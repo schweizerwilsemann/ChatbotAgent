@@ -1,0 +1,157 @@
+[SECTION: General Rules of the Game]
+
+[TOPIC: Table Layout and Ball Values]
+Pool billiards is played on a rectangular table with six pockets — one at each corner and one at the midpoint of each long rail. A standard pool table used in competition measures 9 feet by 4.5 feet (2.74 m × 1.37 m), though 7-foot and 8-foot tables are common in recreational venues. The playing surface (the bed) is made of slate covered with a tightly-woven cloth, typically a blend of wool and nylon. The cloth is usually blue or green in professional play.
+
+The game uses a cue ball (white) and 15 object balls. In 8-ball, the object balls are divided into two groups: solids (balls numbered 1 through 7, which are solid in color) and stripes (balls numbered 9 through 15, which have a white base with a colored stripe). The 8-ball is black with the number 8 and is the most critical ball on the table. In 9-ball, only balls numbered 1 through 9 are used. In 10-ball, balls numbered 1 through 10 are used.
+
+Each ball has a nominal diameter of 2.25 inches (57.15 mm) and weighs between 5.5 and 6.0 ounces (156–170 grams). The cue ball is the same size and weight as the object balls in standard play. Some venues use a slightly larger cue ball for coin-operated tables, but this is not permitted in official WPA competition.
+
+[TOPIC: Legal Shot Definition]
+A legal shot requires the cue ball to first contact a legal object ball and then either pocket a ball or drive any ball (including the cue ball) to a cushion. Failure to make a legal shot results in a foul. The specific requirements for a legal shot vary by game format (8-ball, 9-ball, 10-ball), but the general principle is consistent: the shooter must strike the cue ball with the tip of the cue stick in a forward motion, making contact only once per stroke.
+
+In 9-ball and 10-ball, the cue ball must contact the lowest numbered ball on the table first. In 8-ball, the cue ball must contact any ball from the shooter's assigned group first (solids or stripes). If the table is still open, the cue ball may contact any object ball first.
+
+[TOPIC: Racking Rules]
+In 8-ball, the 15 balls are racked in a triangle at the foot of the table. The 8-ball must be placed in the center of the third row (the middle of the rack). The front ball (apex) is placed on the foot spot. One corner of the triangle must contain a solid ball and the opposite corner must contain a stripe. The remaining balls are placed randomly within the rack. The rack should be tight, with all balls touching their neighbors.
+
+In 9-ball, the 9 balls are racked in a diamond shape. The 1-ball is placed at the apex (front of the diamond) on the foot spot. The 9-ball must be placed in the center of the diamond. All other balls are arranged randomly. The rack should be tight.
+
+In 10-ball, the 10 balls are racked in a triangle similar to 8-ball. The 1-ball is placed at the apex on the foot spot. The 10-ball is placed in the center of the third row. All other balls are arranged randomly.
+
+[TOPIC: Lagging for Break]
+At the start of a match or when the right to break is in dispute, players lag to determine who breaks first. Each player places a ball on the head string and simultaneously shoots it toward the foot cushion. The ball must contact the foot cushion and return toward the head end. The player whose ball comes to rest closest to the head cushion wins the lag. If a ball contacts a side cushion before reaching the foot cushion, or if a ball jumps off the table, the lag is void for that player. In tournament play, lagging is typically done only once at the start of a match; subsequent breaks alternate.
+
+---
+
+[SECTION: 8-Ball Rules]
+
+[TOPIC: Object of the Game]
+The object of 8-ball is to pocket all of the balls in your assigned group (either solids 1-7 or stripes 9-15) and then legally pocket the 8-ball. A player's group is not determined until the first ball is legally pocketed after the break shot. Once a player pockets a ball (or balls) of a specific group on a legal shot after the break, that player is assigned that group for the remainder of the game. The game is won by legally pocketing the 8-ball in a called pocket after clearing your group.
+
+[TOPIC: Break Shot Rules]
+The break shot is the opening shot of the game. The cue ball is placed behind the head string (in the "kitchen"). The breaker must strike the racked balls with the cue ball. For a break to be legal: (1) the cue ball must contact the rack, (2) at least four object balls must be driven to one or more cushions, or a ball must be pocketed. If the break is not legal, the incoming player has the option of accepting the table as-is or requesting a re-rack and breaking again (or having the original breaker re-break, depending on the specific tournament rules).
+
+If the 8-ball is pocketed on the break, the breaker may choose to have the 8-ball re-spotted and continue shooting, or re-rack and break again. This varies by ruleset — some rulesets allow the breaker to win immediately by pocketing the 8-ball on the break, while others require it to be re-spotted. Under the current WPA rules, if the 8-ball is pocketed on the break, it is re-spotted and the breaker continues shooting.
+
+If the cue ball is pocketed (scratched) on the break, it is a foul. The incoming player receives ball in hand behind the head string (or full ball in hand, depending on the ruleset).
+
+[TOPIC: Open Table Rules]
+After the break, the table is "open" — meaning neither player has been assigned solids or stripes. During an open table, the shooter may hit any ball first (including stripes to pocket solids, or vice versa). The table remains open until a player legally pockets a called ball after the break. Groups are assigned based on the first ball legally pocketed after the break. If a player pockets balls from both groups on the break, the table remains open. If a player pockets one or more balls of the same group on a legal shot after the break, that group is assigned to the shooter.
+
+[TOPIC: Pocketing the 8-Ball]
+The 8-ball may only be pocketed after all balls in the shooter's group have been cleared from the table. The shooter must call the pocket for the 8-ball. The 8-ball is legally pocketed when it enters the called pocket without any foul occurring on the same shot.
+
+Loss of game occurs if a player: (1) pockets the 8-ball before clearing all balls in their group, (2) pockets the 8-ball in a pocket other than the one called, (3) pockets the 8-ball on the same shot as the last ball in their group but commits a foul, (4) drives the 8-ball off the table at any time, or (5) pockets the 8-ball when it is not the legal object ball (e.g., during an open table situation or when the opponent's group is still on the table). Note: pocketing the 8-ball on the break is not a loss under WPA rules — the 8-ball is re-spotted.
+
+[TOPIC: Combination Shots]
+Combination shots are legal in 8-ball. A player may use any ball on the table to create a combination, including the opponent's balls or the 8-ball (as long as the 8-ball is not pocketed illegally). However, the cue ball must first contact a ball from the shooter's assigned group (unless the table is open). For example, a player assigned solids may hit the 1-ball into the 12-ball to pocket the 1-ball legally, but may not hit the 12-ball first to pocket the 1-ball.
+
+[TOPIC: Fouls and Their Penalties]
+A foul in 8-ball results in ball in hand for the incoming player. The incoming player may place the cue ball anywhere on the table and shoot in any direction. Common fouls include: (1) cue ball scratched (pocketed), (2) cue ball does not contact a legal ball first, (3) no ball is driven to a cushion or pocketed after the cue ball contacts a legal ball, (4) ball driven off the table, (5) double hit, (6) push shot, (7) shooting while the cue ball or an object ball is still in motion, (8) touching or moving any ball with body, clothing, or cue (other than a legal shot), (9) shooting out of turn, and (10) placing the cue ball in the wrong area on a ball-in-hand situation.
+
+Three consecutive fouls by the same player result in loss of game in 8-ball. The fouls must be three consecutive turns at the table; the count resets if the player makes a legal shot between fouls.
+
+[TOPIC: Three Consecutive Fouls Rule]
+If a player commits three consecutive fouls (three successive turns at the table without making a legal shot), that player loses the game. The player must be warned after the second consecutive foul that a third foul will result in loss of game. If the warning is not given, the three-foul penalty does not apply. The count resets once the player makes a legal shot.
+
+---
+
+[SECTION: 9-Ball Rules]
+
+[TOPIC: Object of the Game]
+The object of 9-ball is to legally pocket the 9-ball. However, the cue ball must always contact the lowest numbered ball on the table first. This means the game progresses sequentially — the 1-ball must be contacted first (whether or not it is pocketed), then the 2-ball, and so on. The game is won when the 9-ball is legally pocketed at any point during the game, including on the break or via a combination shot. For example, if the shooter hits the 1-ball into the 9-ball and the 9-ball is pocketed, the game is won. The 9-ball does not need to be the final ball pocketed — it just needs to be legally pocketed.
+
+[TOPIC: Push-Out Rule]
+After the break shot, the player at the table may choose to "push out." A push out is declared before the shot and allows the cue ball to be hit in any direction without the requirement to contact the lowest numbered ball first or drive any ball to a cushion. The incoming player then has the choice of either (1) accepting the table position and shooting, or (2) passing the shot back to the push-out player. A push out can only be used immediately after the break — it cannot be used later in the game.
+
+[TOPIC: Break Shot Rules]
+The cue ball is placed behind the head string for the break. The breaker must strike the 1-ball first (the ball at the apex of the rack). For the break to be legal, at least three object balls must be driven to one or more cushions, or a ball must be pocketed. If the break is not legal, the incoming player may accept the table as-is or request a re-rack and break themselves (or have the original breaker re-break, depending on the ruleset).
+
+If the 9-ball is pocketed on a legal break, the breaker wins the game immediately. If the cue ball is scratched on the break, the incoming player receives ball in hand anywhere on the table.
+
+[TOPIC: Winning by Pocketing the 9-Ball on the Break]
+If the breaker pockets the 9-ball on a legal break (without fouling), the breaker wins the game. This is one of the exciting aspects of 9-ball — a player can win a game without the opponent ever getting to the table. If the 9-ball is pocketed but the break is not legal (e.g., insufficient balls driven to cushions), the 9-ball is re-spotted and the incoming player receives ball in hand.
+
+[TOPIC: Fouls and Penalties]
+All fouls in 9-ball result in ball in hand for the incoming player. The incoming player may place the cue ball anywhere on the table. Fouls include: (1) cue ball scratched, (2) cue ball does not contact the lowest numbered ball first, (3) no ball is driven to a cushion or pocketed after legal contact, (4) ball driven off the table (the ball is spotted), (5) double hit, (6) push shot, (7) touching or moving balls, (8) shooting while balls are in motion, (9) shooting out of turn, and (10) illegal jump shot.
+
+Unlike 8-ball, a ball driven off the table is spotted (placed on the foot spot, or as close as possible in a direct line behind the foot spot if the spot is occupied). In 9-ball, the 9-ball being driven off the table is also spotted — it does not result in loss of game.
+
+[TOPIC: Three Consecutive Fouls]
+Three consecutive fouls in 9-ball result in loss of game. The player must be notified after the second foul that a third consecutive foul will result in loss of game. The count resets once the player makes a legal shot. If the warning is not given before the third foul, the penalty does not apply.
+
+---
+
+[SECTION: 10-Ball Rules]
+
+[TOPIC: Differences from 9-Ball]
+10-ball is similar to 9-ball but with several important differences. Ten balls are used (numbered 1-10) instead of nine. The rack is a triangle (like 8-ball) rather than a diamond. The key difference is that 10-ball is a "call shot" game — the shooter must call the ball and the intended pocket for each shot. The cue ball must still contact the lowest numbered ball on the table first. However, obvious shots do not need to be called; only shots where the intended pocket is not immediately obvious must be called. Banks, combinations, caroms, and kick shots should typically be called.
+
+10-ball is considered by many professionals to be a more skillful game than 9-ball because the call-shot requirement reduces the element of luck. Slop shots (unintentional pocketed balls) do not count in 10-ball — if a ball is pocketed in an uncalled pocket, it is re-spotted and the shooter's turn ends.
+
+[TOPIC: Call Shot Requirement]
+In 10-ball, each shot must be called. The player must indicate the intended ball and intended pocket before each shot. The details of the shot (number of cushions, caroms, etc.) do not need to be specified — only the ball and the pocket. If the called ball enters the called pocket, the shot is legal and the player continues. If the called ball enters a different pocket, the ball is re-spotted and the shooter's turn ends. If the called ball does not enter any pocket, play continues as long as a legal shot was made (cue ball contacted the lowest numbered ball and a ball reached a cushion).
+
+[TOPIC: Push-Out Rules]
+Push-out rules in 10-ball are the same as in 9-ball. After the break, the player at the table may declare a push out. The cue ball may be hit in any direction without the normal requirements. The incoming player may then choose to accept the position and shoot, or pass the shot back. Push outs are only available immediately after the break.
+
+If the 10-ball is pocketed on a legal break, it is either a win (in some rulesets) or it is re-spotted (in the current WPA ruleset). Under the most widely used professional rules, the 10-ball is re-spotted if pocketed on the break, and the breaker continues shooting with ball in hand behind the head string.
+
+---
+
+[SECTION: 3-Cushion Billiards (Carom)]
+
+[TOPIC: Table Dimensions and Layout]
+3-cushion billiards (also known as carom billiards or "bida 3 bang" in Vietnamese) is played on a pocketless table. The standard competition table measures 10 feet by 5 feet (3.0 m × 1.5 m), though 9-foot tables are also common in recreational play. The table has a heated playing surface (to reduce moisture and ensure consistent ball behavior) covered with Simonis or similar high-quality cloth, typically in blue, green, or yellow. The rail height and cushion profile are standardized to ensure consistent rebound angles.
+
+The table features diamond markers (also called "billiard spots" or "pins") along the rails. These diamonds are used as reference points for aiming and for the diamond system, a mathematical aiming method. On a standard 10-foot table, there are typically 6 diamonds on each short rail and 9 diamonds on each long rail (including the corner diamonds). The diamonds divide each rail into equal segments.
+
+Three balls are used: one white cue ball (for both players, or one white and one yellow), one yellow object ball, and one red object ball. In international competition, each player has their own cue ball (one white, one yellow) so that fouls can be clearly attributed.
+
+[TOPIC: Object of the Game and Scoring]
+The object of 3-cushion billiards is to score points by making the cue ball contact at least three cushions (rails) before hitting the second object ball. The sequence is: the cue ball is struck, contacts one or more cushions (the first object ball counts as a cushion if hit), contacts the second object ball, and must have contacted a total of at least three cushions before hitting the second object ball. A point is scored each time this is achieved legally.
+
+If the cue ball contacts three or more cushions before hitting the second object ball, a point is scored. If fewer than three cushions are contacted, no point is scored and the turn ends (but no foul is committed unless other foul conditions are met). The game is played to a predetermined number of points — typically 15 in international competition, 25 in professional tournaments, or 10 in casual play. The first player to reach the target score wins.
+
+Common scoring patterns include the "natural" (using two short rails and one long rail), "plus two" diamond system shots, and "plus three" patterns. Players with high averages (2.0+ points per inning) are considered elite. The world record average in competition is above 3.0.
+
+[TOPIC: Common Patterns and Diamond System Applications]
+In 3-cushion billiards, players use the diamond markers on the rails to calculate angles for multi-cushion shots. The most common pattern is the "plus 2" system, where the starting diamond on one rail and the ending diamond on the opposite rail add up to 2. For example, starting at diamond 1 on the long rail and ending at diamond 1 on the opposite long rail (1+1=2). This is a fundamental pattern that players learn early.
+
+Other common patterns include the "plus 3" system for shorter rail travel, cross-table shots, and end-rail patterns. The diamond system provides a mathematical framework, but experienced players develop "feel" and adjust based on speed, spin, cloth conditions, and ball positions. The system works best for medium-speed shots with center-ball striking on the cue ball.
+
+[TOPIC: Fouls in 3-Cushion]
+Fouls in 3-cushion billiards include: (1) cue ball does not contact any object ball, (2) cue ball contacts fewer than three cushions before the second object ball, (3) cue ball jumps off the table, (4) object ball jumps off the table (it is spotted), (5) double hit or push shot, (6) touching or moving any ball, (7) shooting while balls are in motion, (8) foot not on the floor during the shot, and (9) shooting out of turn.
+
+A foul in 3-cushion does not result in ball in hand (unlike pool). Instead, the incoming player shoots from the current position of the balls. If an object ball is driven off the table, it is spotted on the foot spot (or the center spot if the foot spot is occupied). The penalty for a foul is simply loss of turn and no point scored. There is no "three consecutive fouls" penalty in standard 3-cushion billiards.
+
+---
+
+[SECTION: General Fouls]
+
+[TOPIC: Cue Ball Scratched]
+A scratch occurs when the cue ball is pocketed. In pool (8-ball, 9-ball, 10-ball), a scratch results in ball in hand for the incoming player. The incoming player may place the cue ball anywhere on the table (in most modern rulesets) or behind the head string (in some traditional rulesets). In 3-cushion billiards, a scratch is a foul and the incoming player plays from the resulting position — the cue ball is retrieved and placed at a designated spot (typically the head spot or center spot).
+
+[TOPIC: Ball Driven Off the Table]
+If any object ball is driven off the table, it is a foul. In pool, the ball is spotted (placed on the foot spot or as close as possible in a line behind the foot spot). In 8-ball, if the 8-ball is driven off the table, it is loss of game. In 9-ball and 10-ball, the ball is simply spotted. In 3-cushion, the object ball is spotted on the foot spot. If the cue ball is driven off the table, it is also a foul — in pool, the incoming player receives ball in hand; in 3-cushion, the cue ball is placed at the starting position.
+
+[TOPIC: Double Hit]
+A double hit occurs when the cue tip strikes the cue ball more than once on a single shot. This is most likely to happen when the cue ball is very close to an object ball. When the cue ball is within one ball's width of the object ball, extra care must be taken to avoid a double hit. A double hit is a foul. To avoid it, players should use a elevated cue or strike the cue ball with a smooth, continuous stroke. If the referee determines that a double hit occurred, the shot is a foul.
+
+[TOPIC: Push Shot]
+A push shot occurs when the cue tip remains in contact with the cue ball for an extended period during the stroke, effectively "pushing" the ball rather than striking it. This is distinct from a normal stroke where the tip contacts the ball for a brief moment. Push shots are fouls because they give the player unfair control over the cue ball. Push shots are most likely to occur when the cue ball is very close to an object ball. The distinction between a push shot and a legal stroke can be subjective, which is why referees are used in professional play.
+
+[TOPIC: Foot Not on the Floor]
+At least one foot must be touching the floor at the moment of the stroke. This rule prevents players from climbing on the table or positioning themselves in an unplayable manner. If both feet are off the floor at the moment the cue tip contacts the cue ball, it is a foul. This rule is enforced by the referee in professional play.
+
+[TOPIC: Touching or Moving Balls]
+If a player touches, moves, or disturbs any ball on the table (other than through a legal shot), it is a foul. This includes touching balls with the cue stick, hand, arm, clothing, or any other object. If a ball is moved accidentally (e.g., by a gust of wind, a vibrating table, or the player's cue touching a ball during a practice stroke), the ball should be replaced to its original position if possible, and the shot is replayed. If the ball cannot be replaced to its original position, the referee makes a judgment call.
+
+[TOPIC: Shooting Out of Turn]
+If a player shoots when it is not their turn, it is a foul. The opponent may choose to accept the resulting position or require the balls to be replaced and the correct player to shoot. This rule is rarely enforced in casual play but is important in tournament settings.
+
+[TOPIC: Ball in Hand Placement Rules]
+When a player receives ball in hand (after an opponent's foul in pool), the cue ball may be placed anywhere on the table. In some traditional or bar rulesets, ball in hand is limited to behind the head string (the "kitchen"). Under WPA rules for 8-ball, 9-ball, and 10-ball, ball in hand is anywhere on the table. The player places the cue ball by hand and must ensure it is in a legal position before shooting. The cue ball must not be touching any object ball when placed. If the cue ball is placed in contact with an object ball, it is a foul. The player may adjust the position of the cue ball before shooting but may not use the cue to move the cue ball into position.
+
+---

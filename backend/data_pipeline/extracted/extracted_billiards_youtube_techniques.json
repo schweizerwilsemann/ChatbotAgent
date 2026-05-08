@@ -1,0 +1,345 @@
+{
+  "extracted_at": "2026-05-08T05:42:53.815652+00:00",
+  "source": "billiards_youtube_techniques",
+  "extraction_count": 4,
+  "total_entities": 28,
+  "total_relationships": 20,
+  "extractions": [
+    {
+      "chunk_title": "Kỹ thuật cơ bản bida lỗ (8-ball basics)",
+      "chunk_source": "youtube_techniques.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:40:42.454050+00:00",
+      "entity_count": 14,
+      "relationship_count": 11,
+      "entities": [
+        {
+          "name": "ngắm (Aiming)",
+          "type": "Technique",
+          "description": "Kỹ thuật hướng dẫn bóng mục tiêu khi đánh bida lỗ.",
+          "properties": {}
+        },
+        {
+          "name": "điểm tiếp xúc (contact point)",
+          "type": "Technique",
+          "description": "Điểm mà bi cue chạm vào bi mục tiêu để điều khiển hướng đi của nó.",
+          "properties": {}
+        },
+        {
+          "name": "hệ thống ghost ball",
+          "type": "Concept",
+          "description": "Hình dung một bóng ảo để định vị điểm tiếp xúc chính xác.",
+          "properties": {}
+        },
+        {
+          "name": "ngắm bằng mắt thuận (dominant eye)",
+          "type": "Technique",
+          "description": "Phương pháp ngắm bóng dựa trên mắt thuận của người chơi.",
+          "properties": {}
+        },
+        {
+          "name": "đánh (Stroke)",
+          "type": "Technique",
+          "description": "Kỹ thuật thực hiện việc đánh bida lỗ.",
+          "properties": {}
+        },
+        {
+          "name": "tư thế đứng",
+          "type": "Technique",
+          "description": "Cách người chơi đứng khi chuẩn bị đánh bida lỗ.",
+          "properties": {}
+        },
+        {
+          "name": "tay cầm cơ",
+          "type": "Technique",
+          "description": "Phương pháp cầm cơ trong kỹ thuật đánh bida lỗ.",
+          "properties": {}
+        },
+        {
+          "name": "tay giá (bridge)",
+          "type": "Technique",
+          "description": "Cách đặt tay giữa hai chân khi đánh bida lỗ.",
+          "properties": {}
+        },
+        {
+          "name": "follow through",
+          "type": "Technique",
+          "description": "Phương pháp kéo dài cơ sau khi đánh để tăng lực và kiểm soát bóng.",
+          "properties": {}
+        },
+        {
+          "name": "kiểm soát bi cue",
+          "type": "Concept",
+          "description": "Kỹ thuật điều khiển di chuyển của bi cue trong quá trình đánh bida lỗ.",
+          "properties": {}
+        },
+        {
+          "name": "stop shot",
+          "type": "Technique",
+          "description": "Kiểu đánh khiến bi cue dừng lại sau khi chạm vào bóng mục tiêu.",
+          "properties": {}
+        },
+        {
+          "name": "follow shot",
+          "type": "Technique",
+          "description": "Kiểu đánh khiến bi cue đi theo bóng mục tiêu sau khi chạm.",
+          "properties": {}
+        },
+        {
+          "name": "draw shot",
+          "type": "Technique",
+          "description": "Kiểu đánh khiến bi cue lùi lại sau khi chạm vào bóng mục tiêu.",
+          "properties": {}
+        },
+        {
+          "name": "stun shot",
+          "type": "Technique",
+          "description": "Kiểu đánh khiến bi cue đi ngang sau khi chạm vào bóng mục tiêu.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "ngắm (Aiming)",
+          "target": "điểm tiếp xúc (contact point)",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "ngắm (Aiming)",
+          "target": "hệ thống ghost ball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "ngắm (Aiming)",
+          "target": "ngắm bằng mắt thuận (dominant eye)",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "đánh (Stroke)",
+          "target": "tư thế đứng",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "đánh (Stroke)",
+          "target": "tay cầm cơ",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "đánh (Stroke)",
+          "target": "tay giá (bridge)",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "đánh (Stroke)",
+          "target": "follow through",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "kiểm soát bi cue",
+          "target": "stop shot",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "kiểm soát bi cue",
+          "target": "follow shot",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "kiểm soát bi cue",
+          "target": "draw shot",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "kiểm soát bi cue",
+          "target": "stun shot",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Kỹ thuật bida 3 băng (Three-cushion techniques)",
+      "chunk_source": "youtube_techniques.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:41:33.610634+00:00",
+      "entity_count": 6,
+      "relationship_count": 4,
+      "entities": [
+        {
+          "name": "Hệ thống diamond",
+          "type": "Rule",
+          "description": "Hệ thống tính toán góc dựa trên các viên kim cương (diamond) trên thành bàn.",
+          "properties": {}
+        },
+        {
+          "name": "Pattern dài",
+          "type": "GameType",
+          "description": "Một loại pattern trong billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Pattern ngắn",
+          "type": "GameType",
+          "description": "Một loại pattern trong billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Plus 2",
+          "type": "GameType",
+          "description": "Một kiểu Plus pattern dùng cho pattern dài.",
+          "properties": {}
+        },
+        {
+          "name": "Plus 3",
+          "type": "GameType",
+          "description": "Một kiểu Plus pattern dùng cho pattern ngắn.",
+          "properties": {}
+        },
+        {
+          "name": "Cross-table",
+          "type": "GameType",
+          "description": "Một loại trò chơi trong billiards khi hai bi ở hai bên bàn.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Hệ thống diamond",
+          "target": "Pattern dài",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Hệ thống diamond",
+          "target": "Pattern ngắn",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Plus 2",
+          "target": "Pattern dài",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "Plus 3",
+          "target": "Pattern ngắn",
+          "type": "THUOC",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Kỹ thuật phòng thủ (Safety play)",
+      "chunk_source": "youtube_techniques.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:42:22.722775+00:00",
+      "entity_count": 5,
+      "relationship_count": 3,
+      "entities": [
+        {
+          "name": "Phòng thủ",
+          "type": "Technique",
+          "description": "Kỹ thuật chơi phòng thủ trong billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Shot rõ ràng",
+          "type": "Rule",
+          "description": "Định nghĩa một shot rõ ràng trong billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Bi cue",
+          "type": "Equipment",
+          "description": "Trái đạp được sử dụng để đánh bóng trong billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Bi mục tiêu",
+          "type": "Equipment",
+          "description": "Bóng cần ghi điểm trong billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Speed",
+          "type": "Concept",
+          "description": "Khái niệm về tốc độ trong billiards.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Phòng thủ",
+          "target": "Shot rõ ràng",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Phòng thủ",
+          "target": "Bi cue",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Phòng thủ",
+          "target": "Bi mục tiêu",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Masse shot kỹ thuật",
+      "chunk_source": "youtube_techniques.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:42:48.813163+00:00",
+      "entity_count": 3,
+      "relationship_count": 2,
+      "entities": [
+        {
+          "name": "Masse",
+          "type": "Technique",
+          "description": "Kỹ thuật đánh bi cue cong trong billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Bi cue",
+          "type": "Equipment",
+          "description": "Trang thiết bị dùng để đánh trong billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Bàn",
+          "type": "Equipment",
+          "description": "Bàn chơi của game billiards.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Masse",
+          "target": "Bi cue",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Masse",
+          "target": "Bàn",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,753 @@
+{
+  "extracted_at": "2026-05-08T04:59:08.725074+00:00",
+  "source": "billiards_diamond_system",
+  "extraction_count": 7,
+  "total_entities": 58,
+  "total_relationships": 52,
+  "extractions": [
+    {
+      "chunk_title": "Diamond System Overview",
+      "chunk_source": "diamond_system.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T04:51:21.878611+00:00",
+      "entity_count": 9,
+      "relationship_count": 8,
+      "entities": [
+        {
+          "name": "diamond system",
+          "type": "Technique",
+          "description": "A mathematical aiming system used in 3-cushion billiards.",
+          "properties": {}
+        },
+        {
+          "name": "3-cushion billiards",
+          "type": "GameType",
+          "description": "A variant of billiards where the cue ball must contact three cushions before pocketing a ball.",
+          "properties": {}
+        },
+        {
+          "name": "diamond markers",
+          "type": "Equipment",
+          "description": "Markers on the rails used in the diamond system for aiming calculations.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The ball struck by the player to hit other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "object ball",
+          "type": "Equipment",
+          "description": "A ball that can be pocketed during a shot in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "rebound angle",
+          "type": "Concept",
+          "description": "The angle at which a ball bounces off a cushion.",
+          "properties": {}
+        },
+        {
+          "name": "spin",
+          "type": "Concept",
+          "description": "A rotational motion imparted to a billiard ball.",
+          "properties": {}
+        },
+        {
+          "name": "speed",
+          "type": "Concept",
+          "description": "The velocity of a billiard ball.",
+          "properties": {}
+        },
+        {
+          "name": "cloth conditions",
+          "type": "Concept",
+          "description": "The state or quality of the table cloth in billiards.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "diamond system",
+          "target": "3-cushion billiards",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "diamond system",
+          "target": "diamond markers",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "diamond system",
+          "target": "cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "diamond system",
+          "target": "object ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "diamond system",
+          "target": "rebound angle",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "diamond system",
+          "target": "spin",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "diamond system",
+          "target": "speed",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "diamond system",
+          "target": "cloth conditions",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Rail Diamond Numbering",
+      "chunk_source": "diamond_system.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T04:52:36.051844+00:00",
+      "entity_count": 9,
+      "relationship_count": 7,
+      "entities": [
+        {
+          "name": "diamond system",
+          "type": "Concept",
+          "description": "A method for aiming in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "billiard table",
+          "type": "Equipment",
+          "description": "The playing surface of a billiard game.",
+          "properties": {}
+        },
+        {
+          "name": "diamonds",
+          "type": "Equipment",
+          "description": "Reference points on the rail for aiming in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "plus 2 system",
+          "type": "GameType",
+          "description": "A numbering system used in diamond system aiming.",
+          "properties": {}
+        },
+        {
+          "name": "plus 3 system",
+          "type": "GameType",
+          "description": "Another numbering system used in diamond system aiming.",
+          "properties": {}
+        },
+        {
+          "name": "long rails",
+          "type": "Equipment",
+          "description": "The longer sides of a billiard table.",
+          "properties": {}
+        },
+        {
+          "name": "short rails",
+          "type": "Equipment",
+          "description": "The shorter sides of a billiard table.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "object balls",
+          "type": "Equipment",
+          "description": "Balls that are struck by the cue ball in billiards.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "diamond system",
+          "target": "billiard table",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "diamonds",
+          "target": "long rails",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "diamonds",
+          "target": "short rails",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "plus 2 system",
+          "target": "long rails",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "plus 3 system",
+          "target": "long rails",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "cue ball",
+          "target": "diamonds",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "object balls",
+          "target": "diamonds",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "The Plus 2 Formula",
+      "chunk_source": "diamond_system.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T04:53:41.729292+00:00",
+      "entity_count": 7,
+      "relationship_count": 5,
+      "entities": [
+        {
+          "name": "plus 2 formula",
+          "type": "Rule",
+          "description": "A diamond system pattern in 3-cushion billiards where the starting and ending diamond numbers sum to 2.",
+          "properties": {}
+        },
+        {
+          "name": "diamond system",
+          "type": "Concept",
+          "description": "A method used in 3-cushion billiards for aiming shots based on diamond positions.",
+          "properties": {}
+        },
+        {
+          "name": "long patterns",
+          "type": "Technique",
+          "description": "Shots where the cue ball travels a significant distance across the table, typically involving the short rail and opposite long rail.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "short rail",
+          "type": "Equipment",
+          "description": "One of the rails on a billiard table, typically located near the corners.",
+          "properties": {}
+        },
+        {
+          "name": "long rail",
+          "type": "Equipment",
+          "description": "The other rail on a billiard table, opposite the short rail.",
+          "properties": {}
+        },
+        {
+          "name": "object balls",
+          "type": "Equipment",
+          "description": "Balls used in billiards besides the cue ball.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "plus 2 formula",
+          "target": "diamond system",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "long patterns",
+          "target": "plus 2 formula",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "cue ball",
+          "target": "long patterns",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "short rail",
+          "target": "long patterns",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "long rail",
+          "target": "long patterns",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "The Plus 3 Formula",
+      "chunk_source": "diamond_system.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T04:54:49.184580+00:00",
+      "entity_count": 7,
+      "relationship_count": 6,
+      "entities": [
+        {
+          "name": "plus 3",
+          "type": "Rule",
+          "description": "A formula used in billiards for shorter patterns where the cue ball travels less distance across the table.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The main striking object in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "object balls",
+          "type": "Equipment",
+          "description": "Small balls that are hit by the cue ball during a shot in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "long rail",
+          "type": "Concept",
+          "description": "One of the rails on a billiard table, typically longer than the short rail.",
+          "properties": {}
+        },
+        {
+          "name": "short rail",
+          "type": "Concept",
+          "description": "The shorter rail on a billiard table.",
+          "properties": {}
+        },
+        {
+          "name": "corner",
+          "type": "Concept",
+          "description": "One of the four corners of a billiard table.",
+          "properties": {}
+        },
+        {
+          "name": "natural pattern",
+          "type": "Concept",
+          "description": "A standard shot in billiards where the cue ball travels from one rail to another, typically hitting an object ball along the way.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "plus 3",
+          "target": "cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "plus 3",
+          "target": "object balls",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "plus 3",
+          "target": "long rail",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "plus 3",
+          "target": "short rail",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "plus 3",
+          "target": "corner",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "plus 3",
+          "target": "natural pattern",
+          "type": "LA_LOAI",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Cross-Table Shots",
+      "chunk_source": "diamond_system.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T04:55:47.332170+00:00",
+      "entity_count": 6,
+      "relationship_count": 5,
+      "entities": [
+        {
+          "name": "Cross-table shots",
+          "type": "Technique",
+          "description": "A type of shot in 3-cushion billiards where the cue ball travels from one short rail to another, contacting one or more long rails.",
+          "properties": {}
+        },
+        {
+          "name": "Diamond system",
+          "type": "Concept",
+          "description": "A numbering system used for cross-table shots in 3-cushion billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Short rail",
+          "type": "Equipment",
+          "description": "One of the rails on a billiard table, typically shorter than the long rails.",
+          "properties": {}
+        },
+        {
+          "name": "Long rail",
+          "type": "Equipment",
+          "description": "One of the rails on a billiard table, typically longer than the short rails.",
+          "properties": {}
+        },
+        {
+          "name": "Cue ball",
+          "type": "Equipment",
+          "description": "The white ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Object ball",
+          "type": "Equipment",
+          "description": "Any of the colored balls used in billiards, except the cue ball.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Cross-table shots",
+          "target": "Diamond system",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Cross-table shots",
+          "target": "Short rail",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Cross-table shots",
+          "target": "Long rail",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Cross-table shots",
+          "target": "Cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Cross-table shots",
+          "target": "Object ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Practice Drills",
+      "chunk_source": "diamond_system.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T04:57:22.300231+00:00",
+      "entity_count": 9,
+      "relationship_count": 11,
+      "entities": [
+        {
+          "name": "Drill",
+          "type": "Concept",
+          "description": "A practice session for developing billiards skills.",
+          "properties": {}
+        },
+        {
+          "name": "Straight Plus-2 Patterns",
+          "type": "GameType",
+          "description": "A drill focusing on shooting plus-2 patterns in a straight line.",
+          "properties": {}
+        },
+        {
+          "name": "Angled Plus-2 Patterns",
+          "type": "GameType",
+          "description": "A drill focusing on shooting plus-2 patterns at an angle.",
+          "properties": {}
+        },
+        {
+          "name": "Plus-3 Patterns",
+          "type": "GameType",
+          "description": "A drill focusing on shooting plus-3 patterns.",
+          "properties": {}
+        },
+        {
+          "name": "Mixed Patterns",
+          "type": "GameType",
+          "description": "A drill involving random positions and mixed systems of plus-2 or plus-3.",
+          "properties": {}
+        },
+        {
+          "name": "Diamond System",
+          "type": "Rule",
+          "description": "A system for calculating and executing shots in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Cue Ball",
+          "type": "Equipment",
+          "description": "The ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Object Balls",
+          "type": "Equipment",
+          "description": "Balls that are struck by the cue ball in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Diamonds",
+          "type": "Equipment",
+          "description": "Markers on the table used to set up shots in the diamond system.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Drill",
+          "target": "Straight Plus-2 Patterns",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Drill",
+          "target": "Angled Plus-2 Patterns",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Drill",
+          "target": "Plus-3 Patterns",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Drill",
+          "target": "Mixed Patterns",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Straight Plus-2 Patterns",
+          "target": "Diamond System",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Angled Plus-2 Patterns",
+          "target": "Diamond System",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Plus-3 Patterns",
+          "target": "Diamond System",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Mixed Patterns",
+          "target": "Diamond System",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Drill",
+          "target": "Cue Ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Drill",
+          "target": "Object Balls",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Drill",
+          "target": "Diamonds",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Limitations and Feel",
+      "chunk_source": "diamond_system.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T04:59:03.717336+00:00",
+      "entity_count": 11,
+      "relationship_count": 10,
+      "entities": [
+        {
+          "name": "diamond system",
+          "type": "Concept",
+          "description": "A powerful tool for billiards that helps players make accurate shots.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "object ball",
+          "type": "Equipment",
+          "description": "A ball that is struck by the cue ball during a shot in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "cushion",
+          "type": "Equipment",
+          "description": "The boundary of the table where balls can hit and bounce back.",
+          "properties": {}
+        },
+        {
+          "name": "spin",
+          "type": "Technique",
+          "description": "A method of applying force to a ball in billiards, causing it to rotate.",
+          "properties": {}
+        },
+        {
+          "name": "extreme angles",
+          "type": "Rule",
+          "description": "Angles greater than 60 degrees when the cue ball needs to contact the cushion.",
+          "properties": {}
+        },
+        {
+          "name": "very short shots",
+          "type": "Rule",
+          "description": "Shots where the cue ball is very close to the first object ball.",
+          "properties": {}
+        },
+        {
+          "name": "very long shots",
+          "type": "Rule",
+          "description": "Shots where the cue ball needs to travel a long distance across the table.",
+          "properties": {}
+        },
+        {
+          "name": "experience and 'feel'",
+          "type": "Concept",
+          "description": "The ability of players to make adjustments based on their intuition and past experiences.",
+          "properties": {}
+        },
+        {
+          "name": "table conditions",
+          "type": "Rule",
+          "description": "Factors such as cloth speed, cushion hardness, and humidity that affect shot accuracy.",
+          "properties": {}
+        },
+        {
+          "name": "intuition",
+          "type": "Concept",
+          "description": "The ability to make quick decisions based on experience and understanding of the game.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "diamond system",
+          "target": "cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "diamond system",
+          "target": "object ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "diamond system",
+          "target": "cushion",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "diamond system",
+          "target": "spin",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "extreme angles",
+          "target": "cue ball",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "very short shots",
+          "target": "cue ball",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "very long shots",
+          "target": "cue ball",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "experience and 'feel'",
+          "target": "diamond system",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "table conditions",
+          "target": "diamond system",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "intuition",
+          "target": "diamond system",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    }
+  ]
+}

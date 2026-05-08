@@ -1,0 +1,2469 @@
+{
+  "extracted_at": "2026-05-08T05:38:36.125509+00:00",
+  "source": "billiards_wpa_rules",
+  "extraction_count": 32,
+  "total_entities": 190,
+  "total_relationships": 156,
+  "extractions": [
+    {
+      "chunk_title": "Table Layout and Ball Values",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:09:23.769468+00:00",
+      "entity_count": 7,
+      "relationship_count": 6,
+      "entities": [
+        {
+          "name": "Bóng cờ vua",
+          "type": "Equipment",
+          "description": "Bóng cờ vua trắng dùng để đánh trong trò chơi bắn bóng.",
+          "properties": {}
+        },
+        {
+          "name": "Bóng đối tượng",
+          "type": "Equipment",
+          "description": "15 bóng đối tượng có các số từ 1 đến 15, được phân thành hai nhóm: bóng đồng (số 1-7) và bóng sọc (số 9-15). Bóng số 8 là màu đen.",
+          "properties": {}
+        },
+        {
+          "name": "Bảng bắn bóng",
+          "type": "Equipment",
+          "description": "Một bàn bắn bóng vuông có kích thước 9 feet x 4.5 feet (2.74 m × 1.37 m), với sáu túi ở mỗi góc và giữa hai đường dài.",
+          "properties": {}
+        },
+        {
+          "name": "Bảng đánh",
+          "type": "Equipment",
+          "description": "Một bề mặt chơi được làm từ đá slate phủ một lớp vải tơ chặt chẽ, thường là kết hợp của sợi lông và nylon. Màu sắc thường là xanh hoặc lá cây trong các trận đấu chuyên nghiệp.",
+          "properties": {}
+        },
+        {
+          "name": "Trò chơi 8-ball",
+          "type": "GameType",
+          "description": "Một loại trò chơi bắn bóng với 15 bóng đối tượng được phân thành hai nhóm: bóng đồng và bóng sọc, cùng với một bóng số 8.",
+          "properties": {}
+        },
+        {
+          "name": "Trò chơi 9-ball",
+          "type": "GameType",
+          "description": "Một loại trò chơi bắn bóng chỉ sử dụng 9 bóng đối tượng từ số 1 đến 9.",
+          "properties": {}
+        },
+        {
+          "name": "Trò chơi 10-ball",
+          "type": "GameType",
+          "description": "Một loại trò chơi bắn bóng chỉ sử dụng 10 bóng đối tượng từ số 1 đến 10.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Bóng cờ vua",
+          "target": "Trò chơi 8-ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Bóng đối tượng",
+          "target": "Trò chơi 8-ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Bảng bắn bóng",
+          "target": "Bóng cờ vua",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Bảng bắn bóng",
+          "target": "Bóng đối tượng",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Bảng đánh",
+          "target": "Bóng cờ vua",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Bảng đánh",
+          "target": "Bóng đối tượng",
+          "type": "DUNG_DE",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Legal Shot Definition",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:10:19.872652+00:00",
+      "entity_count": 7,
+      "relationship_count": 4,
+      "entities": [
+        {
+          "name": "Cue Ball",
+          "type": "Equipment",
+          "description": "The white ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Object Ball",
+          "type": "Equipment",
+          "description": "Any of the colored balls on the table that can be pocketed during a shot.",
+          "properties": {}
+        },
+        {
+          "name": "Cue Stick",
+          "type": "Equipment",
+          "description": "The long stick used to strike the cue ball in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Foul",
+          "type": "Rule",
+          "description": "An infraction of the rules that results in a penalty.",
+          "properties": {}
+        },
+        {
+          "name": "Game Format",
+          "type": "Concept",
+          "description": "A specific variation of billiards, such as 8-ball, 9-ball, or 10-ball.",
+          "properties": {}
+        },
+        {
+          "name": "Solid Ball",
+          "type": "Equipment",
+          "description": "One of the colored balls in a group of similar color used in 8-ball.",
+          "properties": {}
+        },
+        {
+          "name": "Stripe Ball",
+          "type": "Equipment",
+          "description": "One of the colored balls in a group of alternating colors used in 8-ball.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Cue Ball",
+          "target": "Object Ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Foul",
+          "target": "Game Format",
+          "type": "QUY_DINH",
+          "properties": {}
+        },
+        {
+          "source": "Game Format",
+          "target": "Solid Ball",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "Game Format",
+          "target": "Stripe Ball",
+          "type": "THUOC",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Racking Rules",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:11:52.736255+00:00",
+      "entity_count": 6,
+      "relationship_count": 9,
+      "entities": [
+        {
+          "name": "8-ball",
+          "type": "GameType",
+          "description": "A variant of billiards where 15 balls are racked in a triangle.",
+          "properties": {}
+        },
+        {
+          "name": "9-ball",
+          "type": "GameType",
+          "description": "A variant of billiards where 9 balls are racked in a diamond shape.",
+          "properties": {}
+        },
+        {
+          "name": "10-ball",
+          "type": "GameType",
+          "description": "A variant of billiards where 10 balls are racked in a triangle similar to 8-ball.",
+          "properties": {}
+        },
+        {
+          "name": "ball",
+          "type": "Equipment",
+          "description": "The round objects used in billiards games.",
+          "properties": {}
+        },
+        {
+          "name": "racking",
+          "type": "Technique",
+          "description": "The process of arranging balls on the table before play begins.",
+          "properties": {}
+        },
+        {
+          "name": "foot spot",
+          "type": "Concept",
+          "description": "A designated spot at the foot of the billiards table where certain balls are placed.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "8-ball",
+          "target": "ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "9-ball",
+          "target": "ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "10-ball",
+          "target": "ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "8-ball",
+          "target": "racking",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "9-ball",
+          "target": "racking",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "10-ball",
+          "target": "racking",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "8-ball",
+          "target": "foot spot",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "9-ball",
+          "target": "foot spot",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "10-ball",
+          "target": "foot spot",
+          "type": "DUNG_DE",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Lagging for Break",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:12:20.834205+00:00",
+      "entity_count": 3,
+      "relationship_count": 2,
+      "entities": [
+        {
+          "name": "Lag",
+          "type": "Rule",
+          "description": "A method to determine who breaks first in a billiards match.",
+          "properties": {}
+        },
+        {
+          "name": "Head string",
+          "type": "Equipment",
+          "description": "The line on the table where balls are placed for the lag shot.",
+          "properties": {}
+        },
+        {
+          "name": "Foot cushion",
+          "type": "Equipment",
+          "description": "One of the cushions at the bottom of the billiards table.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Lag",
+          "target": "Head string",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Lag",
+          "target": "Foot cushion",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Object of the Game",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:13:02.370037+00:00",
+      "entity_count": 5,
+      "relationship_count": 3,
+      "entities": [
+        {
+          "name": "8-ball",
+          "type": "GameType",
+          "description": "A specific game variant of billiards.",
+          "properties": {}
+        },
+        {
+          "name": "solids",
+          "type": "Concept",
+          "description": "One group of balls in 8-ball billiards, numbered 1-7.",
+          "properties": {}
+        },
+        {
+          "name": "stripes",
+          "type": "Concept",
+          "description": "Another group of balls in 8-ball billiards, numbered 9-15.",
+          "properties": {}
+        },
+        {
+          "name": "break shot",
+          "type": "Technique",
+          "description": "The initial shot at the start of a game in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "pocket",
+          "type": "Technique",
+          "description": "Action of hitting a ball into a corner pocket to remove it from play.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "8-ball",
+          "target": "solids",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "8-ball",
+          "target": "stripes",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "break shot",
+          "target": "pocket",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Break Shot Rules",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:14:13.610566+00:00",
+      "entity_count": 8,
+      "relationship_count": 7,
+      "entities": [
+        {
+          "name": "Break shot",
+          "type": "Technique",
+          "description": "The opening shot of the game.",
+          "properties": {}
+        },
+        {
+          "name": "Cue ball",
+          "type": "Equipment",
+          "description": "The ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Head string",
+          "type": "Concept",
+          "description": "A line on the table used for positioning the cue ball and balls during a break shot.",
+          "properties": {}
+        },
+        {
+          "name": "Rack",
+          "type": "Equipment",
+          "description": "The device used to arrange balls before a game in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Object balls",
+          "type": "Equipment",
+          "description": "Balls other than the cue ball and 8-ball used in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Cushions",
+          "type": "Equipment",
+          "description": "The sides of the table that balls can hit during play.",
+          "properties": {}
+        },
+        {
+          "name": "8-ball",
+          "type": "Equipment",
+          "description": "A ball with a solid color used in 8-ball billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Ball in hand",
+          "type": "Concept",
+          "description": "The incoming player's right to choose any ball on the table as their next shot.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Break shot",
+          "target": "Cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Break shot",
+          "target": "Head string",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Break shot",
+          "target": "Rack",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Break shot",
+          "target": "Object balls",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Break shot",
+          "target": "Cushions",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Break shot",
+          "target": "8-ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Break shot",
+          "target": "Ball in hand",
+          "type": "DUNG_DE",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Open Table Rules",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:15:03.585062+00:00",
+      "entity_count": 5,
+      "relationship_count": 5,
+      "entities": [
+        {
+          "name": "Break",
+          "type": "Rule",
+          "description": "The initial shot at the start of a game in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Open Table",
+          "type": "Concept",
+          "description": "A state where neither player has been assigned solids or stripes after the break.",
+          "properties": {}
+        },
+        {
+          "name": "Solids",
+          "type": "Equipment",
+          "description": "The numbered balls in billiards, typically 1 through 7.",
+          "properties": {}
+        },
+        {
+          "name": "Stripes",
+          "type": "Equipment",
+          "description": "The colored balls in billiards, typically 9 through 15.",
+          "properties": {}
+        },
+        {
+          "name": "Group Assignment",
+          "type": "Concept",
+          "description": "The process of assigning groups (solids or stripes) to players based on their first legal shot after the break.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Break",
+          "target": "Open Table",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Open Table",
+          "target": "Solids",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Open Table",
+          "target": "Stripes",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Group Assignment",
+          "target": "Solids",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Group Assignment",
+          "target": "Stripes",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Pocketing the 8-Ball",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:15:41.126415+00:00",
+      "entity_count": 4,
+      "relationship_count": 3,
+      "entities": [
+        {
+          "name": "8-ball",
+          "type": "Equipment",
+          "description": "A billiard ball used in 8-ball pool.",
+          "properties": {}
+        },
+        {
+          "name": "shooter's group",
+          "type": "Concept",
+          "description": "The set of balls a player is trying to pocket first in 8-ball pool.",
+          "properties": {}
+        },
+        {
+          "name": "pocket",
+          "type": "Equipment",
+          "description": "A hole on the billiard table where balls can be pocketed.",
+          "properties": {}
+        },
+        {
+          "name": "foul",
+          "type": "Rule",
+          "description": "An illegal action in billiards that results in a penalty.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "8-ball",
+          "target": "shooter's group",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "pocket",
+          "target": "8-ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "foul",
+          "target": "shooter's group",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Combination Shots",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:16:28.901104+00:00",
+      "entity_count": 5,
+      "relationship_count": 4,
+      "entities": [
+        {
+          "name": "Combination shots",
+          "type": "Rule",
+          "description": "A legal shot in 8-ball billiards where a player uses any ball on the table to create a combination, including opponent's balls or the 8-ball.",
+          "properties": {}
+        },
+        {
+          "name": "Cue ball",
+          "type": "Equipment",
+          "description": "The white ball used by players in billiards to strike other balls.",
+          "properties": {}
+        },
+        {
+          "name": "Solid balls",
+          "type": "Concept",
+          "description": "A group of numbered balls (1-7) in 8-ball billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Striped balls",
+          "type": "Concept",
+          "description": "A group of numbered balls (9-15) in 8-ball billiards.",
+          "properties": {}
+        },
+        {
+          "name": "8-ball",
+          "type": "Equipment",
+          "description": "The black ball used as the target ball in 8-ball billiards.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Combination shots",
+          "target": "Cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Solid balls",
+          "target": "Combination shots",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Striped balls",
+          "target": "Combination shots",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "8-ball",
+          "target": "Combination shots",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Fouls and Their Penalties",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:17:52.882356+00:00",
+      "entity_count": 9,
+      "relationship_count": 8,
+      "entities": [
+        {
+          "name": "8-ball",
+          "type": "GameType",
+          "description": "A variant of billiards where players use numbered balls to achieve specific objectives.",
+          "properties": {}
+        },
+        {
+          "name": "ball in hand",
+          "type": "Technique",
+          "description": "A penalty in 8-ball where the incoming player is given a free shot with the cue ball on the table.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The primary striking ball used in billiards, including 8-ball.",
+          "properties": {}
+        },
+        {
+          "name": "legal ball",
+          "type": "Concept",
+          "description": "A ball that can be legally hit during a shot in 8-ball.",
+          "properties": {}
+        },
+        {
+          "name": "cushion",
+          "type": "Equipment",
+          "description": "The boundary of the billiard table where balls can pocketed or bounce off.",
+          "properties": {}
+        },
+        {
+          "name": "pocketed",
+          "type": "Technique",
+          "description": "A foul in 8-ball where a ball is accidentally sent into one of the pockets.",
+          "properties": {}
+        },
+        {
+          "name": "double hit",
+          "type": "Rule",
+          "description": "A foul in 8-ball where the cue ball is struck more than once during a shot.",
+          "properties": {}
+        },
+        {
+          "name": "push shot",
+          "type": "Rule",
+          "description": "A foul in 8-ball where the cue ball is pushed instead of being struck with the cue stick.",
+          "properties": {}
+        },
+        {
+          "name": "turn",
+          "type": "Concept",
+          "description": "A sequence of shots made by a single player before passing to the opponent.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "8-ball",
+          "target": "ball in hand",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "8-ball",
+          "target": "cue ball",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "8-ball",
+          "target": "legal ball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "8-ball",
+          "target": "cushion",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "ball in hand",
+          "target": "cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "double hit",
+          "target": "8-ball",
+          "type": "QUY_DINH",
+          "properties": {}
+        },
+        {
+          "source": "push shot",
+          "target": "8-ball",
+          "type": "QUY_DINH",
+          "properties": {}
+        },
+        {
+          "source": "turn",
+          "target": "8-ball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Three Consecutive Fouls Rule",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:18:14.923169+00:00",
+      "entity_count": 2,
+      "relationship_count": 1,
+      "entities": [
+        {
+          "name": "Foul",
+          "type": "Rule",
+          "description": "A foul in billiards where a player fails to make a legal shot.",
+          "properties": {}
+        },
+        {
+          "name": "Game",
+          "type": "Concept",
+          "description": "The overall match or session of billiards.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Foul",
+          "target": "Game",
+          "type": "QUY_DINH",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Object of the Game",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:18:43.284860+00:00",
+      "entity_count": 3,
+      "relationship_count": 2,
+      "entities": [
+        {
+          "name": "9-ball",
+          "type": "GameType",
+          "description": "A specific game variant in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The white ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "lowest numbered ball",
+          "type": "Concept",
+          "description": "The ball with the lowest number on the table that must be contacted first when shooting.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "9-ball",
+          "target": "cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "9-ball",
+          "target": "lowest numbered ball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Push-Out Rule",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:19:12.918109+00:00",
+      "entity_count": 3,
+      "relationship_count": 2,
+      "entities": [
+        {
+          "name": "Break Shot",
+          "type": "Rule",
+          "description": "The initial shot made by a player at the start of a game.",
+          "properties": {}
+        },
+        {
+          "name": "Push Out",
+          "type": "Technique",
+          "description": "A strategy where a player hits the cue ball in any direction without contacting the lowest numbered ball first or driving any ball to a cushion immediately after the break shot.",
+          "properties": {}
+        },
+        {
+          "name": "Cue Ball",
+          "type": "Equipment",
+          "description": "The white ball used for striking other balls in billiards.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Break Shot",
+          "target": "Push Out",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Push Out",
+          "target": "Cue Ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Break Shot Rules",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:20:19.242684+00:00",
+      "entity_count": 7,
+      "relationship_count": 5,
+      "entities": [
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The white ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "head string",
+          "type": "Concept",
+          "description": "A line on the table that marks where the cue ball should be placed for a break shot.",
+          "properties": {}
+        },
+        {
+          "name": "1-ball",
+          "type": "Equipment",
+          "description": "The first ball in the rack, typically white and numbered 1.",
+          "properties": {}
+        },
+        {
+          "name": "object balls",
+          "type": "Equipment",
+          "description": "Balls numbered from 2 to 9 used in billiards games like 9-ball.",
+          "properties": {}
+        },
+        {
+          "name": "cushions",
+          "type": "Equipment",
+          "description": "The sides and ends of the table that balls can hit during play.",
+          "properties": {}
+        },
+        {
+          "name": "break shot",
+          "type": "Technique",
+          "description": "The opening shot in a game, where the cue ball is struck to start play.",
+          "properties": {}
+        },
+        {
+          "name": "9-ball",
+          "type": "Equipment",
+          "description": "A specific object ball used in 9-ball billiards.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "cue ball",
+          "target": "head string",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "break shot",
+          "target": "cue ball",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "break shot",
+          "target": "object balls",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "break shot",
+          "target": "cushions",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "9-ball",
+          "target": "object balls",
+          "type": "LA_LOAI",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Winning by Pocketing the 9-Ball on the Break",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:21:03.893383+00:00",
+      "entity_count": 5,
+      "relationship_count": 3,
+      "entities": [
+        {
+          "name": "Breaker",
+          "type": "Technique",
+          "description": "Player who attempts to pocket balls on the break shot.",
+          "properties": {}
+        },
+        {
+          "name": "9-ball",
+          "type": "Equipment",
+          "description": "The highest-value ball in 9-ball billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Legal Break",
+          "type": "Rule",
+          "description": "Break shot that meets the game's requirements, allowing the player to pocket balls on the break.",
+          "properties": {}
+        },
+        {
+          "name": "Illegal Break",
+          "type": "Rule",
+          "description": "Break shot that does not meet the game's requirements, resulting in a penalty.",
+          "properties": {}
+        },
+        {
+          "name": "Ball in Hand",
+          "type": "Concept",
+          "description": "Position where a player has the option to choose any ball on the table for their next shot.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Breaker",
+          "target": "9-ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Legal Break",
+          "target": "Breaker",
+          "type": "QUY_DINH",
+          "properties": {}
+        },
+        {
+          "source": "Illegal Break",
+          "target": "9-ball",
+          "type": "THUOC",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Fouls and Penalties",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:21:39.693881+00:00",
+      "entity_count": 4,
+      "relationship_count": 3,
+      "entities": [
+        {
+          "name": "9-ball",
+          "type": "GameType",
+          "description": "A variant of billiards where players use a cue ball to pocket balls in ascending order.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The primary ball used for striking other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "incoming player",
+          "type": "Concept",
+          "description": "The player who receives the cue after a foul or successful shot.",
+          "properties": {}
+        },
+        {
+          "name": "foot spot",
+          "type": "Equipment",
+          "description": "A designated area on the table where balls are placed when they are spotted.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "9-ball",
+          "target": "cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "incoming player",
+          "target": "9-ball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "foot spot",
+          "target": "cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Three Consecutive Fouls",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:22:11.337911+00:00",
+      "entity_count": 3,
+      "relationship_count": 2,
+      "entities": [
+        {
+          "name": "9-ball",
+          "type": "GameType",
+          "description": "A variant of billiards where players use a cue ball and numbered balls to score points.",
+          "properties": {}
+        },
+        {
+          "name": "foul",
+          "type": "Rule",
+          "description": "An infraction in the rules of billiards, typically resulting in penalty points or loss of turn.",
+          "properties": {}
+        },
+        {
+          "name": "loss of game",
+          "type": "Rule",
+          "description": "The outcome when a player accumulates a specified number of fouls and is declared the loser.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "9-ball",
+          "target": "foul",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "9-ball",
+          "target": "loss of game",
+          "type": "QUY_DINH",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Differences from 9-Ball",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:23:35.869736+00:00",
+      "entity_count": 9,
+      "relationship_count": 8,
+      "entities": [
+        {
+          "name": "10-ball",
+          "type": "GameType",
+          "description": "A variant of billiards using 10 balls instead of 9.",
+          "properties": {}
+        },
+        {
+          "name": "9-ball",
+          "type": "GameType",
+          "description": "A variant of billiards using 9 balls.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The white ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "rack",
+          "type": "Equipment",
+          "description": "The triangular frame used to arrange the balls at the start of a game.",
+          "properties": {}
+        },
+        {
+          "name": "shot",
+          "type": "Technique",
+          "description": "A single attempt by a player to hit one or more balls into pockets.",
+          "properties": {}
+        },
+        {
+          "name": "pocket",
+          "type": "Concept",
+          "description": "One of the six holes on the billiard table where balls can be legally pocketed.",
+          "properties": {}
+        },
+        {
+          "name": "call shot",
+          "type": "Rule",
+          "description": "A requirement in 10-ball where the shooter must specify the ball and pocket for each shot.",
+          "properties": {}
+        },
+        {
+          "name": "obvious shot",
+          "type": "Concept",
+          "description": "A shot that is easy to predict or execute without needing to be called.",
+          "properties": {}
+        },
+        {
+          "name": "slop shot",
+          "type": "Technique",
+          "description": "An unintentional pocketing of a ball during a shot.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "10-ball",
+          "target": "9-ball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "10-ball",
+          "target": "cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "10-ball",
+          "target": "rack",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "10-ball",
+          "target": "shot",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "10-ball",
+          "target": "pocket",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "10-ball",
+          "target": "call shot",
+          "type": "QUY_DINH",
+          "properties": {}
+        },
+        {
+          "source": "10-ball",
+          "target": "obvious shot",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "10-ball",
+          "target": "slop shot",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Call Shot Requirement",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:24:30.678718+00:00",
+      "entity_count": 6,
+      "relationship_count": 5,
+      "entities": [
+        {
+          "name": "10-ball",
+          "type": "GameType",
+          "description": "A variant of billiards where players must call their intended shot before each turn.",
+          "properties": {}
+        },
+        {
+          "name": "shot",
+          "type": "Technique",
+          "description": "The action of hitting the cue ball to make a ball fall into a pocket.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The white ball used as the starting point for each shot in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "ball",
+          "type": "Equipment",
+          "description": "Any of the colored balls numbered 1 through 15 used in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "pocket",
+          "type": "Equipment",
+          "description": "One of six holes on the table where balls are aimed to be pocketed.",
+          "properties": {}
+        },
+        {
+          "name": "cushion",
+          "type": "Equipment",
+          "description": "The sides and railings of the billiards table that balls can hit during a shot.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "10-ball",
+          "target": "shot",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "shot",
+          "target": "cue ball",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "shot",
+          "target": "ball",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "shot",
+          "target": "pocket",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "shot",
+          "target": "cushion",
+          "type": "THUOC",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Push-Out Rules",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:25:42.628035+00:00",
+      "entity_count": 6,
+      "relationship_count": 8,
+      "entities": [
+        {
+          "name": "Push-out",
+          "type": "Rule",
+          "description": "A rule allowing a player to hit the cue ball in any direction after declaring a push out during the break.",
+          "properties": {}
+        },
+        {
+          "name": "10-ball",
+          "type": "GameType",
+          "description": "A variant of billiards where players aim to pocket balls in numerical order, starting with the 1 object ball and ending with the 10 ball.",
+          "properties": {}
+        },
+        {
+          "name": "9-ball",
+          "type": "GameType",
+          "description": "A variant of billiards where players aim to pocket balls in numerical order, starting with the 1 object ball and ending with the 9 ball.",
+          "properties": {}
+        },
+        {
+          "name": "Break shot",
+          "type": "Technique",
+          "description": "The opening shot at the start of a game in billiards, where players aim to pocket balls on the break.",
+          "properties": {}
+        },
+        {
+          "name": "Cue ball",
+          "type": "Equipment",
+          "description": "The white ball used for striking other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Head string",
+          "type": "Concept",
+          "description": "A line on the table that marks the boundary of the shooting area.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Push-out",
+          "target": "10-ball",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Push-out",
+          "target": "9-ball",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Break shot",
+          "target": "10-ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Break shot",
+          "target": "9-ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Cue ball",
+          "target": "10-ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Cue ball",
+          "target": "9-ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Head string",
+          "target": "10-ball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Head string",
+          "target": "9-ball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Table Dimensions and Layout",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:28:25.325124+00:00",
+      "entity_count": 17,
+      "relationship_count": 16,
+      "entities": [
+        {
+          "name": "3-cushion billiards",
+          "type": "Sport",
+          "description": "A variant of billiards played on a pocketless table.",
+          "properties": {}
+        },
+        {
+          "name": "carom billiards",
+          "type": "Concept",
+          "description": "An alternative name for 3-cushion billiards.",
+          "properties": {}
+        },
+        {
+          "name": "bida 3 bang",
+          "type": "Concept",
+          "description": "The Vietnamese term for 3-cushion billiards.",
+          "properties": {}
+        },
+        {
+          "name": "pocketless table",
+          "type": "Equipment",
+          "description": "A table without pockets used in 3-cushion billiards.",
+          "properties": {}
+        },
+        {
+          "name": "standard competition table",
+          "type": "GameType",
+          "description": "The official size of a 3-cushion billiards table for competitions.",
+          "properties": {}
+        },
+        {
+          "name": "9-foot tables",
+          "type": "Equipment",
+          "description": "An alternative table size used in recreational play.",
+          "properties": {}
+        },
+        {
+          "name": "heated playing surface",
+          "type": "Equipment",
+          "description": "A feature of the table to reduce moisture and ensure consistent ball behavior.",
+          "properties": {}
+        },
+        {
+          "name": "Simonis or similar high-quality cloth",
+          "type": "Equipment",
+          "description": "The covering material for the table's playing surface.",
+          "properties": {}
+        },
+        {
+          "name": "rail height and cushion profile",
+          "type": "Rule",
+          "description": "Standardized specifications to ensure consistent rebound angles.",
+          "properties": {}
+        },
+        {
+          "name": "diamond markers",
+          "type": "Equipment",
+          "description": "Reference points for aiming and the diamond system in 3-cushion billiards.",
+          "properties": {}
+        },
+        {
+          "name": "billiard spots",
+          "type": "Concept",
+          "description": "Another term for diamond markers used in 3-cushion billiards.",
+          "properties": {}
+        },
+        {
+          "name": "pins",
+          "type": "Concept",
+          "description": "Yet another term for diamond markers used in 3-cushion billiards.",
+          "properties": {}
+        },
+        {
+          "name": "diamond system",
+          "type": "Technique",
+          "description": "A mathematical aiming method using the diamond markers.",
+          "properties": {}
+        },
+        {
+          "name": "white cue ball",
+          "type": "Equipment",
+          "description": "The primary cue ball used in 3-cushion billiards, often shared between players.",
+          "properties": {}
+        },
+        {
+          "name": "yellow object ball",
+          "type": "Equipment",
+          "description": "One of the two colored balls used as targets in 3-cushion billiards.",
+          "properties": {}
+        },
+        {
+          "name": "red object ball",
+          "type": "Equipment",
+          "description": "The other colored ball used as a target in 3-cushion billiards.",
+          "properties": {}
+        },
+        {
+          "name": "international competition",
+          "type": "GameType",
+          "description": "A type of competition where each player has their own white and yellow cue balls.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "3-cushion billiards",
+          "target": "carom billiards",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "3-cushion billiards",
+          "target": "bida 3 bang",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "pocketless table",
+          "target": "3-cushion billiards",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "standard competition table",
+          "target": "pocketless table",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "9-foot tables",
+          "target": "pocketless table",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "heated playing surface",
+          "target": "pocketless table",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Simonis or similar high-quality cloth",
+          "target": "pocketless table",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "rail height and cushion profile",
+          "target": "pocketless table",
+          "type": "QUY_DINH",
+          "properties": {}
+        },
+        {
+          "source": "diamond markers",
+          "target": "3-cushion billiards",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "billiard spots",
+          "target": "diamond markers",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "pins",
+          "target": "diamond markers",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "diamond system",
+          "target": "3-cushion billiards",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "white cue ball",
+          "target": "3-cushion billiards",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "yellow object ball",
+          "target": "3-cushion billiards",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "red object ball",
+          "target": "3-cushion billiards",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "international competition",
+          "target": "white cue ball",
+          "type": "THUOC",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Object of the Game and Scoring",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:29:48.658880+00:00",
+      "entity_count": 9,
+      "relationship_count": 7,
+      "entities": [
+        {
+          "name": "3-cushion billiards",
+          "type": "Sport",
+          "description": "A variant of billiards where the objective is to make the cue ball contact at least three cushions before hitting the second object ball.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The main striking ball in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "cushions (rails)",
+          "type": "Equipment",
+          "description": "The rails around the table that the cue ball must contact to score points.",
+          "properties": {}
+        },
+        {
+          "name": "object ball",
+          "type": "Equipment",
+          "description": "A ball hit by the cue ball during gameplay.",
+          "properties": {}
+        },
+        {
+          "name": "point",
+          "type": "Rule",
+          "description": "The scoring unit in billiards, awarded for successfully hitting the object ball after contacting at least three cushions.",
+          "properties": {}
+        },
+        {
+          "name": "natural shot",
+          "type": "Technique",
+          "description": "A scoring pattern where two short rails and one long rail are used to score points.",
+          "properties": {}
+        },
+        {
+          "name": "plus two diamond system shots",
+          "type": "Technique",
+          "description": "Scoring patterns involving specific shots that result in additional points.",
+          "properties": {}
+        },
+        {
+          "name": "plus three pattern",
+          "type": "Technique",
+          "description": "A scoring pattern where the cue ball contacts three cushions to score points.",
+          "properties": {}
+        },
+        {
+          "name": "world record average",
+          "type": "Concept",
+          "description": "The highest average score achieved in official competitions.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "3-cushion billiards",
+          "target": "cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "3-cushion billiards",
+          "target": "cushions (rails)",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "3-cushion billiards",
+          "target": "object ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "point",
+          "target": "cue ball",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "natural shot",
+          "target": "3-cushion billiards",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "plus two diamond system shots",
+          "target": "3-cushion billiards",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "plus three pattern",
+          "target": "3-cushion billiards",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Common Patterns and Diamond System Applications",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:30:42.100712+00:00",
+      "entity_count": 5,
+      "relationship_count": 4,
+      "entities": [
+        {
+          "name": "3-cushion billiards",
+          "type": "GameType",
+          "description": "A variant of billiards where players use diamond markers to calculate angles for multi-cushion shots.",
+          "properties": {}
+        },
+        {
+          "name": "diamond markers",
+          "type": "Equipment",
+          "description": "Markers on the rails used in 3-cushion billiards to calculate angles for shots.",
+          "properties": {}
+        },
+        {
+          "name": "plus 2 system",
+          "type": "Rule",
+          "description": "A mathematical pattern used in 3-cushion billiards where starting and ending diamond positions add up to 2.",
+          "properties": {}
+        },
+        {
+          "name": "plus 3 system",
+          "type": "Rule",
+          "description": "Another mathematical pattern used in 3-cushion billiards for shorter rail travel, cross-table shots, and end-rail patterns.",
+          "properties": {}
+        },
+        {
+          "name": "feel",
+          "type": "Concept",
+          "description": "A skill developed by experienced players to adjust their shots based on various factors like speed, spin, cloth conditions, and ball positions.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "3-cushion billiards",
+          "target": "diamond markers",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "plus 2 system",
+          "target": "3-cushion billiards",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "plus 3 system",
+          "target": "3-cushion billiards",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "feel",
+          "target": "3-cushion billiards",
+          "type": "THUOC",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Fouls in 3-Cushion",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:31:36.991435+00:00",
+      "entity_count": 6,
+      "relationship_count": 5,
+      "entities": [
+        {
+          "name": "Foul",
+          "type": "Rule",
+          "description": "A violation of the rules during a game of 3-cushion billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Cue ball",
+          "type": "Equipment",
+          "description": "The white ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Object ball",
+          "type": "Equipment",
+          "description": "Any colored ball that can be hit during a game of billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Cushion",
+          "type": "Equipment",
+          "description": "The rail around the table in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Foot spot",
+          "type": "Concept",
+          "description": "A designated area on the table where balls are spotted after being driven off.",
+          "properties": {}
+        },
+        {
+          "name": "Center spot",
+          "type": "Concept",
+          "description": "The center of the table, used as an alternative spot if the foot spot is occupied.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Foul",
+          "target": "Cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Foul",
+          "target": "Object ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Foul",
+          "target": "Cushion",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Foul",
+          "target": "Foot spot",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Foul",
+          "target": "Center spot",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Cue Ball Scratched",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:32:21.620960+00:00",
+      "entity_count": 5,
+      "relationship_count": 3,
+      "entities": [
+        {
+          "name": "Scratch",
+          "type": "Rule",
+          "description": "A foul where the cue ball is pocketed.",
+          "properties": {}
+        },
+        {
+          "name": "Cue Ball",
+          "type": "Equipment",
+          "description": "The white ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Incoming Player",
+          "type": "Concept",
+          "description": "The player who will take the next shot after a foul.",
+          "properties": {}
+        },
+        {
+          "name": "Head String",
+          "type": "Equipment",
+          "description": "A line on the table used to mark where balls should be placed in some traditional rulesets.",
+          "properties": {}
+        },
+        {
+          "name": "3-Cushion Billiards",
+          "type": "GameType",
+          "description": "A variant of billiards played with three cushions.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Scratch",
+          "target": "Cue Ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Incoming Player",
+          "target": "Cue Ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "3-Cushion Billiards",
+          "target": "Scratch",
+          "type": "QUY_DINH",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Ball Driven Off the Table",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:33:09.367668+00:00",
+      "entity_count": 5,
+      "relationship_count": 3,
+      "entities": [
+        {
+          "name": "foul",
+          "type": "Rule",
+          "description": "A foul occurs when an object ball is driven off the table.",
+          "properties": {}
+        },
+        {
+          "name": "foot spot",
+          "type": "Equipment",
+          "description": "A specific point on the table where balls are placed.",
+          "properties": {}
+        },
+        {
+          "name": "incoming player",
+          "type": "Concept",
+          "description": "The player who will take the next shot after a foul.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The white ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "starting position",
+          "type": "Concept",
+          "description": "The initial position of the cue ball on the table.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "incoming player",
+          "target": "foul",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "cue ball",
+          "target": "foul",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "starting position",
+          "target": "cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Double Hit",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:33:56.906573+00:00",
+      "entity_count": 5,
+      "relationship_count": 4,
+      "entities": [
+        {
+          "name": "Double hit",
+          "type": "Rule",
+          "description": "A foul in billiards where the cue tip strikes the cue ball more than once on a single shot.",
+          "properties": {}
+        },
+        {
+          "name": "Cue ball",
+          "type": "Equipment",
+          "description": "The white ball used as the target in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Object ball",
+          "type": "Equipment",
+          "description": "Any colored ball used as a target in billiards except the cue ball.",
+          "properties": {}
+        },
+        {
+          "name": "Elevated cue",
+          "type": "Technique",
+          "description": "A playing technique where the cue is raised above the table to avoid double hits.",
+          "properties": {}
+        },
+        {
+          "name": "Smooth, continuous stroke",
+          "type": "Technique",
+          "description": "A playing technique where the cue is struck smoothly and continuously to avoid double hits.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Double hit",
+          "target": "Cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Double hit",
+          "target": "Object ball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Double hit",
+          "target": "Elevated cue",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Double hit",
+          "target": "Smooth, continuous stroke",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Push Shot",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:34:34.531116+00:00",
+      "entity_count": 4,
+      "relationship_count": 3,
+      "entities": [
+        {
+          "name": "Push Shot",
+          "type": "Technique",
+          "description": "A playing technique where the cue tip remains in contact with the cue ball for an extended period during the stroke.",
+          "properties": {}
+        },
+        {
+          "name": "Cue Ball",
+          "type": "Equipment",
+          "description": "The main ball used in billiards, struck by the cue stick to score points.",
+          "properties": {}
+        },
+        {
+          "name": "Object Ball",
+          "type": "Equipment",
+          "description": "A ball other than the cue ball that can be pocketed for points in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Cue Stick",
+          "type": "Equipment",
+          "description": "The stick used to strike the cue ball and object balls in billiards.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Push Shot",
+          "target": "Cue Ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Push Shot",
+          "target": "Object Ball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Push Shot",
+          "target": "Cue Stick",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Foot Not on the Floor",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:35:29.355135+00:00",
+      "entity_count": 6,
+      "relationship_count": 5,
+      "entities": [
+        {
+          "name": "Rule",
+          "type": "Rule",
+          "description": "A specific rule or regulation of billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Stroke",
+          "type": "Technique",
+          "description": "The action of hitting the cue ball with a cue stick in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Floor",
+          "type": "Equipment",
+          "description": "The ground on which the billiard table is placed.",
+          "properties": {}
+        },
+        {
+          "name": "Cue Tip",
+          "type": "Equipment",
+          "description": "The tip of the cue stick used to hit the cue ball in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Cue Ball",
+          "type": "Equipment",
+          "description": "The white ball at the center of a billiard table, which players aim to pocket during gameplay.",
+          "properties": {}
+        },
+        {
+          "name": "Referee",
+          "type": "Concept",
+          "description": "A person responsible for enforcing rules and maintaining order in competitive sports.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Rule",
+          "target": "Stroke",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Rule",
+          "target": "Floor",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Rule",
+          "target": "Cue Tip",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Rule",
+          "target": "Cue Ball",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Referee",
+          "target": "Rule",
+          "type": "QUY_DINH",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Touching or Moving Balls",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:36:58.571723+00:00",
+      "entity_count": 10,
+      "relationship_count": 9,
+      "entities": [
+        {
+          "name": "foul",
+          "type": "Rule",
+          "description": "A foul occurs when a player touches, moves, or disturbs any ball on the table other than through a legal shot.",
+          "properties": {}
+        },
+        {
+          "name": "cue stick",
+          "type": "Equipment",
+          "description": "The tool used to strike the balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "hand",
+          "type": "Equipment",
+          "description": "A part of a player's body used for handling equipment or touching the table.",
+          "properties": {}
+        },
+        {
+          "name": "arm",
+          "type": "Equipment",
+          "description": "A part of a player's body used for handling equipment or touching the table.",
+          "properties": {}
+        },
+        {
+          "name": "clothing",
+          "type": "Equipment",
+          "description": "Wearables that may come into contact with the ball during play.",
+          "properties": {}
+        },
+        {
+          "name": "ball",
+          "type": "Equipment",
+          "description": "A round object used in billiards to be struck by the cue stick.",
+          "properties": {}
+        },
+        {
+          "name": "gust of wind",
+          "type": "Concept",
+          "description": "An external factor that may move a ball unintentionally.",
+          "properties": {}
+        },
+        {
+          "name": "vibrating table",
+          "type": "Concept",
+          "description": "A condition where the table shakes or moves, potentially moving balls unintentionally.",
+          "properties": {}
+        },
+        {
+          "name": "practice stroke",
+          "type": "Technique",
+          "description": "A non-official shot used for practice before an official game.",
+          "properties": {}
+        },
+        {
+          "name": "referee",
+          "type": "Equipment",
+          "description": "An official who makes decisions during the game, including ruling on fouls and ball positions.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "foul",
+          "target": "cue stick",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "foul",
+          "target": "hand",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "foul",
+          "target": "arm",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "foul",
+          "target": "clothing",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "foul",
+          "target": "ball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "gust of wind",
+          "target": "ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "vibrating table",
+          "target": "ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "practice stroke",
+          "target": "cue stick",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "referee",
+          "target": "ball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Shooting Out of Turn",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:37:24.218658+00:00",
+      "entity_count": 3,
+      "relationship_count": 2,
+      "entities": [
+        {
+          "name": "foul",
+          "type": "Rule",
+          "description": "A foul occurs when a player shoots when it is not their turn.",
+          "properties": {}
+        },
+        {
+          "name": "opponent",
+          "type": "Concept",
+          "description": "The other player in the game.",
+          "properties": {}
+        },
+        {
+          "name": "balls",
+          "type": "Equipment",
+          "description": "The objects used in billiards to score points.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "foul",
+          "target": "opponent",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "foul",
+          "target": "balls",
+          "type": "THUOC",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Ball in Hand Placement Rules",
+      "chunk_source": "wpa_rules.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-05-08T05:38:31.116370+00:00",
+      "entity_count": 8,
+      "relationship_count": 5,
+      "entities": [
+        {
+          "name": "Billiards",
+          "type": "Sport",
+          "description": "A sport played with a cue stick and balls on a table.",
+          "properties": {}
+        },
+        {
+          "name": "Cue ball",
+          "type": "Equipment",
+          "description": "The white ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Object ball",
+          "type": "Equipment",
+          "description": "Any of the colored balls used in billiards except the cue ball.",
+          "properties": {}
+        },
+        {
+          "name": "Head string",
+          "type": "Concept",
+          "description": "A line on the table that defines a restricted area for placing the cue ball after an opponent's foul.",
+          "properties": {}
+        },
+        {
+          "name": "WPA rules",
+          "type": "Rule",
+          "description": "The World Pool-Billiard Association's set of rules governing various billiards games.",
+          "properties": {}
+        },
+        {
+          "name": "8-ball",
+          "type": "GameType",
+          "description": "A variant of pool where players must pocket balls in a specific order to win.",
+          "properties": {}
+        },
+        {
+          "name": "9-ball",
+          "type": "GameType",
+          "description": "A variant of pool where players must pocket balls in numerical order to win.",
+          "properties": {}
+        },
+        {
+          "name": "10-ball",
+          "type": "GameType",
+          "description": "A variant of pool where players must pocket balls in numerical order to win, with a maximum of 10 balls.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Billiards",
+          "target": "Cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Billiards",
+          "target": "Object ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "WPA rules",
+          "target": "8-ball",
+          "type": "QUY_DINH",
+          "properties": {}
+        },
+        {
+          "source": "WPA rules",
+          "target": "9-ball",
+          "type": "QUY_DINH",
+          "properties": {}
+        },
+        {
+          "source": "WPA rules",
+          "target": "10-ball",
+          "type": "QUY_DINH",
+          "properties": {}
+        }
+      ]
+    }
+  ]
+}

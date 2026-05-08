@@ -1,0 +1,2934 @@
+2026
+OFFICIAL
+RULEBOOK
+
+2026 USA PICKLEBALL
+OFFICIAL RULEBOOK
+USA Pickleball was organized to perpetuate the growth and
+advancement of pickleball on a national level and to set goals
+for worldwide play and recognition. USA Pickleball is committed
+to furthering the growth and development of pickleball among
+all players.
+USA Pickleball published the sport’s first official rulebook in
+March 1984.
+USA Pickleball is the National Governing Body of American pickleball
+that formulates and interprets all the rules of the sport in a manner
+that preserves the traditional nature and character of the sport and
+the skills traditionally required to play the sport. All such decisions
+by USA Pickleball are final and cannot be appealed.
+The purpose of the rulebook is to provide pickleball players with the
+rules necessary for standard play (recreational, social, organized
+league), and tournament play. Part I and Part II of this rulebook are
+applicable to all play, both standard play and tournament play. Part
+III modifies the standard play rules in Part II and is designed to be
+used in the conduct of USA Pickleball sanctioned tournaments. Part
+IV contains standard play and tournament play rules for players with
+disabilities and modifies the rules in Part II and Part III. A sanctioned
+tournament allows players to obtain a rating on a national or
+international basis.
+Non-sanctioned tournaments may also use these rules as guidelines.
+Directors of non-sanctioned tournaments may be flexible in the use
+of these guidelines to better fit the skills, ages, and diversity of their
+ii
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+players. It is recommended that non-sanctioned tournaments follow
+this rulebook to prevent player confusion in future events. USA
+Pickleball enthusiastically encourages these non-sanctioned
+tournaments to promote knowledge and growth of the sport, as well
+as skill development, while having fun playing pickleball.
+These rules will not be changed without good cause. Comments and
+opinions are always welcome. If you have any questions about the
+rules, please go to the USA Pickleball website: usapickleball.org
+USA Pickleball
+Website: usapickleball.org
+Cover Photo and Design Credit: USA Pickleball
+2010©; revised 2026© All rights reserved. Any dissemination,
+distribution, publication, or copying of these rules without the
+express written consent of USA Pickleball Association is strictly
+prohibited.
+The USA Pickleball Association logo is a registered trademark of USA
+Pickleball Association and use in any manner is prohibited unless
+written approval is obtained from the organization.
+For more information about pickleball and ordering bulk copies of
+the Official Rules of USA Pickleball, contact: info@usapickleball.org
+iii
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+TABLE OF CONTENTS
+Part I Introduction to Pickleball
+Section 1 The Game ....................................................... 1
+Section 2 Definitions ...................................................... 2
+Section 3 Court and Equipment .................................... 5
+Part II General Rules of Play
+Section 4 Point Scoring ............................................... 11
+Section 5 Player Positions and Serving Sequence ..... 12
+Section 6 Player Readiness and Calling the Score ...... 14
+Section 7 Serving ......................................................... 16
+Section 8 Line Calls ...................................................... 19
+Section 9 Dead Balls, Faults, and Hinders .................. 21
+Section 10 Rally Situations ............................................ 23
+Section 11 Non-Volley Zone Infractions. ....................... 25
+Section 12 The Paddle During Play ............................... 26
+Section 13 The Net & Net Support System During Play
+..................................................................... 27
+Section 14 Variations on Standard Pickleball ............... 30
+Part III Tournament Play
+Section 15 Tournament Event and Scoring Options .... 32
+Section 16 Tournament Director Responsibilities ........ 37
+Section 17 Referee Responsibilities .............................. 39
+Section 18 Player Pre-Match Responsibilities .............. 42
+Section 19 Tournament Line Calls ................................ 44
+i
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 20 Tournament Match Situations .................... 47
+Section 21 Time-Outs and Breaks ................................. 52
+Section 22 Unsportsmanlike Conduct and Related
+Penalties ...................................................... 57
+Section 23 Retirements and Withdrawals ..................... 62
+Section 24 Non-Officiated Tournament Play ................ 64
+Part IV Rules for Inclusive Play
+Section 25 Wheelchair, Adaptive Standing and Hybrid
+Doubles Play ................................................ 65
+Appendix A Faults and Replays ....................................... 72
+Appendix B Rulebook Priorities and Guiding Principles 78
+Index ...................................................................................... 83
+ii
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Part I Introduction to Pickleball
+Section 1 The Game
+Pickleball is a paddle sport that combines elements of badminton, table
+tennis, and tennis. It is played using a special perforated ball on a 20-foot
+by 44-foot court with a tennis type net. The court is divided into right and
+left service courts and a non-volley zone on each end of the net (Figure 3-1).
+Pickleball can be played as singles or doubles.
+In standard pickleball, the ball is served diagonally across the net to the
+opposite service court on the opponent’s end, using an approved motion.
+The ball is then hit back and forth across the net until a player fails to return
+the ball in accordance with the rules.
+Standard pickleball uses a scoring method where points are scored only
+when the serving team wins the rally. The server alternates service courts
+and continues to serve until they lose a rally (commit a fault). Typically, the
+first player or team scoring 11 points and leading by at least a 2-point
+margin wins the game.
+Rally scoring has been provisionally approved as an option (Rule 14.A),
+wherein a point is scored by the team that wins each rally. Mini-singles
+(Rule 14.B) is a half-court variation of standard singles.
+Unique Features
+Two-Bounce Rule. After the serve, the receiver must allow the ball to
+bounce before making their first return, and then the serving team must
+allow the ball to bounce before making their first return.
+Non-Volley Zone. The non-volley zone is the area of the court that
+extends 7 feet from the net on each end of the court, within which a player
+is not allowed to hit the ball out of the air before it bounces.
+Wheelchair and Adaptive Play. Players using wheelchairs and players
+having certain disabilities may allow the ball to bounce twice before
+returning the ball. The first bounce must be in the court, but the second
+bounce can be anywhere on the playing surface.
+1
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Underlying Principles
+Pickleball is a game that requires cooperation and courtesy. A sense of fair
+play by giving the opponent the benefit of any doubt is essential in
+maintaining the game’s underlying principles of fun and competition.
+• All points played are treated the same regardless of their importance: the
+first point of the match is as important as match point.
+• Either partner in doubles can make calls, especially line calls.
+• Calls are made promptly to preserve fair play and prevent players from
+making delayed calls for their own advantage.
+• Players strive to cooperate when confronted with a situation not covered
+by the Rulebook. Resolutions can be made by asking for a referee to
+resolve a dispute. allowing the rally to stand, or in extreme cases, a replay
+of the rally.
+• Where possible, rules accommodate players with various adaptive needs.
+• Players avoid wearing clothing that closely matches the ball color.
+• Players should not question or comment on an opponent’s call except
+through an appeal to a referee.
+Section 2 Definitions
+Ball In Play. The timeframe during which a rally is played, from when the serve is
+hit until the ball becomes dead.
+Carry. Hitting the ball in such a way that it does not bounce away from the paddle
+but is carried along on the face of the paddle.
+Coaching. Communication of information (including verbal, nonverbal, and
+electronic) from someone other than a player’s partner, that players may act upon
+to gain an advantage or help them avoid a rules violation.
+Court. The area inside the outer dimensions of the baselines and sidelines.
+Dead Ball. A ball that is no longer in play.
+Distraction. Physical actions by a player that are not common to the game and
+interfere with the opponent’s ability or concentration to hit the ball. Examples
+include, but are not limited to, making loud noises, stomping feet, and
+waving the paddle in an erratic manner.
+2
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Double Bounce. When the ball bounces twice on one end of the net before it is
+returned.
+Double Hit. Hitting the ball twice before it is returned.
+Drop Serve. A serve made by dropping the ball and hitting the ball with the paddle
+after the ball bounces on the playing surface.
+Ejection. Removal of a player from tournament competition for a flagrant or
+injurious behavioral violation.
+Expulsion. Banishment of a player from the tournament venue for a flagrant or
+injurious behavioral violation.
+Fault. A rules violation that results in a dead ball and the loss of a rally.
+First Server (Doubles). The player who begins the team’s service rotation from
+the right serving area after a side out.
+Forfeit. The awarding of a game or a match to the opponent due to a violation of
+the rules.
+Hinder. Any transient element or occurrence not caused by a player that adversely
+impacts play. Examples include, but are not limited to, stray balls, flying insects,
+foreign material, players, or officials on another court that impacted a player’s
+ability to make a play on the ball. (Permanent objects are not hinders.)
+Imaginary Extension. The continuation of a line beyond its actual,
+physical endpoint, as if the line were projected further even though it is not
+drawn or present.
+Line Call. An audible or visual signal that a ball in play has not landed in the
+required court area.
+Live Ball. The timeframe from the start of the score call until the ball becomes
+dead.
+Momentum. A property of a body in motion that causes a player to continue in
+motion after contacting the ball. The act of volleying produces momentum that
+ends when the player regains balance and control of their motion or stops moving
+toward the non-volley zone.
+Non-Volley Zone. The 7-foot by 20-foot area of the court on each end of the net
+where players are not allowed to volley the ball. (See Rule 3.A.4.c for specifications.)
+3
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Officiating Team. Personnel under the leadership of the Tournament Head
+Referee on or off the playing surface, including Lead and Second Referees, Tracking
+Referee, Video Replay Referee, and Line Judges.
+Paddle Grip Adjustments. Non-mechanical devices that change the size of the
+grip or stabilize a player’s hand on the grip.
+Paddle Head. The paddle, excluding the handle.
+Permanent Object. Any object on, above, or near the court that can interfere
+with play. Examples include, but are not limited to ceilings, walls, fencing, lighting
+fixtures, net posts (including connected wheels, arms, and legs). Net cable or rope
+on top of the net post, and other net support construction. Stands and seats for
+spectators, the referee, line judges, spectators when in their recognized positions,
+and all other objects around and above the court.
+Plane of the Net. The vertical plane in line with the net extending above, below,
+and to both sides of the net.
+Playing Surface. The court and the area surrounding the court designated for
+playing.
+Profanity. Words, phrases, or gestures commonly considered to be vulgar or
+inappropriate in public or around children. Typically included are words used as
+expletives or verbal intensifiers.
+Rally. Continuous play that occurs after the serve is hit and before the ball
+becomes dead.
+Receiver. The player who returns the serve.
+Replay. The restart of a rally without the awarding of a point or changing of the
+server.
+Retirement. A singles player or doubles team’s decision to discontinue playing in
+a match in progress.
+Second Serve (Doubles). A term used to describe the serving condition after the
+first server loses their serve.
+Second Server (Doubles). The first server’s partner. The second server serves
+after the first server loses serve.
+Serve. The initial strike of the ball with the paddle to start a rally.
+4
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Server. The player who initiates a rally by serving the ball.
+Service Court. The area of the court on either side of the centerline, excluding the
+non-volley zone. (See Rule 3.A.4.f for specifications.)
+Serving Area. The area behind the baseline on each end of the court. (See Rule
+3.A.4.g for specifications.)
+Side Out. The awarding of the serve to the opposing team after a singles player or
+doubles team loses its serve.
+Starting Server (Doubles). For each doubles team, the player designated to
+serve first at the start of a game.
+Technical Foul. A one-point penalty assessed for extreme unsportsmanlike
+actions or behaviors.
+Technical Warning. A punitive warning assessed for minor unsportsmanlike
+actions or behaviors.
+Verbal Warning. A non-punitive caution for minor unsportsmanlike behavior,
+usually given in advance of assessing a technical warning or technical foul for such
+behavior.
+Volley. A strike of the ball before the ball bounces.
+Volley Serve. A serve made by hitting the released ball with the paddle before the
+ball bounces on the playing surface.
+Volleying, Act of. The act of volleying begins when the ball is hit out of the air
+before bouncing (i.e., volleyed) and ends when the player’s movement from the
+follow-through action (i.e., momentum) stops.
+Withdrawal. A singles player’s or doubles team’s decision to be removed from all
+upcoming play in a specified bracket.
+Section 3 Court and Equipment
+3.A Court Specifications. The dimensions and measurements for the standard
+pickleball court are shown in Figure 3-1.
+5
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Figure 3-1: Court Specifications
+3.A.1 Court Dimensions. The court must be a rectangle measuring 20
+feet (6.10 m) wide and 44 feet (13.41 m) long for both singles and
+doubles matches. (See Figure 3-1.)
+3.A.2 Court Measurements. Court measurements must be made to the
+outside edge of the perimeter and non-volley zone lines.
+3.A.3 Playing Surface. The minimum playing surface area is 30 feet
+(9.14 m) wide and 60 feet (18.29 m) long. Other recommendations
+for playing surface dimensions are:
+Purpose Width – feet Length – feet
+(meters) (meters)
+New Construction 34 ft (10.36 m) 64 ft (19.5 m)
+6
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Tournament Play 34 ft (10.36 m) 64 ft (19.5 m)
+Stadium Court 50 ft (15.24 m) 80 ft (24.38 m)
+3.A.4 Lines and Areas. The lines and areas of the standard pickleball
+court are described in Rules 3.A.4.a through 3.A.4.g. (See Figure 3-
+1.)
+3.A.4.a Baselines. The lines parallel to the net at each end of
+the court.
+3.A.4.b Sidelines. The two lines bounding the court that are
+perpendicular to the net and baselines.
+3.A.4.c Non-Volley Zone. The 7-foot by 20-foot (2.13.m by
+6.08 m) area of the court adjacent to each end of the
+net. The non-volley zone lines run parallel to the net, 7
+feet (2.13 m) from the net on each end between the
+two sidelines. All lines that bound the non-volley zone
+are part of the zone. The non-volley zone is two-
+dimensional and does not extend above the playing
+surface.
+3.A.4.d Centerline. The line down the center of the court on
+each end of the court extending from the non-volley
+zone line to the baseline. The centerline separates the
+right and left service courts.
+3.A.4.e Line Size and Color. All lines should be 2 inches (5.08
+cm) wide and the same color, clearly contrasting with
+the color of the playing surface and court.
+3.A.4.f Service Courts. The areas on each end of the court
+between the non-volley zone and the baseline on
+either side of the centerline. The right and left service
+courts are bounded by and include their adjacent
+baseline, sideline, and the centerline.
+3.A.4.g Serving Areas. The areas behind the baseline on each
+end of the court. The right and left serving areas are
+bounded by and include the imaginary extensions of
+their adjacent sideline and the centerline.
+3.B Net Specifications. The requirements for the net and related elements are
+set forth in Rules 3.B.1 through 3.B.7.
+7
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+3.B.1 Material. The net may be made of any mesh fabric material that
+will not allow a ball to pass through it.
+3.B.2 Posts. Net posts should be 22 feet +/- 1.0 inches (6.71 m) from the
+inside of one post to the inside of the other post. The maximum
+diameter of the net posts should be 3 inches (7.62 cm).
+3.B.3 Size. The net length should be at least 21 feet 9 inches (6.63 m),
+extending from one post to the other. The net measurement from
+the bottom edge of the net to the top should be at least 30 inches
+(76.2 cm).
+3.B.4 Edging. The top of the net should be edged with a 2-inch (5.08 cm)
+white tape binding over a cord or cable running through the
+binding. This binding must rest upon the cord or cable.
+3.B.5 Center Strap. A strap may be placed at the center of the net
+(centered 10 feet from the outside edge of the sidelines) to enable
+adjustment to the required center net height.
+3.B.6 Sideline Net Height. The top of the net must be 36 inches +/- 0.25
+inch (91.44 cm +/- 0.635 cm) above the playing surface where the
+net crosses the outer edge of the sidelines. (See Figure 3-1.)
+3.B.7 Center Net Height. The top of the net must be 34 inches +/- 0.25
+inch (86.36 cm +/- 0.635 cm) above the playing surface at the center
+point of the court. If there is a center strap, the center net height
+measurement includes the center strap. (See Figure 3-1.)
+3.C Ball Specifications. The requirements for the ball are set forth in Rules 3.C.1
+through 3.C.5. The complete list of approved balls is posted on the USA
+Pickleball website.
+3.C.1 Usage. All approved balls are acceptable for indoor or outdoor
+play. (See Figure 3-2.)
+3.C.2 Design. The design of the ball must be approved by USA Pickleball
+as detailed in the Equipment Standards Manual. USA Pickleball
+Equipment Standards Manual
+3.C.3 Color. The ball must be one uniform color, except for identification
+markings. Colors may vary.
+3.C.4 Brand Identification. The ball must have a manufacturer or
+supplier name or logo printed or embossed on the surface.
+3.C.5 Construction. The ball must be made of durable material molded
+with a smooth surface and free of texturing. The ball may have a
+8
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+slight ridge at the seam, as long as it does not significantly impact
+the ball’s flight characteristics. (See Figure 3-2.)
+The ball with larger holes is customarily used
+for indoor play (pictured on the left). The ball
+with smaller holes is customarily used for
+outdoor play (pictured on the right).
+Figure 3-2: Approved Balls – Examples
+3.D Paddle Specifications. The requirements for the paddle are set forth in
+Rules 3.D.1 through 3.D.7. The complete list of approved paddles is posted
+on the USA Pickleball Approved Paddle List.
+3.D.1 Brand and Model Identification. The manufacturer must have a
+clearly marked brand and model name or model number on the
+paddle and must also include the ‘USA Pickleball Approved’ seal or
+text treatment. Paddles that were manufactured prior to the seal
+or text treatment requirement must still be on the USA Pickleball
+approved paddle list for sanctioned play.
+3.D.2 Dimensions. The combined length and width of the paddle,
+including any edge guard and butt cap, must not exceed 24 inches
+(60.96 cm). The paddle length must not exceed 17 inches (43.18
+cm). There is no restriction on paddle thickness.
+3.D.3 Weight. There is no restriction on paddle weight.
+3.D.4 Material. The paddle must be made of material deemed safe and
+not prohibited by these rules. Paddles must be made of rigid, non-
+compressible material meeting the criteria specified in the USA
+Pickleball Equipment Standards Manual.
+3.D.5 Prohibited Surface Features. The paddle’s hitting surface must
+not contain:
+9
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+3.D.5.a Holes, cracks, delamination, or indentations that break
+the paddle skin or surface.
+3.D.5.b Rough texturing.
+3.D.5.c Sandpaper characteristics.
+3.D.5.d Natural or synthetic rubber.
+3.D.5.e Moving parts that can increase head momentum.
+3.D.5.f Anti-skid paint, paint textured with sand, rubber
+particles, vinyl compounds, or any material that causes
+additional spin.
+3.D.5.g Any other objects or features that allow a player to
+impart excessive spin on the ball.
+3.D.5.h A reflective finish that might adversely affect the vision
+of opposing players.
+3.D.6 Allowable Alterations. Altered paddles must meet all
+specifications. The only allowable alterations or additions by a
+player to a commercially produced paddle as certified are:
+3.D.6.a Addition or replacement of edge guard tape (see Rule
+3.D.7).
+3.D.6.b Addition of weighted tape (see Rule 3.D.7).
+3.D.6.c Addition or removal of weights for an Original
+Equipment Manufacturer (OEM) integrated weight
+system.
+3.D.6.d Replacement of OEM interchangeable grips.
+3.D.6.e Replacement of OEM interchangeable paddle faces.
+3.D.6.f Addition of name decals or other identification
+markings on the paddle face (see Rule 3.D.7).
+3.D.6.g Changes to the grip size via inserts.
+3.D.6.h Addition or replacement of grip wrap.
+3.D.6.i Handwritten pen markings on the paddle surface for
+identification purposes only (name, signature, phone,
+email address), or an autograph. No aftermarket
+graphics are allowed on a commercially made paddle.
+3.D.7 Decals and Tape. Decals and tape on the paddle face must not
+extend more than 1.0 inch (2.54 cm) above the top of the grip nor
+more than 0.5 inch (1.27 cm) inside the outer edge of the paddle or,
+if an edge guard is in place, 0.5 inch (1.27 cm) inside the edge
+guard.
+10
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Part II General Rules of Play
+Part II (Sections 4 through 14) applies to standard pickleball play. Section
+14 provides format variations to standard play.
+See Part III for additional rules that apply to tournament play.
+Part IV for additional rules that apply to players with physical limitations.
+Section 4 Point Scoring
+4.A Standard Scoring. A point is scored by serving the ball and winning the
+rally. (See Rule 14.A.2 for the rally scoring option.)
+4.B Winning the Game. The first singles player or doubles team that scores the
+winning point wins the game.
+11
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 5 Player Positions and Serving
+Sequence
+5.A Singles. The correct positions of the server and receiver are determined by
+the server’s score.
+5.A.1 Server Position. When the server’s score is zero or even, the serve
+must be made from the right serving area and be received in the
+opponent’s right service court. When the server’s score is odd, the
+serve must be made from the left serving area and be received in
+the opponent’s left service court. (See Rule 14.B.2 for mini-singles.)
+5.A.2 Holding Serve. A player continues to serve, alternating right and
+left serving areas after each point won, until the player loses a rally.
+5.A.3 Side Out. A side out occurs after the server loses a rally.
+5.B Doubles. Both players on a team will serve before a side out is declared,
+except at the start of each game when only the starting server will serve as a
+second server before a side out is declared.
+5.B.1 Correct Server and Receiver. For each rally, the correct server
+must serve from the correct serving area, and the correct receiver
+must receive the serve. (See Rule 14.B for rally scoring.)
+5.B.2 Designation of First and Second Servers. After each side out,
+service begins with the player correctly positioned on the right side
+according to the team’s score. For the duration of that team’s
+service rotation, this player is designated as the first server and
+their partner is the second server. The starting server for the team
+that starts each game is designated as a second server for the
+team’s first service rotation of that game.
+5.B.3 Correct Serving and Receiving Positions. The correct positions of
+the server and receiver for each rally are determined by their
+team’s score. When serving or receiving, the starting server's
+correct position is on the right side of the court when their team’s
+score is zero or even, and on the left side of the court when their
+score is odd. When serving or receiving, the starting server’s
+partner's correct position is on the left side of the court when their
+team’s score is zero or even and on the right side of the court when
+their score is odd.
+5.B.4 Player Positions During Rallies. Except while serving and
+receiving, there is no restriction on the position of the players, on
+12
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+or off the court, as long as they are on their respective end of the
+net while the ball is live, except when a player crosses the plane of
+the net as allowed in Rule 13.I.
+5.B.5 Duration of First Server. The first server serves,
+alternating between right and left serving areas after each point is
+won, until the serving team loses a rally. The serve then passes to
+the second server.
+5.B.6 Duration of Second Server. The second server serves,
+alternating between right and left serving areas after each point is
+won, until the serving team loses a rally, which results in a side out.
+5.C Questions About Correct Server, Receiver, and Positions. Before the serve
+is hit, a player may ask their opponent who is the correct server or receiver,
+or whether players are in the correct positions. The opponent must respond
+with the appropriate information.
+5.C.1 Player or Position Error Claimed During Rally. Any player may
+stop a rally to claim an incorrect server, incorrect receiver, or
+incorrect player position.
+5.C.1.a Replay – Correct Claim. If the correct server or correct
+receiver is not in their correct position when the score
+is called and a player stops the rally to correctly
+identify the player or position error, the rally must be
+replayed.
+5.C.1.b Fault – Incorrect Claim. When a player stops a rally
+and incorrectly identifies a player or position error, it is
+a fault against the player who stopped the rally.
+5.C.1.c Fault – Incorrect Receiver. When the correct server
+and correct receiver are in their correct positions when
+the score is called, it is a fault against a player who
+returns the serve but is not the correct receiver, even if
+the rally is completed before the fault is called. The
+fault must be called before the next serve.
+5.C.2 Player or Position Error Identified After Rally. When the correct
+server or correct receiver is not in their correct position when the
+score is called and the rally is completed, the result of the rally
+stands.
+13
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 6 Player Readiness and Calling the
+Score
+6.A Readiness. Before the start of the score call, any player may signal they are
+not ready to start play.
+6.A.1 “Not Ready” Signals. Players must use one of the following
+signals to indicate “not ready” 1. Raising the paddle above the
+head. 2 Raising the non-paddle hand above the head 3. Completely
+turning their back to the net.
+6.A.2 Invalid “Not Ready” Signals. After the start of the score call, “not
+ready” signals are not valid while the ball is live except to indicate
+hinders.
+6.B Calling the Score. The score must not be called until the server and receiver
+are (or should be) in position and all players are (or should be) ready to play.
+The server normally calls the score.
+6.B.1 Singles. For singles play, the score must be called as two numbers:
+server’s score, then receiver’s score. To start each game, the score
+will be called as “zero – zero.”
+6.B.2 Doubles. For doubles play, the score must be called as three
+numbers: serving team’s score, then receiving team’s score, then
+the server number. To start each game, the score will be called as
+“zero – zero – two.”
+6.B.2.a Score Call by Partner (Doubles). When a server is
+unable to call the score, the server’s partner may call
+the score. The same player must call the score
+throughout the entire game unless the player’s voice
+becomes impaired.
+6.C When to Serve. The entire score must be called before the server hits the
+serve.
+6.C.1 Fault – Early Serve. When the server hits the serve while the score
+is being called, it is a fault against the server.
+6.D 10-Second Rule. The server must serve the ball within 10 seconds after the
+score call is completed.
+6.D.1 Fault – 10-Second Violation. When the server does not serve
+within 10 seconds after the score is called, it is a fault against the
+server.
+14
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+6.D.2 Replay – Player Repositioning. When the serving team changes
+serving areas after the score has been called, the server must allow
+all players to reposition, and then the score must be re-called to
+restart the 10-second count.
+6.E Stop Play Indicators. After the start of the score call, verbal indicators to
+stop play such as “stop” and “wait” will be recognized.
+6.E.1 Question About the Score. Before the serve is hit, a player may
+ask their opponent for the correct score. The opponent must
+respond with the appropriate information.
+6.F Challenging the Score Call. A player may stop a rally to ask for a score
+correction before the return of serve is hit and before the ball becomes dead.
+6.F.1 Replay – Incorrect Score Called. When an incorrect score is called
+and the rally is stopped before the return of serve and before the
+ball becomes dead, the rally must be replayed with the correct
+score called.
+6.F.2 Fault – Correct Score Called. When a player stops a rally to
+challenge a correct score call, it is a fault against the player who
+stopped the rally.
+6.F.3 Fault – Late Challenge to Score Call. When a player stops a rally
+to ask for a score correction after the return of serve is hit, it is a
+fault against the player who stopped the rally.
+6.F.4 Incorrect Score Identified After Rally. When an incorrect score
+was called and the rally is completed, the result of the rally stands,
+and the score must be corrected before the next serve.
+15
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 7 Serving
+7.A Server Positioning. When the serve is hit, the server must be in compliance
+with Rules 7.A.1, 7.A.2 and 7.A.3.
+7.A.1 Grounded. At least one of the server’s feet must be in contact with
+the correct serving area when the serve is hit.
+7.A.1.a Fault – Server Not Grounded. When both server’s feet
+are off the playing surface when the serve is hit, it is a
+fault against the server.
+7.A.2 Outside Court. Neither of the server’s feet is allowed to be in
+contact with the court when the serve is hit.
+7.A.2.a Fault – Server Contacting Court. If a server’s foot is in
+contact with the court when the serve is hit, it is a fault
+against the server.
+7.A.3 In Serving Area. Neither of the server’s feet is allowed to be in
+contact with the playing surface outside the correct serving area
+when the serve is hit.
+7.A.3.a Fault – Server Outside Serving Area. If a server’s foot is
+in contact with the playing surface outside the correct
+serving area when the serve is hit, it is a fault against the
+server.
+7.B Ball Release. The server must comply with Rules 7.B.1 through 7.B.3 when
+releasing the ball to make the serve.
+7.B.1 Release from Hand or Paddle. The server must release the ball
+using only one hand or only the paddle.
+7.B.2 No Manipulation or Spin Upon Release. Some natural rotation of
+the ball is expected during any release of the ball. The server must
+not manipulate the ball to add spin with any part of the server's
+body or the paddle prior to hitting the ball to make the serve,
+except that the server may allow the ball to roll off the face of the
+paddle by gravity. Spin may be applied to the ball upon contact by
+the paddle.
+7.B.2.a Replay – Manipulation or Spin Added. When the
+receiver determines that the server has imparted
+manipulation or spin during the release of the ball, the
+16
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+receiver may call for a replay, but only before returning
+the serve.
+7.B.3 Visible Release. The server’s release of the ball must be visible to
+the receiver.
+7.B.3.a Replay – Ball Release Not Visible. When the receiver
+cannot see the release of the ball, the receiver may call
+for a replay, but only before the return of serve.
+7.C Volley Serve. The service motion for a volley serve must comply with Rules
+7.C.1 through 7.C.4.
+7.C.1 Upward Arc. The server’s paddle must be moving in a clear
+upward arc when the paddle contacts the ball.
+7.C.2 Paddle Head. The highest point of the paddle head must clearly
+not be above the highest part of the server’s wrist joint when the
+paddle contacts the ball.
+7.C.3 Ball Height. The ball must clearly be no higher than the server’s
+waist when the paddle contacts the ball.
+7.C.4 Forehand or Backhand. The serve can be made with a forehand or
+backhand motion.
+7.C.5 Fault – Illegal Volley Serve. When the server violates Rule 7.C.1,
+7.C.2, or 7.C.3, it is a fault against the server.
+7.D Drop Serve. A drop serve is made by dropping the ball and hitting the ball
+with the paddle after the ball bounces on the playing surface. The service
+motion for a drop serve must comply with Rules 7.D.1 through 7.D.5.
+7.D.1 Release Position. The server must release the ball from a natural
+(unaided) height.
+7.D.2 Release Force. When releasing the ball, the ball must not be
+propelled in any direction or in any manner prior to hitting the
+serve.
+7.D.3 Number of Bounces. Before the server hits the ball to make the
+serve, there is no restriction on how many times the ball can
+bounce.
+7.D.4 Bounce Location. Before the server hits the ball to make the serve,
+there is no restriction on where the ball bounces on the playing
+surface.
+17
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+7.D.5 Forehand or Backhand. The serve can be made with a forehand or
+backhand motion.
+7.D.6 Fault – Illegal Drop Serve. When the server violates Rule 7.D.1 or
+7.D.2, it is a fault against the server.
+7.E Serve Placement. The server must serve to the service court diagonally
+opposite their correct position. (See Rule 14.B.3 for mini-singles.) The served
+ball must clear the opponent’s non-volley zone, with or without touching the
+net, and land in the correct service court.
+7.E.1 Fault – Serve Lands Out of Bounds. When a served ball lands
+outside the correct service court, it is a fault against the server.
+7.E.2 Fault – Serve Lands in Non-Volley Zone. When a served ball lands
+in the non-volley zone, it is a fault against the server.
+7.E.3 Fault – Serve Hits Permanent Object. When a served ball
+contacts a permanent object before landing, it is a fault against the
+server.
+7.E.4 Fault – Serve Hits Server or Server’s Partner. When a served ball
+contacts the server or server’s partner or anything that is worn or
+carried by either, it is a fault against the server.
+7.E.5 Fault – Serve Hits Receiver or Receiver’s Partner. When a served
+ball contacts the receiver or receiver’s partner or anything that is
+worn or carried by either, before landing, it is a fault against the
+receiver.
+18
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 8 Line Calls
+8.A Line Calling Responsibility. Players are responsible for making “out” calls
+for all lines on their end of the court. In doubles, either or both partners may
+make a line call.
+8.B “In” Ball. A served ball that clears the opponent’s non-volley zone line and
+lands in the correct service court is “in.” A ball returned by a player that
+lands on the opponent’s end of the court is “in.”
+8.C “Out” Ball. A served ball that does not land in the correct service court on
+the opponent’s end of the court, including one that lands on the non-volley
+zone line, is “out.” Any other ball that lands outside the court is “out.”
+8.D Code of Ethics for Line Calling. When making line calls, players must strive
+for accuracy and operate under the principle that all questionable calls must
+be resolved in favor of the opponent. The opponent gets the benefit of the
+doubt on line calls made. Any ball that cannot be promptly called “out” must
+be considered “in.”
+8.E Line Call Certainty. Players must not call a ball “out” unless they can clearly
+see a space between the line and the ball when it lands. (See Figure 8-1.)
+Figure 8-1: Out Ball Illustration
+8.F “Out” Call and Signal. Players must promptly signal an “out” ball audibly
+by voice, visibly by a hand signal, or both.
+19
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+8.F.1 Valid Line Call. Any “out” call made by a player after the ball lands
+is a line call.
+8.F.2 Dead Ball. A line call results in a dead ball and play must stop.
+8.F.3 Out Call Timing. If a player returns the ball, their “out” call must
+be made before the ball is hit by the opponent or before the ball
+becomes dead; otherwise, play continues. If a player does not
+return the ball, an “out" call made promptly will be recognized,
+even if the ball becomes dead before the “out” call is made.
+8.F.4 Partner Communication. While the ball is in the air, any
+communication between partners about whether a ball might land
+out is considered player communication, not a line call.
+8.G Overriding a Call. Players may override a partner’s line call, their own line
+call, or an “in” ruling to their own disadvantage.
+8.H Partner Disagreement (Doubles). When partners disagree on a line call,
+then conflict exists, and the team's call will be “in.”
+8.I Requesting Opponent’s Opinion. A player may defer to the opponent any
+line call that the player is responsible for making by asking the opponent’s
+opinion up until the next serve is hit. When the opponent makes a clear “in”
+or “out” decision, the opponent’s decision will stand. When the opponent
+does not make a definitive call, the player’s call will stand or when no call
+was made by the player, the ball will be considered “in.” After asking the
+opponent, the player and the player’s partner lose the opportunity to make
+the line call, except to override the call to favor the opponent.
+8.J Spectator Involvement. Spectators must not be consulted on any call.
+20
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 9 Dead Balls, Faults, and Hinders
+9.A Stopping a Rally. Any action that stops play results in a dead ball.
+9.A.1 Fault – Stopping a Rally. When a player stops a rally before the
+ball otherwise becomes dead, it is a fault against the player unless
+the stoppage is to call a hinder (see Rule 9.C), to correctly identify a
+player position or server error (see Rule 5.C.1.a), or to ask for
+correction of an incorrect score before the return of serve (see Rule
+6.F.1).
+9.B Faults. A called fault or a fault committed by a player results in a dead ball.
+9.B.1 Fault Occurrence. A fault only occurs while the ball is live, except
+for non-volley zone violations involving momentum. (See Rule
+11.A.2.)
+9.B.2 Fault Call Responsibility. Players are expected to call faults on
+themselves or on their partner as soon as the fault is committed or
+detected.
+9.B.3 Calling Non-Volley Zone Faults and Service Foot Faults on
+Opponent. Players may only call non-volley zone faults and service
+foot faults on an opponent.
+9.B.3.a Fault Call Timing. A fault should be called as soon as the
+claimed fault is committed or detected. The fault must be
+called before the serve is hit to begin the next rally.
+9.B.3.b Disagreement Between Teams. When there is any
+disagreement between teams about a fault call, the rally
+must be replayed.
+9.B.3.c Disagreement Between Partners. Any disagreement
+between partners on a fault call will be decided to the
+benefit of their opponents.
+9.B.4 No Enforcement of Other Faults. If a player believes an opponent
+has committed any type of fault other than a non-volley zone fault
+or a service foot fault, they may mention the specific fault to the
+opponent upon completion of the rally, but they have no authority
+to enforce the fault. The final decision on fault resolution belongs
+to the player that allegedly committed the fault.
+9.C Hinders. A called hinder results in a dead ball.
+9.C.1 Who Can Call Hinder. Any player may call a hinder.
+21
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+9.C.2 Replay – Hinder. When a hinder is called, the rally must be
+replayed.
+22
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 10 Rally Situations
+10.A Two-Bounce Rule. The serve and the return of serve must each bounce
+before being returned.
+10.A.1 Fault – No Bounce by Receiver. When the receiver does not allow
+the serve to bounce before hitting the ball, it is a fault against the
+receiver.
+10.A.2 Fault – No Bounce by Serving Side. When the server or server’s
+partner does not allow the return of serve to bounce before hitting
+the ball, it is a fault against the serving side.
+10.B Maximum Number of Bounces. A player must return the ball before a
+second bounce.
+10.B.1 Fault – Double Bounce. When a player fails to return a ball before
+it bounces twice, it is a fault against the player.
+10.C Returned Ball Placement. A player must return the ball so that the ball
+lands on the opponent’s end of the court or contacts the opponent or
+anything that is worn or carried by the opponent before the ball lands.
+10.C.1 Fault – Ball Lands Out of Bounds. When a player hits a ball that
+first lands outside the opponent’s end of the court, it is a fault
+against that player.
+10.C.2 Fault – Ball Lands on Player’s Side of Net. When a player hits a
+ball that fails to cross the net and lands on the player’s side of the
+net, it is a fault against that player.
+10.C.3 Fault – Ball Hits Player. After the serve, when the ball contacts a
+player or anything that is worn or carried by the player, except the
+player’s paddle or the player’s hands below the wrist joint while in
+contact with the paddle, it is a fault against that player.
+10.C.4 Fault – Ball Hits Permanent Object Before Landing. When a
+player hits a ball that contacts a permanent object before
+bouncing on the court, it is a fault against that player.
+10.C.5 Fault – Ball Hits Permanent Object After Landing. When a player
+fails to return a ball that has bounced in the player’s court before
+the ball contacts a permanent object, it is a fault against that
+player.
+10.D Double Hit. Balls can be hit more than once, but the stroke must be
+continuous in a single direction by one player.
+23
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+10.D.1 Fault – Double Hit. When a player hits a ball more than once using
+a stroke that is not continuous and in a single direction, it is a fault
+against that player.
+10.D.2 Fault – Ball Hit by Two-Players. It is a fault if both a player and
+their partner strike the ball while attempting to return it.
+10.E Missed Shot. When a player completely misses hitting the ball, the ball
+remains live.
+10.F Distraction. A player must not distract their opponent when the opponent is
+about to hit the ball.
+10.G Damaged Ball. When a ball is or becomes broken, cracked, soft or degraded,
+play must continue until the end of the rally. The ball will be replaced if all
+players agree.
+10.G.1 Replay – Broken or Cracked Ball. When all players agree that a
+broken or cracked ball affected the outcome of the rally, the rally
+must be replayed. If all players do not agree that a broken or
+cracked ball affected the outcome of the rally, the result of the rally
+stands.
+10.G.2 No Replay – Soft or Degraded Ball. When a ball is or becomes
+degraded or soft, the result of the prior rally stands.
+10.H Injury. If a player is injured during a rally, play must continue until the end of
+the rally.
+10.I Player Equipment or Apparel Problem. If a player experiences an
+equipment or apparel problem during a rally, play must continue until the
+end of the rally.
+10.J Item on Court. When anything that is worn or carried by a player lands on
+the player’s end of the court (except when the item contacts the non-volley
+zone as a result of the player volleying the ball (see Rule 11.A.1)), the ball
+remains in play, even if the ball hits the item.
+10.K Between Rallies. Players may quickly hydrate, towel off, and adjust
+equipment and apparel between rallies as long as the flow of the game is not
+adversely impacted.
+24
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 11 Non-Volley Zone Infractions
+11.A Allowable Contact. All volleys must be initiated outside of the non-volley
+zone. A player, or anything in contact with the player, may contact the non-
+volley zone at any time except during the act of volleying a ball.
+11.A.1 Fault – Non-Volley Zone Contact While Volleying. When a
+volleying player or anything that has contact with the volleying
+player (including the player’s partner) contacts the non-volley
+zone, it is a fault against the player.
+11.A.2 Fault – Non-Volley Zone Momentum. When a volleying player’s
+momentum causes the player to contact anything (including the
+player’s partner) that is in contact with the non-volley zone, even
+after the ball becomes dead, it is a fault against the volleying
+player.
+11.A.3 Fault – Failure to Exit the Non-Volley Zone Before Volleying.
+After contacting the non-volley zone, when a player volleys a ball
+before both feet contact the playing surface completely outside
+the non-volley zone, it is a fault against the player.
+25
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 12 The Paddle During Play
+12.A One Paddle. A player must not use or carry more than one paddle during a
+rally.
+12.A.1 Fault – More Than One Paddle. When a player uses or carries
+more than one paddle while the ball is in play, it is a fault against
+the player.
+12.B Paddle Possession. A player must have possession of the paddle when
+hitting the ball. A player is allowed to hold the paddle with one or both
+hands. The paddle may be switched from hand to hand at any time.
+12.B.1 Fault – Paddle Not in Possession. When a player does not have
+possession of the paddle when hitting the ball, it is a fault against
+the player.
+12.C Catch or Carry. A player must not catch or carry a ball on their paddle
+during a rally.
+12.C.1 Fault – Catch or Carry. When a player catches or carries a ball on
+their paddle during a rally, it is a fault against the player.
+26
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 13 The Net and Net Support
+System During Play
+13.A Ball Contacting Net. When the ball contacts the net, or the rope or cable at
+the top of the net between the net posts, the ball remains in play.
+13.A.1 Replay – Ball Contacts Net. When a returned ball that crosses the
+net gets caught in the net, contacts a part of the net that is draping
+on the ground, or contacts a deflecting net before or after
+bouncing, the rally must be replayed.
+13.B Ball Contacting Net Support System. A served ball must not contact any
+part of the net support system. A returned ball must not contact any part of
+the net support system on the hitting player’s end of the net.
+13.B.1 Fault – Ball Contacts Net Support System. When a player serves a
+ball that contacts the net support system on either end of the net
+or returns a ball that contacts the net support system before going
+over the net, it is a fault against the player.
+13.B.2 Replay – Ball Affected by Net Support System. When a returned
+ball crosses the net and contacts any part of a crossbar, or any
+other part of the net support system within the court boundaries,
+before or after the ball bounces, the rally must be replayed.
+13.C Ball Around Net Post. A ball may be returned around the outside of the net
+post.
+13.D Ball Between Net and Net Post. A ball must not be hit between the net and
+the net post.
+13.D.1 Fault – Ball Between Net and Net Post. When a player hits the
+ball between the net and the net post, it is a fault against the
+player.
+13.E Ball Under Net. A ball must not be hit under the net.
+13.E.1 Fault – Ball Under Net. When a player hits the ball under the net, it
+is a fault against the player.
+13.F Ball Crossing Plane of Net. A ball must entirely cross to a player’s end of
+the net before the player hits the ball.
+13.F.1 Fault – Ball Hit Before Crossing Plane of Net. When a player hits
+the ball before the ball entirely crosses the plane of the net to the
+player’s end, it is a fault against the player.
+27
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+13.G Player Contacting Net or Net Support System. A player or anything that is
+worn or carried by the player must not contact the net or net support system
+while the ball is live.
+13.G.1 Fault – Player Contacts Net or Net Support System. When a
+player or anything that is worn or carried by the player contacts the
+net or net support system while the ball is live, it is a fault against
+the player.
+13.H Player Contacting Opponent or Opponent’s Court. A player or anything
+that is worn or carried by the player must not contact their opponent or the
+opponent’s end of the court while the ball is live.
+13.H.1 Fault – Player Contacts Opponent or Opponent’s Court. When a
+player or anything that is worn or carried by the player contacts
+their opponent or the opponent’s end of the court while the ball is
+live, it is a fault against the player.
+13.I Player Crossing Plane of Net. A player or anything that is worn or carried by
+the player must not cross the plane of the net when the ball is live, except as
+provided for in Rules 13.I.1 and 13.I.2.
+13.I.1 After Hitting the Ball. A player may cross the plane of the net
+immediately after hitting the ball. The allowance to cross the plane
+of the net only applies while executing the current strike of the ball
+and for continuation associated with the current strike of the ball.
+13.I.1.a Fault – Player Crosses Plane of Net Before Hitting
+Ball. When any part of a player or anything that is worn
+or carried by the player crosses the plane of the net
+before the player hits the ball, it is a fault against the
+player.
+13.I.1.b Fault – Player Crosses Plane of Net Without Hitting
+Ball. When any part of a player or anything that is worn
+or carried by the player crosses the plane of the net
+and the player does not hit the ball, it is a fault against
+the player.
+13.I.2 Ball Crosses Back to Opponent’s Side. When a ball bounces in the
+court on the receiving player’s end of the net and then returns to
+the opponent’s side of the net without being hit, the receiving
+player may cross over, under, or around the net to hit the ball, but
+only after the ball has first crossed back to the opponent’s end of
+the net.
+28
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+13.I.2.a Fault – Player Crosses Plane of Net Before Ball
+Crosses. When a ball bounces in the court on the
+receiving player’s end of the net and is returning to the
+opponent’s end without being hit, it is a fault against
+the player if the player crosses the plane of the net
+before the ball crosses entirely.
+13.I.2.b Fault – Ball Not Contacted. When a ball bounces in
+the court on the receiving player’s end of the net and
+then returns to the opponent’s end of the net without
+being hit, it is a fault against a player who fails to hit
+the ball before it bounces once on the opponent’s end
+of the net.
+13.J Replay – Net System Malfunction. When a net system malfunctions during
+a rally, the rally must be replayed.
+29
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 14 Variations on Standard
+Pickleball
+14.A (Provisional Rule) Rally Scoring Option. Rally scoring may be used for
+singles and doubles.
+14.A.1 Applicability of Rules. All standard rules for singles and doubles
+apply except for the modifications included in this section.
+14.A.2 Point Scoring. A point is scored by the singles player or doubles
+team that wins each rally. (Modifies Rule 4.A)
+14.A.3 Calling the Score. The score must be called as two numbers:
+server’s score, then receiver’s score. (Modifies Rule 6.B.2)
+14.A.4 Serving (Doubles). After each side out, service begins with the
+player correctly positioned on the right side according to the
+team’s score. The server will alternate serving areas after each
+point is won, until a rally is lost . (Modifies Rule 5.B.2)
+14.A.5 One Server (Doubles). Only one player on a team will serve before
+a side out is declared. After the serving team loses the rally, a side
+out will occur, and service is awarded to the opponent. (Modifies
+Rules 5.B, 5.B.2, 5.B.5, 5.B.6)
+14.B Mini-Singles. All standard singles rules apply to mini-singles except for the
+modifications included in this section.
+14.B.1 The Court. Mini-singles is played on a standard pickleball court.
+(See Figure 3-1.)
+14.B.1.a Court Area In Play. Only the right or left side on each
+player’s end of the court is in play during each rally
+based on each player’s respective score. (Modifies
+Rules 3.A.4.c, 5.A.1)
+14.B.1.b Boundary Lines. The boundary lines of the in-play side
+of the court for a rally are the baseline, the respective
+sideline, and the centerline of the court. The opposite
+side of the court is out of bounds.
+14.B.1.c Additional Court Line. An additional line must be
+provided that extends the centerline of the court
+through each non-volley zone. The color of the
+additional line is not required to be the same as the
+other court lines. (Modifies Rule 3.A.4.d)
+30
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+14.B.2 Player Positions. The server’s and the receiver’s correct positions
+for a rally are determined by their individual scores. (Modifies Rule
+5.A)
+14.B.3 Shot Placement. Each player’s served and returned balls must
+land in bounds of the opponent’s side of the court that is in play.
+31
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Part III Tournament Play
+Part III (Sections 15 through 24) presents additional rules, and
+modifications to rules in Part II, that apply to tournament play only.
+Section 15 Tournament Event and Scoring
+Options
+15.A Event Categories.
+Men’s: Singles and Doubles
+Women’s: Singles and Doubles
+Mixed: Doubles
+Wheelchair: Singles and Doubles (See Section 25.A)
+Adaptive Standing: Singles and Doubles (See Section 25.B)
+Hybrid: Doubles (See Section 25.C)
+15.A.1 Gender Events. In events categorized by gender, only members of
+that gender are allowed to play in that event.
+15.A.2 Open Gender and Age Events. Players of any gender and age are
+allowed to play in an open gender and age event.
+15.A.3 Doubles. A doubles team must consist of two players who meet
+the classification requirements to participate in a particular
+division of play.
+15.A.3.a Mixed Doubles. A mixed doubles team must consist of
+one male player and one female player.
+15.A.3.b Skill-Rated Doubles Events. In a doubles event based
+on player skill rating, the skill level of the higher-rated
+team member determines a team’s skill rating for the
+event.
+15.A.3.c Age-Qualified Doubles Events. In a doubles event
+qualified by ages 19 years and older (adult event), the
+age of the younger team member determines a team’s
+age classification for the event. Players may play in a
+younger age adult event unless prohibited by the rules
+of the National Senior Games Association.
+15.A.4 Junior Events. Junior events are qualified by ages 18 and younger.
+Players aged 18 years and younger may play in any adult event
+32
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+when a junior event is not available or does not have enough
+entrants, or with the Tournament Director’s permission.
+15.B Event Formats. Matches may use any of the approved tournament formats.
+15.B.1 Double Elimination. In a double elimination format, after losing
+one match, a singles player or doubles team plays in a consolation
+bracket. The player or team is eliminated from competition after
+one loss in the consolation bracket. The winner of the consolation
+bracket plays the winner of the winners’ bracket to determine first
+place and second place. If the winner of the consolation bracket
+defeats the winner of the winners’ bracket, then a tie-breaker
+match to 15 points must be played to determine first place and
+second place. The loser of the final match in the consolation
+bracket wins third place.
+15.B.2 Single Elimination with Consolation. In a single elimination with
+consolation format, after losing one match, a singles player or
+doubles team plays in a consolation bracket. The player or team is
+eliminated from competition after one loss in the consolation
+bracket. The final two players or teams in the winners’ bracket play
+for first place and second place. The final two singles players or
+doubles teams in the consolation bracket play for third place.
+15.B.3 Single Elimination Without Consolation. (Pro and Senior Pro
+Player Brackets) Single Elimination Without Consolation. The first
+player/team to score the match-winning point by at least a two-
+point margin wins. The final two players/teams in the winner’s
+bracket play for the gold/first place and silver/second-place
+medals. The determination of the final standings of the remaining
+players/teams is left to the discretion of tournament officials.
+15.B.4 Round Robin. All singles players or doubles teams play each other.
+The winner is determined based on the highest number of matches
+won. When two or more teams are tied for the number of matches
+won, ties must be broken in accordance with the sequence in Rules
+15.B.4.a through 15.B.4.f. The method that succeeds in breaking
+the tie will be used to rank all tied teams.
+15.B.4.a Withdrawal, Retirement, or Forfeit. When a singles
+player or doubles team withdraws, retires, or is
+forfeited from a round robin event, then that player’s
+or team’s match results will not count toward the
+standings of that event and the player or team will not
+be eligible to participate in any elimination playoff or
+33
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+medal match for that event. The match results will
+count towards the player’s or team’s rating.
+15.B.4.b First Tie-Breaker. The first tie-breaker is the best
+record of head-to-head matches among the tied
+teams.
+15.B.4.c Second Tie-Breaker. The second tie-breaker is the
+best point differential of all games played. This tie-
+breaker does not apply across multiple pools where
+the number of teams in each pool is not equal. (For
+example, Team A wins their first match, 11-8, 11-4, so
+they would have a point differential of +10. Team A
+then wins the second match, 11-9, 2-11, 11-6. For the
+second round, they would have a point differential of -
+2. This would give them a total for the two rounds of
++8.)
+15.B.4.d Third Tie-Breaker. The third tie-breaker is the best
+point differential of head-to-head games.
+15.B.4.e Fourth Tie-Breaker. The fourth tie-breaker is the best
+point differential of games played against the singles
+player or doubles team with the next -highest number
+of matches won. (For example, when players or teams
+are tied for second-place, the total point differential
+against the first-place singles player or doubles team is
+used.)
+15.B.4.f Fifth Tie-Breaker. The fifth tie-breaker is the highest
+number of points scored across all matches in the
+round robin. This tie-breaker does not apply across
+multiple pools where the number of teams in each
+pool is not equal.
+15.B.5 Pool Play. The singles players or doubles teams are divided into
+two or more player pools. Each pool plays a round robin to seed
+the players or teams for a single-elimination or double-elimination
+playoff.
+15.B.6 Non-Pool Play. After playing a round robin to determine seeding,
+seeded singles players or doubles teams play a single-elimination
+or double-elimination playoff, using a match format of two of three
+games to 11 points, one game to 15 points, or one game to 21
+points, all win by two points.
+34
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+15.B.7 Team Play. Team play participants are designated by roster and
+play can include gender singles, gender doubles, and mixed
+doubles. Team play may use standard scoring or rally scoring for
+both singles and doubles play.
+15.C Tournament Match and Scoring Options. All scoring options are win by
+two points, except win by one point is allowed for team play.
+15.C.1 Standard Scoring Formats. The tournament standard scoring
+options are:
+15.C.1.a Best 2-of-3 games to 11 points.
+15.C.1.b Best 3-of-5 games to 11 points.
+15.C.1.c One game to 15 or 21 points.
+15.C.1.d One game to 11 points (for round robin events with six
+or more teams only).
+15.C.2 (Provisional Rule) Rally Scoring Match Formats. The
+Tournament Director has the option to use rally scoring except for
+double-elimination doubles events, all 2026 USA Pickleball Golden
+Ticket events, and the 2026 USA Pickleball National Championship
+events. The tournament rally scoring options are:
+15.C.2.a One game to 11 points, 15 points, or 21 points.
+15.C.2.b Best 2-of-3 games to 11 points, 15 points, or 21 points.
+15.C.2.c Best 3-of-5 games to 11 points, 15 points, or 21 points.
+15.C.2.d For inclement weather considerations, the
+Tournament Director may approve game scoring to 7
+points with an end change at 4 points in a single-game
+match or the tie-breaker game of a multiple-game
+match.
+15.D Scheduling Matches. A player is not permitted to enter multiple events
+scheduled on the same day with an overlapping time duration.
+15.E Draws and Seeding. A draw and seeding committee must rank the
+players and teams and set up a fair draw in each event.
+15.F Two-Match Minimum. Each player is entitled to participate in a minimum
+of two scheduled matches per event entered except for a Single
+Elimination Without Consolation event. (See Rule 15.B.3.)
+35
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+15.G Error Corrections. Tournament Operations personnel have the authority
+to correct any operational errors that result in incorrect scores, players on
+courts, match results, bracket results, medal results, matches being
+played, or future matches to be played.
+36
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 16 Tournament Director
+Responsibilities
+16.A Overall Responsibility. The Tournament Director is responsible for the
+tournament, designates the officials and their areas of responsibility, and
+ensures that planned support is available.
+16.B Designee Selection. The Tournament Director may designate a
+representative to assume certain Director duties, but the Tournament
+Director retains final decision-making authority.
+16.C Event Formats. The Tournament Director or the tournament sponsor
+typically selects the event formats. (See Rule 15.B.)
+16.D Draw and Seeding Committee. The Tournament Director must appoint a
+draw and seeding committee. (See Rule 15.E.)
+16.E Notification of Hazards and Abnormal Conditions. Before the tournament,
+the Tournament Director must notify players and referees of any unique
+features, abnormal local conditions, or hazards associated with the courts.
+When possible, players should be notified in writing as part of the pre-
+tournament instructions. Referees must be notified at the venue.
+16.F Local Rules and Exceptions. The Tournament Director must not implement
+or impose any rule that is not provided in this Rulebook. Exceptions to the
+rules because of physical limitations of the courts or other local conditions
+must be approved in advance of the tournament by the USA Pickleball
+Managing Director of Officiating.
+16.G Ball Selection. The Tournament Director will choose the tournament ball
+from the official list of approved balls posted on the USA Pickleball website.
+16.H Starting Server Identification (Doubles). The Tournament Director will
+provide a method of identifying each team’s starting server for each game.
+16.I Line Judges. The Tournament Director will determine which matches will
+use line judges.
+16.J Removal of Referee or Line Judge. The Tournament Director has the final
+authority to remove and replace members of the officiating team. (See Rules
+20.K and 20.L.)
+16.K Player Apparel Changes. The Tournament Director has the authority to
+require players to change apparel. (See Rule 18.B.3 and 18.B.4.)
+37
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+16.L Notice of Schedule Changes. When any change is made to the tournament
+schedule of matches after the initial posting, the Tournament Director must
+notify the players of the changes.
+16.M Extending Time to Report to Match. The Tournament Director may allow
+an extension of time for players to report to a match when circumstances
+warrant.
+16.N Court Changes. The Tournament Director may direct a court change during
+a match after the completion of any game to accommodate better spectator
+or playing conditions.
+16.O Officiating Appeals. The Tournament Director must resolve player appeals
+concerning officiating rulings. Decisions of the Tournament Director are
+final.
+16.P Player Misconduct. The Tournament Director has the authority to impose
+warnings, technical fouls, and match forfeits and to eject or expel any player
+for misconduct. (See Rules 22.A.3, 22.I and 22.K)
+16.Q Partner Changes. The Tournament Director must approve any allowable
+doubles partner changes. (See Rule 18.G.)
+38
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 17 Referee Responsibilities
+17.A Basic Duties. The referee is responsible for all decisions related to
+procedural and judgment calls during a match.
+17.B Pre-Match Checks. Before each match starts, the referee must:
+17.B.1 Referee Tools. Check the availability and suitability of necessary
+supplies for the match, such as balls, scoresheets, pencils, and a
+timing device.
+17.B.2 Court Conditions. Check the preparation of the court with respect
+to cleanliness, lighting, net height, court markings, and hazards.
+17.C Pre-Match Briefing. Before each match starts, the referee must meet with
+the players at the court to:
+17.C.1 Paddle Inspection. Inspect paddles for compliance with paddle
+specifications. (See Rules 3.D, and 18.A.)
+17.C.2 Rule Modifications and Hinders. Point out approved rule
+modifications, court abnormalities, and non-standard court
+conditions that could be potential safety issues.
+17.C.3 Line Calling Duties. Instruct players on the line calling duties of
+the referee, players, and line judges when applicable. This
+requirement may be satisfied by the Tournament Director
+providing pre-match instructions to the players. (See Section 19.)
+17.C.4 Selection of Service and End. Use a fair method (e.g., selection of
+a number [1 or 2] written on the back of the scoresheet, coin toss)
+to determine which singles player or doubles team has first choice
+of serving, receiving, selecting at which end of the court to start the
+match, or deferring the first choice to their opponent. Once a
+selection is made, it cannot be changed.
+17.C.5 Starting Server Identification (Doubles). Ensure the starting
+server for each team wears the required identification. (See Rule
+18.C.)
+17.D Officiating Play. During the match, the referee must:
+17.D.1 Player and Position Confirmations. Confirm the correct server,
+receiver, and player positions and correct the players if necessary.
+39
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+17.D.2 Score Calls. Call the score to start each rally after confirming that
+the correct server has the ball (see Rule 6.B). Calling the score
+indicates to all players that play is ready to resume.
+17.D.2.a Serving Area Change. Allow players to reposition
+when the serving team changes serving areas after the
+score has been called, and then re-call the score. (See
+Rule 20.D.)
+17.D.3 Point Calls. Call “point” after each point is awarded.
+17.D.4 Second Server Calls (Doubles). Call “second server” (or “second
+serve”) after the first server’s team loses a rally.
+17.D.5 Side Out Calls. Announce “side out” when a singles player or
+second server loses the serve.
+17.D.6 Scoresheet Annotations. Appropriately annotate the scoresheet
+after a rally is completed or a time-out is called.
+17.D.7 Net Checks. Recheck the net height and position if the net is
+disturbed.
+17.D.8 Fault Calls. Identify and call rule violations when they occur.
+17.D.9 Replay Calls. Call replays as appropriate. (See Appendix A.2.)
+17.D.10 Line Calls. Assist with line calls upon appeal and when a line
+judge signals a blocked view. (See Section 19.)
+17.D.11 Appealed Calls. Rule on other calls appealed by players. The
+referee may consult players and line judges to decide the
+outcome of any appeal.
+17.D.12 Line Judges. Monitor and manage line judge performance. (See
+Rule 20.K.)
+17.D.13 Hinders. Calls hinders and determines the validity of player-
+called hinders. (See Rule 20.H.)
+17.D.14 Damaged Balls. Determine whether a ball is broken or cracked
+and must be replaced, and whether the broken or cracked ball
+affected the outcome of a rally. (See Rule 20.F.)
+17.D.15 Time-Outs. Enforce time-out procedures. (See Section 21.)
+17.D.16 15-Second Warnings. Announce when there are 15 seconds
+remaining in a time-out. At the end of the 15 seconds, the referee
+40
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+must call “time in” and then the score when all players are ready
+to play or should be ready to play.
+17.D.17 Player Conduct. Monitor and manage player conduct. The
+referee is empowered to call verbal warnings, technical
+warnings, and technical fouls, and to forfeit games and matches
+based on a defined combination of technical warnings and/or
+technical fouls. The referee may also recommend ejection of a
+player to the Tournament Director. (See Section 22.)
+41
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 18 Player Pre-Match
+18.A USA Pickleball Approved Paddle. Players must use an approved paddle
+that complies with the paddle specifications in Rule 3.D. Players must
+confirm that their paddle is approved and listed on the USA Pickleball
+Approved Paddle List.
+18.A.1 Non-Compliant Paddle Discovered Before Match Starts. Before
+a match starts, when a player is discovered using a paddle that is
+not listed on the USA Pickleball Approved Paddle List or is not in
+compliance with the paddle specifications in Rule 3.D, the player
+must switch to a compliant paddle. There is no penalty to switch
+paddles.
+18.A.2 Match Forfeit – Non-Compliant Paddle Discovered During Play.
+During a match, when a player is discovered playing with a paddle
+that is not listed on the USA Pickleball Approved Paddle List or is
+not in compliance with the paddle specifications in Rule 3.D, a
+match forfeit will be imposed on the player.
+18.A.3 Non-Compliant Paddle Discovered After Match Concludes. After
+a match has ended, when a player is discovered to have used a
+paddle that is not listed on the USA Pickleball Approved Paddle List
+or is not in compliance with the paddle specifications in Rule 3.D,
+the match results stand.
+18.B Apparel. Player apparel must comply with Rules 18.B.1 and 18.B.2.
+18.B.1 Depictions. Graphics, insignias, pictures, and writing on apparel
+must be in good taste.
+18.B.2 Footwear. Shoes must have soles that do not mark or damage the
+playing surface.
+18.B.3 Apparel Change. A player must change apparel that is considered
+inappropriate by the Tournament Director, including that which
+approximates the color of the ball. A referee time-out will be used
+for an apparel change required during a match. (See Rule 16.K.)
+18.B.4 Match Forfeit – Refusal to Change Apparel. When a player refuses
+to comply with the apparel rules, the Tournament Director may
+impose a forfeit of the player’s match.
+18.C Starting Server Identification (Doubles). Starting servers must wear the
+required form of identification determined by the Tournament Director. This
+identification must be visible to the officiating team and players during play.
+42
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+18.C.1 Match Forfeit – Refusal to Wear Identification. When a player
+refuses to wear the required form of identification, the
+Tournament Director may impose a forfeit of the player’s match.
+18.D Electronic Equipment. During competition play, players may not wear or
+use headphones, earbuds, or any other equipment that enables audio
+communication, except for prescribed or required hearing aids.
+18.E Notice of Matches. It is the responsibility of each player to check the posted
+schedules and notifications of schedule changes to determine the time and
+place of each match.
+18.F Reporting for Match. Players must report to play a match within 10 minutes
+after the match is called. A match cannot begin until all players are present
+and the starting score is called.
+18.F.1 Game or Match Forfeit – No Show for First Game. When a player
+fails to report to play within 10 minutes after the match has been
+called to play, the referee will impose a game forfeit on the player,
+unless the Tournament Director grants a delay of the match start
+for extenuating circumstances. If the match format is one game,
+the game forfeit will result in a match forfeit.
+18.F.2 Match Forfeit – No Show for Multiple-Game Match. In a multiple-
+game match, when a player fails to report to play within 15
+minutes after the match has been called to play, the referee will
+impose a match forfeit on the player, unless the Tournament
+Director grants a delay of the match start for extenuating
+circumstances. (See Rule 16.M.)
+18.G Partner Change (Doubles). With the Tournament Director’s approval, a
+player may change a partner before a first-round match when the change is
+due to injury, illness, or circumstances beyond the control of the player. A
+partner change after the partners start team play is prohibited.
+43
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 19 Tournament Line Calls
+19.A Match Officiating Options. Matches may be officiated by a referee with or
+without line judges.
+19.A.1 Referee Responsibilities: The referee is responsible for calling
+service foot faults, short serves, and non-volley zone faults.
+(Modifies 9.B.4, first sentence)
+19.B Matches Without Line Judges. In matches officiated by a referee without
+line judges, players are responsible for making “out” calls for the baseline,
+sidelines, and center service line on their end of the court.
+19.C Matches with Line Judges. In matches officiated by a referee with line
+judges:
+19.C.1 Line Judge Responsibilities. Line judges make line calls and
+foot fault calls for their assigned line and assist the referee with
+other calls as requested. Line judges will signify by loudly calling
+“out” (or “service foot fault”) and showing the “out” signal
+(outstretched arm pointing in the out- of-bounds direction).
+19.C.2 Player Responsibilities. Players are responsible for making
+“out” calls for only the service court centerline on their end of
+the court.
+19.C.3 Invalid Line Calls. Player line calls are not valid, except for their
+centerline and to override an official’s line call to favor the
+opponent.
+19.D Appeals. Only rally-ending shots can be appealed. Any player may make
+the appeal.
+19.D.1 Appeal Timing. The appeal must be made before the ball is hit
+to make the next serve. An appeal of a match-ending shot must
+be made before the scoresheet is initialed.
+19.D.2 Requesting Opponent’s Opinion Before Appeal. Before
+appealing to the referee, a player may ask an opponent’s
+opinion on any line call the player is responsible for making.
+When the opponent is asked and the opponent makes a
+definitive call, the opponent’s call stands unless the referee
+overrules the opponent’s call on appeal or the player or their
+partner overrides the call to favor the opponent (Rule 19.I).
+44
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+19.D.3 Loss of Opportunity to Make Line Call. After appealing to the
+referee or asking the opponent’s opinion on a line call, the
+player and the player’s partner lose the opportunity to make the
+line call, except to override the call to favor the opponent. (See
+Rule 19.I.)
+19.E Referee Makes Call – Without Line Judges. In a match without line
+judges, when a player appeals a rally-ending shot to the referee, the
+referee must make the call when they clearly saw where the ball landed.
+19.F Referee Overrule of Line Call. Upon appeal, the referee may overrule any
+line call by a player or a line judge. The referee must overrule the line call if
+the referee saw the ball land “in.”
+19.F.1 Fault – Referee Overrule of Player’s “Out” Call. When the
+referee overrules an “out” call made by a player, it is a fault
+against that singles player or doubles team.
+19.F.2 Replay or Concession – Referee Overrule of Line Judge’s
+“Out” Call. When the referee overrules a line judge’s “out” call
+as “in,” the rally must be replayed, unless the singles player or
+doubles team that benefits from the referee’s ruling concedes
+the rally to their opponent.
+19.G No Definitive Call by Referee. When the referee is unable to make a call
+upon appeal, the outcome of the rally is determined by Rules 19.G.1
+through 19.G.4.
+19.G.1 No Call by Referee – Without Line Judges. When the referee is
+unable to make a call upon appeal, the player’s call stands,
+unless the player or the player’s partner asked the opponent and
+the opponent made a definitive call, in which case the
+opponent’s call stands. (See also Rule 19.D.2.)
+19.G.2 No Call by Players and Referee – Without Line Judges. Upon
+appeal, when the players and the referee are unable to make a
+call, the ball is ruled “in.”
+19.G.3 No Call by Referee – With Line Judges. When the referee is
+unable to make a call upon appeal, the line judge’s call stands.
+19.G.4 Replay – No Call by Officiating Team. When the line judges and
+referees are unable to make a call, the rally must be replayed.
+19.H Immediate Call by Referee. If a line judge shows the “blocked/blinded”
+signal at any time, the referee must make the call immediately if they
+clearly saw where the ball landed. If the referee cannot make the call on a
+45
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+rally-ending shot, the referee must canvass other appropriate members of
+the officiating team to assist in making the call.
+19.I Player Override of Call. A player may override an official’s line call, their
+partner’s line call, their own line call, or any “in” ruling when the override
+favors the opponent.
+19.I.1 Replay or Concession – Player Override of Official’s “Out”
+Call. When a player disagrees with a line judge’s or a referee’s
+“out” call that favored the player, the rally must be replayed,
+unless the player concedes the rally to their opponent.
+19.I.2 Player Override of Official’s “In” Ruling. When a player
+disagrees with a line judge’s or a referee’s ruling of an “in” ball
+that favored the player, the opponent wins the rally. (See also
+Rule 8.G.)
+46
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 20 Tournament Match Situations
+20.A Confirmation of Score. Before the serve is hit, any player may ask the
+referee for the correct score. (Modifies Rule 6.E)
+20.B Confirmation of Correct Player or Position. Before the serve is hit, any
+player may ask the referee to confirm the correct server, correct receiver,
+and correct player positions. (Modifies Rule 5.C)
+20.C Replay – Server or Position Correction. When the referee stops a rally to
+identify a player or position error, the rally must be replayed.
+20.D Player Repositioning. After the score is called, when the serving team
+changes serving areas, the referee must stop play, allow all players to
+reposition, and re-call the score to restart the 10-second count. (Modifies
+Rule 6.D.2)
+20.E Service Faults and Replays. Service faults or replays will be called in
+accordance with Rule 20.E.1 or Rule 20.E.2.
+20.E.1 Faults. In addition to the violations cited in Section 7, the
+referee will call faults for service violations.
+20.E.1.a Fault – Volley Serve, No Upward Service Motion.
+When the server’s arm is not clearly moving in an
+upward arc when the paddle contacts the ball, it is a
+fault against the server.
+20.E.1.b Fault – Volley Serve, Paddle Head Above Wrist.
+When the highest point of the paddle head is clearly
+above the server’s wrist joint when the paddle
+contacts the ball, it is a fault against the server.
+20.E.1.c Fault – Volley Serve, Ball Contacted Above Waist.
+When the ball is clearly above the server’s waist
+when the paddle contacts the ball, it is a fault against
+the server.
+20.E.1.d Fault – Volley Serve and Drop Serve, Release from
+Hands and Paddle. When the server does not clearly
+release the ball from only one hand or only from the
+paddle immediately prior to the serve, it is a fault
+against the server.
+20.E.1.e Fault – Volley Serve and Drop Serve, Spin or
+Manipulation on Release. When the server
+47
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+manipulates or spins the ball immediately prior to
+the serve, it is a fault against the server.
+20.E.1.f Fault – Drop Serve, Force Added to Ball Release.
+When the server propels the ball in any direction or
+manner prior to hitting the ball to make a drop serve,
+it is a fault against the server.
+20.E.1.g Fault – Drop Serve, Ball Release Aided Height.
+When the server does not clearly release the ball
+from a natural (un-aided) height, it is a fault against
+the server.
+20.E.2 Replays. The referee has the authority to call for a replay when
+they are not certain that one or more of the requirements of the
+serve has been met. Replays must be called before the return of
+serve.
+20.E.2.a Replay – Ball Release Not Visible. When it is
+questionable whether the release of the ball was not
+visible to the referee and receiver, the referee may
+call for a replay. When the referee is certain that the
+release of the ball was not visible, the referee must
+call for a replay.
+20.E.2.b Replay – Questionable Release From One Hand,
+Paddle or Natural Height. When it is questionable
+whether the server released the ball from only one
+hand or only from the paddle, or whether the release
+on a drop serve was from a natural (un-aided) height,
+the referee may call for a replay.
+20.E.2.c Replay – Questionable Manipulation or Spin. When
+it is questionable whether the server imparted
+manipulation or spin during the release of the ball,
+the referee may call for a replay. (Modifies Rule
+7.B.2.a)
+20.E.2.d Replay – Questionable Foot Contact with Serving
+Area. When it is questionable whether either of the
+server’s feet were in contact with the serving area
+when the paddle contacted the ball, the referee may
+call for a replay.
+20.E.2.e Replay – Questionable Foot Contact Outside the
+Serving Area. When it is questionable whether either
+48
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+of the server’s feet were in contact with the playing
+surface outside the serving area when the paddle
+contacted the ball, the referee may call for a replay.
+20.E.2.f Replay – Volley Serve, Questionable Upward
+Service Motion. When it is questionable whether the
+server’s arm was moving in an upward arc when the
+paddle contacted the ball to make a volley serve, the
+referee may call for a replay.
+20.E.2.g Replay – Volley Serve, Questionable Paddle Head
+Height. When it is questionable whether the highest
+point of the paddle head was no higher than the
+server’s wrist joint when the paddle contacted the
+ball to make a volley serve, the referee may call for a
+replay.
+20.E.2.h Replay – Volley Serve, Questionable Ball Height.
+When it is questionable whether the ball was no
+higher than the server’s waist when the paddle
+contacted the ball to make a volley serve, the referee
+may call for a replay.
+20.E.2.i Replay – Drop Serve, Questionable Force on Ball.
+When it is questionable whether the ball was
+propelled when the server released the ball to make
+a drop serve, the referee must call for a replay.
+20.F Damaged Ball. A player may appeal to the referee to determine whether a
+ball is degraded, soft, broken, or cracked. A potentially soft or degraded
+ball will not be replaced unless all players agree. If the referee determines
+that the ball is broken or cracked, it will be replaced. (Modifies Rule 10.G)
+20.F.1 Replay – Broken or Cracked Ball. When the referee determines
+that the broken or cracked ball affected the outcome of the rally,
+the rally must be replayed with a replacement ball. (Modifies
+Rule 10.G.1)
+20.G Coaching. Except during time-outs and between games, players or teams
+must not receive coaching from anyone other than a partner.
+20.G.1 Verbal Warning or Technical Warning – Illegal Coaching. The
+referee may assess a verbal warning or technical warning against
+a singles player or doubles team that receives coaching other
+than during time-outs or between games.
+49
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+20.H Hinder. The referee must validate a hinder called by a player. (Modifies
+Rule 9.C.2)
+20.H.1 Fault – Invalid Hinder. When the referee does not validate a
+hinder called by a player, it is a fault against the player.
+20.H.2 Replay – Valid Hinder. When the referee validates a hinder
+called by a player, the rally must be replayed. (Modifies Rule
+9.C.2)
+20.I Distraction. The referee must determine when a player has distracted
+their opponent from hitting the ball.
+20.I.1 Fault – Distraction. When, in the judgement of the referee, a
+player distracts an opponent when the opponent is about to hit
+the ball, it is a fault against the player.
+20.J Officiating Decision Challenge. Players may appeal any officiating
+decision to the Head Referee or Tournament Director.
+20.J.1 Rescinding Challenge Request. After a request for the Head
+Referee or Tournament Director has been acknowledged by the
+referee, the player may rescind the request; however, the player
+or team will be charged a standard time-out. When a standard
+time-out is not available, the referee will assess a technical foul
+against the player or team.
+20.J.2 Technical Warning or Technical Foul – Correct Ruling by
+Referee. When the Head Referee or Tournament Director
+concurs with a referee’s ruling, the referee will assess a technical
+warning and charge a standard time-out against the singles
+player or doubles team that challenged the ruling. When a
+standard time-out is not available, the referee will assess a
+technical foul against the player or team.
+20.J.3 Referee’s Ruling Overturned. When the Head Referee or
+Tournament Director does not concur with a referee’s ruling, the
+referee must reverse the ruling to correct the situation or order a
+replay of the rally, as appropriate.
+20.K Removal of Line Judge. The referee may remove and replace a line judge
+for any reasonable cause based on the referee's own observation or the
+unanimous request of the players.
+20.K.1 Player Request. When all players agree, they may petition the
+referee to have a line judge removed.
+50
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+20.K.2 Referee Disagreement. When the referee disagrees with the
+players’ request to remove a line judge, the referee must
+summon the Tournament Director for a final decision.
+20.L Removal of Referee. When all players agree, they may petition the
+Tournament Director to have a referee removed.
+51
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 21 Time-Outs and Breaks
+21.A Standard Time-Out. Two standard time-outs are allowed per singles
+player or doubles team for each 11-point and 15-point game and three
+time-outs for a 21-point game.
+21.A.1 Before Start of Match. A standard time-out cannot be called
+before a match starts.
+21.A.2 Requesting Time-Out. Any player may call a time-out between
+rallies before the next serve occurs or between games. The time-
+out must be called audibly by voice or visibly by hand signal, or
+both, and must be directed toward the opposing player or team
+and to the referee.
+21.A.2.a Fault – Late Time-Out Request. When a player calls
+a time-out after the serve has been hit, it is a fault
+against that player.
+21.A.2.b Verbal Warning or Technical Warning – No Audible
+or Visible Request. If the time-out call is not made
+audibly by voice or visibly by hand, the referee may
+assess a verbal warning or technical warning for
+delay of game.
+21.A.3 Between Games. Between games, players may request to use
+one or both standard time-outs before the start of the next
+game. The players must inform the referee. The standard time-
+out will start immediately after the expiration of the time-out
+between games. A time-out must be charged when any portion
+of the time is used. When the requesting singles player or
+doubles team is ready to resume play before a requested time-
+out begins, that time-out is not charged.
+21.A.4 After Medical Time-Out. A player may use available standard
+time-outs after the expiration of a medical time-out.
+21.A.5 Duration. A maximum of one minute is allowed for each
+standard time-out.
+21.A.6 Resuming Play. The referee will resume play by announcing a
+15-second warning (Rule 17.D.16).
+21.B End Change Time-Out. The referee will call a time-out to allow players to
+change ends at specified points during single-game matches and tie-
+52
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+breaker games. Players will not change ends during the tie-breaker game
+when the first game of the match was forfeited due to late arrival.
+21.B.1 11-Point Game. In a single game or tie-breaker game to 11
+points, the players will change ends when the first singles player
+or doubles team reaches a score of 6.
+21.B.2 15-Point Game. In a single game or tie-breaker game to 15
+points, the players will change ends when the first singles player
+or doubles team reaches a score of 8.
+21.B.3 21-Point Game. In a single game or tie-breaker game to 21
+points, the players will change ends when the first singles player
+or doubles team reaches a score of 11.
+21.B.4 No Server Change. After an end change time-out, play
+continues with the same server.
+21.B.5 Duration. A maximum of one minute is allowed to change ends
+during a game.
+21.B.6 Loss of End Change Point. A technical foul resulting in the loss
+of the end change point will have no effect on the completed
+end change.
+21.B.7 Failure to Change Ends. When an end change is not executed at
+the required point score, the end change will be executed when
+the failure to change ends is detected. It is not a fault on either
+team, the score is not impacted, and service continues with the
+same server.
+21.B.8 Resuming Play. The referee will resume play by announcing a
+15-second warning (Rule 17.D.16).
+21.C Medical Time-Out. A player needing medical attention during a match,
+including between games, may request a medical time-out.
+21.C.1 Before Start of Match. A medical time-out cannot be called
+before the start of a match.
+21.C.2 Between Games. Between games, a player may request a
+medical time-out, when available, before the start of the next
+game.
+21.C.3 Number Available. A player may be granted only one medical
+time-out per match.
+53
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+21.C.4 Rescinding Medical Time-Out Request. If the player rescinds
+the medical time-out after the medical personnel have been
+called and before they have arrived, a standard time-out will be
+charged and the medical time-out will not be charged. When a
+standard time-out is not available, the referee will assess a
+technical foul against the player or team for delay of game.
+21.C.5 Summoning Medical Assistance. The referee will immediately
+summon on-site medical personnel to assess the situation and
+render appropriate first aid. When medical personnel are not
+available, the Tournament Director will be summoned for
+assistance.
+21.C.6 Duration. A maximum of 15 minutes is allowed for a medical
+time-out. However, when medical treatment is rendered off-
+court at another location at the venue, the time to transport the
+player to and from the off-court location will be excluded from
+15-minute time period.
+21.C.7 Time Start. When medical assistance arrives, the referee will
+start a 15-minute timer. Play must resume as soon as possible
+but no later than 15 minutes of elapsed time.
+21.C.8 Valid Medical Condition. When medical personnel, or the
+Tournament Director, when medical personnel are not available,
+determine that a valid medical condition exists, the player must
+be able to resume play in 15 minutes or less. When the player is
+able to resume play in fewer than 15 minutes, the remaining
+medical time is lost and no longer available to the player during
+the match.
+21.C.9 Match Retirement. A match retirement is imposed when a
+player is not able to continue play after the 15-minute medical
+time-out period expires. A player may use their available
+standard time-outs to allow more time before the match must
+be retired (Rule 21.A.4). In doubles, if the retiring player's partner
+decides to continue, the match will resume following all
+applicable rules. The retiring player must leave the playing
+surface.
+21.C.10 Technical Warning or Technical Foul – Invalid Medical
+Condition. When medical personnel, or the Tournament
+Director when medical personnel are not available, determine
+that no valid medical condition exists for granting a medical
+timeout, the referee will assess a technical warning and charge
+54
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+a standard time-out against the singles player or doubles team
+that requested the medical time-out. When a standard time-
+out is not available, the referee will assess a technical foul
+against the player or team. The medical time-out is no longer
+available to that player and the player must resume play
+immediately.
+21.C.11 Resuming Play. The referee will resume play by announcing a
+15-second warning (Rule 17.D.16).
+21.D Referee Time-Out. The referee may call a referee time-out to address
+extenuating circumstances that require an extended interruption of play
+and summon assistance, as necessary. When designated personnel are
+not available, the Tournament Director will respond. Extenuating
+circumstances include, but are not limited to, those cited in this section.
+21.D.1 Referee Discretion. In the interest of overall safety, when the
+referee determines a potential medical situation exists, the
+referee is authorized to call a referee time-out and summon
+medical personnel, or the Tournament Director when medical
+personnel are not available.
+21.D.2 Presence of Blood. When a player is actively bleeding or blood
+is found on the court or a player, play must be stopped at the
+end of the rally. Play must not resume until the blood has been
+cleaned up and the bleeding has been controlled. Issues relating
+solely to blood cleanup or control that do not require the
+services of medical personnel will be addressed as a referee
+time-out.
+21.D.3 Foreign Substances. Foreign substances on the court, such as
+debris, water, or other fluids, must be removed or cleaned up.
+21.D.4 Resuming Play. The referee will resume play by announcing a
+15-second warning (Rule 17.D.16).
+21.E Equipment Time-Out. Players are expected to keep all apparel and
+equipment in playable condition.
+21.E.1 Time-Out Award. When the referee determines that an
+equipment change or adjustment is necessary for fair and safe
+continuation of the match, the referee may award an equipment
+time-out of reasonable duration.
+21.E.2 Resuming Play. The referee will resume play by announcing a
+15-second warning (Rule 17.D.16).
+55
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+21.F Time-Out Between Games. The referee will call a time-out between
+games of a match.
+21.F.1 Duration. A maximum of two minutes is allowed to change ends
+between games.
+21.F.2 End Change and Initial Service Change. Singles players or
+doubles teams must change ends and initial service for the next
+game of the match.
+21.F.3 Change of Starting Server. Teams may change the starting
+server between games and should notify the referee before the
+start of the next game.
+21.F.4 Resuming Play. The referee will resume play by announcing a
+15-second warning (Rule 17.D.16).
+21.G Time Between Matches. The allowed time between matches, including a
+tie-breaker match to determine a championship, is 10 minutes. When all
+players agree, a match may start early.
+21.H Suspended Game. A game suspended due to extenuating circumstances
+must resume with the same server, score, and remaining time-outs as when
+the game was suspended.
+56
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 22 Unsportsmanlike Conduct and
+Related Penalties
+22.A Referee Authorization. The referee is authorized to assess verbal
+warnings and penalties to a singles player or doubles team any time
+during a match while the players are in the vicinity of the court, including
+before the match starts.
+22.A.1 Timing of Assessment. Play will not be stopped to assess a
+warning or foul. The assessment will be applied after the rally
+has ended.
+22.A.2 Player Misconduct After Match. Behavior rising to the level of a
+warning or foul after the match is over while a player is still in
+the vicinity of the court must be brought to the attention of the
+Tournament Director. Based on this information, the
+Tournament Director may impose a verbal warning, technical
+warning, or technical foul that will be applied to the offending
+player’s next match at the tournament.
+22.B Verbal and Technical Warnings. The referee will assess a verbal warning
+or technical warning for minor unsportsmanlike conduct. Only one verbal
+warning may be assessed to each singles player or doubles team per
+match. Warnings will be assessed for:
+22.B.1 Objectionable Language. Using objectionable language
+directed at another person.
+22.B.2 Profanity. Using audible or visual profanity for any reason.
+22.B.3 Aggressive Arguing. Arguing aggressively with the officiating
+team, other players, or spectators in a manner that disrupts the
+flow of play.
+22.B.4 Ball Abuse. Intentionally damaging or aggressively hitting a
+dead ball without endangering people.
+22.B.5 Delay of Game. Delaying a game between rallies in a manner
+that unnecessarily disrupts the flow of play.
+22.B.6 Excessive Line Call Appeals. Repeatedly appealing line calls in
+a manner that disrupts the flow of play.
+22.B.7 Unauthorized Coaching. Receiving coaching from anyone other
+than a partner, except during a time-out. See Rule 20.G.1.
+57
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+22.B.8 Lost Ruling Challenge – Time-Out Charged. Challenging a
+referee’s ruling that is subsequently upheld by the Head Referee
+or Tournament Director. (A verbal warning is not applicable.)
+A standard time-out is also charged. See Rule 20.J.2.
+22.B.9 Invalid Medical Time-Out Request – Time-Out Charged.
+Requesting a medical time-out when no valid medical condition
+exists. (A verbal warning is not applicable.) A standard time-out
+is also charged. See Rule 21.C.10.
+22.B.10 Other Behavior. Other minor unsportsmanlike behavior.
+22.C Verbal and Technical Warning Consequences. The assessment of a verbal
+warning or technical warning will be accompanied by a brief explanation of
+the reason.
+22.C.1 No Loss of Rally or Point. Verbal warnings and technical
+warnings do not result in a loss of rally or point adjustment.
+22.C.2 No Effect on Server. A verbal warning or technical warning does
+not result in a server change or side out.
+22.D Technical Fouls. The referee will assess a technical foul for extreme
+unsportsmanlike conduct:
+22.D.1 Paddle Abuse. Aggressively or recklessly throwing a paddle in
+frustration or anger with negligent disregard for the
+consequences as long as the paddle does not strike a person or
+damage property but puts a person or the facility at risk or in
+danger.
+22.D.2 Ball Abuse. Aggressively or recklessly throwing or hitting a dead
+ball in frustration or anger with negligent disregard for the
+consequences as long as the ball does not strike a person but
+puts a person at risk or in danger.
+22.D.3 Extreme Objectionable Language. Using extremely
+objectionable language or profanity regardless of to whom or
+what it is directed.
+22.D.4 Threats. Making a threat or challenge of any nature toward or
+against any person.
+22.D.5 Lost Ruling Challenge – No Time-Out. Challenging a referee’s
+ruling that is subsequently upheld by the Head Referee or
+Tournament Director and a standard time-out is not available to
+be charged. See Rule 20.J.2.
+58
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+22.D.6 Invalid Medical Time-Out Request – No Time-Out. Requesting
+a medical time-out when no valid medical condition exists and a
+standard time-out is not available to be charged. See Rule
+21.C.10.
+22.D.7 Second Technical Warning. Being assessed a second technical
+warning during a match.
+22.D.8 Other Behavior. Other extreme unsportsmanlike behavior.
+22.E Technical Foul Consequences. The assessment of a technical foul will be
+accompanied by a brief explanation of the reason.
+22.E.1 Score Adjustment. When a technical foul is assessed against a
+singles player or doubles team, one point will be deducted from
+the score of the offending player or team. When the offender’s
+score is zero, one point will be added to the opponent’s score.
+The player or team whose score is adjusted must move to their
+correct position(s) based on their new score. A point adjustment
+due to assessment of a technical foul that results in a game-
+winning score applies regardless of who was serving during the
+preceding rally.
+22.E.2 No Effect on Server. A technical foul does not result in a server
+change or side out.
+22.F Game Forfeit. The referee will impose a game forfeit on a singles player or
+doubles team for:
+22.F.1 Technical Warning Plus Technical Foul. Being assessed any
+combination of one technical warning and one technical foul (or
+three technical warnings) during a match.
+22.F.2 Late Reporting for First Game. (See Rule 18.F.1.)
+22.G Game Forfeit Consequences. The assessment of a game forfeit will be
+accompanied by a brief explanation of the reason.
+22.G.1 Eligibility to Continue Match. A singles player or doubles team
+against which a game forfeit is imposed continues play in any
+subsequent games in the match.
+22.G.2 Match Forfeit. For single-game matches, a game forfeit is
+equivalent to a match forfeit.
+22.H Scoring for Game Forfeit. When a game forfeit is imposed on a singles
+player or doubles team, their score for the forfeited game must be
+reported as zero (e.g., 11-0 for a game to 11 points, 15-0 for a game to 15
+59
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+points, or 21-0 for a game to 21 points). Scores for games completed
+before the forfeited game are retained. (See Rule 15.B.4.a for a round
+robin.)
+22.I Match Forfeit by Referee. The referee will impose a match forfeit on a
+singles player or doubles team for:
+22.I.1 Dangerous Paddle or Ball Abuse. Aggressively or recklessly
+striking or throwing a ball or paddle in frustration or anger that
+strikes an individual or damages facility property.
+22.I.2 Starting Server Identification. See Rule 18.C.1.
+22.I.3 Late Reporting for First Game. See Rule 18.F.1.
+22.I.4 Late Reporting for Multiple-Game Match. See Rule 18.F.2.
+22.I.5 Non-Compliant Paddle. See Rule 18.A.
+22.I.6 Improper Contact. Making deliberately aggressive physical
+contact with another person.
+22.I.7 Multiple Penalties. Being assessed a second technical foul
+during a match. Being assessed a technical warning or technical
+foul after a game forfeit resulting from a combination of
+technical warnings and/or technical fouls during a match.
+22.J Match Forfeit by Tournament Director. Any time a player is at the
+tournament venue, the Tournament Director may impose a forfeit of a
+singles player’s or doubles team’s current or upcoming match, when
+applicable, or an upcoming match for:
+22.J.1 Venue Rules. Failure to comply with the tournament or host
+facility’s rules.
+22.J.2 Improper Conduct. Improper conduct between matches.
+22.J.3 Abuse of Facilities. Abuse of hospitality or locker rooms.
+22.J.4 Improper Apparel. See Rule 18.B.4.
+22.J.5 Other Rules. Failure to comply with other tournament or facility
+rules and procedures.
+22.K Scoring for Match Forfeit. When a match forfeit is imposed on a singles
+player or doubles team, all their game scores are reported as zero (e.g., 11-
+0, 11-0 for a two-of-three games to 11 points format; 11-0, 11-0, 11-0 for a
+three-of-five games to 11 points format; 15-0 for a 15-point game format;
+and 21-0 for a 21-point game format). Scores for matches completed
+60
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+before the forfeited match are retained. (See Rule 15.B.4.a for a round
+robin.)
+22.L Ejection or Expulsion. Any time a player is at the tournament venue, the
+Tournament Director is authorized to eject a player from the tournament
+or expel a player from the venue for:
+22.L.1 Slurs. Using ethnic, religious, racial, or homophobic slurs.
+22.L.2 Injurious Paddle or Ball Abuse. Damage to the venue or injury
+to a player, official, or spectator through an act of paddle or ball
+abuse or other acts of physical violence.
+22.L.3 Biological Substances. Spitting or coughing on another person.
+22.L.4 Lack of Effort. Not exhibiting “best effort.” This includes, but is
+not limited to, defaulting, forfeiting, or not giving best efforts in
+matches, whether for their own benefit or otherwise.
+22.L.5 Other Behavior. Other flagrant, injurious, or egregious behavior
+that the Tournament Director deems detrimental to the
+tournament.
+22.M Scoring for Ejection and Expulsion. When an ejection or expulsion is
+imposed on a singles player or doubles team, all their game scores for the
+current match and any upcoming matches in the bracket must be
+reported as zero (e.g., 11-0, 11-0 for a two-of-three games to 11 points
+format; 11-0, 11-0, 11-0 for a three-of-five games to 11 points format; 15-0
+for a 15-point game format; and 21-0 for a 21-point game format). Scores
+for matches completed before the ejection or expulsion are retained. (See
+Rule 15.B.4.a for a round robin.)
+61
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 23 Retirements and Withdrawals
+23.A Retirement from Match. A singles player or doubles team may retire from
+a match for any reason. The only option to discontinue playing a match
+after the initial score has been called is retirement. Upon retirement, the
+match is awarded to the opponent.
+23.A.1 Retirement During Match. A singles player or doubles team
+may retire before the end of any match being played by notifying
+the referee.
+23.A.2 Advance Notification of Retirement. A singles player or
+doubles team may request a retirement in advance of any
+upcoming match by notifying the Tournament Director, Head
+Referee, or operations desk personnel.
+23.A.3 Eligibility to Continue Play. A singles player or doubles team
+that retires from a match may continue play in the same bracket
+if eligible based on the event format.
+23.A.4 Scoring for Retirement. When a singles player or doubles team
+retires from a match, the scores for all games and matches
+completed prior to retirement are retained. For a game in
+progress, the actual score of the retiring singles player or
+doubles team at the time of retirement must be recorded and
+the opponent will be awarded the required number of points to
+reflect a winning score for the game. Scores for games not
+played in a match, when appropriate, must be reported as 11-0
+for games to 11 points, 15-0 for games to 15 points, or 21-0 for
+games to 21 points. (See Rule 15.B.4.a for a round robin.)
+23.B Withdrawal from Bracket. Players may withdraw from a bracket by
+notifying the Tournament Director, Head Referee, or operations desk
+personnel.
+23.B.1 Withdrawal Before Start of Bracket. A singles player or
+doubles team may withdraw from a bracket that has not started
+play.
+23.B.2 Withdrawal from Upcoming Matches. A singles player or
+doubles team may withdraw from all remaining matches in a
+bracket prior to the initial score being called to start their next
+match.
+62
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+23.B.3 Ineligibility to Continue Play. A singles player or doubles team
+that withdraws is removed from all upcoming matches in the
+specified bracket.
+23.B.4 Scoring for Withdrawal. When a singles player or doubles team
+withdraws from a bracket, the scores for each game of each
+match not played are reported as 0-0. Scores for matches
+completed before the request for withdrawal are retained. (See
+Rule 15.B.4.a for a round robin.)
+63
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Section 24 Non-Officiated Tournament
+Play
+NOTE: In non-officiated tournament play, players administer their own matches
+and report the results. All rules in Parts II and III apply to non-officiated tournament
+play, except for those involving a referee or line judge, along with the modifications
+set forth in this section.
+24.A Change of Starting Server (Doubles). Teams may change the starting
+server between games. They should notify the opponent before the start
+of the next game. (Modifies Rule 21.F.3)
+24.B Extra Ball. An extra ball carried by a player during a rally must not be
+visible to the opponent and must remain in possession of the player.
+24.B.1 Fault – Extra Ball Visible or Ball Falls. When an extra ball
+carried by a player is visible to an opponent or falls to the
+playing surface while the ball is live, it is a fault against the
+player.
+24.C Request for Referee or Tournament Director. Any player may request a
+referee or the Tournament Director when:
+24.C.1 Repeated Rule Violations. The player believes that the
+opponent is repeatedly violating one or more rules.
+24.C.2 Inability to Resolve Issue. A situation arises that players are not
+able to resolve quickly and easily.
+24.D Paddle Compliance Appeal. When any player believes a paddle is not
+USA Pickleball approved or does not otherwise comply with all paddle
+rules, the player may request that the Head Referee or Tournament
+Director determine whether the paddle is approved.
+24.E Use of Time-Outs Between Games. Players must notify the opponent of
+their intent to use one or both standard time-outs before the start of the
+next game. (Modifies Rule 21.A.3)
+24.F Retirement During Match. A singles player or doubles team may retire
+before the end of any match being played by notifying their opponent.
+(Modifies Rule 23.A.1)
+Section 25
+64
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Part IV Rules for Inclusive Play
+Part IV (Section 25) presents additional rules that apply to players who use a
+wheelchair during play, standing players with permanent physical limitations that
+affect their balance, mobility, or coordination, and players in hybrid doubles events
+in tournaments. The rules that are not tournament-specific apply to all play, both
+standard and tournament.
+Section 25 Wheelchair, Adaptive Standing,
+and Hybrid Doubles Play
+25.A Wheelchair Play. Section 25.A applies to wheelchair players and events
+that include one or more wheelchair players. Wheelchair players must
+comply with Rules 25.A.1 through 25.A.12.
+25.A.1 Player Eligibility. An eligible wheelchair player is any person,
+with or without a disability, who plays the game in a wheelchair.
+25.A.2 Doubles. Players in doubles who use a wheelchair may play with
+a standing partner, an adaptive standing partner, or a partner
+who uses a wheelchair, except as provided for in Rule 25.A.12 for
+tournaments.
+25.A.3 Power Wheelchairs. Players unable to propel a manual
+wheelchair for the duration of an entire match are permitted to
+utilize wheelchairs powered by electric motors. Power
+wheelchairs must be controlled by the player only and cannot
+exceed 10 miles-per-hour.
+25.A.4 Part of Body. A player’s wheelchair is considered part of the
+player’s body. The large rear wheels are treated like a standing
+player’s legs for positioning.
+25.A.5 Contact with Seat. A wheelchair player must have at least one
+buttock in contact with the wheelchair seat when they strike the
+ball.
+25.A.5.a Fault – Failure to Contact Seat. When a wheelchair
+player does not have at least one buttock in contact
+with the wheelchair seat when they strike the ball, it
+is a fault against the player.
+65
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+25.A.6 No Ground Contact by Lower Extremities. Except as provided
+for in Rule 25.A.7, a wheelchair player’s lower extremities, which
+are the buttocks, hips, thighs, knees, calves, ankles, and feet,
+must not contact the ground or any wheelchair wheel while the
+ball is live, regardless of intent.
+25.A.6.a Fault – Contact with Ground or Wheel. When a
+wheelchair player’s lower extremity contacts the
+ground or any wheelchair wheel while the ball is live,
+it is a fault against the player.
+25.A.7 Propelling Wheelchair with Foot. A player who is unable to
+propel their wheelchair with one or both upper extremities
+(arms) for the entire duration of a match is permitted to propel
+the wheelchair using a single foot against the ground. The player
+is then subject to the following restrictions for the entire
+duration of the match:
+1) The player must not utilize their upper extremities for
+propulsion.
+2) The player’s foot must not be in contact with the ground
+when the player strikes the ball to make a shot.
+3) The player’s lower extremities must not contact any
+wheelchair wheel.
+25.A.7.a Fault – Prohibited Actions. For a wheelchair player
+who is allowed to use a single foot against the
+ground for propulsion, when any upper extremity
+contacts a wheelchair wheel, their foot is in contact
+with the ground when they hit the ball, or any lower
+extremity contacts any wheelchair wheel, it is a fault
+against the player.
+25.A.8 Serving. The moment the ball is served, both large rear wheels
+must be on the playing surface behind the baseline and must not
+touch anywhere outside the correct serving area. The front
+(smaller) wheels are allowed to extend into the court when the
+serve is hit.
+25.A.8.a Fault – Wheel Not Grounded. If either or both large
+rear wheels of a server’s wheelchair are off the
+playing surface when the serve is hit, it is a fault
+against the server. (Modifies Rule 7.A.1.a)
+66
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+25.A.8.b Fault – Wheel Contacting Court. If a large rear
+wheel of a server’s wheelchair is in contact with the
+court when the serve is hit, it is a fault against the
+server. (Modifies Rule 7.A.2.a)
+25.A.8.c Fault – Wheel Outside Serving Area. If a large rear
+wheel of a server’s wheelchair is in contact with the
+playing surface outside the correct serving area
+when the serve is hit, it is a fault against the server.
+(Modifies Rule 7.A.3.a)
+25.A.9 Two-Bounce Allowance. A wheelchair player may allow the ball
+to bounce twice before returning the ball. The second bounce
+can be anywhere on the playing surface. (Modifies Rule 10.B)
+25.A.9.a Fault – Failure to Return Ball Before Third Bounce.
+When a wheelchair player does not return a ball
+before it bounces three times, it is a fault against the
+player. (Modifies Rule 10.B.1)
+25.A.10 Volleying. The front (smaller) wheels and the rear stabilizing
+wheels may contact the non-volley zone at any time. (Modifies
+Rule 11.A)
+25.A.10.a Fault – Non-Volley Zone Contact While Volleying.
+When a large rear wheel of the player’s wheelchair,
+or anything that has contact with the volleying
+player (including the player’s partner) contacts the
+non-volley zone, it is a fault against the player.
+(Modifies Rule 11.A.1)
+25.A.10.b Fault – Non-Volley Zone Momentum. When a
+volleying player’s momentum causes a large rear
+wheel of the player’s wheelchair to contact
+anything (including the player’s partner) that is in
+contact with the non-volley zone, even after the
+ball becomes dead, it is a fault against the
+volleying player. (Modifies Rule 11.A.2)
+25.A.10.c Fault – Failure to Exit the Non-Volley Zone
+Before Volleying. After contacting the non-volley
+zone, when a player volleys a ball before both large
+rear wheels of the player’s wheelchair contact the
+playing surface completely outside the non-volley
+67
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+zone, it is a fault against the player. (Modifies Rule
+11.A.3)
+25.A.11 Playing Surface Dimensions. The recommended playing
+surface area for wheelchair play is 44 feet (13.41 m) wide and
+74 feet (22.55 m) long. The recommended playing surface area
+for wheelchair play in a stadium court is 50 feet (15.24 m) wide
+by 80 feet (24.38 m) long. (Modifies Rule 3.A.3)
+25.A.12 Tournament Events. Wheelchair players may compete in any
+tournament event, other than an adaptive standing-only
+event, and may partner with or compete against either
+standing players, adaptive standing players, or wheelchair
+players. Only wheelchair players are allowed to play in
+wheelchair-only events. In all cases, the specific rules
+governing wheelchair players apply to any player who uses a
+wheelchair, regardless of the event format or the classification
+of their opponents or partners.
+25.A.12.a Transition Between Standing and Sitting. When
+playing in a non-wheelchair event, a player is
+permitted to transition between rallies from being
+a standing player to a wheelchair player, or from a
+wheelchair player to a standing player, but only
+once per match. The transition will be treated as an
+equipment timeout.
+25.A.12.b Replay – Questionable Wheel Contact with
+Serving Area. When it is questionable whether
+both wheels of the server’s wheelchair were in
+contact with the serving area when the serve was
+hit, the referee may call for a replay. (Modifies Rule
+20.E.2.d)
+25.A.12.c Replay – Questionable Wheel Contact Outside
+the Serving Area. When it is questionable whether
+a large rear wheel of the server’s wheelchair was in
+contact with the playing surface outside the
+serving area when the serve was hit, the referee
+may call for a replay. (Modifies Rule 20.E.2.e)
+25.B Adaptive Standing Play. Adaptive standing players must comply with
+Rules 25.B.1 through 25.B.4.
+68
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+25.B.1 Player Eligibility. Adaptive standing players must have a
+permanent physical disability that significantly affects their
+mobility, balance, or coordination, and not use a wheelchair
+during play. Examples include, but are not limited to, players
+with lower-limb amputation above the knee, limb difference,
+cerebral palsy, stroke, neurological or orthopedic conditions
+that affect movement coordination, severe balance limitations,
+or spinal cord injury with ambulatory function, and players using
+crutches or braces who cannot move quickly to the ball. Players
+with below-knee amputations or minor impairments without
+significant balance or mobility limitations are eligible as
+adaptive standing players but are not eligible for the two-
+bounce allowance option (see Rule 25.B.3.a.)
+25.B.1.a Confirmation of Eligibility. Adaptive standing
+player eligibility may be verified by self-assessment.
+25.B.2 Assistive Devices. Players may use assistive devices such as
+prosthetics, orthotics, braces, crutches, or canes during play.
+25.B.2.a Part of Body. Assistive devices are considered part
+of the player’s body.
+25.B.2.b Prohibited Use. Assistive devices must not be used
+to strike the ball or to intentionally alter its flight. If
+an assistive device contacts a live ball, the ball
+becomes dead and the rally ends.
+25.B.2.c Dislodged Device. If an assistive device becomes
+dislodged during a rally, the rally must continue to
+completion.
+25.B.2.d Fault – Non-Volley Zone Contact While Volleying.
+When a player’s assistive device, or anything that has
+contact with the volleying player (including the
+player’s partner) contacts the non-volley zone, it is a
+fault against the player. (Modifies Rule 11.A.1)
+25.B.2.e Fault – Non-Volley Zone Momentum. When a
+volleying player’s momentum causes the player’s
+assistive device to contact anything (including the
+player’s partner) that is in contact with the non-
+volley zone, even after the ball becomes dead, it is a
+fault against the volleying player. (Modifies Rule
+11.A.2)
+69
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+25.B.2.f Fault – Outside Serving Area. If a server’s assistive
+device is in contact with the playing surface outside
+the correct serving area when the serve is hit, it is a
+fault against the server. (Modifies Rule 7.A.3.a)
+25.B.3 Two-Bounce Allowance. Eligible adaptive standing players may
+use the two-bounce allowance option in an adaptive standing or
+hybrid event.
+25.B.3.a Eligibility and Declaration. Players that may be
+eligible for the two-bounce allowance option include
+above-knee amputees, players with significant
+mobility impairments, players with neurological
+conditions (e.g. cerebral palsy, stroke) that
+significantly affect their movement, balance, or
+coordination, and players using crutches or braces
+who cannot move quickly to the ball. If a player has
+any doubt about their eligibility for the two-bounce
+allowance option, the player must not use the two-
+bounce allowance option. The two-bounce
+allowance option must be declared prior to the start
+of a match and must be used for the entire match.
+25.B.3.b Second Bounce Location. The second bounce can
+be anywhere on the playing surface. (Modifies Rule
+10.B.)
+25.B.3.c Fault – Failure to Return Ball Before Third Bounce.
+When the player does not return a ball before it
+bounces three times, it is a fault against the player.
+(Modifies Rule 10.B.1.)
+25.B.3.d Dead Ball. When the ball strikes a permanent object
+(e.g., fence, wall) before the second bounce, it is a
+dead ball and the rally ends.
+25.B.3.e Player Identification Marker. At the Tournament
+Director’s discretion, adaptive standing players using
+the two-bounce allowance may be required to wear a
+unique visible identification marker (e.g., a
+wristband) during a match.
+25.B.3.f Hybrid Events. Players not qualified for the two-
+bounce allowance in an adaptive standing event are
+70
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+not eligible for the two-bounce allowance in hybrid
+events.
+25.B.4 Tournament Events. Adaptive standing players may play in any
+event that allows standing players with either standing players
+or partners, or wheelchair players or partners. Only adaptive
+standing players are allowed to play in adaptive standing-only
+events. Adaptive standing players may play in hybrid events. In
+all cases, the specific rules governing adaptive standing players
+apply to any player who is eligible, regardless of the event
+format or the classification of their opponents or partners.
+25.C Hybrid Doubles Play. Hybrid doubles events must comply with Rules
+25.C.1 through 25.C.3.
+25.C.1 Tournament Event. Hybrid Doubles is a doubles event in which
+each team consists of one wheelchair player and one standing
+player, able-bodied or adaptive.
+25.C.2 Tournament Bracket Designations. The Tournament Director
+may designate hybrid brackets or include hybrid pairings in
+standard divisions with appropriate accommodation.
+25.C.3 Adaptive Standing Players. Eligible adaptive standing players
+(per Rule 25.B.3.a) are the only standing players who may use
+the two-bounce allowance in hybrid play and must declare this
+accommodation before the match.
+71
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Appendix A Faults and Replays
+The following compilation of faults and replays is provided for
+information purposes.
+NOTE: The scenario descriptions are abbreviated. Refer to the
+applicable rule for the complete parameters of the fault or replay.
+A.1 Faults
+Rule Scenario
+SECTION 5 – PLAYER POSITIONS AND SERVING SEQUENCE
+5.C.1.b Stopping play for incorrect claim of server or position
+error
+5.C.1.c Incorrect receiver when positions are correct
+SECTION 6 – PLAYER READINESS AND CALLING THE SCORE
+6.D.1 10-second violation
+6.F.2 Challenge a correct score
+6.F.3 Late score challenge
+SECTION 7 – SERVING
+7.A.1.a Server not grounded
+7.A.2.a Server contacting the court
+7.A.3.a Server contacting outside the serving area
+7.C.5 Server makes an illegal volley serve
+7.D.6 Server makes an illegal drop serve
+7.E.1 Serve lands out of bounds
+7.E.2 Serve lands in non-volley zone
+7.E.3 Serve hits permanent object
+7.E.4 Serve hits server or server’s partner
+7.E.5 Serve hits receiver or receiver’s partner
+SECTION 9 – DEAD BALLS, FAULTS, AND HINDERS
+9.A.1 Stopping a rally
+SECTION 10 – RALLY SITUATIONS
+10.A.1 Receiver volleys the serve
+72
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Rule Scenario
+10.A.2 Server or partner volleys return of serve
+10.B.1 Too many bounces before returning ball
+10.C.1 Shot lands out of bounds and is called “out”
+10.C.2 Shot lands on hitter’s court
+10.C.3 Ball hits player
+10.C.4 Ball hits permanent object before landing
+10.C.5 Ball hits permanent object after landing
+10.D.1 Ball double hit by player
+10.D.2 Ball by partner and partner
+SECTION 11 – NON-VOLLEY ZONE INFRACTIONS
+11.A.1 Non-volley zone fault
+11.A.2 Non-volley zone momentum fault
+11.A.3 Push-off non-volley zone fault
+SECTION 12 – THE PADDLE DURING PLAY
+12.A.1 Using or carrying more than one paddle
+12.B.1 Paddle not in possession when ball is hit
+12.C.1 Catch or carry live ball
+SECTION 13 – THE NET AND NET SUPPORT SYSTEM DURING PLAY
+13.B.1 Serve contacting net support system
+13.D.1 Ball hit between net and net post
+13.E.1 Ball hit under net
+13.F.1 Ball hit before ball crosses net plane
+13.G.1 Player contacting net or net support system
+13.H.1 Player contacting opponent or opponent’s end of the
+court
+13.I.1.a Player crossing net plane before hitting ball
+13.I.1.b Player crossing net plane without hitting ball
+13.I.2.a Ball crossing back over net to opponent’s side -
+player crossing net plane before ball crosses net
+plane
+13.I.2.b Ball crossing back over net to opponent’s side – ball
+bounces on opponent’s side before player hits ball
+73
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Rule Scenario
+SECTION 19 – TOURNAMENT LINE CALLS
+19.F.1 Referee overrules player’s out call
+SECTION 20 – TOURNAMENT MATCH SITUATIONS
+20.E.1.a Service faults
+through
+20.E.1.g
+20.H.1 Invalid hinder
+20.I.1 Distraction
+SECTION 21 – TIME-OUTS AND BREAKS
+21.A.2.a Calling time-out after serve
+21.A.2.b Failure to call time-out audibly or visibly
+SECTION 24 – NON-OFFICIATED TOURNAMENT PLAY
+24.B.1 Carrying extra ball that is visible to an opponent or
+falls to playing surface
+SECTION 25 – WHEELCHAIR, ADAPATIVE STANDING AND HYBRID DOUBLES
+PLAY
+25.A.5.a Failure to contact seat
+25.A.6.a Contact with the ground or wheel
+25.A.7.a Prohibited actions when allowed to use foot for
+propulsion
+25.A.8.a Wheelchair not grounded
+25.A.8.b Wheel contacting the court
+25.A.8.c Wheel contacting outside the serving area
+25.A.9.a Wheelchair player too many bounces before
+returning ball
+25.A.10.a Non-volley zone fault
+25.A.10.b Non-volley zone momentum fault
+25.A.10.c Non-volley zone push-off fault
+25.B.2.d Adaptive standing player non-volley zone fault
+25.B.2.e Adaptive standing player non-volley zone
+momentum fault
+74
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Rule Scenario
+25.B.2.f Adaptive standing player contact outside the serving
+area
+25.B.3.c Adaptive standing player too many bounces before
+returning ball
+75
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+A.2 Replays
+Rule Scenario
+SECTION 5 – PLAYER POSITIONS AND SERVING SEQUENCE
+5.C.1.a Stopping play for correct claim of server or position
+error
+SECTION 6 – PLAYER READINESS AND SCORE CALLING
+6.D.2 Player repositions after score call
+6.F.1 Incorrect score call
+SECTION 7 – SERVING
+7.B.2.a Imparting manipulation or spin
+7.B.3.a Ball release not visible
+SECTION 9 – DEAD BALL
+9.B.3.b Players disagree on a fault call
+9.C.2 Valid hinder
+SECTION 10 – RALLY SITUATIONS
+10.G.1 Players agree broken or cracked ball affected rally
+SECTION 13 – THE NET
+13.A.1 Ball affected by net
+13.B.2 Ball affected by net support system
+SECTION 19 – TOURNAMENT LINE CALLS
+19.F.2 Referee overrules line judge’s out call
+19.G.4 All officials unable to make line call
+19.I.1 Player overrides line judge’s out call
+SECTION 20 – TOURNAMENT MATCH SITUATIONS
+20.C Referee stops a rally related to player or position
+20.E.2.a Referee uncertain whether serve requirements have
+through been met
+20.E.2.i
+20.F.1 Referee determines broken or cracked ball affected
+rally
+20.H.2 Valid hinder
+20.J.3 Tournament Director orders replay
+76
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Rule Scenario
+SECTION 25 – WHEELCHAIR, ADAPTIVE STANDING AND HYBRID DOUBLES
+PLAY
+25.A.12.b Questionable wheel contact with serving area
+25.A.12.c Questionable wheel contact outside serving area
+77
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Appendix B Rulebook Priorities and Guiding
+Principles
+Preface
+The USA Pickleball Official Rulebook is the organization’s most important product.
+It is the foundational document for the sport of pickleball and should be treated
+with the respect accorded the sport’s founders and those who have written and
+approved rules over the years.
+Writing rules that are objective, clear, and concise is difficult work. Because those
+involved in writing and/or approving rules come from diverse backgrounds and
+experiences, it is important to have rule writing priorities and guiding principles
+that help provide a measure of consistency from year to year. The following
+Rulebook Priorities and Guiding Principles were developed to guide rule writers and
+approvers in their important work.
+Priorities
+The following three priorities should be considered “tests” for any suggested rule
+change. Any suggested rule change should satisfy at least one of these three
+priorities, listed in order of importance:
+1. The first priority is preserving the integrity of the sport, one that incorporates
+the elements of fun, cooperation, courtesy, and competition. This priority pays
+homage to those who developed the sport in 1965 and those who have written
+and approved rule changes over the years.
+2. The second priority is what is collectively best for the players. This priority
+examines rule changes for improving the player’s experience. It “tests”
+suggested rule changes from the standpoint of minimizing player
+disagreements, making it easier to learn the sport, teach the sport, and play
+the sport, while also allowing for moderate innovation as player skills and
+equipment develop and evolve.
+3. The third priority is what is best for officiating. It “tests” rule changes to make it
+less likely conflicts will occur between players as well as between players and
+officials.
+Guiding Principles
+The USA Pickleball Official Rulebook contains a wide variety of rules that cover the
+court and equipment, recreational and social play as well as tournament play,
+78
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+officiated and non-officiated. The following are Guiding Principles for those writing
+and approving rules. To the extent possible, rules should:
+1. Apply to all levels and categories of players: recreational and social players, as
+well as professional and amateur tournament players (officiated and non-
+officiated). Specific rules for a single category of player, for example, the pro
+level player, should be approved after careful consideration and examination
+of how the rule change might impact the sport beyond the pro level of
+competition.
+2. Be written with a deterministic focus, i.e., from the standpoint of “if this occurs,
+this is what happens.” If something is not allowed or should not happen, the
+consequences (for example: replay, fault, technical warning, etc.) should be
+provided as part of the rule (e.g., replay, fault, technical warning, etc.).
+3. Center on that which should not occur, not on what is permitted or allowed.
+Attempts to include rules describing what is allowed will result in an
+unnecessarily lengthy Rulebook.
+4. Avoid ambiguity, player discretion, or referee judgment-related rules. Such
+rules invite disagreements and different interpretations. To this end, when a
+key word is used to describe when a rule applies, the word should be defined
+as either a part of the rule or in the Definition section of the Rulebook.
+5. Allow equipment manufacturers to innovate, as long as such innovation does
+not overwhelm or outpace the average player’s ability to keep up with the
+speed and difficulty of the sport. Equipment-related rule changes should be
+given particularly close scrutiny because of their precedent-setting potential.
+6. Have an element of precedent accorded to them. Change for change’s sake
+should be avoided to avoid frustration among, or a loss of confidence by,
+players.
+7. Allow for an appropriate degree of player innovation. Such innovation should
+maintain a healthy balance between historical rules that have been
+instrumental to the sport’s growth and appeal.
+8. Preserve the unique features and rules of the sport involving the Non-Volley
+Zone and the two-bounce rule and prevent one shot, one paddle, or one type
+of play from dominating the sport.
+9. Address a known issue or anticipate trends and needs of the sport before
+problems develop.
+10. Be subjected to reviews and comments by domestic and international
+stakeholders.
+79
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+INDEX
+10-second rule 6.D changes 16.K, 18.B.3
+15-second warning compliance 18.B,
+17.D.16 18.B.1, 18.B.2,
+between games time- 18.B.3, 18.B.4, 22.J.4
+out 21.F.4 Ball abuse
+end change time-out Penalties 22.B.4,
+21.B.8 22.D.2, 22.I.1, 22.L.2
+equipment time-out Ball specifications 3.C
+21.E.2 Ball, damaged (cracked,
+medical time-out broken)
+21.C.11 appeal 20.F
+referee time-out 21.D.4 during rallies 10.G
+standard time-out replay 10.G.1, 10.G.2,
+21.A.6 20.F, 20.F.1
+technical foul 21.C.11 Ball, in play 2
+verbal or technical Ball, live 2
+warning 22.C.2 Balls, dead 9
+Adaptive standing play definition 2
+25.B faults 9.A.1
+assistive devices hinders 9.C
+25.B.2 out calls 8.F.2
+eligibility 25.B.1 stopping play 9.A,
+tournament rules 9.A.1
+25.B.3 timing 9.A.1, 9.B
+event categories Blood 21.D.2
+15.A Carry 2, 12.C
+two-bounce allowance Catch 12.C
+25.B.3 Coaching
+Apparel definition 2
+adjustment 10.I, 10.K penalty 20.G.1
+80
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+when allowed 20.G Expulsion (See
+Court Ejection)
+definition 2 Faults (See Appendix
+lines and areas 3.A.4 A.1)
+specifications 3.A Forfeit
+Definitions 2 definition 2
+Distraction 10.F game forfeit by referee
+definition 2 22.F
+validity 20.I, 20.I.1 consequences 22.G,
+Double or triple bounce 22.G.1, 22.G.2
+10.B, 10.B.1 late reporting, multi-
+Double hit game match 22.F.2
+definition 2 multiple penalties
+both partners 10.D.2 22.F.1
+same player 10.D, scoring 22.H
+10.D.1 match forfeit, referee
+Ejection, Expulsion 22.L 22.I
+biological substances improper physical
+22.L.3 contact 22.I.6
+paddle or ball abuse late reporting, single
+22.L.2 game match 22.I.3
+definitions, ejection 2, late reporting, multi-
+expulsion 2 game match 22.I.4
+lack of effort 22.L.4 non-compliant
+other behavior 22.L.5 paddle 22.I.5
+slurs 22.L.1 paddle or ball abuse
+End change time-outs 22.I.1
+21.B player conduct
+Equipment, player 17.D.17
+adjustments 10.K scoring 22.K
+continue play 10.I
+electronic 18.D Forfeits, match forfeits,
+time-outs 21.E, 21.E.1 referee
+81
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+starting server Injury, effect on play
+identification 10.H
+22.I.2 (See also Time-outs,
+technical foul plus Medical)
+second foul 22.I.7 Line calls 8
+match forfeits, certainty, in vs. out 8.E
+Tournament definition 2
+Director 22.J disagreement
+abuse of facilities (partner) 8.H
+22.J.3 loss of opportunity,
+improper apparel player 8.I, 19.D.3
+22.J.4, 18.B.4 opponent’s opinion
+improper conduct 8.I, 19.I
+22.J.2 out call and signal 8.F
+other rules 22.J.5 partner
+scoring 22.K communication
+venue rules 22.J.1 8.F.4
+Hinder 9.C player override 8.G,
+calls 9.C.1 19.F.2
+definition 2 promptness 8.F.3
+net or net support responsibilities 8.A
+system malfunction spectators 8.J
+13.J sportsmanship 1, 8.D,
+referee responsibility 8.G, 8.I
+17.C.2, 17.D.13 tournament, non-
+validity 20.H, 20.H.1, officiated play 8
+20.H.2 tournament, officiated
+Hybrid Tournament 19
+Play 25.C appeals, excessive
+Adaptive standing 22.B.6
+players 25.C.3 line judges 19.C
+Bracket designations no line judges 19.B,
+,25.C.2 19.E
+Events 15.A, 25.C.1
+82
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+no definitive call Not ready (See
+19.G Readiness)
+referee role 17.D.10, Non-volley zone 11
+19.E, 19.F, 19.G, allowable contact 11.A
+19.H definition 2
+uncertainty 8.E dimensions Figure 3-1,
+validity 8.F.1 3.A.4.c
+Line judges faults 11.A, 11.A.1,
+Blocked view 19.H 11.A.2, 11.A.3
+player override 19.I, fault calls, non-
+19.I.1, 19.I.2 officiated 9.B.3,
+referee overrule 19.F, 9.B.4
+19.F.1, 19.F.2 momentum 11.A.2
+removal 20.K, 20.K.1, serves 7.E.2
+20.K.2 wheelchair 25.A.10
+responsibilities 19.C.1 Paddle 12
+Momentum abuse 22.D.1, 22.I.1
+definition 2 appeal 24.D
+fault 11.A.2 allowable alterations
+Net and net support 3.D.6, 3.D.7
+system (See also Plane head, definition 2
+of Net) 13 non-compliant 18.A,
+ball, contacts 13.A, 18.A.1, 18.A.2, 18.A.3,
+13.A.1 13.B, 13.B.1, 22.I.5
+13.B.2 possession during play
+ball around net post 12.B, 12.B.1
+13.C specifications 3.D
+ball between net and two hands 12.B
+net post 13.D, 13.D.1 Permanent object
+ball under 13.E, 13.E.1 dead ball 10.C.4, 10.C.5
+player contacts definition 2
+(touches) 13.G, Plane of net
+13.G.1 ball crossing 13.F,
+specifications 3.B 13.F.1
+83
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+definition 2 serving and receiving
+player crossing 13.I, positioning 5.B.2,
+13.I.1, 13.I.2 5.B.3
+Player conduct (See in serving area 7.A.3
+also Sportsmanship) singles 5.A, 5.A.1
+ejection or expulsion serving area reposition
+22.L, 22.M 6.D.2
+forfeit, game by Playing surface 2
+referee 22.F, 22.G, 22.H Profanity
+forfeit, match by definition 2
+referee 22.I, 22.K technical foul
+forfeit, match by (extreme objectional
+Tournament Director 22.D.3
+22.J, 22.K technical warning
+misconduct 16.P 22.B.2
+technical foul 22.D, verbal warning 22.B.2
+22.E Readiness 6.A
+Player conduct (cont’d) after time-outs 17.D.16
+technical warning signals 6.A.1, 6.A.2
+22.B, 22.C Receiver
+referee management confirmation of 20.B,
+17.D.17 20.C
+verbal warning 22.B, contacted (touched)
+22.C by ball 10.C.3
+Player positions 5 correction by referee
+after score adjustment 20.D
+22.E.1 definition 2
+after score call 20.D position 5.B.3, 5.B.4
+confirmation 20.B, reposition after score
+20.C call 6.D.2
+doubles 5.B.3, 5.B.4 serve hits 7.E.5
+partner 5.B.3, 5.B.4 Replays (See Appendix
+A.2)
+Reporting for a match
+84
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+extension of time 16.M Selection of service and
+late reporting 18.F.1, end 17.C.4
+18.F.2 Serve
+reporting time 18.F 10-second rule 6.D,
+Resuming play 17.D.16 6.D.1, 6.D.2
+Retirement 23.A ball release 7.B
+advance notification definition 2
+23.A.2 drop serve 7.D
+definition 2 good serve 8.B, 13.B
+during match 23.A.1 placement 7.E
+medical time-out positions (See also
+21.C.9 Player Positions) 5
+scoring 23.A.4 singles 5.A
+Score doubles 5.B
+calling 6.B, 6.B.1, 6.B.2, positioning in serving
+6.B.2.a, 17.D.2 area 7.A
+challenging 6.E, 6.F, questions 5.C
+6.F.1, 6.F.2, 6.F.3, replay 7.B.2.a, 7.B.3.a
+6.F.4 (See also Appendix
+confirmation request A.2)
+6.E.1, 20.A two-bounce rule 1,
+correction, replay 6.F.1 10.A
+end change 21.B.1, volley serve 7.C
+21.B.2, 21.B.3 Server (See also
+incorrect 6.F.1 Starting Server)
+points 4 Correct, doubles 5.B.1,
+positions 5.A, 5.A.1, 5.B.4
+5.B.2, 5.B.3 definition 2
+technical foul, duration 5.B.5, 5.B.6
+adjustments 22.E.1 first & second, doubles
+tournament scoring 2, 5.B.2
+15.C, 15.C.1, 15.C.2 position 5.B.3
+winning game 4.B positioning 7.A
+Service court 2
+85
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Service motion 7.C, 7.D score adjustment
+Serving area 2 22.E.1
+Side out 2, 5.A.3, 5.B.6, two technical fouls
+17.D.5 22.I.7
+Sportsmanship 1, 8.D, two technical
+8.G, 19.D.2, 19.D.3, warnings 22.D.7
+19.F.2, 19.I, 22 (See Technical warning
+also Player Conduct) behaviors that warrant
+Starting server, 22.B
+Doubles challenge of official
+change of, non- ruling 20.J, 20.J.2
+officiated 21.F.3, coaching 20.G.1
+24.A consequences 22.C
+correct position 5.B.3 definition 2
+definition 2 invalid medical
+identification 16.H, condition 21.C.10
+17.C.5, 18.C, 22.I.2 player conduct 16.P,
+Technical foul 17.D.17
+behaviors that warrant plus technical foul
+22.D 22.F, 22.F.1
+challenge of official two technical
+ruling 20.J, 20.J.2 warnings 22.D.7
+consequences 22.E, Time allowances
+22.E.1, 22.E.2 between games 21.F.1
+definition 2 between matches 21.G
+following end change between rallies 10.K
+21.B.6 end change 21.B.5
+invalid medical equipment time-out
+condition 21.C.10 21.E, 21.E.1
+player conduct 16.P, medical time-out
+17.D.17 21.C.6
+plus technical warning standard time-out
+22.F, 22.F.1 21.A.5
+86
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+reporting to a match between games
+16.M, 18.F 21.A.3
+Time-outs 21 duration 21.A.5
+between games 21.F lost appeal of referee
+end change 21.B, ruling 20.J.2
+21.B.4 requesting, when
+equipment 21.E, 21.E.1 21.A.2
+medical 21.C resuming play 21.A.6
+before start of a Tournament
+match 21.C.1 Management
+between games ball selection 16.G
+21.C.2 draws and seeding
+duration 21.C.6 16.D
+number per match event categories
+21.C.3 15.A
+rescinding the gender restrictions
+request 21.C.4 15.A.1, 15.A.2
+resuming play event formats 15.B
+21.C.11 double elimination
+start of time 21.C.7 15.B.1
+validity 21.C.8, non-pool play
+21.C.10 15.B.6
+referee 21.D pool play 15.B.5
+discretionary 21.D.1 round robin 15.B.4
+foreign substances single elimination
+21.D.3 with consolation
+presence of blood 15.B.2
+21.D.2 single elimination
+resuming play 21.D.4 without
+resuming play 17.D.16 consolation
+standard 21.A 15.B.3
+before start of a team play 15.B.7
+match 21.A.1 match scoring
+options 15.C
+87
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+scheduling matches partners 25.A.2
+15.D playing surface
+Tournament Director dimensions 25.A.11
+responsibilities 16 power wheelchairs
+two-match 25.A.3
+minimum 15.F propelling with one
+Two-bounce rule 1, 10.A foot 25.A.7
+Verbal warning (See serving 25.A.8
+also Profanity) 2, tournament rules
+17.D.17, 22.B 25.A.12, 25.C
+Volley 2 event categories
+Wheelchair rules 25.A 15.A
+bounces allowed Withdrawal 23.B
+25.A.9 before start 23.B.1
+contact with seat definition 2
+25.A.5 from upcoming
+eligibility 25.A.1 matches 23.B.2
+lower extremity ineligibility to
+contact 25.A.6 continue 23.B.3
+non-volley zone scoring 23.B.4
+contact 25.A.10
+part of the body 25.A.4
+88
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+Acknowledgments: USA Pickleball would like to thank
+the teams that developed the new rulebook format, as well
+as the 2025 Rules Committee, whose members collectively
+contributed over 90 hours of volunteer time to this project.
+We also want to acknowledge all the general members that
+submitted new rules, rules modifications, comments on
+rules, and voted during the rule change process.
+USA Pickleball extends our sincere appreciation to the
+committee of wheelchair and adaptive standing players
+and the other advocates of adaptive pickleball whose
+insight and dedication shaped these rules and revisions.
+Their contributions were essential in making tournament
+play more accessible, easier to understand, and welcoming
+for all.
+89
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+NOTES:
+90
+2026 USA Pickleball Official Rulebook © Copyright – All rights reserved
+
+NATIONAL GOVERNING BODY
+The Official Rules of pickleball is an essential resource for
+players, referees, coaches, parents, and fans.
+Included are USA Pickleball’s official playing rules and
+interpretations, and detailed court diagrams.
+This book is the singular source for the rules of the game.
+USA Pickleball
+All Rights Reserved
+Printed in the United States of America
+Please visit our website: usapickleball.org for the
+most current rules and information
+2010©; revised 2026©

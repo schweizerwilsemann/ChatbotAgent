@@ -1,0 +1,37 @@
+# HƯỚNG DẪN ĐIỀN THỦ CÔNG
+# File này cần chủ quán cung cấp thông tin
+# Format mẫu:
+
+[CATEGORY: Nước uống]
+- Nước suối: 10,000đ
+- Coca Cola: 15,000đ
+- Pepsi: 15,000đ
+- Trà đá: 5,000đ
+- Cà phê đen: 20,000đ
+- Cà phê sữa: 25,000đ
+- Bia Heineken: 35,000đ
+- Bia Tiger: 30,000đ
+- Bia Sài Gòn: 25,000đ
+- Nước cam: 30,000đ
+- Nước tăng lực: 20,000đ
+---
+[CATEGORY: Đồ ăn nhẹ]
+- Bánh mì: 25,000đ
+- Mì xào: 35,000đ
+- Cơm chiên: 40,000đ
+- Khô bò: 50,000đ
+- Khô gà: 45,000đ
+- Mực nướng: 60,000đ
+- Khoai tây chiên: 40,000đ
+- Đậu phộng rang: 25,000đ
+- Xúc xích nướng: 35,000đ
+---
+[CATEGORY: Thuê dụng cụ]
+- Cơ cho thuê: 20,000đ/cây
+- Phấn bida: 10,000đ/hộp
+- Găng tay: 15,000đ/chiếc
+- Vợt cầu lông cho thuê: 30,000đ/cây
+- Vợt pickleball cho thuê: 30,000đ/cây
+- Cầu lông: 15,000đ/tube (12 quả)
+- Bóng pickleball: 20,000đ/quả
+---

@@ -1,0 +1,135 @@
+[SECTION: Court and Equipment]
+
+Pickleball is played on a rectangular court that measures 20 feet wide by 44 feet long for both singles and doubles play. This is the same court size regardless of whether you are playing one-on-one or two-on-two, which is one of the unique aspects of pickleball compared to sports like badminton or tennis where court dimensions change between singles and doubles.
+
+The court is divided into several key areas. The net spans the full 20-foot width of the court and is suspended at a height of 36 inches at each sideline and 34 inches at the center of the court. This slight dip in the center is due to the natural sag of the net and is regulated by the USA Pickleball Association (USAPA) rules. The net posts are placed on the sidelines, and the net itself should be taut with no gaps between the net and the posts.
+
+One of the most distinctive features of a pickleball court is the Non-Volley Zone, commonly referred to as "the kitchen." This zone extends 7 feet from the net on both sides, creating a 14-foot-wide strip in the middle of the court. The kitchen is marked by a line parallel to the net, and this line is considered part of the kitchen zone. The kitchen area is critical to the strategy and rules of pickleball, as it prevents players from executing aggressive volley shots right at the net.
+
+The court is further divided into left and right service areas by a centerline that runs from the kitchen line to the baseline. The baseline marks the back boundary of the court. The sidelines mark the outer boundaries on each side. For doubles play, the full court width is used, and for singles play, the same full court width is used as well.
+
+Pickleball paddles are solid, flat surfaces made from rigid materials. As of the 2024-2025 USAPA rules, the paddle must not exceed 17 inches in total length, and there are no specific width restrictions as long as the overall dimensions remain within the allowed combined length and width. Paddles can be made from materials such as wood, composite, or graphite. The surface must be smooth and may have a textured finish for spin control, but the USAPA has strict regulations about the allowable surface roughness. Paddles must not produce excessive noise or have features that give an unfair advantage. The USAPA maintains an approved paddle list, and all paddles used in sanctioned tournament play must be on this list.
+
+The pickleball itself is a perforated polymer ball with a specific set of requirements. Outdoor balls typically have 40 small holes and are slightly heavier and harder than indoor balls. Indoor balls usually have 26 larger holes and are softer, with a lighter weight. The ball must be between 2.87 and 2.97 inches in diameter and must weigh between 0.78 and 0.935 ounces. The ball must be a uniform color, though certain two-tone color combinations are allowed for visibility purposes. In sanctioned play, only USAPA-approved balls may be used, and the specific ball model may be selected based on court surface and playing conditions.
+
+Players are also expected to wear appropriate athletic footwear. Court shoes with non-marking soles are recommended and often required in indoor facilities. There are no specific uniform requirements in recreational play, but tournament play may have dress code guidelines.
+
+---
+
+[SECTION: Serving Rules]
+
+The serve in pickleball is a fundamental aspect of the game and is governed by several specific rules designed to ensure fairness and consistency. The serve must be executed with an underhand motion, which is one of the defining characteristics of pickleball that differentiates it from tennis and other racquet sports.
+
+The server must stand behind the baseline with both feet behind it at the moment of contact. The serve is made diagonally to the opponent's service court, meaning the ball must land in the service court that is diagonally opposite from where the server is standing. The server must keep both feet on the ground behind the baseline until the ball is struck. Stepping on or over the baseline before contact is a fault.
+
+The ball must be struck with the paddle below the waist level. Specifically, the head of the paddle must not be above the wrist at the point of contact. This underhand requirement ensures that the serve is not an overpowering shot and keeps the game accessible and strategic. The server must release the ball by hand before striking it, or use the drop serve option.
+
+The drop serve, which was officially adopted in the 2021 rulebook and remains in effect through 2024-2025, allows the server to drop the ball from any natural height and hit it after it bounces. When using the drop serve, the player is not required to keep the paddle below the waist, but all other serving rules still apply. The ball must be dropped by hand, and it cannot be thrown downward or tossed upward with force.
+
+Unlike tennis, there is no second serve attempt in pickleball. If the server faults on the first attempt, it results in a loss of serve, and the serve passes to the next server in rotation (or to the receiving team in doubles). This makes the serve both a critical opportunity and a potential liability, as players must balance aggression with consistency.
+
+The server continues to serve as long as the serving team wins points. In doubles, each team has two servers before the serve passes to the opposing team. The first server on a team serves from the right side of the court when the team's score is even, and from the left side when the score is odd. After the first server faults, the second server takes over. After both servers on a team have faulted, the serve passes to the opposing team.
+
+A serve that hits the net and lands in the correct service court is a valid serve and is replayed as a let. However, unlike tennis, there is no limit on the number of lets allowed. If the ball hits the net and lands outside the correct service court, it is a fault. The serve must clear the net and land within the correct service court boundaries, including the lines. A serve that lands on any part of the service court line is considered in.
+
+---
+
+[SECTION: The Two-Bounce Rule]
+
+The two-bounce rule is one of the most important and distinctive rules in pickleball, and it fundamentally shapes the strategy and flow of the game. This rule was introduced to eliminate the serve-and-volley advantage that dominant servers would have if they could rush the net immediately after serving.
+
+According to the two-bounce rule, the receiving team must let the serve bounce before returning it. This means the return of serve cannot be volleyed out of the air; it must be hit after the ball bounces once on the receiving side. Similarly, after the return of serve is made, the serving team must let that return bounce before hitting it. The serving team cannot volley the return of serve; they must wait for it to bounce.
+
+Only after these two bounces have occurred — the serve bounce and the return bounce — are both teams allowed to volley the ball (hit it out of the air without a bounce). This rule ensures that the serving team cannot simply rush the net and volley the return, which would create an unfair advantage for the team with the serve.
+
+The two-bounce rule has several strategic implications. First, it forces the serving team to start the point from the baseline, as they must wait for the return to bounce. This means the serving team is typically at a slight positional disadvantage at the start of the rally, as they are further from the net. Second, it encourages longer rallies, as the initial shots are more controlled and less aggressive. Third, it rewards teams that can effectively transition from the baseline to the kitchen line, which is the optimal position in pickleball.
+
+The two-bounce rule also affects the serve strategy itself. Since the receiving team must let the serve bounce, the server can use this to their advantage by hitting a deep serve that pushes the receiver back, making it harder for them to hit a deep return. Conversely, the receiver can use the bounce requirement to their advantage by taking a strong position and hitting a powerful return after the bounce.
+
+In doubles, the two-bounce rule applies in the same way. The receiving team must let the serve bounce, and the serving team must let the return bounce. After these two bounces, all four players are free to volley. This creates a dynamic where the serving team must quickly transition from the baseline to the net after the two bounces, and the receiving team tries to maintain their advantage by hitting a deep, well-placed return.
+
+---
+
+[SECTION: Non-Volley Zone (Kitchen) Rules]
+
+The Non-Volley Zone, affectionately known as "the kitchen," is perhaps the most iconic and strategically important area of the pickleball court. The kitchen is a 7-foot zone on each side of the net, and it is governed by strict rules that prevent aggressive net play and keep the game fair and accessible.
+
+The primary rule governing the kitchen is that a player cannot volley the ball while standing in the kitchen or while their momentum from a volley carries them into the kitchen. A volley is defined as hitting the ball out of the air before it bounces. If a player is standing in the kitchen or steps into the kitchen as a result of their volley motion, it is a fault, and the point is lost.
+
+The kitchen line itself is considered part of the kitchen zone. This means that if a player's foot is touching the kitchen line while volleying, it is a fault. Players must be completely behind the kitchen line when volleying. This includes the player's feet, and any part of the body or clothing that touches the kitchen line or the kitchen area.
+
+The momentum rule is particularly important. If a player volleys the ball while standing outside the kitchen, but their momentum carries them into the kitchen after the shot, it is a fault. This includes situations where a player might stumble, trip, or be pulled into the kitchen by their own motion. Even if the ball has already been hit and is on its way to the opponent's side, if the player's momentum takes them into the kitchen, the point is lost.
+
+However, players are allowed to enter the kitchen to play a ball that has bounced. If the ball bounces in the kitchen or on the kitchen line, a player may step into the kitchen to hit it. The key distinction is that the ball must bounce first. After hitting a bounced ball in the kitchen, the player must exit the kitchen before they can volley again.
+
+In doubles, the kitchen rules apply to each player individually. One partner cannot pull the other into the kitchen. If one player volleys and their momentum carries them into the kitchen, only that player is at fault. The other partner is not penalized unless they also commit a kitchen violation independently.
+
+The kitchen rules have several strategic implications. The kitchen line is the optimal position in pickleball, as it allows players to hit downward volleys and control the point. However, players must be careful not to step into the kitchen while volleying, which requires good footwork and body control. The kitchen also creates opportunities for dinking, which is a soft shot that lands in the opponent's kitchen, forcing them to hit up on the ball.
+
+Players often use a technique called "toeing the line," where they stand as close to the kitchen line as possible without touching it, allowing them to reach balls near the net while still being able to volley. This requires balance and awareness, as a slight misstep can result in a fault.
+
+---
+
+[SECTION: Scoring]
+
+Pickleball scoring is straightforward but has some unique aspects that differentiate it from other racquet sports. In traditional pickleball scoring, only the serving team can score points. This is known as the side-out scoring system, and it has been the standard since the game's inception.
+
+Games are played to 11 points, and a team must win by at least 2 points. This means that if the score reaches 10-10, the game continues until one team has a 2-point lead. There is no cap on the score, so games can theoretically go on indefinitely until the 2-point margin is achieved.
+
+In tournament play, games may be played to 15 or 21 points, depending on the specific tournament format. The win-by-2 rule still applies in these extended games. Some tournaments also use a best-of-three format, where the first team to win two games wins the match.
+
+In doubles, the score is announced with three numbers: the serving team's score, the receiving team's score, and the server number (1 or 2). For example, a score announcement of "4-3-2" means the serving team has 4 points, the receiving team has 3 points, and the second server is serving. The first server on each team is designated as server 1, and the second server is server 2. When a team gains the serve, the player on the right side of the court serves first and is designated as server 1.
+
+In 2024, the USAPA introduced rally scoring as an experimental option for certain tournaments and recreational play. Under rally scoring, a point is scored on every rally, regardless of which team is serving. This speeds up the game and makes it more predictable in terms of game length. However, traditional side-out scoring remains the standard for most sanctioned play.
+
+In singles scoring, the score is announced with just two numbers: the server's score and the receiver's score. The server serves from the right side when their score is even and from the left side when their score is odd. This is the same convention used in doubles for determining which side to serve from.
+
+The scoring system also affects strategy. Since only the serving team can score in traditional scoring, teams must be aggressive when serving and defensive when receiving. The two-bounce rule and kitchen rules help balance this by preventing the serving team from gaining an overwhelming advantage.
+
+---
+
+[SECTION: Faults]
+
+A fault in pickleball results in the loss of the rally, and depending on which team committed the fault, either a point is scored (if the serving team caused the fault) or the serve passes to the next server (if the receiving team caused the fault). Understanding the various types of faults is essential for playing pickleball correctly and avoiding unnecessary errors.
+
+The most common faults include:
+
+Ball out of bounds: If the ball lands outside the court boundaries, including beyond the sidelines or baseline, it is a fault. The lines are considered part of the court, so a ball that lands on any part of the line is in. In doubles, the full court width is used, including the area between the sideline and the centerline on each side.
+
+Ball into the net: If the ball hits the net and does not clear it to the opponent's side, it is a fault. This applies to serves, returns, and all other shots during the rally.
+
+Volleying from the non-volley zone: If a player volleys the ball while standing in the kitchen, on the kitchen line, or if their momentum from a volley carries them into the kitchen, it is a fault. This is one of the most frequently violated rules, especially among beginners.
+
+Serve rule violations: Faults on the serve include hitting the ball above waist level, stepping on or over the baseline before contact, not serving diagonally to the correct service court, and the ball not clearing the net. The serve must also be made within 10 seconds after the score is announced.
+
+Ball hitting a player: If the ball hits a player before it bounces, it is a fault on that player. This includes being hit by the ball on any part of the body or clothing. However, if the ball hits the player's paddle hand below the wrist, it is considered a valid shot. The ball must not hit the player's non-paddle hand or arm.
+
+Two-bounce violation: If a player volleys the ball before the two-bounce rule has been satisfied (i.e., the serve or return has not bounced), it is a fault.
+
+Double hit: If the ball is hit twice by the same player or team before it crosses the net, it is a fault. However, if the ball hits the paddle and then the player's hand in a single continuous motion, it is not considered a double hit.
+
+Carrying or scooping the ball: The ball must be cleanly hit, not carried or scooped on the paddle. If the ball rests on the paddle for more than a moment, it is a fault.
+
+Serving out of turn: In doubles, if a player serves when it is not their turn, it is a fault, and any points scored during that incorrect serve are lost.
+
+---
+
+[SECTION: Doubles Strategy]
+
+Doubles pickleball is the most popular format of the game, and it requires a combination of individual skill and coordinated teamwork. The best doubles teams move as a unit, communicate effectively, and use strategic positioning to control the point.
+
+The most fundamental strategy in doubles is getting to the kitchen line. The kitchen line is the optimal position because it allows players to hit downward volleys, control the pace of the game, and cut off angles. The team that reaches the kitchen line first typically has the advantage. After the serve, the serving team should work to transition from the baseline to the kitchen line, using the third shot drop as the primary tool for this transition.
+
+Communication between partners is critical. Partners should call out shots, especially when the ball is hit down the middle between them. A common rule is that the player with the forehand in the middle takes the shot, but this should be communicated before the point starts. Partners should also communicate about poaching, stacking, and other strategic movements.
+
+Stacking is a formation where both players stand on the same side of the court, typically to keep a player's forehand in the middle or to allow a stronger player to cover more of the court. In a standard formation, players stand side by side, but in stacking, one player shifts to the other side, and the other player covers the vacated area. Stacking is commonly used on the serve to keep the forehand player in the middle, and on the return to keep the backhand player from having to cover too much area.
+
+Poaching is when the non-hitting partner crosses in front of their partner to hit a volley. Poaching is an aggressive strategy that can catch opponents off guard and win points outright. However, it requires good timing and communication, as a failed poach can leave the court open for the opponents. Poaching is most effective when the opponents are hitting predictable shots, such as a cross-court dink that the non-hitting partner can intercept.
+
+The third shot drop is perhaps the most important shot in doubles pickleball. After the serve and return, the third shot is hit by the serving team, and it should be a soft shot that lands in the kitchen, allowing the serving team to approach the net. The third shot drop neutralizes the returner's advantage and allows the serving team to transition from the baseline to the kitchen line. If the third shot is too high or too long, the returner can attack it and gain the advantage.
+
+Dinking is a key strategy at the kitchen line. Dinking involves hitting soft shots that land in the opponent's kitchen, forcing them to hit up on the ball. Dinking requires patience and finesse, as the goal is to create an opportunity to attack while minimizing the risk of making an error. Cross-court dinking is particularly effective because it creates longer angles and gives the dinking team more time to react.
+
+Both players should try to maintain a side-by-side position at the kitchen line, covering the full width of the court. If one player is pulled out of position, the other should shift to cover the gap. This requires good court awareness and the ability to move quickly in all directions.
+
+In competitive doubles, teams often use a variety of formations and strategies depending on the situation. Some teams prefer an aggressive style with frequent poaching and net rushing, while others prefer a more conservative style with consistent dinking and patient shot selection. The best teams can adapt their strategy based on their opponents' strengths and weaknesses.

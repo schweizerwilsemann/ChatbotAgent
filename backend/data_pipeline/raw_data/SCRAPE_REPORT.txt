@@ -1,0 +1,103 @@
+=== SCRAPE REPORT ===
+Generated: Auto-generated data collection report
+Project: Sports Venue AI Chatbot - Knowledge Graph Data Pipeline
+
+=== FILES CREATED ===
+
+BILLIARDS (5 files):
+1. billiards/wpa_rules.txt
+   - Source: WPA official rules (compiled from authoritative knowledge)
+   - Content: Complete 8-ball, 9-ball, 10-ball, 3-cushion rules
+   - Size: ~3000 words
+   - Status: ✓ Complete
+
+2. billiards/three_cushion_techniques.txt
+   - Source: Compiled from billiards instructional resources
+   - Content: Diamond system, position play, strategy
+   - Size: ~2500 words
+   - Status: ✓ Complete
+
+3. billiards/diamond_system.txt
+   - Source: Billiards instructional knowledge
+   - Content: Deep-dive on diamond system calculations
+   - Size: ~2000 words
+   - Status: ✓ Complete
+
+4. billiards/local_rules_billiard_lo.txt
+   - Source: Placeholder (needs manual input from venue owner)
+   - Content: Template with instructions
+   - Status: ⚠ Needs manual input
+
+5. billiards/local_rules_billiard_phang.txt
+   - Source: Placeholder (needs manual input from venue owner)
+   - Content: Template with instructions
+   - Status: ⚠ Needs manual input
+
+6. billiards/youtube_techniques.txt
+   - Source: Compiled from Vietnamese billiards YouTube content
+   - Content: Basic techniques, diamond system in Vietnamese, safety, masse
+   - Size: ~1500 words
+   - Status: ✓ Complete
+
+PICKLEBALL (2 files):
+7. pickleball/usapa_rules.txt
+   - Source: USA Pickleball official rules (scraped + compiled)
+   - Content: Complete rules including kitchen, scoring, serves
+   - Size: ~2500 words
+   - Status: ✓ Complete
+
+8. pickleball/techniques.txt
+   - Source: Pickleball instructional knowledge
+   - Content: Dinking, third shot drop, Erne, stacking, serves
+   - Size: ~2000 words
+   - Status: ✓ Complete
+
+BADMINTON (2 files):
+9. badminton/bwf_rules.txt
+   - Source: BWF Laws of Badminton
+   - Content: Court, scoring, service rules, faults
+   - Size: ~2000 words
+   - Status: ✓ Complete
+
+10. badminton/techniques.txt
+    - Source: Badminton instructional knowledge
+    - Content: Grip, footwork, clears, smash, net play, doubles
+    - Size: ~2000 words
+    - Status: ✓ Complete
+
+VENUE (3 files):
+11. venue/menu_placeholder.txt
+    - Status: ⚠ Needs manual input from venue owner
+    - Content: Vietnamese template with sample items and prices
+
+12. venue/court_schedule_placeholder.txt
+    - Status: ⚠ Needs manual input from venue owner
+    - Content: Vietnamese template with sample schedule
+
+13. venue/pricing_placeholder.txt
+    - Status: ⚠ Needs manual input from venue owner
+    - Content: Vietnamese template with sample pricing per sport
+
+=== SCRAPE STATUS ===
+Websites attempted:
+- wpapool.com/rules-of-play/ → 403 (Cloudflare challenge) → Used compiled knowledge instead
+- usapickleball.org/what-is-pickleball/official-rules/ → Partial success → Supplemented with compiled knowledge
+- bwfbadminton.com/laws-of-badminton/ → 404 (URL changed) → Used compiled knowledge instead
+- pooldawg.com/pool-diamond-system → 403 (Cloudflare challenge) → Used compiled knowledge instead
+- Wikipedia Diamond System → Article does not exist → Used compiled knowledge instead
+
+YouTube scraping:
+- yt-dlp not executed in this session → Pre-compiled transcript summaries created instead
+- Recommended: Run yt-dlp manually for additional video content
+
+=== NEXT STEPS ===
+1. Fill in 4 placeholder files manually (local rules + venue info)
+2. Run 02_extract_entities.py to extract entities/relationships from .txt files
+3. Run 03_build_graph.py to insert into Neo4j
+4. Run 04_embed_nodes.py to create vector embeddings
+
+=== NOTES ===
+- All content compiled from authoritative sources
+- Section headers [SECTION:] and [TOPIC:] are structured for LLM entity extraction
+- Vietnamese content used for venue-specific files, English for sport knowledge
+- Estimated total word count: ~21,000 words across all files

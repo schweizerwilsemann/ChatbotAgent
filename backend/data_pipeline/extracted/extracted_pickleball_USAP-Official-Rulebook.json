@@ -1,0 +1,63 @@
+{
+  "extracted_at": "2026-05-08T05:52:20.216725+00:00",
+  "source": "pickleball_USAP-Official-Rulebook",
+  "extraction_count": 1,
+  "total_entities": 4,
+  "total_relationships": 3,
+  "extractions": [
+    {
+      "chunk_title": "Usap-Official-Rulebook",
+      "chunk_source": "USAP-Official-Rulebook.txt",
+      "sport": "pickleball",
+      "extracted_at": "2026-05-08T05:52:15.209692+00:00",
+      "entity_count": 4,
+      "relationship_count": 3,
+      "entities": [
+        {
+          "name": "Pickleball",
+          "type": "Sport",
+          "description": "A sport played with a paddle and ball on a court.",
+          "properties": {}
+        },
+        {
+          "name": "Standard Play",
+          "type": "GameType",
+          "description": "Regular play of pickleball, including recreational and organized league play.",
+          "properties": {}
+        },
+        {
+          "name": "Tournament Play",
+          "type": "GameType",
+          "description": "Official competitions where players compete for ratings on a national or international basis.",
+          "properties": {}
+        },
+        {
+          "name": "Non-sanctioned Tournaments",
+          "type": "GameType",
+          "description": "Tournaments that use the rules as guidelines but may be more flexible in their application.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Standard Play",
+          "target": "Pickleball",
+          "type": "LA_LOAI",
+          "properties": {}
+        },
+        {
+          "source": "Tournament Play",
+          "target": "Pickleball",
+          "type": "LA_LOAI",
+          "properties": {}
+        },
+        {
+          "source": "Non-sanctioned Tournaments",
+          "target": "Pickleball",
+          "type": "LA_LOAI",
+          "properties": {}
+        }
+      ]
+    }
+  ]
+}

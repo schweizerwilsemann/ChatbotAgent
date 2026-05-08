@@ -1,0 +1,699 @@
+{
+  "extracted_at": "2026-05-08T04:50:06.029398+00:00",
+  "source": "badminton_techniques",
+  "extraction_count": 9,
+  "total_entities": 51,
+  "total_relationships": 46,
+  "extractions": [
+    {
+      "chunk_title": "Grip",
+      "chunk_source": "techniques.txt",
+      "sport": "badminton",
+      "extracted_at": "2026-05-08T04:42:38.897380+00:00",
+      "entity_count": 7,
+      "relationship_count": 10,
+      "entities": [
+        {
+          "name": "grip",
+          "type": "Technique",
+          "description": "A method used to hold a badminton racket.",
+          "properties": {}
+        },
+        {
+          "name": "forehand grip",
+          "type": "Technique",
+          "description": "The most common grip in badminton, also known as the V-grip or handshake grip.",
+          "properties": {}
+        },
+        {
+          "name": "backhand grip",
+          "type": "Technique",
+          "description": "Used for shots on the backhand side, also known as the thumb grip or bevel grip.",
+          "properties": {}
+        },
+        {
+          "name": "panhandle grip",
+          "type": "Technique",
+          "description": "A variation used for net kills and some smashes.",
+          "properties": {}
+        },
+        {
+          "name": "thumb grip",
+          "type": "Technique",
+          "description": "A variation used for backhand shots, where the thumb is placed on the wider surface of the handle for more power.",
+          "properties": {}
+        },
+        {
+          "name": "bevel grip",
+          "type": "Technique",
+          "description": "A variation used for deceptive shots, where the racket is held at an angle to disguise the direction of the shot.",
+          "properties": {}
+        },
+        {
+          "name": "racket",
+          "type": "Equipment",
+          "description": "The implement used in badminton.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "grip",
+          "target": "forehand grip",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "grip",
+          "target": "backhand grip",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "grip",
+          "target": "panhandle grip",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "grip",
+          "target": "thumb grip",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "grip",
+          "target": "bevel grip",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "forehand grip",
+          "target": "racket",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "backhand grip",
+          "target": "racket",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "panhandle grip",
+          "target": "racket",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "thumb grip",
+          "target": "racket",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "bevel grip",
+          "target": "racket",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Footwork",
+      "chunk_source": "techniques.txt",
+      "sport": "badminton",
+      "extracted_at": "2026-05-08T04:43:40.224884+00:00",
+      "entity_count": 6,
+      "relationship_count": 5,
+      "entities": [
+        {
+          "name": "Footwork",
+          "type": "Technique",
+          "description": "The foundation of badminton movement, essential for reaching the shuttle quickly and efficiently.",
+          "properties": {}
+        },
+        {
+          "name": "Split step",
+          "type": "Technique",
+          "description": "A small hop performed as the opponent hits the shuttle, allowing quick reaction in any direction.",
+          "properties": {}
+        },
+        {
+          "name": "Chassé",
+          "type": "Technique",
+          "description": "Lateral movement used to move along the baseline or cover the side of the court.",
+          "properties": {}
+        },
+        {
+          "name": "Lunge",
+          "type": "Technique",
+          "description": "Forward movement used to reach the shuttle when it is hit short, allowing for net shots, drops, and some smashes.",
+          "properties": {}
+        },
+        {
+          "name": "Recovery steps",
+          "type": "Technique",
+          "description": "Used to return to the center of the court after hitting a shot, ensuring quick and efficient movement.",
+          "properties": {}
+        },
+        {
+          "name": "Six corners footwork pattern",
+          "type": "Technique",
+          "description": "System for covering all six corners of the court using split steps, chassés, lunges, and recovery steps.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Footwork",
+          "target": "Split step",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Footwork",
+          "target": "Chassé",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Footwork",
+          "target": "Lunge",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Footwork",
+          "target": "Recovery steps",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Footwork",
+          "target": "Six corners footwork pattern",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Clears (Lobs)",
+      "chunk_source": "techniques.txt",
+      "sport": "badminton",
+      "extracted_at": "2026-05-08T04:44:39.543031+00:00",
+      "entity_count": 6,
+      "relationship_count": 5,
+      "entities": [
+        {
+          "name": "clear",
+          "type": "Technique",
+          "description": "A high, deep shot in badminton that sends the shuttle to the back of the opponent's court.",
+          "properties": {}
+        },
+        {
+          "name": "defensive clear",
+          "type": "Technique",
+          "description": "A high, deep shot used for defensive purposes, giving the player time to recover.",
+          "properties": {}
+        },
+        {
+          "name": "attacking clear",
+          "type": "Technique",
+          "description": "A flatter trajectory shot used to push the opponent back and create opportunities for attack.",
+          "properties": {}
+        },
+        {
+          "name": "overhead clear",
+          "type": "Technique",
+          "description": "The most common type of clear, hit above the head with a full arm swing.",
+          "properties": {}
+        },
+        {
+          "name": "underhand clear",
+          "type": "Technique",
+          "description": "A shot hit from below the waist, typically used at the net to send the shuttle to the back of the opponent's court.",
+          "properties": {}
+        },
+        {
+          "name": "clear strategy",
+          "type": "Concept",
+          "description": "The overall approach to using clears in badminton to control pace and create opportunities for attack.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "clear",
+          "target": "defensive clear",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "clear",
+          "target": "attacking clear",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "clear",
+          "target": "overhead clear",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "clear",
+          "target": "underhand clear",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "clear strategy",
+          "target": "clear",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Smash",
+      "chunk_source": "techniques.txt",
+      "sport": "badminton",
+      "extracted_at": "2026-05-08T04:45:29.591851+00:00",
+      "entity_count": 5,
+      "relationship_count": 4,
+      "entities": [
+        {
+          "name": "Smash",
+          "type": "Technique",
+          "description": "The most powerful and aggressive shot in badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Full Smash",
+          "type": "Technique",
+          "description": "A variation of the smash that involves turning sideways, raising the racket above the head, and hitting the shuttle with a full arm swing.",
+          "properties": {}
+        },
+        {
+          "name": "Jump Smash",
+          "type": "Technique",
+          "description": "A variation where the player jumps into the air to hit the shuttle, creating a steeper downward angle.",
+          "properties": {}
+        },
+        {
+          "name": "Stick Smash",
+          "type": "Technique",
+          "description": "A variation that uses less power but more placement, hit with a shorter swing and less arm speed.",
+          "properties": {}
+        },
+        {
+          "name": "Deceptive Smash",
+          "type": "Technique",
+          "description": "A variation where the player disguises the smash as a different shot to catch the opponent off guard.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Smash",
+          "target": "Full Smash",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Smash",
+          "target": "Jump Smash",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Smash",
+          "target": "Stick Smash",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Smash",
+          "target": "Deceptive Smash",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Drop Shots",
+      "chunk_source": "techniques.txt",
+      "sport": "badminton",
+      "extracted_at": "2026-05-08T04:46:26.403093+00:00",
+      "entity_count": 6,
+      "relationship_count": 5,
+      "entities": [
+        {
+          "name": "drop shot",
+          "type": "Technique",
+          "description": "A soft, delicate shot that sends the shuttle just over the net.",
+          "properties": {}
+        },
+        {
+          "name": "fast drop",
+          "type": "Technique",
+          "description": "A variation of the drop shot hit with more speed.",
+          "properties": {}
+        },
+        {
+          "name": "slow drop",
+          "type": "Technique",
+          "description": "A variation of the drop shot hit with less speed, causing the shuttle to float.",
+          "properties": {}
+        },
+        {
+          "name": "straight drop",
+          "type": "Technique",
+          "description": "A drop shot that travels straight down the sideline.",
+          "properties": {}
+        },
+        {
+          "name": "cross-court drop",
+          "type": "Technique",
+          "description": "A drop shot that travels diagonally across the court.",
+          "properties": {}
+        },
+        {
+          "name": "deceptive drop",
+          "type": "Technique",
+          "description": "A drop shot disguised as a different shot to catch the opponent off guard.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "drop shot",
+          "target": "fast drop",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "drop shot",
+          "target": "slow drop",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "drop shot",
+          "target": "straight drop",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "drop shot",
+          "target": "cross-court drop",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "drop shot",
+          "target": "deceptive drop",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Net Play",
+      "chunk_source": "techniques.txt",
+      "sport": "badminton",
+      "extracted_at": "2026-05-08T04:47:17.121917+00:00",
+      "entity_count": 5,
+      "relationship_count": 4,
+      "entities": [
+        {
+          "name": "Net play",
+          "type": "Technique",
+          "description": "Playing shots near the net in badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Net shot",
+          "type": "Technique",
+          "description": "A soft shot that sends the shuttle just over the net, landing near the front of the opponent's court.",
+          "properties": {}
+        },
+        {
+          "name": "Net kill",
+          "type": "Technique",
+          "description": "An aggressive shot hit when the shuttle is above the net, used to win points and create opportunities for attack.",
+          "properties": {}
+        },
+        {
+          "name": "Cross-court net shot",
+          "type": "Technique",
+          "description": "A variation that sends the shuttle diagonally across the court, landing near the front corner of the opponent's court.",
+          "properties": {}
+        },
+        {
+          "name": "Tumbling net shot",
+          "type": "Technique",
+          "description": "A variation that causes the shuttle to tumble and spin as it crosses the net.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Net play",
+          "target": "Net shot",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Net play",
+          "target": "Net kill",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Net play",
+          "target": "Cross-court net shot",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Net play",
+          "target": "Tumbling net shot",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Drive",
+      "chunk_source": "techniques.txt",
+      "sport": "badminton",
+      "extracted_at": "2026-05-08T04:47:54.459168+00:00",
+      "entity_count": 4,
+      "relationship_count": 3,
+      "entities": [
+        {
+          "name": "Drive",
+          "type": "Technique",
+          "description": "A flat, fast shot that travels horizontally over the net.",
+          "properties": {}
+        },
+        {
+          "name": "Flat Drive",
+          "type": "Technique",
+          "description": "A drive hit with a flat trajectory, sending the shuttle horizontally over the net.",
+          "properties": {}
+        },
+        {
+          "name": "Push Drive",
+          "type": "Technique",
+          "description": "A variation of the drive hit with less speed, causing the shuttle to land closer to the net.",
+          "properties": {}
+        },
+        {
+          "name": "Block Drive",
+          "type": "Technique",
+          "description": "A defensive drive hit when the opponent hits a smash.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Drive",
+          "target": "Flat Drive",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Drive",
+          "target": "Push Drive",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Drive",
+          "target": "Block Drive",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Serve Types",
+      "chunk_source": "techniques.txt",
+      "sport": "badminton",
+      "extracted_at": "2026-05-08T04:48:43.309200+00:00",
+      "entity_count": 5,
+      "relationship_count": 4,
+      "entities": [
+        {
+          "name": "Serve",
+          "type": "Technique",
+          "description": "The shot that starts every rally in badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Low Serve",
+          "type": "GameType",
+          "description": "A serve used in doubles where the shuttle is hit just over the net and lands near the short service line.",
+          "properties": {}
+        },
+        {
+          "name": "High Serve",
+          "type": "GameType",
+          "description": "A serve used in singles where the shuttle is hit high and deep, landing near the back boundary line.",
+          "properties": {}
+        },
+        {
+          "name": "Flick Serve",
+          "type": "GameType",
+          "description": "A deceptive serve used in doubles to catch the opponent off guard with a flick of the wrist.",
+          "properties": {}
+        },
+        {
+          "name": "Drive Serve",
+          "type": "GameType",
+          "description": "An aggressive serve hit flat and fast, landing in the middle or back of the opponent's court.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Serve",
+          "target": "Low Serve",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Serve",
+          "target": "High Serve",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Serve",
+          "target": "Flick Serve",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Serve",
+          "target": "Drive Serve",
+          "type": "DUNG_DE",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Doubles Strategy",
+      "chunk_source": "techniques.txt",
+      "sport": "badminton",
+      "extracted_at": "2026-05-08T04:50:01.019033+00:00",
+      "entity_count": 7,
+      "relationship_count": 6,
+      "entities": [
+        {
+          "name": "Doubles badminton",
+          "type": "Sport",
+          "description": "A fast-paced and exciting format of badminton played by two teams.",
+          "properties": {}
+        },
+        {
+          "name": "Front-and-back formation",
+          "type": "Technique",
+          "description": "An attacking formation where one player is at the front near the net, responsible for net shots, kills, and intercepting weak returns, while the other player is at the back, responsible for clears, smashes, and drops.",
+          "properties": {}
+        },
+        {
+          "name": "Side-by-side formation",
+          "type": "Technique",
+          "description": "A defensive formation where both players stand side by side, each covering half of the court, most effective against smashes and fast shots.",
+          "properties": {}
+        },
+        {
+          "name": "Rotation between formations",
+          "type": "Technique",
+          "description": "Key strategy in doubles where teams switch from side-by-side to front-and-back formation based on rally control.",
+          "properties": {}
+        },
+        {
+          "name": "Service strategy",
+          "type": "Technique",
+          "description": "Using different serves to keep the opponent guessing and create opportunities for attack, including low serve, flick serve, and drive serve.",
+          "properties": {}
+        },
+        {
+          "name": "Communication and coordination",
+          "type": "Concept",
+          "description": "Important aspect of doubles strategy involving partners communicating about shot selection, especially when the shuttle is hit down the middle.",
+          "properties": {}
+        },
+        {
+          "name": "Deception and variation",
+          "type": "Technique",
+          "description": "Using speed, direction, and placement variations to keep opponents guessing and control court with formations and rotation.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Doubles badminton",
+          "target": "Front-and-back formation",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Doubles badminton",
+          "target": "Side-by-side formation",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Doubles badminton",
+          "target": "Rotation between formations",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Doubles badminton",
+          "target": "Service strategy",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Doubles badminton",
+          "target": "Communication and coordination",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Doubles badminton",
+          "target": "Deception and variation",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    }
+  ]
+}

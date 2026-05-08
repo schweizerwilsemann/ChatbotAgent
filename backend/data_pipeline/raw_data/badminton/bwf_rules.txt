@@ -1,0 +1,119 @@
+[SECTION: Court and Equipment]
+
+Badminton is played on a rectangular court that measures 13.4 meters (44 feet) in length. The width of the court varies depending on the format of play. For singles matches, the court width is 5.18 meters (17 feet), while for doubles matches, the court width is 6.1 meters (20 feet). The court is divided into two equal halves by a net that spans the full width of the court.
+
+The net in badminton is suspended at a height of 1.55 meters (5 feet 1 inch) at the edges, where it is attached to the net posts, and 1.524 meters (5 feet) at the center of the court. The net posts are placed on the doubles sidelines, regardless of whether singles or doubles is being played. The net itself is made of fine cord of dark color and even thickness, with a mesh size between 15mm and 20mm. The top of the net is edged with a 75mm white tape folded over a cord or cable that runs through the tape.
+
+The court is marked with lines that are 40mm wide, and the lines are considered part of the area they define. A shuttle landing on any part of the line is considered in. The court has several key lines: the boundary lines (sidelines and back boundary lines), the short service line (1.98 meters from the net), the long service line for doubles (0.76 meters inside the back boundary line), and the center line that divides the service courts.
+
+The shuttle, also known as the shuttlecock, is a conical projectile that is struck with a racket. Shuttles can be made from natural feathers (typically goose or duck feathers) or synthetic materials. Feather shuttles are used in professional and competitive play, while synthetic shuttles are used in recreational play and training. The shuttle must weigh between 4.74 and 5.50 grams. The feathers are fixed in a cork base, and the shuttle must have 16 feathers fixed in the base. The feathers measure between 62mm and 70mm in length. The cork base is 25mm to 28mm in diameter and is covered with leather or synthetic material.
+
+The speed of the shuttle is affected by temperature, altitude, and humidity. Shuttles are graded by speed, with slower shuttles (typically marked with a green or blue dot) used in warmer conditions and faster shuttles (marked with a red dot) used in cooler conditions. In professional play, the shuttle speed is tested before the match by hitting a full underhand stroke from the back boundary line, and the shuttle should land within a specific area of the court.
+
+The racket must not exceed 680mm in overall length and 230mm in overall width. The head of the racket must not exceed 280mm in length and 220mm in width. The stringed area must not exceed 280mm in overall length and 220mm in overall width. The racket frame and shaft must be free of any objects or devices that could change the shape of the racket or affect its performance. The strings must be interlaced and must not have any knots or irregularities.
+
+Players are also expected to wear appropriate athletic clothing and footwear. Badminton shoes should have non-marking soles and provide good grip and support for the quick movements required in the sport. There are no specific uniform requirements in recreational play, but tournament play may have dress code guidelines set by the Badminton World Federation (BWF) or the organizing body.
+
+---
+
+[SECTION: Scoring System]
+
+The scoring system in badminton is based on rally point scoring, which was introduced in 2006 and has been the standard ever since. Under this system, a point is scored on every rally, regardless of which side is serving. This is a change from the older system where only the serving side could score points.
+
+A match consists of the best of three games. Each game is played to 21 points. The side that first scores 21 points wins the game, except in the case of a tie at 20-all. At 20-all, the side that gains a 2-point lead first wins the game. For example, if the score is 20-20, the game continues until one side leads by 2 points, such as 22-20 or 23-21. At 29-all, the side that scores the 30th point wins the game. This means that the maximum score in a single game is 30-29.
+
+The side that wins a rally scores a point. If the serving side wins the rally, they score a point and continue to serve. If the receiving side wins the rally, they score a point and become the new server. In singles, the server serves from the right service court when their score is even and from the left service court when their score is odd. In doubles, the serving side changes service courts each time they score a point, but the receiving side does not change service courts.
+
+An interval of 60 seconds is allowed between each game. Additionally, when the leading score reaches 11 points in each game, a 60-second interval is allowed. During these intervals, players may receive coaching, hydration, and rest. The interval at 11 points is a strategic opportunity for players to regroup and adjust their tactics.
+
+In doubles, the service changes in a specific pattern. When the serving side wins a rally, the same server serves again, but from the other service court. When the receiving side wins a rally, the receiving side becomes the new serving side, and the player who was in the right service court serves first. This system ensures that both players on a team serve and that the service courts are properly rotated.
+
+The scoring system also affects strategy. Since every rally scores a point, there is no advantage to being the serving side or the receiving side. Both sides must play every point with equal intensity. The game can change quickly, as a single rally can shift the momentum and the score.
+
+---
+
+[SECTION: Service Rules]
+
+The service in badminton is governed by strict rules designed to ensure fairness and prevent the server from gaining an unfair advantage. The service rules have been updated several times, with the most recent changes implemented in 2018.
+
+The server must hit the shuttle below the waist, which is defined as the lowest rib. In the 2018 rule change, the BWF introduced a fixed height of 1.15 meters from the surface of the court as the maximum height at which the shuttle can be contacted. This change was made to standardize the service and make it easier for umpires to judge. The entire shuttle must be below 1.15 meters at the instant of being hit by the server's racket.
+
+The server must keep both feet on the ground at the moment of contact. This means that the server cannot lift either foot or jump while serving. Both feet must be in contact with the court surface, and the server must not be standing on the lines. The feet must be stationary and in a stationary position until the shuttle is struck.
+
+The serve must be hit in an upward direction, meaning the shaft of the racket must be pointing downward at the moment of contact. This ensures that the serve is an underhand shot and cannot be hit with a downward motion like a smash. The racket must be pointing downward, and the shuttle must be hit from below the waist.
+
+The server and receiver must stand in diagonally opposite service courts. The serve must cross the net and land in the opponent's service court. In singles, the service court is the area bounded by the short service line, the center line, the sideline, and the long service line (which is the back boundary line). In doubles, the service court is the area bounded by the short service line, the center line, the sideline, and the long service line for doubles (which is 0.76 meters inside the back boundary line).
+
+The service rules also specify the order of service. In singles, the server serves from the right service court when their score is even and from the left service court when their score is odd. In doubles, the serving team changes service courts each time they score a point, but the receiving team does not change service courts.
+
+---
+
+[SECTION: Lets]
+
+A let is a situation where the rally is stopped and replayed without a point being scored. Lets are called by the umpire in specific situations where the rally cannot be fairly completed.
+
+The most common let is when the shuttle hits the net on a serve and lands in the correct service court. In this case, the serve is replayed as a let. This is different from tennis, where a let is replayed only on the serve. In badminton, a let can be called during a rally if the shuttle gets caught on the net and stays on top of it.
+
+Other situations that result in a let include: the server serves before the receiver is ready, both the server and receiver fault at the same time, the umpire is unable to make a decision, or any unforeseen or accidental situation occurs. If a let is called, the last serve does not count, and the server serves again.
+
+Lets are also called if the shuttle disintegrates during play, or if the shuttle passes through or under the net. If the shuttle breaks during a rally, the rally is stopped and replayed as a let. This ensures that the game is played with a shuttle that is in proper condition.
+
+The umpire has the authority to call a let in any situation where the rally cannot be fairly completed. The umpire's decision is final, and players must accept the let and replay the rally.
+
+---
+
+[SECTION: Faults]
+
+A fault in badminton results in the loss of the rally, and depending on which side committed the fault, either a point is scored or the serve changes. Understanding the various types of faults is essential for playing badminton correctly and avoiding unnecessary errors.
+
+The most common faults include:
+
+Shuttle landing outside boundaries: If the shuttle lands outside the court boundaries, including beyond the sidelines or back boundary lines, it is a fault. The lines are considered part of the court, so a shuttle that lands on any part of the line is in.
+
+Shuttle passing through or under the net: If the shuttle passes through or under the net, it is a fault. The shuttle must pass over the net to be a valid shot. If the shuttle hits the net and falls on the same side, it is a fault on the side that hit it.
+
+Shuttle touching the ceiling or walls: If the shuttle touches the ceiling or walls, it is a fault. In indoor play, the shuttle must not touch the ceiling or any objects above the court. In outdoor play, the shuttle must not touch any obstructions.
+
+Player touching the net: If a player touches the net with their body, clothing, or racket, it is a fault. The net is a boundary between the two sides, and any contact with the net is a violation. This includes touching the net posts or the net itself.
+
+Player invading the opponent's court: If a player's racket or body crosses the net and invades the opponent's court, it is a fault. However, a player may follow through over the net after hitting the shuttle on their own side, as long as the initial contact was made on their side.
+
+Double hit: If the shuttle is hit twice by the same player or team before it crosses the net, it is a fault. However, if the shuttle hits the racket and then the player's hand in a single continuous motion, it is not considered a double hit.
+
+Obstruction: If a player obstructs an opponent, such as blocking their shot or preventing them from reaching the shuttle, it is a fault. Players must not interfere with each other's ability to play the shuttle.
+
+Service faults: Faults on the serve include hitting the shuttle above the waist, not keeping both feet on the ground, not hitting the shuttle in an upward direction, and serving from the wrong service court. The serve must also be made within 5 seconds after the server and receiver are ready.
+
+---
+
+[SECTION: Faults in Service]
+
+Service faults are a specific category of faults that occur during the serve. The service rules in badminton are strict, and any violation results in a fault. The most common service faults include:
+
+Hitting the shuttle above the waist: The entire shuttle must be below 1.15 meters from the surface of the court at the instant of being hit. If the shuttle is above this height, it is a fault.
+
+Not keeping both feet on the ground: The server must have both feet on the ground at the moment of contact. If either foot is lifted or if the server jumps, it is a fault.
+
+Not hitting the shuttle in an upward direction: The shaft of the racket must be pointing downward at the moment of contact, and the shuttle must be hit in an upward direction. If the racket is pointing upward or if the shuttle is hit with a downward motion, it is a fault.
+
+Serving from the wrong service court: The server must serve from the correct service court based on the score. If the server serves from the wrong court, it is a fault.
+
+Not serving diagonally: The serve must cross the net and land in the opponent's service court. If the serve lands in the wrong service court, it is a fault.
+
+The receiver not being ready: If the server serves before the receiver is ready, it is a let, not a fault. However, if the receiver attempts to return the serve, they are considered ready, and the serve is valid.
+
+The server taking too long: The server must serve within 5 seconds after the server and receiver are ready. If the server takes too long, it is a fault.
+
+The server's partner interfering: In doubles, the server's partner must not interfere with the receiver's ability to see the shuttle. If the partner is standing in a position that blocks the receiver's view, it is a fault on the serving side.
+
+---
+
+[SECTION: Continuous Play and Misconduct]
+
+Badminton has specific rules about continuous play and player conduct. Players are expected to play continuously and not delay the game. If a player is unable to continue due to injury or illness, the umpire may allow a medical timeout, but the player must resume play within a reasonable time.
+
+Misconduct includes any behavior that is unsportsmanlike or disrespectful. This includes arguing with the umpire, using offensive language, making gestures that are offensive, and damaging equipment. Players who commit misconduct may receive a warning, a fault, or be disqualified from the match.
+
+The umpire has the authority to warn players, fault players, or disqualify players for misconduct. The umpire's decision is final, and players must accept the ruling and continue play. Repeated misconduct can result in disqualification from the tournament.
+
+Players are also expected to respect their opponents and play with integrity. This includes not making line calls that are clearly wrong, not using deception that is considered unsportsmanlike, and not intentionally delaying the game. The spirit of the game is important, and players are expected to uphold the values of fair play and sportsmanship.

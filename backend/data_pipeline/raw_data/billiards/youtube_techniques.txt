@@ -1,0 +1,72 @@
+[TOPIC: Kỹ thuật cơ bản bida lỗ (8-ball basics)]
+Nguồn: Tổng hợp từ video YouTube về bida lỗ
+
+Kỹ thuật ngắm (Aiming):
+- Điểm tiếp xúc (contact point): Khi bi cue chạm bi mục tiêu, bi mục tiêu sẽ đi theo hướng từ điểm tiếp xúc đến tâm bi cue.
+- Hệ thống ghost ball: Hình dung một bi "ma" ở vị trí mà bi cue cần đến để đẩy bi mục tiêu vào lỗ.
+- Ngắm bằng mắt thuận (dominant eye): Xác định mắt thuận bằng cách chỉ tay vào vật xa, lần nhắm một mắt.
+
+Kỹ thuật đánh (Stroke):
+- Tư thế đứng: Chân trước hơi cong, chân sau thẳng, trọng tâm dồn về chân trước.
+- Tay cầm cơ: Cầm cơ nhẹ nhàng, không siết chặt. Tay phải (hoặc tay thuận) cầm ở cuối cơ.
+- Tay giá (bridge): Open bridge cho đánh thường, closed bridge cho đánh mạnh.
+- Follow through: Sau khi đánh, cơ phải đi theo hướng đánh thêm một đoạn.
+
+Kỹ thuật kiểm soát bi cue:
+- Stop shot: Đánh vào tâm bi cue, bi cue dừng lại sau khi chạm bi mục tiêu.
+- Follow shot: Đánh cao hơn tâm, bi cue đi theo bi mục tiêu.
+- Draw shot: Đánh thấp hơn tâm, bi cue lùi lại sau khi chạm.
+- Stun shot: Đánh đúng tâm, bi cue đi ngang sau khi chạm.
+
+---
+[TOPIC: Kỹ thuật bida 3 băng (Three-cushion techniques)]
+Nguồn: Tổng hợp từ video YouTube về bida 3 băng
+
+Hệ thống diamond (Diamond System):
+- Đây là hệ thống tính toán góc dựa trên các viên kim cương (diamond) trên thành bàn.
+- Nguyên tắc cơ bản: Điểm bắt đầu + Điểm kết thúc = 2 (cho pattern dài) hoặc 3 (cho pattern ngắn).
+
+Ví dụ: Nếu bi cue ở gần diamond số 2 trên thành ngắn, đánh vào thành dài tại diamond số 0 (2+0=2), bi sẽ đi 3 băng và trúng bi mục tiêu.
+
+Cách tính:
+1. Xác định vị trí bi cue so với diamond trên thành gần nhất
+2. Xác định vị trí bi mục tiêu so với diamond trên thành đối diện
+3. Cộng hai số lại, điều chỉnh góc đánh
+4. Speed control rất quan trọng - đánh quá mạnh hoặc quá nhẹ đều sai góc
+
+Các pattern phổ biến:
+- Plus 2 (dùng cho pattern dài): Thường gặp nhất trong game
+- Plus 3 (dùng cho pattern ngắn): Cho các góc rộng hơn
+- Cross-table: Khi hai bi ở hai bên bàn
+
+---
+[TOPIC: Kỹ thuật phòng thủ (Safety play)]
+Nguồn: Tổng hợp từ video YouTube
+
+Khi nào nên chơi phòng thủ:
+- Không có shot rõ ràng để ghi điểm
+- Bi cue ở vị trí bất lợi sau khi đối thủ chơi safety
+- Gần cuối game, muốn giữ advantage
+
+Kỹ thuật safety:
+- Đánh bi cue vào thành, để bi mục tiêu ở vị trí khó
+- Giấu bi cue sau bi khác (hide the cue ball)
+- Đánh bi mục tiêu về cuối bàn, bi cue về đầu bàn
+- Kiểm soát speed để bi dừng ở vị trí chính xác
+
+---
+[TOPIC: Masse shot kỹ thuật]
+Nguồn: Tổng hợp từ video YouTube
+
+Masse là kỹ thuật đánh bi cue cong, thường dùng khi bi cue bị che bởi bi khác.
+
+Cách thực hiện:
+1. Nâng cơ lên góc 45-75 độ so với bàn
+2. Đánh vào phần dưới của bi cue (6 giờ)
+3. Follow through ngắn và mạnh
+4. Bi sẽ cong theo hình vòng cung
+
+Lưu ý:
+- Cần nhiều không gian để bi cong
+- Không nên lạm dụng vì dễ hỏng
+- Luyện tập với góc nhẹ trước

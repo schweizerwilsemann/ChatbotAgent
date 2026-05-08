@@ -1,0 +1,18 @@
+# HƯỚNG DẪN ĐIỀN THỦ CÔNG
+# File này cần chủ quán cung cấp thông tin
+# Format mẫu:
+
+[SCHEDULE: Giờ mở cửa]
+Thứ 2 - Thứ 6: 08:00 - 23:00
+Thứ 7 - Chủ nhật: 07:00 - 24:00
+Ngày lễ: 08:00 - 24:00
+---
+[SCHEDULE: Giờ cao điểm]
+Thứ 2 - Thứ 6: 17:00 - 22:00
+Thứ 7 - Chủ nhật: 09:00 - 22:00
+---
+[SCHEDULE: Thời gian đặt sân tối thiểu]
+Bida: 1 giờ
+Cầu lông: 1 giờ
+Pickleball: 1 giờ
+---

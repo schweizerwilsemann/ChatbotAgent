@@ -1,0 +1,25 @@
+# HƯỚNG DẪN ĐIỀN THỦ CÔNG
+# File này cần chủ quán cung cấp thông tin
+# Format mẫu:
+
+[SPORT: Bida lỗ]
+Giờ thường (08:00-17:00): 40,000đ/giờ/bàn
+Giờ cao điểm (17:00-23:00): 60,000đ/giờ/bàn
+Khuyến mãi: Mua 2 giờ tặng 30 phút
+---
+[SPORT: Bida phăng (3 băng)]
+Giờ thường: 50,000đ/giờ/bàn
+Giờ cao điểm: 70,000đ/giờ/bàn
+---
+[SPORT: Cầu lông]
+Giờ thường: 60,000đ/giờ/sân
+Giờ cao điểm: 80,000đ/giờ/sân
+---
+[SPORT: Pickleball]
+Giờ thường: 50,000đ/giờ/sân
+Giờ cao điểm: 70,000đ/giờ/sân
+---
+[EXTRA: Khác]
+Giữ xe: Miễn phí
+Wifi: Miễn phí (mật khẩu: ...)
+---
