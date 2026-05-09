@@ -9,7 +9,7 @@ class ChatRequest(BaseModel):
 
 
 class ChatResponse(BaseModel):
-    reply: str = Field(..., description="AI assistant reply")
+    response: str = Field(..., description="AI assistant reply")
     session_id: str = Field(..., description="Session ID for conversation continuity")
     tools_used: list[str] = Field(
         default_factory=list, description="List of tools invoked"

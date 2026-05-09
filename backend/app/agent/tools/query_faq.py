@@ -1,10 +1,13 @@
+import hashlib
 import json
 import logging
 from typing import Any
 
 from langchain_core.tools import tool
 
+from app.core.config import settings
 from app.core.neo4j_client import Neo4jClient
+from app.core.redis_client import redis_client
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +33,15 @@ async def query_knowledge(question: str) -> str:
     if not _neo4j_client:
         return "Knowledge graph chưa được kết nối. Vui lòng thử lại sau."
 
+    cache_key = _cache_key(question)
+    try:
+        cached = await redis_client.get(cache_key)
+        if cached:
+            return cached
+    except Exception:
+        logger.debug("KG cache read skipped", exc_info=True)
+
+    # ── 1. Try fulltext index search ─────────────────────────────────
     try:
         cypher_query = """
         CALL db.index.fulltext.queryNodes("sport_faq", $question)
@@ -52,8 +64,16 @@ async def query_knowledge(question: str) -> str:
         )
 
         if results:
-            return _format_results(results)
+            formatted = _format_results(results)
+            await _cache_result(cache_key, formatted)
+            return formatted
+    except Exception:
+        logger.warning(
+            "Fulltext index 'sport_faq' not available, falling back to keyword search"
+        )
 
+    # ── 2. Fallback: keyword search ───────────────────────────────────
+    try:
         fallback_query = """
         MATCH (n)
         WHERE n.content IS NOT NULL
@@ -76,13 +96,34 @@ async def query_knowledge(question: str) -> str:
         )
 
         if results:
-            return _format_results(results)
-
-        return "Tôi không tìm thấy thông tin liên quan trong cơ sở dữ liệu. Bạn có thể hỏi cụ thể hơn về bida, pickleball hoặc cầu lông không?"
+            formatted = _format_results(results)
+            await _cache_result(cache_key, formatted)
+            return formatted
 
     except Exception as exc:
-        logger.exception("Error querying knowledge graph")
-        return f"Lỗi khi truy vấn knowledge graph: {exc}"
+        logger.warning("Keyword search also failed: %s", exc)
+
+    # ── 3. Nothing found ──────────────────────────────────────────────
+    not_found = "Tôi không tìm thấy thông tin liên quan trong cơ sở dữ liệu. Bạn có thể hỏi cụ thể hơn về bida, pickleball hoặc cầu lông không?"
+    await _cache_result(cache_key, not_found, ttl=900)
+    return not_found
+
+
+def _cache_key(question: str) -> str:
+    normalized = " ".join(question.lower().strip().split())
+    digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+    return f"kg:answer:{settings.KG_CACHE_VERSION}:{digest}"
+
+
+async def _cache_result(
+    key: str,
+    value: str,
+    ttl: int | None = None,
+) -> None:
+    try:
+        await redis_client.set(key, value, ex=ttl or settings.KG_CACHE_TTL_SECONDS)
+    except Exception:
+        logger.debug("KG cache write skipped", exc_info=True)
 
 
 def _format_results(results: list[dict[str, Any]]) -> str:

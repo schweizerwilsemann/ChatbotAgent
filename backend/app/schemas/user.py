@@ -11,6 +11,11 @@ class UserCreate(BaseModel):
     email: EmailStr | None = None
 
 
+class UserLogin(BaseModel):
+    phone: str = Field(..., min_length=7, max_length=20)
+    password: str = Field(..., min_length=1, max_length=128)
+
+
 class UserResponse(BaseModel):
     id: uuid.UUID
     phone: str
@@ -21,3 +26,8 @@ class UserResponse(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class AuthResponse(BaseModel):
+    user: UserResponse
+    token: str

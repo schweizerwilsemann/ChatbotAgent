@@ -88,7 +88,7 @@ class ChatBubble extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Text(
-                      AppDateUtils.formatTime(message.timestamp),
+                      VietnameseDateUtils.formatTime(message.timestamp),
                       style: TextStyle(color: AppColors.textHint, fontSize: 11),
                     ),
                   ),

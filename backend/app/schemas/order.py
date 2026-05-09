@@ -10,7 +10,7 @@ class OrderItemCreate(BaseModel):
 
 
 class OrderCreate(BaseModel):
-    user_id: str = Field(..., min_length=1, max_length=128)
+    user_id: str = Field("current_user", min_length=1, max_length=128)
     table_number: int = Field(0, ge=0)
     items: list[OrderItemCreate] = Field(..., min_length=1)
     notes: str = Field("", max_length=500)
@@ -21,6 +21,7 @@ class OrderItemResponse(BaseModel):
     item_name: str
     quantity: int
     unit_price: Decimal
+    total_price: Decimal
 
     class Config:
         from_attributes = True

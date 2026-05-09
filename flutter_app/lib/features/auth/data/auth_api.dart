@@ -12,12 +12,12 @@ class AuthApi {
 
   AuthApi(this._dioClient);
 
-  /// Login with phone number and name, returns auth response with token
-  Future<AuthResponse> login(String phone, String name) async {
+  /// Login with phone number and password, returns auth response with token
+  Future<AuthResponse> login(String phone, String password) async {
     try {
       final response = await _dioClient.post<Map<String, dynamic>>(
         ApiConstants.authLoginEndpoint,
-        data: {'phone': phone, 'name': name},
+        data: {'phone': phone, 'password': password},
       );
       return AuthResponse.fromJson(response.data!);
     } catch (e) {

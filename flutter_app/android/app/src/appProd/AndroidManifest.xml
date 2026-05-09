@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Prod flavor: HTTPS only, no cleartext traffic -->
+    <application
+        android:usesCleartextTraffic="false" />
+</manifest>

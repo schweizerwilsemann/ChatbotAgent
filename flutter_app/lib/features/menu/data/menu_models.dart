@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'menu_models.g.dart';
 
 /// Menu item model
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class MenuItem {
   final String name;
   final String description;
@@ -26,7 +26,7 @@ class MenuItem {
 }
 
 /// Menu category containing a list of items
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class MenuCategory {
   final String name;
   final List<MenuItem> items;
@@ -40,7 +40,7 @@ class MenuCategory {
 }
 
 /// Order item for creating an order
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class OrderItemCreate {
   final String itemName;
   final int quantity;
@@ -59,7 +59,7 @@ class OrderItemCreate {
 }
 
 /// Order item returned from the API
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class OrderItem {
   final String itemName;
   final int quantity;
@@ -80,13 +80,21 @@ class OrderItem {
 }
 
 /// Order creation request
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class OrderCreate {
+  final String userId;
+  final int tableNumber;
   final List<OrderItemCreate> items;
   final String? bookingId;
   final String? notes;
 
-  const OrderCreate({required this.items, this.bookingId, this.notes});
+  const OrderCreate({
+    required this.userId,
+    this.tableNumber = 0,
+    required this.items,
+    this.bookingId,
+    this.notes,
+  });
 
   factory OrderCreate.fromJson(Map<String, dynamic> json) =>
       _$OrderCreateFromJson(json);
@@ -126,7 +134,7 @@ extension OrderStatusExtension on OrderStatus {
 }
 
 /// Order returned from the API
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class Order {
   final String id;
   final List<OrderItem> items;

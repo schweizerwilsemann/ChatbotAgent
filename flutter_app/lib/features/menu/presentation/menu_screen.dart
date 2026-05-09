@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/menu/data/menu_models.dart';
 import 'package:sports_venue_chatbot/features/menu/presentation/menu_provider.dart';
+import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
 
 /// Vietnamese currency formatter
 final _vndFormat = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
@@ -141,7 +143,7 @@ class _MenuCategoryGrid extends ConsumerWidget {
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 0.72,
-        crossAxisAxisSpacing: 12,
+        crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
       itemCount: category.items.length,
@@ -173,7 +175,7 @@ class _MenuItemCard extends ConsumerWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -204,8 +206,8 @@ class _MenuItemCard extends ConsumerWidget {
                   Text(
                     item.name,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                          fontWeight: FontWeight.w600,
+                        ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -384,9 +386,9 @@ class _CartSummaryBar extends ConsumerWidget {
                   Text(
                     _vndFormat.format(cart.totalPrice),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.primary,
-                    ),
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.primary,
+                        ),
                   ),
                 ],
               ),
@@ -420,7 +422,7 @@ class _CartSummaryBar extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
       ),
       builder: (_) => _OrderConfirmationSheet(cart: cart),
     );
@@ -501,8 +503,8 @@ class _OrderConfirmationSheetState
                   Text(
                     _vndFormat.format(item.totalPrice),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                 ],
               ),
@@ -523,9 +525,9 @@ class _OrderConfirmationSheetState
               Text(
                 _vndFormat.format(widget.cart.totalPrice),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
-                ),
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
               ),
             ],
           ),
@@ -571,27 +573,24 @@ class _OrderConfirmationSheetState
   }
 
   Future<void> _submitOrder() async {
+    final userId =
+        ref.read(authStateProvider).valueOrNull?.id ?? 'current_user';
     final orderCreate = OrderCreate(
+      userId: userId,
       items: widget.cart.toOrderItems(),
       notes: _notesController.text.trim().isEmpty
           ? null
           : _notesController.text.trim(),
     );
 
-    final success = await ref
-        .read(createOrderProvider.notifier)
-        .createOrder(orderCreate);
+    final success =
+        await ref.read(createOrderProvider.notifier).createOrder(orderCreate);
 
     if (success && mounted) {
       ref.read(cartProvider.notifier).clear();
       Navigator.of(context).pop(); // dismiss bottom sheet
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Đặt hàng thành công! 🎉'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      AppSnackBar.showSuccess(context, 'Đặt hàng thành công! 🎉');
 
       // Reset order state after showing success
       ref.read(createOrderProvider.notifier).reset();

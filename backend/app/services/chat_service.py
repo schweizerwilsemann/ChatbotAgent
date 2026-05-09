@@ -37,7 +37,7 @@ class ChatService:
         await self._save_history(session_id, history)
 
         return ChatResponse(
-            reply=agent_response.output,
+            response=agent_response.output,
             session_id=session_id,
             tools_used=agent_response.tools_used,
         )

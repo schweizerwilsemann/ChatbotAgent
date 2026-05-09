@@ -15,15 +15,51 @@ class MenuApi {
   /// Fetch the full menu grouped by categories
   Future<List<MenuCategory>> getMenu() async {
     try {
-      final response = await _dioClient.get<List<dynamic>>(
+      final response = await _dioClient.get<dynamic>(
         ApiConstants.menuEndpoint,
       );
-      if (response.data == null) return [];
-      return response.data!
-          .map((json) => MenuCategory.fromJson(json as Map<String, dynamic>))
-          .toList();
+      final data = response.data;
+      if (data == null) return [];
+
+      if (data is List<dynamic>) {
+        return data
+            .map((json) => MenuCategory.fromJson(json as Map<String, dynamic>))
+            .toList();
+      }
+
+      if (data is Map<String, dynamic> && data['categories'] is Map) {
+        final categories = data['categories'] as Map;
+        return categories.entries.map((entry) {
+          final name = _categoryLabel(entry.key.toString());
+          final items = (entry.value as List<dynamic>).map((raw) {
+            final item = raw as Map<String, dynamic>;
+            return MenuItem(
+              name: item['item_name'] as String,
+              description: item['unit'] as String? ?? '',
+              price: (item['price'] as num).toDouble(),
+              category: name,
+            );
+          }).toList();
+          return MenuCategory(name: name, items: items);
+        }).toList();
+      }
+
+      return [];
     } catch (e) {
       rethrow;
+    }
+  }
+
+  String _categoryLabel(String key) {
+    switch (key) {
+      case 'drinks':
+        return 'Đồ uống';
+      case 'snacks':
+        return 'Đồ ăn';
+      case 'billiards':
+        return 'Phụ kiện';
+      default:
+        return key;
     }
   }
 

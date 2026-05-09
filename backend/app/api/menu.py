@@ -1,7 +1,12 @@
 from decimal import Decimal
+import logging
 
 from fastapi import APIRouter
 
+from app.core.config import settings
+from app.core.redis_client import redis_client
+
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/menu", tags=["menu"])
 
 MENU: dict[str, list[dict]] = {
@@ -34,6 +39,12 @@ MENU: dict[str, list[dict]] = {
     ],
 }
 
+MENU_CATEGORY_LABELS: dict[str, str] = {
+    "drinks": "Đồ uống",
+    "snacks": "Đồ ăn",
+    "billiards": "Phụ kiện",
+}
+
 # Flat lookup: lowercase item_name -> Decimal price (for order total calculation)
 MENU_PRICES: dict[str, Decimal] = {}
 for _category_items in MENU.values():
@@ -41,10 +52,46 @@ for _category_items in MENU.values():
         MENU_PRICES[_item["item_name"].lower()] = Decimal(str(_item["price"]))
 
 
+def _menu_payload() -> list[dict]:
+    payload: list[dict] = []
+    for category_key, items in MENU.items():
+        category_name = MENU_CATEGORY_LABELS.get(category_key, category_key)
+        payload.append(
+            {
+                "name": category_name,
+                "items": [
+                    {
+                        "name": item["item_name"],
+                        "description": item["unit"],
+                        "price": float(item["price"]),
+                        "image_url": None,
+                        "category": category_name,
+                    }
+                    for item in items
+                ],
+            }
+        )
+    return payload
+
+
 @router.get("/")
-async def get_menu() -> dict:
-    """Return the full menu with categories and prices in VND."""
-    return {
-        "currency": "VND",
-        "categories": MENU,
-    }
+async def get_menu() -> list[dict]:
+    """Return the menu in the shape expected by the Flutter app."""
+    cache_key = f"menu:{settings.MENU_CACHE_VERSION}"
+    try:
+        cached = await redis_client.get_json(cache_key)
+        if cached is not None:
+            return cached
+    except Exception:
+        logger.debug("Menu cache read skipped", exc_info=True)
+
+    payload = _menu_payload()
+    try:
+        await redis_client.set_json(
+            cache_key,
+            payload,
+            ex=settings.MENU_CACHE_TTL_SECONDS,
+        )
+    except Exception:
+        logger.debug("Menu cache write skipped", exc_info=True)
+    return payload

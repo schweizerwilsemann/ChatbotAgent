@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_provider.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/widgets/chat_bubble.dart';
+import 'package:sports_venue_chatbot/shared/widgets/app_confirm_dialog.dart';
+import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -72,19 +74,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
       // Show error as snackbar
       if (next.error != null && next.error != previous?.error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.error!),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-            action: SnackBarAction(
-              label: 'Thử lại',
-              textColor: Colors.white,
-              onPressed: () {
-                ref.read(chatProvider.notifier).retryLastMessage();
-              },
-            ),
-          ),
+        AppSnackBar.showError(
+          context,
+          next.error!,
+          actionLabel: 'Thử lại',
+          onAction: () => ref.read(chatProvider.notifier).retryLastMessage(),
         );
         ref.read(chatProvider.notifier).clearError();
       }
@@ -98,10 +92,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: AppColors.border,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.smart_toy, color: Colors.white, size: 20),
+              child: const Icon(Icons.smart_toy,
+                  color: AppColors.primary, size: 20),
             ),
             const SizedBox(width: 12),
             Column(
@@ -112,7 +107,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 Text(
@@ -121,7 +116,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       : 'Trực tuyến',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withOpacity(0.8),
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -205,8 +200,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Text(
               'Chào mừng bạn!',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: AppColors.textPrimary,
-              ),
+                    color: AppColors.textPrimary,
+                  ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -245,8 +240,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Widget _buildMessagesList(ChatState chatState) {
-    final messageCount =
-        chatState.messages.length +
+    final messageCount = chatState.messages.length +
         (chatState.isLoading ? 1 : 0) +
         (chatState.isStreaming && chatState.streamingContent.isEmpty ? 1 : 0);
 
@@ -386,28 +380,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
-  void _showNewChatDialog() {
-    showDialog(
+  void _showNewChatDialog() async {
+    final confirmed = await AppConfirmDialog.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cuộc trò chuyện mới'),
-        content: const Text(
+      title: 'Cuộc trò chuyện mới',
+      content:
           'Bạn có muốn bắt đầu cuộc trò chuyện mới?\nLịch sử chat hiện tại sẽ bị xóa.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              ref.read(chatProvider.notifier).clearChat();
-              Navigator.of(context).pop();
-            },
-            child: const Text('Tạo mới'),
-          ),
-        ],
-      ),
+      confirmLabel: 'Tạo mới',
     );
+    if (confirmed == true && mounted) {
+      ref.read(chatProvider.notifier).clearChat();
+    }
   }
 }

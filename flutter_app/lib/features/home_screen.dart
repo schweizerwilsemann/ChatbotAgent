@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
-import 'package:sports_venue_chatbot/features/auth/presentation/login_screen.dart';
-import 'package:sports_venue_chatbot/features/booking/presentation/booking_screen.dart';
-import 'package:sports_venue_chatbot/features/chat/presentation/chat_screen.dart';
-import 'package:sports_venue_chatbot/features/menu/presentation/menu_screen.dart';
 
 /// Home screen with bottom navigation bar (Material 3 NavigationBar).
 ///
-/// Used as a [ShellRoute] wrapper in [GoRouter]. Each tab is pre-built
-/// inside an [IndexedStack] to preserve widget state across tab switches.
+/// Used as a [ShellRoute] wrapper in [GoRouter].
 class HomeScreen extends StatefulWidget {
   final Widget child;
 
@@ -75,21 +70,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: const [
-          ChatScreen(),
-          BookingScreen(),
-          MenuScreen(),
-          LoginScreen(),
-        ],
-      ),
+      body: widget.child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: _onTabTapped,
         backgroundColor: AppColors.surface,
         indicatorColor: AppColors.primarySurface,
-        elevation: 8,
+        elevation: 0,
         shadowColor: AppColors.shadow,
         height: 65,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,

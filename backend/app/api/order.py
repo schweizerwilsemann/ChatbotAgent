@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -33,6 +33,19 @@ async def create_order(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         logger.exception("Error creating order")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+@router.get("/", response_model=list[OrderResponse])
+async def get_orders(
+    user_id: str = Query(..., description="User ID"),
+    service: OrderService = Depends(_get_order_service),
+) -> list[OrderResponse]:
+    """Get all food/drink orders for a user."""
+    try:
+        return await service.get_user_orders(user_id)
+    except Exception as exc:
+        logger.exception("Error fetching user orders")
         raise HTTPException(status_code=500, detail="Internal server error") from exc
 
 

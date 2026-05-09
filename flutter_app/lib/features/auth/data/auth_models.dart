@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'auth_models.g.dart';
 
 /// User model
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class User {
   final String id;
   final String phone;
@@ -41,7 +41,7 @@ class User {
 }
 
 /// Authentication response containing user info and JWT token
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class AuthResponse {
   final User user;
   final String token;

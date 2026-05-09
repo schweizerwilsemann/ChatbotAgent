@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "appDev (debug)",
+      "request": "launch",
+      "type": "dart",
+      "args": ["--flavor", "appDev"],
+    },
+    {
+      "name": "appDevRelease",
+      "request": "launch",
+      "type": "dart",
+      "args": ["--flavor", "appDevRelease"],
+    },
+    {
+      "name": "appProd",
+      "request": "launch",
+      "type": "dart",
+      "args": ["--flavor", "appProd"],
+    },
+  ],
+}

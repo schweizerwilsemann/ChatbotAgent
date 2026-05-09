@@ -1,29 +1,26 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:sports_venue_chatbot/core/config/flavor_config.dart';
 import 'package:sports_venue_chatbot/core/constants/api_constants.dart';
 import 'package:sports_venue_chatbot/core/network/api_exception.dart';
 
 final dioClientProvider = Provider<DioClient>((ref) {
-  return DioClient(ref);
+  return DioClient();
 });
 
 class DioClient {
   late final Dio _dio;
-  final Ref _ref;
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
-  DioClient(this._ref) {
+  DioClient() {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
-        connectTimeout: const Duration(
-          milliseconds: ApiConstants.connectTimeoutMs,
-        ),
-        receiveTimeout: const Duration(
-          milliseconds: ApiConstants.receiveTimeoutMs,
-        ),
-        sendTimeout: const Duration(milliseconds: ApiConstants.sendTimeoutMs),
+        connectTimeout: ApiConstants.connectTimeout,
+        receiveTimeout: ApiConstants.receiveTimeout,
+        sendTimeout: ApiConstants.sendTimeout,
         headers: {
           ApiConstants.contentTypeHeader: ApiConstants.applicationJson,
           'Accept': ApiConstants.applicationJson,
@@ -31,11 +28,11 @@ class DioClient {
       ),
     );
 
-    _dio.interceptors.addAll([
-      _AuthInterceptor(_secureStorage),
-      _LoggingInterceptor(),
-      _ErrorInterceptor(),
-    ]);
+    _dio.interceptors.add(_AuthInterceptor(_secureStorage));
+    if (FlavorConfig.enableVerboseLogging) {
+      _dio.interceptors.add(_LoggingInterceptor());
+    }
+    _dio.interceptors.add(_ErrorInterceptor());
   }
 
   Dio get dio => _dio;
@@ -280,37 +277,42 @@ class _AuthInterceptor extends Interceptor {
 class _LoggingInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    print('┌─────────────────────────────────────────────────');
-    print('│ REQUEST: ${options.method} ${options.uri}');
-    print('│ Headers: ${options.headers}');
+    final headers = Map<String, dynamic>.from(options.headers);
+    if (headers.containsKey(ApiConstants.authHeader)) {
+      headers[ApiConstants.authHeader] = '<redacted>';
+    }
+
+    debugPrint('┌─────────────────────────────────────────────────');
+    debugPrint('│ REQUEST: ${options.method} ${options.uri}');
+    debugPrint('│ Headers: $headers');
     if (options.data != null) {
-      print('│ Body: ${options.data}');
+      debugPrint('│ Body: ${options.data}');
     }
     if (options.queryParameters.isNotEmpty) {
-      print('│ Query: ${options.queryParameters}');
+      debugPrint('│ Query: ${options.queryParameters}');
     }
-    print('└─────────────────────────────────────────────────');
+    debugPrint('└─────────────────────────────────────────────────');
     handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print('┌─────────────────────────────────────────────────');
-    print('│ RESPONSE: ${response.statusCode} ${response.requestOptions.uri}');
-    print('│ Data: ${response.data}');
-    print('└─────────────────────────────────────────────────');
+    debugPrint('┌─────────────────────────────────────────────────');
+    debugPrint('│ RESPONSE: ${response.statusCode} ${response.requestOptions.uri}');
+    debugPrint('│ Data: ${response.data}');
+    debugPrint('└─────────────────────────────────────────────────');
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    print('┌─────────────────────────────────────────────────');
-    print('│ ERROR: ${err.response?.statusCode} ${err.requestOptions.uri}');
-    print('│ Message: ${err.message}');
+    debugPrint('┌─────────────────────────────────────────────────');
+    debugPrint('│ ERROR: ${err.response?.statusCode} ${err.requestOptions.uri}');
+    debugPrint('│ Message: ${err.message}');
     if (err.response?.data != null) {
-      print('│ Data: ${err.response?.data}');
+      debugPrint('│ Data: ${err.response?.data}');
     }
-    print('└─────────────────────────────────────────────────');
+    debugPrint('└─────────────────────────────────────────────────');
     handler.next(err);
   }
 }

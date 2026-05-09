@@ -10,10 +10,18 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api", tags=["chat"])
 
+_chat_service: ChatService | None = None
+
+
+def set_chat_service(service: ChatService) -> None:
+    global _chat_service
+    _chat_service = service
+
 
 def _get_chat_service() -> ChatService:
-    """Dependency — in production this would come from app state / DI container."""
-    raise NotImplementedError("ChatService dependency not wired. See main.py lifespan.")
+    if _chat_service is None:
+        raise HTTPException(status_code=503, detail="Chat service is not ready")
+    return _chat_service
 
 
 @router.post("/chat", response_model=ChatResponse)

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
+import 'package:sports_venue_chatbot/shared/widgets/loading_button.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -12,12 +16,12 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
-  final _nameController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   void dispose() {
     _phoneController.dispose();
-    _nameController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -30,7 +34,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.listen<AsyncValue<dynamic>>(authStateProvider, (prev, next) {
       final user = next.valueOrNull;
       if (user != null) {
-        Navigator.of(context).pushReplacementNamed('/home');
+        context.go('/home');
       }
     });
 
@@ -56,9 +60,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Text(
                     'Sports Venue Chatbot',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.primary,
-                    ),
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.primary,
+                        ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
@@ -67,7 +71,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     'Đăng nhập để tiếp tục',
                     style: Theme.of(
                       context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                    )
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 40),
 
@@ -91,20 +98,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Name field
+                  // Password field
                   TextFormField(
-                    controller: _nameController,
-                    keyboardType: TextInputType.name,
+                    controller: _passwordController,
+                    obscureText: true,
                     textInputAction: TextInputAction.done,
                     decoration: const InputDecoration(
-                      labelText: 'Tên',
-                      hintText: 'Nhập tên của bạn',
-                      prefixIcon: Icon(Icons.person_outline),
+                      labelText: 'Mật khẩu',
+                      hintText: 'Nhập mật khẩu',
+                      prefixIcon: Icon(Icons.lock_outline),
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Vui lòng nhập tên';
+                        return 'Vui lòng nhập mật khẩu';
                       }
                       return null;
                     },
@@ -126,25 +133,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 24),
 
                   // Login button
-                  SizedBox(
+                  LoadingButton(
+                    label: 'Đăng nhập',
+                    onPressed: _handleLogin,
+                    isLoading: loginState.isLoading,
                     width: double.infinity,
                     height: 48,
-                    child: FilledButton(
-                      onPressed: loginState.isLoading ? null : _handleLogin,
-                      child: loginState.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text(
-                              'Đăng nhập',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                    ),
                   ),
                 ],
               ),
@@ -162,16 +156,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     final success = await ref
         .read(loginProvider.notifier)
-        .login(_phoneController.text, _nameController.text);
+        .login(_phoneController.text, _passwordController.text);
 
     if (!success && mounted) {
       // Error is already reflected in loginState; optionally show a snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(ref.read(loginProvider).error ?? 'Đăng nhập thất bại'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
+      AppSnackBar.showError(
+          context, ref.read(loginProvider).error ?? 'Đăng nhập thất bại');
     }
   }
 }

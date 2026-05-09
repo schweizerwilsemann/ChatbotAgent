@@ -51,6 +51,11 @@ class OrderService:
             return None
         return self._to_response(order)
 
+    async def get_user_orders(self, user_id: str) -> list[OrderResponse]:
+        """Get all orders for a user."""
+        orders = await self._repo.get_by_user_id(user_id)
+        return [self._to_response(order) for order in orders]
+
     async def update_status(self, order_id: str, status: str) -> OrderResponse | None:
         """Update the status of an order."""
         order = await self._repo.get_by_id(order_id)
@@ -89,6 +94,7 @@ class OrderService:
                     item_name=item.item_name,
                     quantity=item.quantity,
                     unit_price=item.unit_price,
+                    total_price=item.unit_price * item.quantity,
                 )
             )
 

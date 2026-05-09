@@ -53,13 +53,28 @@ class OrderRepository:
         return order
 
     async def get_by_id(self, order_id: str) -> Order | None:
+        try:
+            order_uuid = uuid.UUID(order_id)
+        except ValueError:
+            return None
+
         stmt = (
             select(Order)
             .options(selectinload(Order.items))
-            .where(Order.id == uuid.UUID(order_id))
+            .where(Order.id == order_uuid)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def get_by_user_id(self, user_id: str) -> list[Order]:
+        stmt = (
+            select(Order)
+            .options(selectinload(Order.items))
+            .where(Order.user_id == user_id)
+            .order_by(Order.created_at.desc())
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
 
     async def update_status(self, order_id: str, status: str) -> Order | None:
         order = await self.get_by_id(order_id)

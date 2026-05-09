@@ -1,6 +1,9 @@
+import json
 import logging
+from typing import Any
 
 import redis.asyncio as aioredis
+
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -36,6 +39,15 @@ class RedisClient:
 
     async def set(self, key: str, value: str, ex: int | None = None) -> None:
         await self.client.set(key, value, ex=ex)
+
+    async def get_json(self, key: str) -> Any | None:
+        raw = await self.get(key)
+        if raw is None:
+            return None
+        return json.loads(raw)
+
+    async def set_json(self, key: str, value: Any, ex: int | None = None) -> None:
+        await self.set(key, json.dumps(value, ensure_ascii=False), ex=ex)
 
     async def delete(self, key: str) -> None:
         await self.client.delete(key)

@@ -1,12 +1,10 @@
+import 'package:sports_venue_chatbot/core/config/flavor_config.dart';
+
 class ApiConstants {
   ApiConstants._();
 
-  // Base URL - configurable per environment
-  // 10.0.2.2 is Android emulator's localhost
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://10.0.2.2:8000',
-  );
+  /// Base URL resolved from the active FlavorConfig.
+  static String get baseUrl => FlavorConfig.apiBaseUrl;
 
   // API Endpoints
   static const String chatEndpoint = '/api/chat';
@@ -20,10 +18,19 @@ class ApiConstants {
   static const String authVerifyEndpoint = '/api/auth/verify';
   static const String userProfileEndpoint = '/api/user/profile';
 
-  // Timeouts
-  static const int connectTimeoutMs = 15000;
-  static const int receiveTimeoutMs = 30000;
-  static const int sendTimeoutMs = 15000;
+  // Timeouts. Dev intentionally has no network timeout because local models can
+  // take a long time to respond on first run.
+  static Duration? get connectTimeout => FlavorConfig.flavor == Flavor.appDev
+      ? null
+      : const Duration(seconds: 15);
+
+  static Duration? get receiveTimeout => FlavorConfig.flavor == Flavor.appDev
+      ? null
+      : const Duration(seconds: 60);
+
+  static Duration? get sendTimeout => FlavorConfig.flavor == Flavor.appDev
+      ? null
+      : const Duration(seconds: 15);
 
   // Headers
   static const String authHeader = 'Authorization';

@@ -21,15 +21,25 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
     SESSION_TTL: int = 3600  # 1 hour
+    MENU_CACHE_TTL_SECONDS: int = 300
+    MENU_CACHE_VERSION: str = "v1"
+    KG_CACHE_TTL_SECONDS: int = 21600
+    KG_CACHE_VERSION: str = "v1"
 
     # LLM
-    ANTHROPIC_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
-    LLM_PROVIDER: str = "ollama"  # "anthropic", "google", or "ollama"
-    LLM_MODEL: str = "qwen2.5-coder:7b"
+    LLM_PROVIDER: str = "google"  # "google", "mimo", or "ollama"
+    LLM_MODEL: str = "gemini-2.0-flash"
+    OLLAMA_FALLBACK_MODEL: str = "qwen2.5-coder:7b"
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
     LLM_TEMPERATURE: float = 0.3
     LLM_MAX_TOKENS: int = 2048
+
+    # MiMo (Xiaomi) - OpenAI-compatible API
+    MIMO_API_KEY: str = ""
+    MIMO_API_BASE_URL: str = "https://token-plan-sgp.xiaomimimo.com/v1"
+    MIMO_MODEL: str = "mimo-v2.5"
 
     # Embedding
     EMBEDDING_MODEL: str = "models/text-embedding-004"

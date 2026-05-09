@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/booking/data/booking_models.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_provider.dart';
+import 'package:sports_venue_chatbot/shared/widgets/app_confirm_dialog.dart';
+import 'package:sports_venue_chatbot/shared/widgets/app_section_title.dart';
+import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
+import 'package:sports_venue_chatbot/shared/widgets/loading_button.dart';
 
 class BookingScreen extends ConsumerStatefulWidget {
   const BookingScreen({super.key});
@@ -37,9 +42,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   void _loadBookings() {
-    // Load all bookings; in a real app, pass the current user ID
-    ref.read(bookingProvider.notifier).loadBookings('current_user');
+    ref.read(bookingProvider.notifier).loadBookings(_currentUserId);
   }
+
+  String get _currentUserId =>
+      ref.read(authStateProvider).valueOrNull?.id ?? 'current_user';
 
   void _checkAvailability() {
     ref
@@ -86,23 +93,14 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   Future<void> _confirmBooking() async {
     if (_selectedStartTime == null || _selectedEndTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng chọn giờ bắt đầu và kết thúc.'),
-          backgroundColor: AppColors.warning,
-        ),
-      );
+      AppSnackBar.showWarning(
+          context, 'Vui lòng chọn giờ bắt đầu và kết thúc.');
       return;
     }
 
     final courtNumber = int.tryParse(_courtNumberController.text);
     if (courtNumber == null || courtNumber < 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng nhập số sân hợp lệ.'),
-          backgroundColor: AppColors.warning,
-        ),
-      );
+      AppSnackBar.showWarning(context, 'Vui lòng nhập số sân hợp lệ.');
       return;
     }
 
@@ -112,20 +110,14 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       date: _selectedDate,
       startTime: _selectedStartTime!,
       endTime: _selectedEndTime!,
-      userId: 'current_user',
+      userId: _currentUserId,
     );
 
-    final success = await ref
-        .read(bookingProvider.notifier)
-        .createBooking(booking);
+    final success =
+        await ref.read(bookingProvider.notifier).createBooking(booking);
 
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Đặt sân thành công!'),
-          backgroundColor: AppColors.success,
-        ),
-      );
+      AppSnackBar.showSuccess(context, 'Đặt sân thành công!');
       setState(() {
         _selectedStartTime = null;
         _selectedEndTime = null;
@@ -140,24 +132,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     // Listen for errors and success messages
     ref.listen<BookingState>(bookingProvider, (previous, next) {
       if (next.error != null && next.error != previous?.error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.error!),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppSnackBar.showError(context, next.error!);
         ref.read(bookingProvider.notifier).clearError();
       }
       if (next.successMessage != null &&
           next.successMessage != previous?.successMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.successMessage!),
-            backgroundColor: AppColors.success,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppSnackBar.showSuccess(context, next.successMessage!);
         ref.read(bookingProvider.notifier).clearSuccess();
       }
     });
@@ -176,50 +156,48 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Court type selector
-              _buildSectionTitle('Loại sân'),
+              const AppSectionTitle('Loại sân'),
               const SizedBox(height: 8),
               _buildCourtTypeSelector(),
               const SizedBox(height: 24),
 
               // Date picker
-              _buildSectionTitle('Ngày đặt'),
+              const AppSectionTitle('Ngày đặt'),
               const SizedBox(height: 8),
               _buildDatePicker(),
               const SizedBox(height: 24),
 
               // Time slot selection
-              _buildSectionTitle('Giờ chơi'),
+              const AppSectionTitle('Giờ chơi'),
               const SizedBox(height: 8),
               _buildTimeSlotSelection(),
               const SizedBox(height: 24),
 
               // Court number input
-              _buildSectionTitle('Số sân'),
+              const AppSectionTitle('Số sân'),
               const SizedBox(height: 8),
               _buildCourtNumberInput(),
               const SizedBox(height: 32),
 
               // Confirm button
-              _buildConfirmButton(bookingState),
+              LoadingButton(
+                onPressed: _confirmBooking,
+                isLoading: bookingState.isCreating,
+                icon: Icons.check_circle_outline,
+                label: bookingState.isCreating
+                    ? 'Đang xử lý...'
+                    : 'Xác nhận đặt sân',
+                backgroundColor: _getCourtTypeColor(_selectedCourtType),
+              ),
               const SizedBox(height: 32),
 
               // Existing bookings list
-              _buildSectionTitle('Lịch đặt sân của bạn'),
+              const AppSectionTitle('Lịch đặt sân của bạn'),
               const SizedBox(height: 8),
               _buildBookingsList(bookingState),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
       ),
     );
   }
@@ -248,9 +226,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? color.withOpacity(0.1)
-                      : AppColors.surface,
+                  color:
+                      isSelected ? color.withOpacity(0.1) : AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelected ? color : AppColors.divider,
@@ -274,9 +251,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       type.displayName,
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: isSelected
-                            ? FontWeight.w700
-                            : FontWeight.w500,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w500,
                         color: isSelected ? color : AppColors.textSecondary,
                       ),
                     ),
@@ -389,8 +365,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 color: !isAvailable
                     ? AppColors.textHint
                     : isSelected
-                    ? courtColor
-                    : AppColors.textPrimary,
+                        ? courtColor
+                        : AppColors.textPrimary,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 fontSize: 13,
               ),
@@ -398,8 +374,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 color: !isAvailable
                     ? AppColors.divider
                     : isSelected
-                    ? courtColor
-                    : AppColors.divider,
+                        ? courtColor
+                        : AppColors.divider,
               ),
             );
           }).toList(),
@@ -421,8 +397,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           runSpacing: 8,
           children: timeSlots.map((slot) {
             final isSelected = _selectedEndTime == slot;
-            final canSelect =
-                _selectedStartTime != null &&
+            final canSelect = _selectedStartTime != null &&
                 slot.compareTo(_selectedStartTime!) > 0;
 
             return ChoiceChip(
@@ -440,8 +415,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 color: !canSelect
                     ? AppColors.textHint
                     : isSelected
-                    ? courtColor
-                    : AppColors.textPrimary,
+                        ? courtColor
+                        : AppColors.textPrimary,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 fontSize: 13,
               ),
@@ -449,8 +424,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 color: !canSelect
                     ? AppColors.divider
                     : isSelected
-                    ? courtColor
-                    : AppColors.divider,
+                        ? courtColor
+                        : AppColors.divider,
               ),
             );
           }).toList(),
@@ -508,36 +483,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     );
   }
 
-  Widget _buildConfirmButton(BookingState bookingState) {
-    return SizedBox(
-      height: 52,
-      child: ElevatedButton.icon(
-        onPressed: bookingState.isCreating ? null : _confirmBooking,
-        icon: bookingState.isCreating
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            : const Icon(Icons.check_circle_outline),
-        label: Text(
-          bookingState.isCreating ? 'Đang xử lý...' : 'Xác nhận đặt sân',
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _getCourtTypeColor(_selectedCourtType),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-      ),
-    );
-  }
-
   Widget _buildBookingsList(BookingState bookingState) {
     if (bookingState.isLoading && bookingState.bookings.isEmpty) {
       return const Center(
@@ -582,31 +527,19 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     );
   }
 
-  void _showCancelDialog(Booking booking) {
-    showDialog(
+  void _showCancelDialog(Booking booking) async {
+    final confirmed = await AppConfirmDialog.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Hủy đặt sân'),
-        content: Text(
-          'Bạn có chắc muốn hủy đặt sân ${booking.courtType.displayName} '
+      title: 'Hủy đặt sân',
+      content: 'Bạn có chắc muốn hủy đặt sân ${booking.courtType.displayName} '
           'số ${booking.courtNumber}?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Không'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ref.read(bookingProvider.notifier).cancelBooking(booking.id);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Hủy đặt sân'),
-          ),
-        ],
-      ),
+      confirmLabel: 'Hủy đặt sân',
+      isDestructive: true,
+      cancelLabel: 'Không',
     );
+    if (confirmed == true) {
+      ref.read(bookingProvider.notifier).cancelBooking(booking.id);
+    }
   }
 }
 

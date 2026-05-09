@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/network/api_exception.dart';
-import 'package:sports_venue_chatbot/features/auth/data/auth_api.dart';
 import 'package:sports_venue_chatbot/features/auth/data/auth_models.dart';
 import 'package:sports_venue_chatbot/features/auth/domain/auth_repository.dart';
 
@@ -43,11 +42,11 @@ class AuthStateNotifier extends StateNotifier<AsyncValue<User?>> {
     }
   }
 
-  /// Log in with [phone] and [name], update state to the logged-in user
-  Future<bool> login(String phone, String name) async {
+  /// Log in with [phone] and [password], update state to the logged-in user
+  Future<bool> login(String phone, String password) async {
     state = const AsyncValue.loading();
     try {
-      final user = await _repository.login(phone, name);
+      final user = await _repository.login(phone, password);
       state = AsyncValue.data(user);
       return true;
     } on ApiException catch (e, st) {
@@ -108,9 +107,9 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
   LoginNotifier(this._authNotifier) : super(const LoginState());
 
-  Future<bool> login(String phone, String name) async {
+  Future<bool> login(String phone, String password) async {
     state = state.copyWith(isLoading: true, clearError: true);
-    final success = await _authNotifier.login(phone, name);
+    final success = await _authNotifier.login(phone, password);
     if (!success) {
       state = state.copyWith(
         isLoading: false,

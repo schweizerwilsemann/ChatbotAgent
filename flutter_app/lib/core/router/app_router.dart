@@ -7,6 +7,7 @@ import 'package:sports_venue_chatbot/features/booking/presentation/booking_scree
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_screen.dart';
 import 'package:sports_venue_chatbot/features/home_screen.dart';
 import 'package:sports_venue_chatbot/features/menu/presentation/menu_screen.dart';
+import 'package:sports_venue_chatbot/features/profile/presentation/profile_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -62,6 +63,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'menu',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: MenuScreen()),
+          ),
+          GoRoute(
+            path: '/profile',
+            name: 'profile',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ProfileScreen()),
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import logging
+from datetime import date as DateType
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -7,8 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.repositories.booking_repository import BookingRepository
 from app.schemas.booking import (
-    AvailabilityQuery,
-    BookingCancelResponse,
+    AvailabilityResponse,
     BookingCreate,
     BookingResponse,
 )
@@ -29,12 +29,12 @@ async def _get_booking_service(
 @router.post("/", response_model=BookingResponse, status_code=201)
 async def create_booking(
     data: BookingCreate,
-    user_id: str = Query(..., description="User ID"),
+    user_id: str | None = Query(None, description="User ID"),
     service: BookingService = Depends(_get_booking_service),
 ) -> BookingResponse:
     """Create a new court booking."""
     try:
-        booking = await service.create_booking(data, user_id)
+        booking = await service.create_booking(data, user_id or data.user_id or "current_user")
         return booking
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -61,16 +61,30 @@ async def check_availability(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@router.get("/{booking_id}", response_model=BookingResponse)
-async def get_booking(
-    booking_id: str,
+@router.get("/", response_model=list[BookingResponse])
+async def get_bookings(
+    user_id: str = Query(..., description="User ID"),
     service: BookingService = Depends(_get_booking_service),
-) -> BookingResponse:
-    """Get a booking by ID."""
-    booking = await service.get_booking(booking_id)
-    if not booking:
-        raise HTTPException(status_code=404, detail="Booking not found")
-    return booking
+) -> list[BookingResponse]:
+    """Get all bookings for a user."""
+    try:
+        return await service.get_user_bookings(user_id)
+    except Exception as exc:
+        logger.exception("Error fetching user bookings")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+@router.get("/availability", response_model=AvailabilityResponse)
+async def get_day_availability(
+    court_type: str = Query(..., description="Court type"),
+    date: DateType = Query(..., description="Date"),
+    service: BookingService = Depends(_get_booking_service),
+) -> AvailabilityResponse:
+    """Return available slots/courts for a court type on a specific date."""
+    try:
+        return await service.get_day_availability(court_type, date)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @router.get("/user/{user_id}", response_model=list[BookingResponse])
@@ -87,11 +101,26 @@ async def get_user_bookings(
         raise HTTPException(status_code=500, detail="Internal server error") from exc
 
 
-@router.put("/{booking_id}/cancel", response_model=BookingCancelResponse)
+@router.get("/{booking_id}", response_model=BookingResponse)
+async def get_booking(
+    booking_id: str,
+    service: BookingService = Depends(_get_booking_service),
+) -> BookingResponse:
+    """Get a booking by ID."""
+    try:
+        booking = await service.get_booking(booking_id)
+        if not booking:
+            raise HTTPException(status_code=404, detail="Booking not found")
+        return booking
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="Invalid booking ID") from exc
+
+
+@router.patch("/{booking_id}/cancel", response_model=BookingResponse)
 async def cancel_booking(
     booking_id: str,
     service: BookingService = Depends(_get_booking_service),
-) -> BookingCancelResponse:
+) -> BookingResponse:
     """Cancel a booking."""
     try:
         result = await service.cancel_booking(booking_id)

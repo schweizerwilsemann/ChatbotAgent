@@ -17,7 +17,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 
 /// Abstract auth repository interface
 abstract class IAuthRepository {
-  Future<User> login(String phone, String name);
+  Future<User> login(String phone, String password);
   Future<User> getProfile(String userId);
   Future<void> logout();
   Future<bool> isLoggedIn();
@@ -35,16 +35,16 @@ class AuthRepository implements IAuthRepository {
   AuthRepository(this._authApi, this._secureStorage);
 
   @override
-  Future<User> login(String phone, String name) async {
+  Future<User> login(String phone, String password) async {
     try {
       if (phone.trim().isEmpty) {
         throw ValidationException(message: 'Vui lòng nhập số điện thoại');
       }
-      if (name.trim().isEmpty) {
-        throw ValidationException(message: 'Vui lòng nhập tên');
+      if (password.isEmpty) {
+        throw ValidationException(message: 'Vui lòng nhập mật khẩu');
       }
 
-      final authResponse = await _authApi.login(phone.trim(), name.trim());
+      final authResponse = await _authApi.login(phone.trim(), password);
 
       // Persist token and user ID for auto-login
       await _secureStorage.write(key: _tokenKey, value: authResponse.token);
