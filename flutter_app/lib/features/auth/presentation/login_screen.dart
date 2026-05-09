@@ -81,6 +81,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   // Phone number field
                   TextFormField(
                     controller: _phoneController,
+                    enabled: !loginState.isLoading,
                     keyboardType: TextInputType.phone,
                     textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
@@ -101,6 +102,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   // Password field
                   TextFormField(
                     controller: _passwordController,
+                    enabled: !loginState.isLoading,
                     obscureText: true,
                     textInputAction: TextInputAction.done,
                     decoration: const InputDecoration(
@@ -115,7 +117,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       }
                       return null;
                     },
-                    onFieldSubmitted: (_) => _handleLogin(),
+                    onFieldSubmitted: (_) {
+                      if (!loginState.isLoading) {
+                        _handleLogin();
+                      }
+                    },
                   ),
                   const SizedBox(height: 8),
 
@@ -150,6 +156,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
+    if (ref.read(loginProvider).isLoading) return;
     if (!_formKey.currentState!.validate()) return;
 
     ref.read(loginProvider.notifier).clearError();

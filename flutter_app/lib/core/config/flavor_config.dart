@@ -1,3 +1,4 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 
 /// Application build flavors.
@@ -11,17 +12,38 @@ enum Flavor {
 class FlavorConfig {
   FlavorConfig._();
 
+  static const String _androidEmulatorDevBaseUrl = 'http://10.0.2.2:8000';
+  static const String _physicalDeviceDevBaseUrl = 'http://192.168.1.6:8000';
   static Flavor _flavor = Flavor.appDev;
+  static const String _apiBaseUrlOverride =
+      String.fromEnvironment('API_BASE_URL');
+  static bool? _isAndroidEmulator;
 
   /// The active flavor.
   static Flavor get flavor => _flavor;
 
   /// Initialize the config with the given flavor. Must be called once
   /// in each entry-point before `runApp()`.
-  static void init(Flavor f) {
+  static Future<void> init(Flavor f) async {
     _flavor = f;
+    await _detectRuntimeEnvironment();
     debugPrint('=== Flavor: ${f.name} ===');
     debugPrint('=== API URL: $apiBaseUrl ===');
+  }
+
+  static Future<void> _detectRuntimeEnvironment() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+      _isAndroidEmulator = null;
+      return;
+    }
+
+    try {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      _isAndroidEmulator = !androidInfo.isPhysicalDevice;
+    } catch (error) {
+      debugPrint('Could not detect Android device type: $error');
+      _isAndroidEmulator = null;
+    }
   }
 
   /// Resolve Flutter's `--flavor` value to the application flavor config.
@@ -41,12 +63,19 @@ class FlavorConfig {
 
   /// Base URL for the backend API.
   static String get apiBaseUrl {
+    final override = _apiBaseUrlOverride.trim();
+    if (override.isNotEmpty) {
+      return override;
+    }
+
     switch (_flavor) {
       case Flavor.appDev:
       case Flavor.appDevRelease:
-        // 10.0.2.2 = Android emulator -> host localhost
-        // For physical device, replace with your PC's local IP.
-        return 'http://10.0.2.2:8000';
+        if (defaultTargetPlatform == TargetPlatform.android &&
+            _isAndroidEmulator == true) {
+          return _androidEmulatorDevBaseUrl;
+        }
+        return _physicalDeviceDevBaseUrl;
       case Flavor.appProd:
         return 'https://api.sportsvenue.example.com';
     }

@@ -14,7 +14,7 @@ Future<void> _runApp(Flavor flavor) async {
   WidgetsFlutterBinding.ensureInitialized();
   Intl.defaultLocale = 'vi_VN';
   await initializeDateFormatting('vi_VN');
-  FlavorConfig.init(flavor);
+  await FlavorConfig.init(flavor);
   runApp(
     const ProviderScope(
       child: SportsVenueChatbotApp(),

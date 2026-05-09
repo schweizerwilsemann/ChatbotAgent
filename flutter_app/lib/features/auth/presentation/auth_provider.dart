@@ -44,7 +44,6 @@ class AuthStateNotifier extends StateNotifier<AsyncValue<User?>> {
 
   /// Log in with [phone] and [password], update state to the logged-in user
   Future<bool> login(String phone, String password) async {
-    state = const AsyncValue.loading();
     try {
       final user = await _repository.login(phone, password);
       state = AsyncValue.data(user);
@@ -111,9 +110,12 @@ class LoginNotifier extends StateNotifier<LoginState> {
     state = state.copyWith(isLoading: true, clearError: true);
     final success = await _authNotifier.login(phone, password);
     if (!success) {
+      final error = _authNotifier.state.error;
       state = state.copyWith(
         isLoading: false,
-        error: 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.',
+        error: error is ApiException
+            ? error.message
+            : 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.',
       );
     } else {
       state = state.copyWith(isLoading: false);

@@ -18,18 +18,18 @@ class ApiConstants {
   static const String authVerifyEndpoint = '/api/auth/verify';
   static const String userProfileEndpoint = '/api/user/profile';
 
-  // Timeouts. Dev intentionally has no network timeout because local models can
-  // take a long time to respond on first run.
-  static Duration? get connectTimeout => FlavorConfig.flavor == Flavor.appDev
-      ? null
+  // Timeouts. Keep dev receive timeout effectively open-ended for local LLMs,
+  // but keep connect/send finite so unreachable backends fail quickly.
+  static Duration get connectTimeout => FlavorConfig.flavor == Flavor.appDev
+      ? const Duration(seconds: 30)
       : const Duration(seconds: 15);
 
-  static Duration? get receiveTimeout => FlavorConfig.flavor == Flavor.appDev
-      ? null
+  static Duration get receiveTimeout => FlavorConfig.flavor == Flavor.appDev
+      ? const Duration(hours: 24)
       : const Duration(seconds: 60);
 
-  static Duration? get sendTimeout => FlavorConfig.flavor == Flavor.appDev
-      ? null
+  static Duration get sendTimeout => FlavorConfig.flavor == Flavor.appDev
+      ? const Duration(seconds: 30)
       : const Duration(seconds: 15);
 
   // Headers

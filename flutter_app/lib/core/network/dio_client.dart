@@ -202,6 +202,12 @@ class DioClient {
           statusCode: 400,
         );
       case 401:
+        if (response?.requestOptions.path == ApiConstants.authLoginEndpoint) {
+          return ServerException(
+            message: 'Số điện thoại hoặc mật khẩu không đúng.',
+            statusCode: 401,
+          );
+        }
         return ServerException(
           message: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
           statusCode: 401,
