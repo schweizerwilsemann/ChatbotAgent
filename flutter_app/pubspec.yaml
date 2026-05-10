@@ -21,6 +21,7 @@ dependencies:
 
   # Network
   dio: ^5.4.0
+  web_socket_channel: ^3.0.3
 
   # Chat UI
   flutter_chat_ui: ^1.6.12
