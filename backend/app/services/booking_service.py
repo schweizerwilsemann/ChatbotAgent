@@ -8,6 +8,7 @@ from app.schemas.booking import (
     BookingResponse,
     TimeSlotResponse,
 )
+from app.services.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +16,13 @@ VALID_COURT_TYPES = {"billiards", "pickleball", "badminton"}
 
 
 class BookingService:
-    def __init__(self, repo: BookingRepository) -> None:
+    def __init__(
+        self,
+        repo: BookingRepository,
+        notification_service: NotificationService | None = None,
+    ) -> None:
         self._repo = repo
+        self._notification_service = notification_service
 
     async def create_booking(
         self, data: BookingCreate, user_id: str
@@ -62,7 +68,19 @@ class BookingService:
         )
 
         logger.info("Booking created: %s for user %s", booking.id, user_id)
-        return self._to_response(booking)
+        response = self._to_response(booking)
+        if self._notification_service:
+            await self._notification_service.notify_operations(
+                event_type="booking.created",
+                title="Đặt sân mới",
+                message=(
+                    f"Khách vừa đặt {response.court_type} sân "
+                    f"{response.court_number} từ {response.start_time} đến {response.end_time}"
+                ),
+                source="booking",
+                payload=response.model_dump(mode="json"),
+            )
+        return response
 
     async def get_booking(self, booking_id: str) -> BookingResponse | None:
         """Get a booking by ID."""

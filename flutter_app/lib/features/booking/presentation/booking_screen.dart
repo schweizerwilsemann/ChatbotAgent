@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/booking/data/booking_models.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_provider.dart';
@@ -151,51 +152,54 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Court type selector
-              const AppSectionTitle('Loại sân'),
-              const SizedBox(height: 8),
-              _buildCourtTypeSelector(),
-              const SizedBox(height: 24),
+          padding: EdgeInsets.all(Responsive.horizontalPadding(context)),
+          child: ResponsiveContainer(
+            maxWidth: 600,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Court type selector
+                const AppSectionTitle('Loại sân'),
+                const SizedBox(height: 8),
+                _buildCourtTypeSelector(),
+                const SizedBox(height: 24),
 
-              // Date picker
-              const AppSectionTitle('Ngày đặt'),
-              const SizedBox(height: 8),
-              _buildDatePicker(),
-              const SizedBox(height: 24),
+                // Date picker
+                const AppSectionTitle('Ngày đặt'),
+                const SizedBox(height: 8),
+                _buildDatePicker(),
+                const SizedBox(height: 24),
 
-              // Time slot selection
-              const AppSectionTitle('Giờ chơi'),
-              const SizedBox(height: 8),
-              _buildTimeSlotSelection(),
-              const SizedBox(height: 24),
+                // Time slot selection
+                const AppSectionTitle('Giờ chơi'),
+                const SizedBox(height: 8),
+                _buildTimeSlotSelection(),
+                const SizedBox(height: 24),
 
-              // Court number input
-              const AppSectionTitle('Số sân'),
-              const SizedBox(height: 8),
-              _buildCourtNumberInput(),
-              const SizedBox(height: 32),
+                // Court number input
+                const AppSectionTitle('Số sân'),
+                const SizedBox(height: 8),
+                _buildCourtNumberInput(),
+                const SizedBox(height: 32),
 
-              // Confirm button
-              LoadingButton(
-                onPressed: _confirmBooking,
-                isLoading: bookingState.isCreating,
-                icon: Icons.check_circle_outline,
-                label: bookingState.isCreating
-                    ? 'Đang xử lý...'
-                    : 'Xác nhận đặt sân',
-                backgroundColor: _getCourtTypeColor(_selectedCourtType),
-              ),
-              const SizedBox(height: 32),
+                // Confirm button
+                LoadingButton(
+                  onPressed: _confirmBooking,
+                  isLoading: bookingState.isCreating,
+                  icon: Icons.check_circle_outline,
+                  label: bookingState.isCreating
+                      ? 'Đang xử lý...'
+                      : 'Xác nhận đặt sân',
+                  backgroundColor: _getCourtTypeColor(_selectedCourtType),
+                ),
+                const SizedBox(height: 32),
 
-              // Existing bookings list
-              const AppSectionTitle('Lịch đặt sân của bạn'),
-              const SizedBox(height: 8),
-              _buildBookingsList(bookingState),
-            ],
+                // Existing bookings list
+                const AppSectionTitle('Lịch đặt sân của bạn'),
+                const SizedBox(height: 8),
+                _buildBookingsList(bookingState),
+              ],
+            ),
           ),
         ),
       ),

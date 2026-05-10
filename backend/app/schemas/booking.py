@@ -12,7 +12,7 @@ class BookingCreate(BaseModel):
     date: DateType | None = Field(None, description="Booking date")
     start_time: datetime | str = Field(..., description="Booking start time")
     end_time: datetime | str = Field(..., description="Booking end time")
-    notes: str = Field("", max_length=500, description="Additional notes")
+    notes: str | None = Field("", max_length=500, description="Additional notes")
     user_id: str | None = None
 
     @field_validator("court_type")

@@ -152,7 +152,22 @@ class BookingCreate {
   factory BookingCreate.fromJson(Map<String, dynamic> json) =>
       _$BookingCreateFromJson(json);
 
-  Map<String, dynamic> toJson() => _$BookingCreateToJson(this);
+  /// Custom toJson that sends date as yyyy-MM-dd (no time) and notes as
+  /// empty string instead of null, matching the backend Pydantic schema.
+  Map<String, dynamic> toJson() {
+    final d = date;
+    final dateStr =
+        '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    return <String, dynamic>{
+      'court_type': _$CourtTypeEnumMap[courtType]!,
+      'court_number': courtNumber,
+      'date': dateStr,
+      'start_time': startTime,
+      'end_time': endTime,
+      'notes': notes ?? '',
+      'user_id': userId,
+    };
+  }
 }
 
 @JsonSerializable()

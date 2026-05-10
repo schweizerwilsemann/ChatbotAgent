@@ -5,14 +5,19 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.auth import get_current_user
 from app.core.database import get_db
+from app.core.rate_limit import rate_limit
+from app.models.user import User
 from app.repositories.booking_repository import BookingRepository
+from app.repositories.notification_repository import NotificationRepository
 from app.schemas.booking import (
     AvailabilityResponse,
     BookingCreate,
     BookingResponse,
 )
 from app.services.booking_service import BookingService
+from app.services.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)
 
@@ -23,18 +28,20 @@ async def _get_booking_service(
     session: AsyncSession = Depends(get_db),
 ) -> BookingService:
     repo = BookingRepository(session)
-    return BookingService(repo)
+    notification_service = NotificationService(NotificationRepository(session))
+    return BookingService(repo, notification_service)
 
 
-@router.post("/", response_model=BookingResponse, status_code=201)
+@router.post("", response_model=BookingResponse, status_code=201)
 async def create_booking(
     data: BookingCreate,
-    user_id: str | None = Query(None, description="User ID"),
+    _: None = Depends(rate_limit(limit=8, window_seconds=60, scope="booking")),
+    user: User = Depends(get_current_user),
     service: BookingService = Depends(_get_booking_service),
 ) -> BookingResponse:
     """Create a new court booking."""
     try:
-        booking = await service.create_booking(data, user_id or data.user_id or "current_user")
+        booking = await service.create_booking(data, str(user.id))
         return booking
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -61,14 +68,19 @@ async def check_availability(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@router.get("/", response_model=list[BookingResponse])
+@router.get("", response_model=list[BookingResponse])
 async def get_bookings(
-    user_id: str = Query(..., description="User ID"),
+    user_id: str | None = Query(None, description="User ID"),
+    user: User = Depends(get_current_user),
     service: BookingService = Depends(_get_booking_service),
 ) -> list[BookingResponse]:
     """Get all bookings for a user."""
     try:
-        return await service.get_user_bookings(user_id)
+        role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
+        target_user_id = (
+            user_id if role_value in {"STAFF", "ADMIN"} and user_id else str(user.id)
+        )
+        return await service.get_user_bookings(target_user_id)
     except Exception as exc:
         logger.exception("Error fetching user bookings")
         raise HTTPException(status_code=500, detail="Internal server error") from exc
@@ -90,12 +102,20 @@ async def get_day_availability(
 @router.get("/user/{user_id}", response_model=list[BookingResponse])
 async def get_user_bookings(
     user_id: str,
+    user: User = Depends(get_current_user),
     service: BookingService = Depends(_get_booking_service),
 ) -> list[BookingResponse]:
     """Get all bookings for a user."""
     try:
+        role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
+        if role_value not in {"STAFF", "ADMIN"} and user_id != str(user.id):
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's bookings"
+            )
         bookings = await service.get_user_bookings(user_id)
         return bookings
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.exception("Error fetching user bookings")
         raise HTTPException(status_code=500, detail="Internal server error") from exc
@@ -104,6 +124,7 @@ async def get_user_bookings(
 @router.get("/{booking_id}", response_model=BookingResponse)
 async def get_booking(
     booking_id: str,
+    user: User = Depends(get_current_user),
     service: BookingService = Depends(_get_booking_service),
 ) -> BookingResponse:
     """Get a booking by ID."""
@@ -111,6 +132,11 @@ async def get_booking(
         booking = await service.get_booking(booking_id)
         if not booking:
             raise HTTPException(status_code=404, detail="Booking not found")
+        role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
+        if role_value not in {"STAFF", "ADMIN"} and booking.user_id != str(user.id):
+            raise HTTPException(
+                status_code=403, detail="Cannot access another user's booking"
+            )
         return booking
     except ValueError as exc:
         raise HTTPException(status_code=400, detail="Invalid booking ID") from exc
@@ -119,10 +145,19 @@ async def get_booking(
 @router.patch("/{booking_id}/cancel", response_model=BookingResponse)
 async def cancel_booking(
     booking_id: str,
+    user: User = Depends(get_current_user),
     service: BookingService = Depends(_get_booking_service),
 ) -> BookingResponse:
     """Cancel a booking."""
     try:
+        existing = await service.get_booking(booking_id)
+        if not existing:
+            raise HTTPException(status_code=404, detail="Booking not found")
+        role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
+        if role_value not in {"STAFF", "ADMIN"} and existing.user_id != str(user.id):
+            raise HTTPException(
+                status_code=403, detail="Cannot cancel another user's booking"
+            )
         result = await service.cancel_booking(booking_id)
         if not result:
             raise HTTPException(status_code=404, detail="Booking not found")

@@ -2,11 +2,14 @@ import json
 import logging
 from datetime import datetime
 
+from app.agent.context import current_user_id
 from langchain_core.tools import tool
 
 from app.core.database import async_session_factory
 from app.repositories.booking_repository import BookingRepository
+from app.repositories.notification_repository import NotificationRepository
 from app.services.booking_service import BookingService
+from app.services.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +43,8 @@ async def book_court(
     try:
         async with async_session_factory() as session:
             repo = BookingRepository(session)
-            service = BookingService(repo)
+            notification_service = NotificationService(NotificationRepository(session))
+            service = BookingService(repo, notification_service)
 
             available = await service.check_availability(
                 court_type=court_type,
@@ -65,7 +69,7 @@ async def book_court(
                 end_time=end_dt,
                 notes=notes,
             )
-            booking = await service.create_booking(data, user_id="chatbot_user")
+            booking = await service.create_booking(data, user_id=current_user_id.get())
             await session.commit()
 
             return (
