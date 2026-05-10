@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
@@ -140,9 +141,9 @@ class _MenuCategoryGrid extends ConsumerWidget {
 
     return GridView.builder(
       padding: const EdgeInsets.all(12),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.72,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: Responsive.gridColumns(context),
+        childAspectRatio: Responsive.menuGridAspectRatio(context),
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),

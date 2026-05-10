@@ -19,8 +19,26 @@ class MenuItem {
     required this.category,
   });
 
-  factory MenuItem.fromJson(Map<String, dynamic> json) =>
-      _$MenuItemFromJson(json);
+  /// Custom fromJson that handles the backend serializing Decimal as a String.
+  factory MenuItem.fromJson(Map<String, dynamic> json) {
+    final rawPrice = json['price'];
+    final double price;
+    if (rawPrice is num) {
+      price = rawPrice.toDouble();
+    } else if (rawPrice is String) {
+      price = double.parse(rawPrice);
+    } else {
+      throw FormatException('Unexpected price type: ${rawPrice.runtimeType}');
+    }
+
+    return MenuItem(
+      name: json['name'] as String,
+      description: json['description'] as String? ?? '',
+      price: price,
+      imageUrl: json['image_url'] as String?,
+      category: json['category'] as String,
+    );
+  }
 
   Map<String, dynamic> toJson() => _$MenuItemToJson(this);
 }
@@ -55,7 +73,22 @@ class OrderItemCreate {
   factory OrderItemCreate.fromJson(Map<String, dynamic> json) =>
       _$OrderItemCreateFromJson(json);
 
-  Map<String, dynamic> toJson() => _$OrderItemCreateToJson(this);
+  /// Only send item_name and quantity — the backend calculates unit_price
+  /// from the menu automatically.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'item_name': itemName,
+      'quantity': quantity,
+    };
+  }
+}
+
+/// Safely convert a JSON value (num or String) to double.
+/// Handles the backend Pydantic Decimal → String serialization.
+double _toDouble(dynamic v) {
+  if (v is num) return v.toDouble();
+  if (v is String) return double.parse(v);
+  throw FormatException('Expected num or String, got ${v.runtimeType}');
 }
 
 /// Order item returned from the API
@@ -73,8 +106,14 @@ class OrderItem {
     required this.totalPrice,
   });
 
-  factory OrderItem.fromJson(Map<String, dynamic> json) =>
-      _$OrderItemFromJson(json);
+  factory OrderItem.fromJson(Map<String, dynamic> json) {
+    return OrderItem(
+      itemName: json['item_name'] as String,
+      quantity: (json['quantity'] as num).toInt(),
+      unitPrice: _toDouble(json['unit_price']),
+      totalPrice: _toDouble(json['total_price']),
+    );
+  }
 
   Map<String, dynamic> toJson() => _$OrderItemToJson(this);
 }
@@ -99,7 +138,16 @@ class OrderCreate {
   factory OrderCreate.fromJson(Map<String, dynamic> json) =>
       _$OrderCreateFromJson(json);
 
-  Map<String, dynamic> toJson() => _$OrderCreateToJson(this);
+  /// Custom toJson that properly serializes [items] to JSON maps and
+  /// sends empty string instead of null for notes.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'user_id': userId,
+      'table_number': tableNumber,
+      'items': items.map((e) => e.toJson()).toList(),
+      'notes': notes ?? '',
+    };
+  }
 }
 
 /// Order status enum
@@ -152,7 +200,18 @@ class Order {
     required this.createdAt,
   });
 
-  factory Order.fromJson(Map<String, dynamic> json) => _$OrderFromJson(json);
+  factory Order.fromJson(Map<String, dynamic> json) {
+    return Order(
+      id: json['id'] as String,
+      items: (json['items'] as List<dynamic>)
+          .map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      totalPrice: _toDouble(json['total_price']),
+      status: $enumDecode(_$OrderStatusEnumMap, json['status']),
+      notes: json['notes'] as String?,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+  }
 
   Map<String, dynamic> toJson() => _$OrderToJson(this);
 }
