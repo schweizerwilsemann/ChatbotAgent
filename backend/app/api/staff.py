@@ -1,73 +1,44 @@
-import json
-import logging
-import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.redis_client import redis_client
-
-logger = logging.getLogger(__name__)
+from app.api.auth import get_current_user
+from app.core.database import get_db
+from app.core.rate_limit import rate_limit
+from app.models.user import User
+from app.repositories.notification_repository import NotificationRepository
+from app.schemas.notification import StaffNotifyRequest, StaffNotifyResponse
+from app.services.notification_service import NotificationService
 
 router = APIRouter(prefix="/api/staff", tags=["staff"])
 
 
-class StaffNotifyRequest(BaseModel):
-    message: str = Field(
-        ..., min_length=1, max_length=1000, description="Notification message"
-    )
-    table_number: int = Field(0, ge=0, description="Table number (0 if not applicable)")
-
-
-class StaffNotifyResponse(BaseModel):
-    notification_id: str
-    message: str
-    table_number: int
-    status: str
-    timestamp: str
-
-
 @router.post("/notify", response_model=StaffNotifyResponse, status_code=201)
-async def notify_staff(request: StaffNotifyRequest) -> StaffNotifyResponse:
-    """Send a notification to staff. Stores in Redis for pub/sub consumption."""
-    notification_id = str(uuid.uuid4())
-    timestamp = datetime.now(timezone.utc).isoformat()
-
-    notification = {
-        "id": notification_id,
-        "message": request.message,
-        "table_number": request.table_number,
-        "status": "pending",
-        "timestamp": timestamp,
-    }
-
-    try:
-        await redis_client.set(
-            f"staff_notification:{notification_id}",
-            json.dumps(notification),
-            ex=3600,
-        )
-        await redis_client.client.publish(
-            "staff_notifications",
-            json.dumps(notification),
-        )
-        logger.info(
-            "Staff notification created: id=%s table=%d msg=%s",
-            notification_id,
-            request.table_number,
-            request.message,
-        )
-    except Exception as exc:
-        logger.exception("Failed to store staff notification in Redis")
-        raise HTTPException(
-            status_code=500, detail="Failed to send notification"
-        ) from exc
-
+async def notify_staff(
+    request: StaffNotifyRequest,
+    _: None = Depends(rate_limit(limit=10, window_seconds=60, scope="staff_notify")),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> StaffNotifyResponse:
+    """Send a realtime notification to staff and managers."""
+    service = NotificationService(NotificationRepository(session))
+    notification = await service.notify_operations(
+        event_type="staff.requested",
+        title="Khách cần hỗ trợ",
+        message=request.message,
+        source="customer",
+        payload={
+            "user_id": str(user.id),
+            "table_number": request.table_number,
+            "message": request.message,
+        },
+    )
+    timestamp = notification.created_at or datetime.now(timezone.utc)
     return StaffNotifyResponse(
-        notification_id=notification_id,
+        notification_id=notification.id,
         message=request.message,
         table_number=request.table_number,
         status="sent",
-        timestamp=timestamp,
+        timestamp=timestamp.isoformat(),
     )
