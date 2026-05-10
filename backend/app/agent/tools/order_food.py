@@ -1,11 +1,15 @@
 import json
 import logging
 
+from app.agent.context import current_user_id
 from langchain_core.tools import tool
 
 from app.core.database import async_session_factory
+from app.repositories.menu_repository import MenuRepository
+from app.repositories.notification_repository import NotificationRepository
 from app.repositories.order_repository import OrderRepository
 from app.schemas.order import OrderCreate, OrderItemCreate
+from app.services.notification_service import NotificationService
 from app.services.order_service import OrderService
 
 logger = logging.getLogger(__name__)
@@ -43,10 +47,12 @@ async def order_food(items: str, notes: str = "") -> str:
 
         async with async_session_factory() as session:
             repo = OrderRepository(session)
-            service = OrderService(repo)
+            menu_repo = MenuRepository(session)
+            notification_service = NotificationService(NotificationRepository(session))
+            service = OrderService(repo, menu_repo, notification_service)
 
             order_data = OrderCreate(
-                user_id="chatbot_user",
+                user_id=current_user_id.get(),
                 table_number=0,
                 items=order_items,
                 notes=notes,

@@ -6,6 +6,8 @@ from datetime import datetime, timezone
 from langchain_core.tools import tool
 
 from app.core.redis_client import redis_client
+from app.services.notification_service import OPERATIONS_ROLES
+from app.services.realtime import realtime_manager
 
 logger = logging.getLogger(__name__)
 
@@ -27,11 +29,20 @@ async def call_staff(message: str, table_number: int = 0) -> str:
 
         notification = {
             "id": notification_id,
+            "event_type": "staff.requested",
+            "title": "Khách cần hỗ trợ",
             "message": message,
+            "target_roles": OPERATIONS_ROLES,
             "table_number": table_number,
             "status": "pending",
+            "created_at": timestamp,
             "timestamp": timestamp,
             "source": "chatbot",
+            "payload": {
+                "table_number": table_number,
+                "message": message,
+            },
+            "read_at": None,
         }
 
         await redis_client.set(
@@ -41,6 +52,7 @@ async def call_staff(message: str, table_number: int = 0) -> str:
         )
 
         try:
+            await realtime_manager.broadcast_to_roles(OPERATIONS_ROLES, notification)
             await redis_client.client.publish(
                 "staff_notifications",
                 json.dumps(notification, ensure_ascii=False),

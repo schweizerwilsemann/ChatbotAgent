@@ -2,6 +2,7 @@ import json
 import logging
 import uuid
 
+from app.agent.context import current_user_id
 from app.agent.agent import AgentResponse, VenueAgent
 from app.core.config import settings
 from app.core.redis_client import redis_client
@@ -15,17 +16,26 @@ class ChatService:
         self._agent = agent
         self._session_ttl = settings.SESSION_TTL
 
-    async def process_message(self, message: str, session_id: str) -> ChatResponse:
+    async def process_message(
+        self,
+        message: str,
+        session_id: str,
+        user_id: str = "chatbot_user",
+    ) -> ChatResponse:
         """Process a chat message, maintaining conversation history in Redis."""
         history = await self._load_history(session_id)
 
         history.append({"role": "user", "content": message})
 
         try:
-            agent_response: AgentResponse = await self._agent.process(
-                message=message,
-                session_history=history,
-            )
+            token = current_user_id.set(user_id)
+            try:
+                agent_response: AgentResponse = await self._agent.process(
+                    message=message,
+                    session_history=history,
+                )
+            finally:
+                current_user_id.reset(token)
         except Exception as exc:
             logger.exception("Agent processing failed for session %s", session_id)
             agent_response = AgentResponse(

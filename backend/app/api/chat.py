@@ -3,6 +3,9 @@ import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.api.auth import get_current_user
+from app.core.rate_limit import rate_limit
+from app.models.user import User
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.services.chat_service import ChatService
 
@@ -27,6 +30,8 @@ def _get_chat_service() -> ChatService:
 @router.post("/chat", response_model=ChatResponse)
 async def chat(
     request: ChatRequest,
+    _: None = Depends(rate_limit(limit=30, window_seconds=60, scope="chat")),
+    user: User = Depends(get_current_user),
     chat_service: ChatService = Depends(_get_chat_service),
 ) -> ChatResponse:
     """Process a chat message through the AI agent and return a response."""
@@ -35,6 +40,7 @@ async def chat(
         result = await chat_service.process_message(
             message=request.message,
             session_id=session_id,
+            user_id=str(user.id),
         )
         return result
     except Exception as exc:
