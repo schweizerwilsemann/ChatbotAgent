@@ -29,11 +29,12 @@ class VenueAgent:
         model_name: str | None = None,
         tools: list | None = None,
         neo4j_client: Neo4jClient | None = None,
+        embedder=None,
     ) -> None:
         self._model_name = model_name or settings.LLM_MODEL
         self._tools = tools or []
         self._neo4j_client = neo4j_client
-        self._intent_router = IntentRouter()
+        self._intent_router = IntentRouter(embedder=embedder)
         self._llm = self._create_llm()
         self._agent_executor = self._build_agent(self._llm)
         self._fallback_agent_executor = None
@@ -157,9 +158,13 @@ class VenueAgent:
             return_intermediate_steps=True,
         )
 
+    async def initialize(self) -> None:
+        """Pre-compute intent embeddings. Call once during startup."""
+        await self._intent_router.initialize()
+
     async def process(self, message: str, session_history: list[dict]) -> AgentResponse:
         """Process a user message through the AI agent."""
-        routed = self._intent_router.route(message)
+        routed = await self._intent_router.route(message)
         if routed:
             return AgentResponse(output=routed.answer, tools_used=[])
 
