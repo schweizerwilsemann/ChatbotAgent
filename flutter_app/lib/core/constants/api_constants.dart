@@ -14,9 +14,23 @@ class ApiConstants {
   static const String orderEndpoint = '/api/order';
   static const String menuEndpoint = '/api/menu';
   static const String staffNotifyEndpoint = '/api/staff/notify';
+  static const String realtimeNotificationsEndpoint =
+      '/api/realtime/notifications';
   static const String authLoginEndpoint = '/api/auth/login';
   static const String authVerifyEndpoint = '/api/auth/verify';
   static const String userProfileEndpoint = '/api/user/profile';
+
+  static String get realtimeNotificationsWsEndpoint {
+    final uri = Uri.parse(baseUrl);
+    final scheme = uri.scheme == 'https' ? 'wss' : 'ws';
+    return uri
+        .replace(
+          scheme: scheme,
+          path: realtimeNotificationsEndpoint,
+          query: '',
+        )
+        .toString();
+  }
 
   // Timeouts. Keep dev receive timeout effectively open-ended for local LLMs,
   // but keep connect/send finite so unreachable backends fail quickly.

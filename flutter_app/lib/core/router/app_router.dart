@@ -8,6 +8,7 @@ import 'package:sports_venue_chatbot/features/chat/presentation/chat_screen.dart
 import 'package:sports_venue_chatbot/features/home_screen.dart';
 import 'package:sports_venue_chatbot/features/menu/presentation/menu_screen.dart';
 import 'package:sports_venue_chatbot/features/profile/presentation/profile_screen.dart';
+import 'package:sports_venue_chatbot/features/staff/presentation/staff_notifications_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -17,6 +18,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     debugLogDiagnostics: true,
     redirect: (context, state) {
       final isLoggedIn = authState.valueOrNull != null;
+      final userRole = authState.valueOrNull?.role.toUpperCase();
       final isLoginRoute = state.matchedLocation == '/login';
 
       // If not logged in and not on login page, redirect to login
@@ -26,6 +28,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       // If logged in and on login page, redirect to home
       if (isLoggedIn && isLoginRoute) {
+        return '/home';
+      }
+
+      if (state.matchedLocation == '/staff' &&
+          userRole != 'STAFF' &&
+          userRole != 'ADMIN') {
         return '/home';
       }
 
@@ -63,6 +71,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'menu',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: MenuScreen()),
+          ),
+          GoRoute(
+            path: '/staff',
+            name: 'staff',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: StaffNotificationsScreen()),
           ),
           GoRoute(
             path: '/profile',
