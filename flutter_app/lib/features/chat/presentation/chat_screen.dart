@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_provider.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/widgets/chat_bubble.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_confirm_dialog.dart';
@@ -180,46 +181,57 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.primarySurface,
-                shape: BoxShape.circle,
+        child: ResponsiveContainer(
+          maxWidth: 500,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppColors.primarySurface,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.sports_tennis,
+                  size: 40,
+                  color: AppColors.primary,
+                ),
               ),
-              child: const Icon(
-                Icons.sports_tennis,
-                size: 40,
-                color: AppColors.primary,
+              const SizedBox(height: 24),
+              Text(
+                'Chào mừng bạn!',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Chào mừng bạn!',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Tôi là trợ lý AI của câu lạc bộ thể thao.\nHỏi tôi bất cứ điều gì!',
-              textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 32),
-            _buildSuggestionChip('🎱 Kiểm tra sân bida trống'),
-            const SizedBox(height: 8),
-            _buildSuggestionChip('🏸 Đặt sân cầu lông chiều nay'),
-            const SizedBox(height: 8),
-            _buildSuggestionChip('🏓 Xem thực đơn đồ uống'),
-            const SizedBox(height: 8),
-            _buildSuggestionChip('📋 Đặt bàn bida số 3 lúc 19h'),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                'Tôi là trợ lý AI của câu lạc bộ thể thao.\nHỏi tôi bất cứ điều gì!',
+                textAlign: TextAlign.center,
+                style: Theme.of(
+                  context,
+                )
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 32),
+              // On tablet, show suggestion chips in a 2-column Wrap
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: [
+                  _buildSuggestionChip('🎱 Kiểm tra sân bida trống'),
+                  _buildSuggestionChip('🏸 Đặt sân cầu lông chiều nay'),
+                  _buildSuggestionChip('🏓 Xem thực đơn đồ uống'),
+                  _buildSuggestionChip('📋 Đặt bàn bida số 3 lúc 19h'),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -244,26 +256,32 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         (chatState.isLoading ? 1 : 0) +
         (chatState.isStreaming && chatState.streamingContent.isEmpty ? 1 : 0);
 
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: messageCount,
-      itemBuilder: (context, index) {
-        if (index < chatState.messages.length) {
-          return ChatBubble(
-            message: chatState.messages[index],
-            key: ValueKey(chatState.messages[index].id),
-          );
-        }
+    return Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 720),
+        child: ListView.builder(
+          controller: _scrollController,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          itemCount: messageCount,
+          itemBuilder: (context, index) {
+            if (index < chatState.messages.length) {
+              return ChatBubble(
+                message: chatState.messages[index],
+                key: ValueKey(chatState.messages[index].id),
+              );
+            }
 
-        // Show typing indicator when loading or streaming with no content yet
-        if (chatState.isLoading ||
-            (chatState.isStreaming && chatState.streamingContent.isEmpty)) {
-          return const TypingIndicator();
-        }
+            // Show typing indicator when loading or streaming with no content yet
+            if (chatState.isLoading ||
+                (chatState.isStreaming && chatState.streamingContent.isEmpty)) {
+              return const TypingIndicator();
+            }
 
-        return const SizedBox.shrink();
-      },
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
     );
   }
 
