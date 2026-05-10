@@ -13,7 +13,7 @@ class OrderCreate(BaseModel):
     user_id: str = Field("current_user", min_length=1, max_length=128)
     table_number: int = Field(0, ge=0)
     items: list[OrderItemCreate] = Field(..., min_length=1)
-    notes: str = Field("", max_length=500)
+    notes: str | None = Field("", max_length=500)
 
 
 class OrderItemResponse(BaseModel):

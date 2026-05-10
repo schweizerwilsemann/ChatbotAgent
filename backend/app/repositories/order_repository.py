@@ -50,6 +50,9 @@ class OrderRepository:
 
         order.total_price = total
         await self._session.flush()
+        # Eagerly load the items relationship so _to_response can access
+        # order.items synchronously without hitting MissingGreenlet.
+        await self._session.refresh(order, ["items"])
         return order
 
     async def get_by_id(self, order_id: str) -> Order | None:

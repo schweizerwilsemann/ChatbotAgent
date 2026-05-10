@@ -1,26 +1,43 @@
 import logging
-from decimal import Decimal
 
-from app.api.menu import MENU_PRICES
+from app.repositories.menu_repository import MenuRepository
 from app.repositories.order_repository import OrderRepository
 from app.schemas.order import OrderCreate, OrderItemResponse, OrderResponse
+from app.services.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)
 
 
 class OrderService:
-    def __init__(self, repo: OrderRepository) -> None:
+    def __init__(
+        self,
+        repo: OrderRepository,
+        menu_repo: MenuRepository,
+        notification_service: NotificationService | None = None,
+    ) -> None:
         self._repo = repo
+        self._menu_repo = menu_repo
+        self._notification_service = notification_service
 
     async def create_order(self, data: OrderCreate) -> OrderResponse:
         """Create a new order, calculating total price from the menu."""
         if not data.items:
             raise ValueError("Order must contain at least one item")
 
+        item_names = [item.item_name for item in data.items]
+        menu_items = await self._menu_repo.find_available_by_names(item_names)
+
         items_data = []
+        quantities_by_name: dict[str, int] = {}
+        menu_prices = {}
         for item in data.items:
-            if item.item_name.lower() not in MENU_PRICES:
+            menu_item = menu_items.get(item.item_name.lower())
+            if menu_item is None:
                 raise ValueError(f"Item not found on menu: {item.item_name}")
+            menu_prices[item.item_name.lower()] = menu_item.price
+            quantities_by_name[item.item_name] = (
+                quantities_by_name.get(item.item_name, 0) + item.quantity
+            )
             items_data.append(
                 {
                     "item_name": item.item_name,
@@ -32,9 +49,10 @@ class OrderService:
             user_id=data.user_id,
             table_number=data.table_number,
             items_data=items_data,
-            menu_prices=MENU_PRICES,
+            menu_prices=menu_prices,
             notes=data.notes,
         )
+        await self._menu_repo.increment_sales(quantities_by_name)
 
         logger.info(
             "Order created: %s for user %s, total=%s VND",
@@ -42,7 +60,19 @@ class OrderService:
             data.user_id,
             order.total_price,
         )
-        return self._to_response(order)
+        response = self._to_response(order)
+        if self._notification_service:
+            await self._notification_service.notify_operations(
+                event_type="order.created",
+                title="Đơn đồ ăn mới",
+                message=(
+                    f"Khách vừa đặt {len(response.items)} món, "
+                    f"tổng {response.total_price:,.0f} VND"
+                ),
+                source="order",
+                payload=response.model_dump(mode="json"),
+            )
+        return response
 
     async def get_order(self, order_id: str) -> OrderResponse | None:
         """Get an order by ID."""
