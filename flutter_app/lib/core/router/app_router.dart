@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sports_venue_chatbot/features/admin/presentation/admin_shell.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/analytics_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/admin_profile_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/dashboard_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/booking_management_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/menu_management_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/billing_screen.dart';
+import 'package:sports_venue_chatbot/features/admin/presentation/admin_notifications_screen.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/login_screen.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_screen.dart';
@@ -15,7 +15,9 @@ import 'package:sports_venue_chatbot/features/chat/presentation/chat_screen.dart
 import 'package:sports_venue_chatbot/features/home_screen.dart';
 import 'package:sports_venue_chatbot/features/menu/presentation/menu_screen.dart';
 import 'package:sports_venue_chatbot/features/profile/presentation/profile_screen.dart';
+import 'package:sports_venue_chatbot/features/shared/presentation/role_based_shell.dart';
 import 'package:sports_venue_chatbot/features/staff/presentation/staff_notifications_screen.dart';
+import 'package:sports_venue_chatbot/features/staff/presentation/staff_profile_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -24,121 +26,135 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/home',
     debugLogDiagnostics: true,
     redirect: (context, state) {
-      // Don't redirect while auth state is still loading (auto-login in progress)
       if (authState.isLoading) return null;
 
       final isLoggedIn = authState.valueOrNull != null;
       final userRole = authState.valueOrNull?.role.toUpperCase();
-      final isLoginRoute = state.matchedLocation == '/login';
-      final isAdminRoute = state.matchedLocation.startsWith('/admin');
+      final location = state.matchedLocation;
+      final isLoginRoute = location == '/login';
+      final isAdminRoute = location.startsWith('/admin');
+      final isStaffRoute = location.startsWith('/staff');
+      final isManagementRoute = isAdminRoute || isStaffRoute;
 
-      // ── Not logged in → force to login ────────────────────────
-      if (!isLoggedIn && !isLoginRoute) {
-        return '/login';
-      }
+      // Not logged in → login
+      if (!isLoggedIn && !isLoginRoute) return '/login';
 
-      // ── Logged in on login page → redirect based on role ─────
+      // Logged in on login page → redirect by role
       if (isLoggedIn && isLoginRoute) {
-        if (userRole == 'ADMIN' || userRole == 'STAFF') {
-          return '/admin/dashboard';
-        }
+        if (userRole == 'ADMIN') return '/admin/dashboard';
+        if (userRole == 'STAFF') return '/staff/notifications';
         return '/home';
       }
 
-      // ── Admin/Staff accessing customer routes → redirect to admin ──
-      if (isLoggedIn &&
-          (userRole == 'ADMIN' || userRole == 'STAFF') &&
-          !isAdminRoute) {
+      // Staff trying admin routes → staff area
+      if (isLoggedIn && userRole == 'STAFF' && isAdminRoute) {
+        return '/staff/notifications';
+      }
+
+      // Admin trying staff routes → admin area
+      if (isLoggedIn && userRole == 'ADMIN' && isStaffRoute) {
         return '/admin/dashboard';
       }
 
-      // ── Customer accessing admin routes → redirect to home ───
-      if (isLoggedIn &&
-          userRole != 'ADMIN' &&
-          userRole != 'STAFF' &&
-          isAdminRoute) {
+      // Logged-in staff/admin on customer routes → their area
+      if (isLoggedIn && !isManagementRoute) {
+        if (userRole == 'ADMIN') return '/admin/dashboard';
+        if (userRole == 'STAFF') return '/staff/notifications';
+      }
+
+      // Customer on management routes → home
+      if (isLoggedIn && userRole != 'ADMIN' && userRole != 'STAFF' && isManagementRoute) {
         return '/home';
       }
 
       return null;
     },
     routes: [
-      // ── Login ────────────────────────────────────────────────
+      // Login
       GoRoute(
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginScreen(),
       ),
 
-      // ── Customer shell ───────────────────────────────────────
+      // Customer shell
       ShellRoute(
         builder: (context, state, child) => HomeScreen(child: child),
         routes: [
           GoRoute(
             path: '/home',
             name: 'home',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: ChatScreen()),
+            pageBuilder: (context, state) => const NoTransitionPage(child: ChatScreen()),
           ),
           GoRoute(
             path: '/chat',
             name: 'chat',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: ChatScreen()),
+            pageBuilder: (context, state) => const NoTransitionPage(child: ChatScreen()),
           ),
           GoRoute(
             path: '/booking',
             name: 'booking',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: BookingScreen()),
+            pageBuilder: (context, state) => const NoTransitionPage(child: BookingScreen()),
           ),
           GoRoute(
             path: '/menu',
             name: 'menu',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: MenuScreen()),
+            pageBuilder: (context, state) => const NoTransitionPage(child: MenuScreen()),
           ),
           GoRoute(
             path: '/profile',
             name: 'profile',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: ProfileScreen()),
+            pageBuilder: (context, state) => const NoTransitionPage(child: ProfileScreen()),
           ),
         ],
       ),
 
-      // ── Admin / Staff shell ──────────────────────────────────
+      // Management shell (Admin + Staff)
       ShellRoute(
-        builder: (context, state, child) => AdminShell(child: child),
+        builder: (context, state, child) => RoleBasedShell(child: child),
         routes: [
+          // Admin-only routes
           GoRoute(
             path: '/admin/dashboard',
             name: 'admin_dashboard',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: DashboardScreen()),
+            pageBuilder: (context, state) => const NoTransitionPage(child: DashboardScreen()),
           ),
           GoRoute(
             path: '/admin/bookings',
             name: 'admin_bookings',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: BookingManagementScreen()),
+            pageBuilder: (context, state) => const NoTransitionPage(child: BookingManagementScreen()),
           ),
           GoRoute(
             path: '/admin/menu',
             name: 'admin_menu',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: MenuManagementScreen()),
+            pageBuilder: (context, state) => const NoTransitionPage(child: MenuManagementScreen()),
           ),
           GoRoute(
             path: '/admin/billing',
             name: 'admin_billing',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: BillingScreen()),
+            pageBuilder: (context, state) => const NoTransitionPage(child: BillingScreen()),
+          ),
+
+          // Staff routes
+          GoRoute(
+            path: '/staff/bookings',
+            name: 'staff_bookings',
+            pageBuilder: (context, state) => const NoTransitionPage(child: BookingManagementScreen()),
+          ),
+          GoRoute(
+            path: '/staff/menu',
+            name: 'staff_menu',
+            pageBuilder: (context, state) => const NoTransitionPage(child: MenuManagementScreen()),
+          ),
+          GoRoute(
+            path: '/staff/notifications',
+            name: 'staff_notifications',
+            pageBuilder: (context, state) => const NoTransitionPage(child: StaffNotificationsScreen()),
           ),
         ],
       ),
 
-      // ── Admin top-level routes (own Scaffold, not inside AdminShell) ──
+      // Top-level routes (own Scaffold)
       GoRoute(
         path: '/admin/analytics',
         name: 'admin_analytics',
@@ -147,12 +163,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/admin/notifications',
         name: 'admin_notifications',
-        builder: (context, state) => const StaffNotificationsScreen(),
+        builder: (context, state) => const AdminNotificationsScreen(),
       ),
       GoRoute(
         path: '/admin/profile',
         name: 'admin_profile',
         builder: (context, state) => const AdminProfileScreen(),
+      ),
+      GoRoute(
+        path: '/staff/profile',
+        name: 'staff_profile',
+        builder: (context, state) => const StaffProfileScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

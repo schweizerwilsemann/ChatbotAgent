@@ -23,7 +23,7 @@ from app.schemas.admin import (
     MenuItemResponse,
     MenuItemUpdate,
 )
-from app.schemas.order import OrderItemResponse, OrderResponse
+from app.schemas.order import OrderItemResponse, OrderResponse, StaffOrderItemResponse, StaffOrderResponse
 from app.services.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)
@@ -109,6 +109,26 @@ def _order_response(order) -> OrderResponse:
     )
 
 
+def _staff_order_response(order) -> StaffOrderResponse:
+    items = [
+        StaffOrderItemResponse(
+            id=str(item.id),
+            item_name=item.item_name,
+            quantity=item.quantity,
+        )
+        for item in order.items
+    ]
+    return StaffOrderResponse(
+        id=str(order.id),
+        user_id=order.user_id,
+        table_number=order.table_number,
+        status=order.status,
+        notes=order.notes,
+        items=items,
+        created_at=getattr(order, "created_at", None),
+    )
+
+
 def _period_to_dates(period: str) -> tuple[date, date]:
     """Convert a period string to (start_date, end_date)."""
     today = date.today()
@@ -130,7 +150,7 @@ def _period_to_dates(period: str) -> tuple[date, date]:
 
 @router.get("/dashboard", response_model=DashboardResponse)
 async def dashboard(
-    user: User = Depends(require_roles("STAFF", "ADMIN")),
+    user: User = Depends(require_roles("ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> DashboardResponse:
     """Return today's summary statistics."""
@@ -276,16 +296,32 @@ async def update_booking_status(
 @router.get("/orders", response_model=list[OrderResponse])
 async def get_all_orders(
     status: str | None = Query(None, description="Filter by status"),
-    user: User = Depends(require_roles("STAFF", "ADMIN")),
+    user: User = Depends(require_roles("ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> list[OrderResponse]:
-    """Get all orders with optional status filter."""
+    """Get all orders with optional status filter (ADMIN only - includes revenue)."""
     try:
         repo = _admin_repo(session)
         orders = await repo.get_all_orders(status=status)
         return [_order_response(order) for order in orders]
     except Exception as exc:
         logger.exception("Error fetching all orders")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+@router.get("/orders/staff", response_model=list[StaffOrderResponse])
+async def get_staff_orders(
+    status: str | None = Query(None, description="Filter by status"),
+    user: User = Depends(require_roles("STAFF", "ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> list[StaffOrderResponse]:
+    """Get orders for staff view (no revenue details)."""
+    try:
+        repo = _admin_repo(session)
+        orders = await repo.get_all_orders(status=status)
+        return [_staff_order_response(order) for order in orders]
+    except Exception as exc:
+        logger.exception("Error fetching staff orders")
         raise HTTPException(status_code=500, detail="Internal server error") from exc
 
 
@@ -361,7 +397,7 @@ async def update_menu_item(
 @router.delete("/menu/{item_id}", status_code=204)
 async def delete_menu_item(
     item_id: str,
-    user: User = Depends(require_roles("STAFF", "ADMIN")),
+    user: User = Depends(require_roles("ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> None:
     """Delete a menu item."""
@@ -412,7 +448,7 @@ async def analytics(
         "month",
         description="Time period: today, week, month, year",
     ),
-    user: User = Depends(require_roles("STAFF", "ADMIN")),
+    user: User = Depends(require_roles("ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> AnalyticsResponse:
     """Return analytics data for the requested period."""

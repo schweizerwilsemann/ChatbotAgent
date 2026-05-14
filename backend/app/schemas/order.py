@@ -51,3 +51,25 @@ class OrderStatusUpdate(BaseModel):
         if v.lower() not in allowed:
             raise ValueError(f"status must be one of {allowed}")
         return v.lower()
+
+
+class StaffOrderItemResponse(BaseModel):
+    id: str
+    item_name: str
+    quantity: int
+
+    class Config:
+        from_attributes = True
+
+
+class StaffOrderResponse(BaseModel):
+    id: str
+    user_id: str
+    table_number: int
+    status: str
+    notes: str | None = None
+    items: list[StaffOrderItemResponse] = []
+    created_at: datetime | None = None
+
+    class Config:
+        from_attributes = True
