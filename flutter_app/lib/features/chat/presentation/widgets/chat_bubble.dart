@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/features/chat/data/chat_models.dart';
 import 'package:sports_venue_chatbot/shared/utils/date_utils.dart';
@@ -20,17 +21,15 @@ class ChatBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
-        mainAxisAlignment: isUser
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isUser) ...[_buildAvatar(), const SizedBox(width: 8)],
           Flexible(
             child: Column(
-              crossAxisAlignment: isUser
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 Container(
                   constraints: BoxConstraints(
@@ -65,16 +64,66 @@ class ChatBubble extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SelectableText(
-                        message.content,
-                        style: TextStyle(
-                          color: isUser
-                              ? AppColors.userBubbleText
-                              : AppColors.botBubbleText,
-                          fontSize: 15,
-                          height: 1.4,
-                        ),
-                      ),
+                      isUser
+                          ? SelectableText(
+                              message.content,
+                              style: const TextStyle(
+                                color: AppColors.userBubbleText,
+                                fontSize: 15,
+                                height: 1.4,
+                              ),
+                            )
+                          : MarkdownBody(
+                              data: message.content,
+                              styleSheet: MarkdownStyleSheet(
+                                p: const TextStyle(
+                                  color: AppColors.botBubbleText,
+                                  fontSize: 15,
+                                  height: 1.4,
+                                ),
+                                strong: const TextStyle(
+                                  color: AppColors.botBubbleText,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                em: const TextStyle(
+                                  color: AppColors.botBubbleText,
+                                  fontSize: 15,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                listBullet: const TextStyle(
+                                  color: AppColors.botBubbleText,
+                                  fontSize: 15,
+                                ),
+                                code: TextStyle(
+                                  backgroundColor: AppColors.botBubbleBorder
+                                      .withOpacity(0.3),
+                                  color: AppColors.botBubbleText,
+                                  fontSize: 13,
+                                  fontFamily: 'monospace',
+                                ),
+                                codeblockDecoration: BoxDecoration(
+                                  color: AppColors.botBubbleBorder
+                                      .withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                h1: const TextStyle(
+                                  color: AppColors.botBubbleText,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                h2: const TextStyle(
+                                  color: AppColors.botBubbleText,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                h3: const TextStyle(
+                                  color: AppColors.botBubbleText,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                       if (message.toolsUsed != null &&
                           message.toolsUsed!.isNotEmpty) ...[
                         const SizedBox(height: 8),

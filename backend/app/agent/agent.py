@@ -185,6 +185,7 @@ class VenueAgent:
             repaired = await self._repair_tool_leak(output)
             if repaired:
                 return repaired
+            output = self._clean_tool_leak_text(output)
             return AgentResponse(output=output, tools_used=tools_used)
 
         except Exception as exc:
@@ -206,6 +207,7 @@ class VenueAgent:
                     repaired = await self._repair_tool_leak(output)
                     if repaired:
                         return repaired
+                    output = self._clean_tool_leak_text(output)
                     return AgentResponse(output=output, tools_used=tools_used)
                 except Exception:
                     logger.exception(
@@ -264,6 +266,33 @@ class VenueAgent:
             output="Mình cần thêm một chút thông tin để xử lý yêu cầu này.",
             tools_used=[],
         )
+
+    def _clean_tool_leak_text(self, output: str) -> str:
+        """Remove trailing plain-text tool name leaks from output.
+
+        Some LLMs output the tool name as plain text instead of calling it
+        (e.g. 'order food' instead of invoking the order_food tool).
+        Strip these from the final output so the user doesn't see them.
+        """
+        lines = output.strip().split("\n")
+        tool_names = [getattr(tool, "name", "") for tool in self._tools]
+        tool_aliases: dict[str, str] = {}
+        for tn in tool_names:
+            tool_aliases[tn] = tn
+            # "order_food" also matches "order food"
+            tool_aliases[tn.replace("_", " ")] = tn
+            # bare first word: "order" matches "order_food"
+            tool_aliases[tn.split("_")[0]] = tn
+
+        if lines:
+            last_line = lines[-1].strip().lower()
+            if last_line in tool_aliases:
+                logger.info("Stripped trailing tool name leak: '%s'", last_line)
+                cleaned = "\n".join(lines[:-1]).strip()
+                if cleaned:
+                    return cleaned
+
+        return output
 
     @staticmethod
     def _extract_argument(output: str, argument_name: str) -> str | None:

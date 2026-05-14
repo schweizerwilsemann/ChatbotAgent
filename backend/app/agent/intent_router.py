@@ -150,6 +150,25 @@ class IntentRouter:
         "kỹ thuật thể thao",
         "hướng dẫn chơi",
         "mẹo chơi hay",
+        # Food ordering — direct item mentions (no explicit verb)
+        "khoai tây chiên 2 phần",
+        "cà phê sữa cho tôi",
+        "cho tôi 2 coca cola",
+        "lấy 1 bia tiger",
+        "khoai tây chiên với cafe sữa",
+        "2 phần khoai tây chiên và cà phê",
+        "1 coca cola và khoai tây chiên",
+        "cho tôi cà phê đen",
+        "gọi 2 phần khô bò",
+        "lấy thêm nước suối",
+        "khoai tây chiên 1 phần",
+        "cafe sữa đi",
+        "trà đá và đậu phộng",
+        "bánh tráng trộn 1 phần",
+        "khô gà lá chanh 2 phần",
+        "bia tiger 3 chai",
+        "order khoai tây chiên",
+        "mua 2 cà phê sữa",
         # Non-diacritics variants (model doesn't always bridge these)
         "dat san",
         "dat ban",
@@ -250,6 +269,25 @@ class IntentRouter:
         "khuyến mãi",
         "giảm giá",
         "ưu đãi",
+        # Food items & ordering — direct mentions
+        "khoai tây",
+        "cà phê",
+        "cafe",
+        "coca cola",
+        "coca",
+        "bia tiger",
+        "bia",
+        "trà đá",
+        "nước suối",
+        "khô bò",
+        "khô gà",
+        "đậu phộng",
+        "bánh tráng",
+        "sting",
+        "phần",
+        "cho tôi",
+        "cho mình",
+        "lấy",
     )
 
     _KW_GREETING_KW: tuple[str, ...] = (
@@ -386,12 +424,18 @@ class IntentRouter:
         ):
             return self._make_sports_answer()
 
-        # 4. Off-topic → block
+        # 4. Off-topic → DO NOT block. Let the LLM handle it.
+        #    The LLM's system prompt already constrains the domain.
+        #    Blocking here prevents semantic understanding of messages
+        #    like food orders that don't match predefined patterns.
         if off_sim >= self._OFF_TOPIC_THRESHOLD and off_sim > domain_sim:
-            logger.info("Off-topic blocked (embedding): %s", message[:80])
-            return self._make_off_topic_answer()
+            logger.info(
+                "Possible off-topic (embedding, score=%.3f) but passing to LLM: %s",
+                off_sim,
+                message[:80],
+            )
 
-        # 5. Ambiguous → give the LLM the benefit of the doubt
+        # 5. Always give the LLM a chance to handle the message
         return None
 
     # ══════════════════════════════════════════════════════════════════
@@ -408,10 +452,14 @@ class IntentRouter:
         ):
             return self._make_sports_answer()
 
-        # 2. Domain relevance check
+        # 2. Domain relevance check — pass through to LLM even if not matched.
+        #    The LLM's system prompt constrains the domain; we no longer block
+        #    messages that don't match keywords, because that prevents the LLM
+        #    from semantically understanding messages like food orders.
         if not self._kw_is_relevant(text, norm):
-            logger.info("Off-topic blocked (keyword): %s", text[:80])
-            return self._make_off_topic_answer()
+            logger.info(
+                "Possible off-topic (keyword) but passing to LLM: %s", text[:80]
+            )
 
         return None
 

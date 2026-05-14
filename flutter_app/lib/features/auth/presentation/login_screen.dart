@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
@@ -31,13 +30,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final loginState = ref.watch(loginProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Navigate to home when the user becomes non-null
-    ref.listen<AsyncValue<dynamic>>(authStateProvider, (prev, next) {
-      final user = next.valueOrNull;
-      if (user != null) {
-        context.go('/home');
-      }
-    });
+    // Note: navigation after login is handled entirely by GoRouter redirect logic.
+    // No ref.listen needed here — it would cause double-navigation and redirect loops.
 
     final hPadding = Responsive.horizontalPadding(context);
 

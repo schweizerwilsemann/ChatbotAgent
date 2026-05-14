@@ -59,13 +59,53 @@ class SimpleVenueAgent:
 
     @staticmethod
     def _is_order_request(text: str) -> bool:
-        return any(keyword in text for keyword in ("đặt", "dat", "gọi", "goi", "mua"))
+        # Explicit ordering verbs
+        if any(kw in text for kw in ("đặt", "dat", "gọi", "goi", "mua")):
+            return True
+        # Implicit: mentions a quantity word + any food context
+        # e.g. "2 phần", "1 ly", "3 chai", "cho tôi", "cho mình", "lấy"
+        quantity_words = (
+            "phần",
+            "ly",
+            "chai",
+            "lon",
+            "cái",
+            "đĩa",
+            "tô",
+            "cho tôi",
+            "cho mình",
+            "lấy",
+        )
+        has_quantity = any(qw in text for qw in quantity_words)
+        food_context = any(
+            kw in text
+            for kw in (
+                "khoai",
+                "cà phê",
+                "cafe",
+                "coca",
+                "bia",
+                "trà",
+                "nước",
+                "khô bò",
+                "khô gà",
+                "đậu",
+                "bánh",
+                "sting",
+                "mì",
+            )
+        )
+        return has_quantity and food_context
 
     async def _menu_answer(self, message: str) -> str:
         async with async_session_factory() as session:
             repo = MenuRepository(session)
             query = self._extract_preference_query(message)
-            items = await repo.search(query, limit=5) if query else await repo.top_selling(5)
+            items = (
+                await repo.search(query, limit=5)
+                if query
+                else await repo.top_selling(5)
+            )
             if not items:
                 items = await repo.top_selling(5)
 
@@ -79,7 +119,9 @@ class SimpleVenueAgent:
         ]
         for index, item in enumerate(items, start=1):
             lines.append(f"{index}. {item.name} - {item.price:,.0f} VND")
-        lines.append("Bạn có thể nói thêm khẩu vị như ít ngọt, không cay, đồ uống lạnh hoặc món ăn nhẹ.")
+        lines.append(
+            "Bạn có thể nói thêm khẩu vị như ít ngọt, không cay, đồ uống lạnh hoặc món ăn nhẹ."
+        )
         return "\n".join(lines)
 
     @staticmethod

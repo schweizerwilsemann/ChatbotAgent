@@ -38,6 +38,8 @@ class StaffNotificationsState {
     this.error,
   });
 
+  int get unreadCount => notifications.where((n) => !n.isRead).length;
+
   StaffNotificationsState copyWith({
     List<StaffNotification>? notifications,
     bool? isConnected,
@@ -110,10 +112,10 @@ class StaffNotificationsNotifier
         .replace(queryParameters: {'token': token});
     try {
       _channel = WebSocketChannel.connect(uri);
-      state = state.copyWith(isConnected: true, clearError: true);
+      // Don't set isConnected until we actually receive data
       _subscription = _channel!.stream.listen(
         _handleSocketMessage,
-        onError: (_) {
+        onError: (error) {
           state = state.copyWith(
             isConnected: false,
             error: 'Mất kết nối realtime.',
@@ -125,6 +127,12 @@ class StaffNotificationsNotifier
           _scheduleReconnect();
         },
       );
+      // Set connected after a short delay to confirm the connection is stable
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (_channel != null) {
+          state = state.copyWith(isConnected: true, clearError: true);
+        }
+      });
     } catch (_) {
       state = state.copyWith(
         isConnected: false,
@@ -153,9 +161,46 @@ class StaffNotificationsNotifier
     }
   }
 
+  /// Mark a single notification as read.
+  Future<void> markAsRead(String notificationId) async {
+    try {
+      await _dioClient.patch<void>(
+        '${ApiConstants.realtimeNotificationsEndpoint}/$notificationId/read',
+      );
+      final updated = state.notifications.map((n) {
+        if (n.id == notificationId) {
+          return n.copyWith(readAt: DateTime.now());
+        }
+        return n;
+      }).toList();
+      state = state.copyWith(notifications: updated);
+    } catch (_) {
+      // Silently fail — the notification is still shown
+    }
+  }
+
+  /// Mark all notifications as read.
+  Future<void> markAllAsRead() async {
+    try {
+      await _dioClient.patch<void>(
+        ApiConstants.realtimeNotificationsReadAllEndpoint,
+      );
+      final now = DateTime.now();
+      final updated = state.notifications.map((n) {
+        if (!n.isRead) {
+          return n.copyWith(readAt: now);
+        }
+        return n;
+      }).toList();
+      state = state.copyWith(notifications: updated);
+    } catch (_) {
+      // Silently fail
+    }
+  }
+
   void _scheduleReconnect() {
     if (!_started) return;
-    Future<void>.delayed(const Duration(seconds: 3), () {
+    Future<void>.delayed(const Duration(seconds: 5), () {
       if (_started && !state.isConnected) {
         _connect();
       }

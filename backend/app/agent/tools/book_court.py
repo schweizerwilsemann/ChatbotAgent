@@ -2,9 +2,9 @@ import json
 import logging
 from datetime import datetime
 
-from app.agent.context import current_user_id
 from langchain_core.tools import tool
 
+from app.agent.context import current_user_id
 from app.core.database import async_session_factory
 from app.repositories.booking_repository import BookingRepository
 from app.repositories.notification_repository import NotificationRepository
@@ -54,10 +54,37 @@ async def book_court(
             )
 
             if not available:
+                # Find alternatives — which courts of the same type are free?
+                alt_courts: list[int] = []
+                for court_num in range(1, 9):
+                    if court_num == court_number:
+                        continue
+                    is_free = await service.check_availability(
+                        court_type=court_type,
+                        court_number=court_num,
+                        start_time=start_dt,
+                        end_time=end_dt,
+                    )
+                    if is_free:
+                        alt_courts.append(court_num)
+
+                type_vi = COURT_TYPE_VIETNAMESE.get(court_type, court_type)
+
+                if alt_courts:
+                    courts_text = ", ".join(f"Sân {c}" for c in alt_courts[:4])
+                    return (
+                        f"❌ {type_vi} sân {court_number} đã có người đặt "
+                        f"từ {start_dt.strftime('%H:%M')} đến {end_dt.strftime('%H:%M')} ngày {start_dt.strftime('%d/%m/%Y')}.\n"
+                        f"Tuy nhiên, còn sân trống: {courts_text}.\n"
+                        f"Bạn muốn đặt sân nào?"
+                    )
+
+                # All courts booked — suggest checking schedule for other times
                 return (
-                    f"❌ Sân {court_type} số {court_number} đã có người đặt "
-                    f"từ {start_dt.strftime('%H:%M %d/%m/%Y')} đến {end_dt.strftime('%H:%M %d/%m/%Y')}. "
-                    f"Vui lòng chọn thời gian hoặc sân khác."
+                    f"❌ {type_vi} sân {court_number} đã có người đặt "
+                    f"từ {start_dt.strftime('%H:%M')} đến {end_dt.strftime('%H:%M')} ngày {start_dt.strftime('%d/%m/%Y')}.\n"
+                    f"Tất cả sân {type_vi} đều kín trong khung giờ này.\n"
+                    f"Bạn có thể thử giờ khác hoặc hỏi mình để xem lịch trống."
                 )
 
             from app.schemas.booking import BookingCreate

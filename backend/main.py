@@ -2,6 +2,7 @@ import logging
 from contextlib import asynccontextmanager
 
 from app.agent.agent import VenueAgent
+from app.agent.simple_agent import SimpleVenueAgent
 from app.agent.tools import (
     book_court,
     call_staff,
@@ -10,8 +11,8 @@ from app.agent.tools import (
     query_knowledge,
     recommend_menu,
 )
-from app.agent.simple_agent import SimpleVenueAgent
 from app.agent.tools.query_faq import set_neo4j_client
+from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
 from app.api.booking import router as booking_router
 from app.api.chat import router as chat_router
@@ -101,12 +102,17 @@ async def lifespan(app: FastAPI):
             embedder=embedder,
         )
     except Exception:
-        logger.warning("LLM agent unavailable; using deterministic dev fallback", exc_info=True)
+        logger.warning(
+            "LLM agent unavailable; using deterministic dev fallback", exc_info=True
+        )
         agent = SimpleVenueAgent()
     try:
         await agent.initialize()
     except Exception:
-        logger.warning("Agent initialization failed; using deterministic dev fallback", exc_info=True)
+        logger.warning(
+            "Agent initialization failed; using deterministic dev fallback",
+            exc_info=True,
+        )
         agent = SimpleVenueAgent()
         await agent.initialize()
     chat_service = ChatService(agent)
@@ -150,6 +156,7 @@ app.include_router(order_router)
 app.include_router(menu_router)
 app.include_router(staff_router)
 app.include_router(realtime_router)
+app.include_router(admin_router)
 
 
 @app.get("/health")

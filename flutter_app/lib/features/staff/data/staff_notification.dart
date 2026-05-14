@@ -6,6 +6,7 @@ class StaffNotification {
   final String source;
   final Map<String, dynamic> payload;
   final DateTime createdAt;
+  final DateTime? readAt;
 
   const StaffNotification({
     required this.id,
@@ -15,7 +16,10 @@ class StaffNotification {
     required this.source,
     required this.payload,
     required this.createdAt,
+    this.readAt,
   });
+
+  bool get isRead => readAt != null;
 
   factory StaffNotification.fromJson(Map<String, dynamic> json) {
     return StaffNotification(
@@ -33,6 +37,22 @@ class StaffNotification {
                 '',
           ) ??
           DateTime.now(),
+      readAt: json['read_at'] != null
+          ? DateTime.tryParse(json['read_at'].toString())
+          : null,
+    );
+  }
+
+  StaffNotification copyWith({DateTime? readAt}) {
+    return StaffNotification(
+      id: id,
+      eventType: eventType,
+      title: title,
+      message: message,
+      source: source,
+      payload: payload,
+      createdAt: createdAt,
+      readAt: readAt ?? this.readAt,
     );
   }
 }

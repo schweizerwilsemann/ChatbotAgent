@@ -34,6 +34,13 @@ class _StaffNotificationsScreenState
       appBar: AppBar(
         title: const Text('Vận hành'),
         actions: [
+          if (state.unreadCount > 0)
+            TextButton.icon(
+              onPressed: () =>
+                  ref.read(staffNotificationsProvider.notifier).markAllAsRead(),
+              icon: const Icon(Icons.done_all, size: 18),
+              label: const Text('Đọc tất cả'),
+            ),
           IconButton(
             tooltip: 'Làm mới',
             icon: const Icon(Icons.refresh),
@@ -68,8 +75,12 @@ class _StaffNotificationsScreenState
                     const _EmptyNotifications()
                   else
                     ...state.notifications.map(
-                      (notification) =>
-                          _NotificationTile(notification: notification),
+                      (notification) => _NotificationTile(
+                        notification: notification,
+                        onMarkRead: () => ref
+                            .read(staffNotificationsProvider.notifier)
+                            .markAsRead(notification.id),
+                      ),
                     ),
                 ],
               ),
@@ -120,11 +131,13 @@ class _ConnectionBanner extends StatelessWidget {
 
 class _NotificationTile extends ConsumerWidget {
   final StaffNotification notification;
+  final VoidCallback? onMarkRead;
 
-  const _NotificationTile({required this.notification});
+  const _NotificationTile({required this.notification, this.onMarkRead});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isRead = notification.isRead;
     final timeText = DateFormat('HH:mm dd/MM', 'vi_VN')
         .format(notification.createdAt.toLocal());
 
@@ -135,9 +148,14 @@ class _NotificationTile extends ConsumerWidget {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: isRead
+              ? AppColors.surface
+              : AppColors.primarySurface.withOpacity(0.4),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(
+            color:
+                isRead ? AppColors.border : AppColors.primary.withOpacity(0.3),
+          ),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,12 +177,25 @@ class _NotificationTile extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
+                      if (!isRead)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          margin: const EdgeInsets.only(right: 6),
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
                       Expanded(
                         child: Text(
                           notification.title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                          style: TextStyle(
+                            fontWeight:
+                                isRead ? FontWeight.w600 : FontWeight.w700,
+                            color: isRead
+                                ? AppColors.textSecondary
+                                : AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -180,7 +211,11 @@ class _NotificationTile extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Text(
                     notification.message,
-                    style: const TextStyle(color: AppColors.textPrimary),
+                    style: TextStyle(
+                      color: isRead
+                          ? AppColors.textSecondary
+                          : AppColors.textPrimary,
+                    ),
                   ),
                   if (notification.payload['table_number'] != null &&
                       notification.payload['table_number'] != 0)
@@ -198,6 +233,22 @@ class _NotificationTile extends ConsumerWidget {
                 ],
               ),
             ),
+            // Mark as read button
+            if (!isRead && onMarkRead != null)
+              IconButton(
+                tooltip: 'Đánh dấu đã đọc',
+                icon: const Icon(
+                  Icons.done,
+                  size: 20,
+                  color: AppColors.textSecondary,
+                ),
+                onPressed: onMarkRead,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: 32,
+                  minHeight: 32,
+                ),
+              ),
           ],
         ),
       ),
