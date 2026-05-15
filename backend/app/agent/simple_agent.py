@@ -7,9 +7,11 @@ from app.core.database import async_session_factory
 from app.repositories.menu_repository import MenuRepository
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.order_repository import OrderRepository
+from app.repositories.staff_request_repository import StaffRequestRepository
 from app.schemas.order import OrderCreate, OrderItemCreate
 from app.services.notification_service import NotificationService
 from app.services.order_service import OrderService
+from app.services.staff_request_service import StaffRequestService
 
 
 class SimpleVenueAgent:
@@ -36,6 +38,8 @@ class SimpleVenueAgent:
                 ),
                 tools_used=[],
             )
+        if self._is_staff_request(text):
+            return await self._try_call_staff(message)
         if "đặt sân" in text or "dat san" in text:
             return AgentResponse(
                 output=(
@@ -96,6 +100,25 @@ class SimpleVenueAgent:
             )
         )
         return has_quantity and food_context
+
+    @staticmethod
+    def _is_staff_request(text: str) -> bool:
+        keywords = (
+            "gọi nhân viên",
+            "gặp nhân viên",
+            "nhờ nhân viên",
+            "gọi phục vụ",
+            "tính tiền",
+            "thanh toán",
+            "trả tiền",
+            "cần giúp đỡ",
+            "cần hỗ trợ",
+            "sân bị hư",
+            "đèn hỏng",
+            "cơ gãy",
+            "gọi người",
+        )
+        return any(kw in text for kw in keywords)
 
     async def _menu_answer(self, message: str) -> str:
         async with async_session_factory() as session:
@@ -202,3 +225,54 @@ class SimpleVenueAgent:
             if match:
                 return max(1, min(int(match.group(1)), 99))
         return 1
+
+    async def _try_call_staff(self, message: str) -> AgentResponse:
+        text = message.lower()
+        request_type = "help"
+        if any(kw in text for kw in ("tính tiền", "thanh toán", "trả tiền")):
+            request_type = "payment"
+        elif any(kw in text for kw in ("đồ uống", "mang nước", "gọi đồ")):
+            request_type = "order"
+        elif any(kw in text for kw in ("hư", "hỏng", "gãy", "đèn", "sân hỏng")):
+            request_type = "maintenance"
+
+        async with async_session_factory() as session:
+            service = StaffRequestService(
+                repo=StaffRequestRepository(session),
+                notification_service=NotificationService(
+                    NotificationRepository(session)
+                ),
+            )
+            try:
+                result = await service.create_request(
+                    user_id=str(current_user_id.get()),
+                    user_name=None,
+                    request_type=request_type,
+                    description=message,
+                    table_number=None,
+                )
+                await session.commit()
+                return AgentResponse(
+                    output=(
+                        f"✅ Đã gọi nhân viên thành công!\n"
+                        f"📋 Mã yêu cầu: {result.id}\n"
+                        f"⏳ Nhân viên sẽ đến hỗ trợ bạn ngay."
+                    ),
+                    tools_used=["call_staff"],
+                )
+            except Exception:
+                await session.rollback()
+                # Fallback to notification-only
+                notif_service = NotificationService(NotificationRepository(session))
+                await notif_service.notify_operations(
+                    event_type="staff.requested",
+                    title="Khách cần hỗ trợ",
+                    message=message,
+                    source="chatbot",
+                    payload={"message": message},
+                )
+                await session.commit()
+                return AgentResponse(
+                    output="✅ Đã gọi nhân viên. Nhân viên sẽ đến hỗ trợ bạn ngay.",
+                    tools_used=["call_staff"],
+                )

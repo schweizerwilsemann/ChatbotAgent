@@ -109,6 +109,9 @@ class IntentRouter:
         "kỹ thuật đánh bida cơ bản",
         "cách cầm cơ bida",
         "billiards rules",
+        "cách đánh bida hay",
+        "kỹ thuật kéo cơ bida",
+        "cách tính điểm bida",
         # Badminton / Cầu lông
         "luật cầu lông",
         "kỹ thuật cầu lông",
@@ -117,6 +120,8 @@ class IntentRouter:
         "luật cầu lông mới nhất",
         "kỹ thuật smash cầu lông",
         "cách cầm vợt cầu lông",
+        "cách phát cầu lông",
+        "kỹ thuật lưới cầu lông",
         # Venue operations — standalone & combined
         "đặt sân",
         "đặt bàn",
@@ -169,6 +174,17 @@ class IntentRouter:
         "bia tiger 3 chai",
         "order khoai tây chiên",
         "mua 2 cà phê sữa",
+        # Staff request variants
+        "gặp nhân viên",
+        "nhờ nhân viên giúp",
+        "cần người hỗ trợ",
+        "gọi người phục vụ",
+        "tính tiền cho tôi",
+        "muốn thanh toán",
+        "mang thêm nước",
+        "sân bị hư",
+        "đèn hỏng rồi",
+        "cơ bida bị gãy",
         # Non-diacritics variants (model doesn't always bridge these)
         "dat san",
         "dat ban",
@@ -186,6 +202,9 @@ class IntentRouter:
         "lien he",
         "huy dat san",
         "kiem tra lich",
+        "goi nhan vien",
+        "tinh tien",
+        "thanh toan",
     ]
 
     _SUPPORTED_SPORTS_EXAMPLES: list[str] = [
@@ -239,6 +258,11 @@ class IntentRouter:
         "hỗ trợ",
         "support",
         "gọi nhân viên",
+        "gặp nhân viên",
+        "phục vụ",
+        "tính tiền",
+        "thanh toán",
+        "trả tiền",
         "lịch",
         "schedule",
         "lịch sử",
@@ -288,6 +312,15 @@ class IntentRouter:
         "cho tôi",
         "cho mình",
         "lấy",
+        # Maintenance & equipment
+        "hư",
+        "hỏng",
+        "gãy",
+        "đèn",
+        "quạt",
+        "cơ bida",
+        "bàn bida",
+        "sân hỏng",
     )
 
     _KW_GREETING_KW: tuple[str, ...] = (
@@ -496,7 +529,8 @@ class IntentRouter:
                 "• Luật chơi, kỹ thuật\n"
                 "• Đặt sân\n"
                 "• Thực đơn & đặt hàng\n"
-                "• Gọi nhân viên hỗ trợ"
+                "• Gọi nhân viên hỗ trợ\n"
+                "• Kiểm tra lịch sử đặt sân"
             )
         )
 

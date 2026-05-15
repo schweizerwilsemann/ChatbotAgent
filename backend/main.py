@@ -23,6 +23,7 @@ from app.api.menu import router as menu_router
 from app.api.order import router as order_router
 from app.api.realtime import router as realtime_router
 from app.api.staff import router as staff_router
+from app.api.staff_request import router as staff_request_router
 from app.core.config import settings
 from app.core.database import async_session_factory, engine
 from app.core.neo4j_client import Neo4jClient
@@ -155,6 +156,7 @@ app.include_router(booking_router)
 app.include_router(order_router)
 app.include_router(menu_router)
 app.include_router(staff_router)
+app.include_router(staff_request_router)
 app.include_router(realtime_router)
 app.include_router(admin_router)
 
