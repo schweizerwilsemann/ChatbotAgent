@@ -87,12 +87,12 @@ class _AdminShellState extends ConsumerState<AdminShell> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.admin_panel_settings,
                 color: AppColors.primary, size: 24),
-            const SizedBox(width: 8),
-            const Text('Quản lý'),
+            SizedBox(width: 8),
+            Text('Quản lý'),
           ],
         ),
         actions: [

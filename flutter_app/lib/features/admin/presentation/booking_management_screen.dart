@@ -236,7 +236,7 @@ class _BookingManagementScreenState
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.calendar_today,
                           size: 18,
                           color: AppColors.primary,
@@ -247,7 +247,7 @@ class _BookingManagementScreenState
                               ? 'Hôm nay, ${DateFormat('dd/MM/yyyy').format(state.selectedDate)}'
                               : DateFormat('EEEE, dd/MM/yyyy', 'vi')
                                   .format(state.selectedDate),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
@@ -317,12 +317,12 @@ class _BookingManagementScreenState
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.error_outline, size: 48, color: AppColors.error),
+              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
               const SizedBox(height: 12),
               Text(
                 state.error!,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textSecondary),
+                style: const TextStyle(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
@@ -346,7 +346,7 @@ class _BookingManagementScreenState
               children: [
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.5,
-                  child: Center(
+                  child: const Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -355,7 +355,7 @@ class _BookingManagementScreenState
                           size: 56,
                           color: AppColors.textHint,
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12),
                         Text(
                           'Không có đặt sân nào',
                           style: TextStyle(
@@ -363,7 +363,7 @@ class _BookingManagementScreenState
                             color: AppColors.textSecondary,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           'Thử thay đổi ngày hoặc bộ lọc',
                           style: TextStyle(
@@ -414,7 +414,7 @@ class _FilterDropdown extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
             color: AppColors.textSecondary,
             fontWeight: FontWeight.w500,
@@ -431,11 +431,11 @@ class _FilterDropdown extends StatelessWidget {
             child: DropdownButton<String>(
               value: value,
               isExpanded: true,
-              icon: Icon(
+              icon: const Icon(
                 Icons.keyboard_arrow_down,
                 color: AppColors.textSecondary,
               ),
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 14,
               ),
@@ -468,11 +468,11 @@ class _BookingCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 8,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -527,13 +527,13 @@ class _BookingCard extends StatelessWidget {
           // ── Customer info
           Row(
             children: [
-              Icon(Icons.person_outline,
+              const Icon(Icons.person_outline,
                   size: 18, color: AppColors.textSecondary),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   booking.userName.isEmpty ? 'Khách hàng' : booking.userName,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                     fontSize: 15,
@@ -548,18 +548,19 @@ class _BookingCard extends StatelessWidget {
           // ── Time row
           Row(
             children: [
-              Icon(Icons.access_time, size: 16, color: AppColors.textSecondary),
+              const Icon(Icons.access_time,
+                  size: 16, color: AppColors.textSecondary),
               const SizedBox(width: 6),
               Text(
                 '${booking.startTime} – ${booking.endTime}',
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 14,
                 ),
               ),
               if (booking.totalPrice != null) ...[
                 const Spacer(),
-                Icon(
+                const Icon(
                   Icons.payments_outlined,
                   size: 16,
                   color: AppColors.success,
@@ -571,7 +572,7 @@ class _BookingCard extends StatelessWidget {
                     symbol: '₫',
                     decimalDigits: 0,
                   ).format(booking.totalPrice),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     color: AppColors.success,
                     fontSize: 14,
@@ -587,7 +588,7 @@ class _BookingCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
+                const Icon(
                   Icons.notes,
                   size: 16,
                   color: AppColors.textHint,
@@ -596,7 +597,7 @@ class _BookingCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     booking.notes!,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.textHint,
                       fontStyle: FontStyle.italic,

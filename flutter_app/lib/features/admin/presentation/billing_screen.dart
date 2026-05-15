@@ -275,13 +275,13 @@ class _BillingScreenState extends ConsumerState<BillingScreen> {
       return ListView(
         children: [
           SizedBox(height: MediaQuery.of(context).size.height * 0.25),
-          Center(
+          const Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.receipt_long, size: 56, color: AppColors.textHint),
-                const SizedBox(height: 12),
-                const Text(
+                SizedBox(height: 12),
+                Text(
                   'Chưa có giao dịch nào',
                   style: TextStyle(color: AppColors.textSecondary),
                 ),
