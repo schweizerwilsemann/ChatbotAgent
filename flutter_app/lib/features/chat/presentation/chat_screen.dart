@@ -4,6 +4,7 @@ import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_provider.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/widgets/chat_bubble.dart';
+import 'package:sports_venue_chatbot/features/staff_request/presentation/widgets/staff_request_bubble.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_confirm_dialog.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
 
@@ -157,21 +158,33 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // Messages list
-          Expanded(
-            child: chatState.messages.isEmpty && !chatState.isLoading
-                ? _buildWelcomeScreen()
-                : _buildMessagesList(chatState),
+          Column(
+            children: [
+              // Messages list
+              Expanded(
+                child: chatState.messages.isEmpty && !chatState.isLoading
+                    ? _buildWelcomeScreen()
+                    : _buildMessagesList(chatState),
+              ),
+
+              // Streaming content preview
+              if (chatState.isStreaming &&
+                  chatState.streamingContent.isNotEmpty)
+                _buildStreamingPreview(chatState),
+
+              // Input area
+              _buildInputArea(chatState),
+            ],
           ),
 
-          // Streaming content preview
-          if (chatState.isStreaming && chatState.streamingContent.isNotEmpty)
-            _buildStreamingPreview(chatState),
-
-          // Input area
-          _buildInputArea(chatState),
+          // Call staff floating bubble
+          Positioned(
+            right: 16,
+            bottom: 80,
+            child: const StaffRequestBubble(),
+          ),
         ],
       ),
     );

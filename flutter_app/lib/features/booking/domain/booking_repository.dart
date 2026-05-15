@@ -1,11 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/network/api_exception.dart';
 import 'package:sports_venue_chatbot/features/booking/data/booking_api.dart';
 import 'package:sports_venue_chatbot/features/booking/data/booking_models.dart';
-
-final bookingRepositoryProvider = Provider<BookingRepository>((ref) {
-  return BookingRepository(ref.watch(bookingApiProvider));
-});
 
 /// Abstract booking repository interface
 abstract class IBookingRepository {

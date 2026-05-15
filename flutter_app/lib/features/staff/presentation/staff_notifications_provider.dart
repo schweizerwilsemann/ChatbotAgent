@@ -30,21 +30,35 @@ class StaffNotificationsState {
   final bool isConnected;
   final bool isLoading;
   final String? error;
+  final Map<String, String> resolvedStatuses;
 
   const StaffNotificationsState({
     this.notifications = const [],
     this.isConnected = false,
     this.isLoading = false,
     this.error,
+    this.resolvedStatuses = const {},
   });
 
   int get unreadCount => notifications.where((n) => !n.isRead).length;
+
+  /// Get the effective status for a staff request notification.
+  /// Uses resolved status (from accept/complete actions) if available,
+  /// otherwise falls back to the notification payload status.
+  String getEffectiveStatus(StaffNotification notification) {
+    final requestId = notification.payload['request_id']?.toString();
+    if (requestId != null && resolvedStatuses.containsKey(requestId)) {
+      return resolvedStatuses[requestId]!;
+    }
+    return notification.payload['status']?.toString() ?? 'pending';
+  }
 
   StaffNotificationsState copyWith({
     List<StaffNotification>? notifications,
     bool? isConnected,
     bool? isLoading,
     String? error,
+    Map<String, String>? resolvedStatuses,
     bool clearError = false,
   }) {
     return StaffNotificationsState(
@@ -52,6 +66,7 @@ class StaffNotificationsState {
       isConnected: isConnected ?? this.isConnected,
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : (error ?? this.error),
+      resolvedStatuses: resolvedStatuses ?? this.resolvedStatuses,
     );
   }
 }
@@ -177,6 +192,35 @@ class StaffNotificationsNotifier
     } catch (_) {
       // Silently fail — the notification is still shown
     }
+  }
+
+  /// Update a notification's payload (e.g. after accepting a request).
+  void updateNotificationPayload(
+      String notificationId, Map<String, dynamic> newPayload) {
+    final updated = state.notifications.map((n) {
+      if (n.id == notificationId) {
+        return StaffNotification(
+          id: n.id,
+          eventType: n.eventType,
+          title: n.title,
+          message: n.message,
+          source: n.source,
+          payload: newPayload,
+          createdAt: n.createdAt,
+          readAt: n.readAt,
+        );
+      }
+      return n;
+    }).toList();
+    state = state.copyWith(notifications: updated);
+  }
+
+  /// Mark a request ID as having a resolved status (accepted/completed).
+  /// This persists across refreshes since it's stored in provider state.
+  void markRequestStatus(String requestId, String status) {
+    final updated = Map<String, String>.from(state.resolvedStatuses)
+      ..[requestId] = status;
+    state = state.copyWith(resolvedStatuses: updated);
   }
 
   /// Mark all notifications as read.

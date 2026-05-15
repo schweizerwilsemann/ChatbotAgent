@@ -63,7 +63,7 @@ extension BookingStatusExtension on BookingStatus {
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class Booking {
   final String id;
   final String userId;
@@ -185,7 +185,7 @@ class BookingUpdate {
   Map<String, dynamic> toJson() => _$BookingUpdateToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class TimeSlot {
   final String startTime;
   final String endTime;
@@ -203,7 +203,7 @@ class TimeSlot {
   Map<String, dynamic> toJson() => _$TimeSlotToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class AvailabilityResponse {
   final CourtType courtType;
   final DateTime date;

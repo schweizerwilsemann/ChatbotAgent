@@ -14,6 +14,7 @@ class ApiConstants {
   static const String orderEndpoint = '/api/order';
   static const String menuEndpoint = '/api/menu';
   static const String staffNotifyEndpoint = '/api/staff/notify';
+  static const String staffRequestEndpoint = '/api/staff/requests';
   static const String realtimeNotificationsEndpoint =
       '/api/realtime/notifications';
   static const String realtimeNotificationsReadAllEndpoint =
