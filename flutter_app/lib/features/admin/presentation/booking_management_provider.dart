@@ -8,6 +8,8 @@ import 'package:sports_venue_chatbot/features/admin/data/admin_models.dart';
 class BookingManagementState {
   final List<AdminBooking> bookings;
   final bool isLoading;
+  final bool isLoadingMore;
+  final bool hasMore;
   final String? error;
   final DateTime selectedDate;
   final String? filterType;
@@ -16,6 +18,8 @@ class BookingManagementState {
   const BookingManagementState({
     this.bookings = const [],
     this.isLoading = false,
+    this.isLoadingMore = false,
+    this.hasMore = true,
     this.error,
     required this.selectedDate,
     this.filterType,
@@ -25,6 +29,8 @@ class BookingManagementState {
   BookingManagementState copyWith({
     List<AdminBooking>? bookings,
     bool? isLoading,
+    bool? isLoadingMore,
+    bool? hasMore,
     String? error,
     DateTime? selectedDate,
     String? filterType,
@@ -36,6 +42,8 @@ class BookingManagementState {
     return BookingManagementState(
       bookings: bookings ?? this.bookings,
       isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasMore: hasMore ?? this.hasMore,
       error: clearError ? null : (error ?? this.error),
       selectedDate: selectedDate ?? this.selectedDate,
       filterType: clearFilterType ? null : (filterType ?? this.filterType),
@@ -48,34 +56,62 @@ class BookingManagementState {
 // ─── Notifier ───────────────────────────────────────────────────────────────
 
 class BookingManagementNotifier extends StateNotifier<BookingManagementState> {
+  static const int _pageSize = 30;
+
   final AdminApi _adminApi;
 
   BookingManagementNotifier(this._adminApi)
       : super(BookingManagementState(selectedDate: DateTime.now()));
 
   /// Load bookings from the API using current filters.
-  Future<void> loadBookings() async {
-    state = state.copyWith(isLoading: true, clearError: true);
+  Future<void> loadBookings({bool reset = true}) async {
+    if (!reset) {
+      if (state.isLoading || state.isLoadingMore || !state.hasMore) return;
+      state = state.copyWith(isLoadingMore: true, clearError: true);
+    } else {
+      state = state.copyWith(
+        isLoading: true,
+        isLoadingMore: false,
+        hasMore: true,
+        clearError: true,
+      );
+    }
+
     try {
       final dateStr = '${state.selectedDate.year.toString().padLeft(4, '0')}-'
           '${state.selectedDate.month.toString().padLeft(2, '0')}-'
           '${state.selectedDate.day.toString().padLeft(2, '0')}';
+      final offset = reset ? 0 : state.bookings.length;
 
       final bookings = await _adminApi.getBookings(
         date: dateStr,
         courtType: state.filterType,
         status: state.filterStatus,
+        limit: _pageSize,
+        offset: offset,
       );
-      state = state.copyWith(bookings: bookings, isLoading: false);
+      state = state.copyWith(
+        bookings: reset ? bookings : [...state.bookings, ...bookings],
+        isLoading: false,
+        isLoadingMore: false,
+        hasMore: bookings.length == _pageSize,
+      );
     } on ApiException catch (e) {
-      state = state.copyWith(isLoading: false, error: e.message);
+      state = state.copyWith(
+        isLoading: false,
+        isLoadingMore: false,
+        error: e.message,
+      );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
+        isLoadingMore: false,
         error: 'Không thể tải danh sách đặt sân.',
       );
     }
   }
+
+  Future<void> loadMoreBookings() => loadBookings(reset: false);
 
   /// Update a booking's status and refresh the list.
   Future<bool> updateBookingStatus(String id, String newStatus) async {

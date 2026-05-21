@@ -6,6 +6,8 @@ import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/booking/data/booking_models.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_provider.dart';
+import 'package:sports_venue_chatbot/features/venue/data/venue_models.dart';
+import 'package:sports_venue_chatbot/features/venue/presentation/venue_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_confirm_dialog.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_section_title.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
@@ -20,6 +22,7 @@ class BookingScreen extends ConsumerStatefulWidget {
 
 class _BookingScreenState extends ConsumerState<BookingScreen> {
   CourtType _selectedCourtType = CourtType.billiards;
+  VenueResource? _selectedResource;
   DateTime _selectedDate = DateTime.now();
   String? _selectedStartTime;
   String? _selectedEndTime;
@@ -99,13 +102,17 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       return;
     }
 
-    final courtNumber = int.tryParse(_courtNumberController.text);
+    final courtNumber =
+        _selectedResource?.number ?? int.tryParse(_courtNumberController.text);
     if (courtNumber == null || courtNumber < 1) {
-      AppSnackBar.showWarning(context, 'Vui lòng nhập số sân hợp lệ.');
+      AppSnackBar.showWarning(context, 'Vui lòng chọn bàn / sân hợp lệ.');
       return;
     }
 
     final booking = BookingCreate(
+      venueId: _selectedResource?.venueId,
+      resourceId: _selectedResource?.id,
+      resourceLabel: _selectedResource?.displayLabel,
       courtType: _selectedCourtType,
       courtNumber: courtNumber,
       date: _selectedDate,
@@ -151,7 +158,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           _checkAvailability();
         },
         child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
           padding: EdgeInsets.all(Responsive.horizontalPadding(context)),
           child: ResponsiveContainer(
             maxWidth: 600,
@@ -176,8 +185,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 _buildTimeSlotSelection(),
                 const SizedBox(height: 24),
 
-                // Court number input
-                const AppSectionTitle('Số sân'),
+                // Court/resource selector
+                const AppSectionTitle('Bàn / sân'),
                 const SizedBox(height: 8),
                 _buildCourtNumberInput(),
                 const SizedBox(height: 32),
@@ -221,6 +230,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               onTap: () {
                 setState(() {
                   _selectedCourtType = type;
+                  _selectedResource = null;
                   _selectedStartTime = null;
                   _selectedEndTime = null;
                 });
@@ -230,8 +240,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color:
-                      isSelected ? color.withOpacity(0.1) : AppColors.surface,
+                  color: isSelected
+                      ? color.withValues(alpha: 0.1)
+                      : AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelected ? color : AppColors.divider,
@@ -240,7 +251,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: color.withOpacity(0.2),
+                            color: color.withValues(alpha: 0.2),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -364,7 +375,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       });
                     }
                   : null,
-              selectedColor: courtColor.withOpacity(0.2),
+              selectedColor: courtColor.withValues(alpha: 0.2),
               labelStyle: TextStyle(
                 color: !isAvailable
                     ? AppColors.textHint
@@ -414,7 +425,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       });
                     }
                   : null,
-              selectedColor: courtColor.withOpacity(0.2),
+              selectedColor: courtColor.withValues(alpha: 0.2),
               labelStyle: TextStyle(
                 color: !canSelect
                     ? AppColors.textHint
@@ -446,6 +457,54 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   Widget _buildCourtNumberInput() {
+    final resourcesAsync = ref.watch(venueResourcesProvider);
+    return resourcesAsync.when(
+      loading: () => const LinearProgressIndicator(minHeight: 2),
+      error: (_, __) => _buildLegacyCourtNumberInput(),
+      data: (resources) {
+        final filtered = resources
+            .where((resource) => resource.sportType == _selectedCourtType.name)
+            .toList();
+        if (filtered.isEmpty) return _buildLegacyCourtNumberInput();
+        final selected = filtered
+            .where((resource) => resource.id == _selectedResource?.id)
+            .firstOrNull;
+        return DropdownButtonFormField<VenueResource>(
+          initialValue: selected,
+          isExpanded: true,
+          decoration: const InputDecoration(
+            labelText: 'Chọn bàn / sân',
+            prefixIcon: Icon(Icons.location_on_outlined),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
+          ),
+          items: filtered
+              .map(
+                (resource) => DropdownMenuItem(
+                  value: resource,
+                  child: Text(
+                    resource.displayLabel,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: (resource) {
+            setState(() {
+              _selectedResource = resource;
+              if (resource != null) {
+                _courtNumberController.text = resource.number.toString();
+              }
+            });
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildLegacyCourtNumberInput() {
     return Row(
       children: [
         IconButton(
@@ -463,12 +522,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             controller: _courtNumberController,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
-            decoration: InputDecoration(
-              labelText: 'Số sân',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
+            decoration: const InputDecoration(
+              labelText: 'Số bàn / sân',
+              contentPadding: EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
@@ -498,13 +554,13 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     }
 
     if (bookingState.bookings.isEmpty) {
-      return Card(
+      return const Card(
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: EdgeInsets.all(32),
           child: Column(
             children: [
               Icon(Icons.event_note, size: 48, color: AppColors.textHint),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Text(
                 'Chưa có lịch đặt sân',
                 style: TextStyle(color: AppColors.textSecondary, fontSize: 15),
@@ -532,11 +588,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   void _showCancelDialog(Booking booking) async {
+    final bookingLabel = booking.resourceLabel ??
+        '${booking.courtType.displayName} số ${booking.courtNumber}';
     final confirmed = await AppConfirmDialog.show(
       context: context,
       title: 'Hủy đặt sân',
-      content: 'Bạn có chắc muốn hủy đặt sân ${booking.courtType.displayName} '
-          'số ${booking.courtNumber}?',
+      content: 'Bạn có chắc muốn hủy $bookingLabel?',
       confirmLabel: 'Hủy đặt sân',
       isDestructive: true,
       cancelLabel: 'Không',
@@ -576,7 +633,8 @@ class _BookingCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${booking.courtType.displayName} - Sân ${booking.courtNumber}',
+                        booking.resourceLabel ??
+                            '${booking.courtType.displayName} - Sân ${booking.courtNumber}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -585,7 +643,7 @@ class _BookingCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         DateFormat('dd/MM/yyyy').format(booking.date),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
                         ),
@@ -599,7 +657,7 @@ class _BookingCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(

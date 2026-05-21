@@ -67,6 +67,9 @@ extension BookingStatusExtension on BookingStatus {
 class Booking {
   final String id;
   final String userId;
+  final String? venueId;
+  final String? resourceId;
+  final String? resourceLabel;
   final CourtType courtType;
   final int courtNumber;
   final DateTime date;
@@ -81,6 +84,9 @@ class Booking {
   const Booking({
     required this.id,
     required this.userId,
+    this.venueId,
+    this.resourceId,
+    this.resourceLabel,
     required this.courtType,
     required this.courtNumber,
     required this.date,
@@ -101,6 +107,9 @@ class Booking {
   Booking copyWith({
     String? id,
     String? userId,
+    String? venueId,
+    String? resourceId,
+    String? resourceLabel,
     CourtType? courtType,
     int? courtNumber,
     DateTime? date,
@@ -115,6 +124,9 @@ class Booking {
     return Booking(
       id: id ?? this.id,
       userId: userId ?? this.userId,
+      venueId: venueId ?? this.venueId,
+      resourceId: resourceId ?? this.resourceId,
+      resourceLabel: resourceLabel ?? this.resourceLabel,
       courtType: courtType ?? this.courtType,
       courtNumber: courtNumber ?? this.courtNumber,
       date: date ?? this.date,
@@ -131,6 +143,9 @@ class Booking {
 
 @JsonSerializable()
 class BookingCreate {
+  final String? venueId;
+  final String? resourceId;
+  final String? resourceLabel;
   final CourtType courtType;
   final int courtNumber;
   final DateTime date;
@@ -140,6 +155,9 @@ class BookingCreate {
   final String? userId;
 
   const BookingCreate({
+    this.venueId,
+    this.resourceId,
+    this.resourceLabel,
     required this.courtType,
     required this.courtNumber,
     required this.date,
@@ -160,6 +178,9 @@ class BookingCreate {
         '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
     return <String, dynamic>{
       'court_type': _$CourtTypeEnumMap[courtType]!,
+      'venue_id': venueId,
+      'resource_id': resourceId,
+      'resource_label': resourceLabel,
       'court_number': courtNumber,
       'date': dateStr,
       'start_time': startTime,

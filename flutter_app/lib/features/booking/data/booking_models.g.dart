@@ -1,4 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: unused_element
 
 part of 'booking_models.dart';
 
@@ -9,6 +10,9 @@ part of 'booking_models.dart';
 Booking _$BookingFromJson(Map<String, dynamic> json) => Booking(
       id: json['id'] as String,
       userId: json['user_id'] as String,
+      venueId: json['venue_id'] as String?,
+      resourceId: json['resource_id'] as String?,
+      resourceLabel: json['resource_label'] as String?,
       courtType: $enumDecode(_$CourtTypeEnumMap, json['court_type']),
       courtNumber: json['court_number'] as int,
       date: DateTime.parse(json['date'] as String),
@@ -26,6 +30,9 @@ Booking _$BookingFromJson(Map<String, dynamic> json) => Booking(
 Map<String, dynamic> _$BookingToJson(Booking instance) => <String, dynamic>{
       'id': instance.id,
       'user_id': instance.userId,
+      'venue_id': instance.venueId,
+      'resource_id': instance.resourceId,
+      'resource_label': instance.resourceLabel,
       'court_type': _$CourtTypeEnumMap[instance.courtType]!,
       'court_number': instance.courtNumber,
       'date': instance.date.toIso8601String(),
@@ -53,6 +60,9 @@ const _$BookingStatusEnumMap = {
 
 BookingCreate _$BookingCreateFromJson(Map<String, dynamic> json) =>
     BookingCreate(
+      venueId: json['venueId'] as String?,
+      resourceId: json['resourceId'] as String?,
+      resourceLabel: json['resourceLabel'] as String?,
       courtType: $enumDecode(_$CourtTypeEnumMap, json['courtType']),
       courtNumber: json['courtNumber'] as int,
       date: DateTime.parse(json['date'] as String),
@@ -64,6 +74,9 @@ BookingCreate _$BookingCreateFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$BookingCreateToJson(BookingCreate instance) =>
     <String, dynamic>{
+      'venueId': instance.venueId,
+      'resourceId': instance.resourceId,
+      'resourceLabel': instance.resourceLabel,
       'courtType': _$CourtTypeEnumMap[instance.courtType]!,
       'courtNumber': instance.courtNumber,
       'date': instance.date.toIso8601String(),

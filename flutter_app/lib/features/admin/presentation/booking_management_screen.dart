@@ -5,6 +5,7 @@ import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/admin/data/admin_models.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/booking_management_provider.dart';
+import 'package:sports_venue_chatbot/shared/widgets/pagination_footer.dart';
 
 // ─── Court type helpers ─────────────────────────────────────────────────────
 
@@ -171,6 +172,13 @@ class _BookingManagementScreenState
         margin: const EdgeInsets.all(16),
       ),
     );
+  }
+
+  bool _handlePagination(ScrollNotification notification) {
+    if (notification.metrics.extentAfter < 360) {
+      ref.read(bookingManagementProvider.notifier).loadMoreBookings();
+    }
+    return false;
   }
 
   // ── Build ────────────────────────────────────────────────────────────────
@@ -341,53 +349,62 @@ class _BookingManagementScreenState
     return RefreshIndicator(
       onRefresh: () =>
           ref.read(bookingManagementProvider.notifier).loadBookings(),
-      child: state.bookings.isEmpty
-          ? ListView(
-              children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.5,
-                  child: const Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.event_busy,
-                          size: 56,
-                          color: AppColors.textHint,
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          'Không có đặt sân nào',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Thử thay đổi ngày hoặc bộ lọc',
-                          style: TextStyle(
-                            fontSize: 13,
+      child: NotificationListener<ScrollNotification>(
+        onNotification: _handlePagination,
+        child: state.bookings.isEmpty
+            ? ListView(
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.event_busy,
+                            size: 56,
                             color: AppColors.textHint,
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 12),
+                          Text(
+                            'Không có đặt sân nào',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Thử thay đổi ngày hoặc bộ lọc',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textHint,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: state.bookings.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                return _BookingCard(
-                  booking: state.bookings[index],
-                  onAction: _updateStatus,
-                );
-              },
-            ),
+                ],
+              )
+            : ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: state.bookings.length + 1,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  if (index == state.bookings.length) {
+                    return PaginationFooter(
+                      isLoading: state.isLoadingMore,
+                      hasMore: state.hasMore,
+                    );
+                  }
+                  return _BookingCard(
+                    booking: state.bookings[index],
+                    onAction: _updateStatus,
+                  );
+                },
+              ),
+      ),
     );
   }
 }
@@ -489,11 +506,13 @@ class _BookingCard extends StatelessWidget {
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: _courtTypeColor(booking.courtType).withOpacity(0.12),
+                  color: _courtTypeColor(booking.courtType)
+                      .withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${_courtTypeDisplay(booking.courtType)} · Sân ${booking.courtNumber}',
+                  booking.resourceLabel ??
+                      '${_courtTypeDisplay(booking.courtType)} · Sân ${booking.courtNumber}',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -508,7 +527,7 @@ class _BookingCard extends StatelessWidget {
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: _statusColor(booking.status).withOpacity(0.12),
+                  color: _statusColor(booking.status).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -625,7 +644,9 @@ class _BookingCard extends StatelessWidget {
                     label: const Text('Huỷ'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.error,
-                      side: BorderSide(color: AppColors.error.withOpacity(0.4)),
+                      side: BorderSide(
+                        color: AppColors.error.withValues(alpha: 0.4),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
