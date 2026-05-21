@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sports_venue_chatbot/core/constants/app_spacing.dart';
 
 /// Responsive breakpoints and helpers.
 ///
@@ -30,9 +31,9 @@ class Responsive {
 
   // ── Dynamic helpers ────────────────────────────────────────────────
 
-  /// Responsive horizontal padding: 20 on phone, 32 on tablet+.
+  /// Responsive horizontal padding: 24 on phone, 32 on tablet+.
   static double horizontalPadding(BuildContext context) =>
-      isPhone(context) ? 20 : 32;
+      isPhone(context) ? AppSpacing.lg : AppSpacing.xl;
 
   /// Returns the number of grid columns for a menu / product grid.
   static int gridColumns(BuildContext context) {

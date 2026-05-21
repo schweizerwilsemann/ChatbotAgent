@@ -13,6 +13,8 @@ class ApiConstants {
   static const String bookingAvailabilityEndpoint = '/api/booking/availability';
   static const String orderEndpoint = '/api/order';
   static const String menuEndpoint = '/api/menu';
+  static const String venuesEndpoint = '/api/venues';
+  static const String venueResourcesEndpoint = '/api/venues/resources';
   static const String staffNotifyEndpoint = '/api/staff/notify';
   static const String staffRequestEndpoint = '/api/staff/requests';
   static const String realtimeNotificationsEndpoint =
