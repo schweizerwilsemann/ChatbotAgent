@@ -358,7 +358,7 @@ class _RecentActivitySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: Replace with real activity data from API
-    final activities = [
+    const activities = [
       _ActivityItem(
         icon: Icons.sports_tennis,
         title: 'Đặt sân Billiards #3',
