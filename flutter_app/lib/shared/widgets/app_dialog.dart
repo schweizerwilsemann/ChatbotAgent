@@ -243,7 +243,6 @@ class AppDialog {
           autofocus: true,
           decoration: InputDecoration(
             hintText: hint,
-            border: const OutlineInputBorder(),
           ),
           validator: validator,
         ),

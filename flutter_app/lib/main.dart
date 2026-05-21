@@ -6,6 +6,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/core/config/flavor_config.dart';
 import 'package:sports_venue_chatbot/core/router/app_router.dart';
+import 'package:sports_venue_chatbot/core/theme/app_scroll_behavior.dart';
 import 'package:sports_venue_chatbot/core/theme/app_theme.dart';
 
 Future<void> main() async => _runApp(FlavorConfig.resolveFlavor(appFlavor));
@@ -35,6 +36,7 @@ class SportsVenueChatbotApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
+      scrollBehavior: const AppScrollBehavior(),
       routerConfig: router,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

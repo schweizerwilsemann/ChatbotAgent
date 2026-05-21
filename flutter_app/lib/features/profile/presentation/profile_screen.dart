@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/core/constants/app_spacing.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/auth/data/auth_models.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_dialog.dart';
+import 'package:sports_venue_chatbot/shared/widgets/floating_card.dart';
+import 'package:sports_venue_chatbot/shared/widgets/glass_app_bar.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -15,14 +18,14 @@ class ProfileScreen extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: GlassAppBar(
         title: const Text('Cá nhân'),
         actions: [
-          IconButton(
+          GlassIconButton(
             tooltip: 'Làm mới',
             onPressed: () =>
                 ref.read(authStateProvider.notifier).refreshProfile(),
-            icon: const Icon(Icons.refresh),
+            icon: Icons.refresh_rounded,
           ),
         ],
       ),
@@ -30,7 +33,7 @@ class ProfileScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -39,13 +42,13 @@ class ProfileScreen extends ConsumerWidget {
                   color: AppColors.error,
                   size: 48,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 Text(
                   'Không thể tải thông tin cá nhân',
                   style: Theme.of(context).textTheme.titleMedium,
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Text(
                   error.toString(),
                   style: Theme.of(context).textTheme.bodySmall,
@@ -65,7 +68,7 @@ class ProfileScreen extends ConsumerWidget {
       bottomNavigationBar: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: LayoutBuilder(
             builder: (context, constraints) {
               final buttonWidth =
@@ -134,7 +137,10 @@ class _ProfileBody extends StatelessWidget {
             : Responsive.horizontalPadding(context);
 
         return ListView(
-          padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: hPad,
+            vertical: AppSpacing.md,
+          ),
           children: [
             CircleAvatar(
               radius: 40,
@@ -148,13 +154,13 @@ class _ProfileBody extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             Text(
               user.name,
               style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.sm / 2),
             Text(
               user.role,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -162,7 +168,7 @@ class _ProfileBody extends StatelessWidget {
                   ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
             _ProfileTile(
               icon: Icons.phone_outlined,
               label: 'Số điện thoại',
@@ -200,8 +206,9 @@ class _ProfileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+    return FloatingCard(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: EdgeInsets.zero,
       child: ListTile(
         leading: Icon(icon, color: AppColors.primary),
         title: Text(label),

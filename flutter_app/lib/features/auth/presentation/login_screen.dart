@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/core/constants/app_spacing.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
-import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
-import 'package:sports_venue_chatbot/shared/widgets/loading_button.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
+import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
+import 'package:sports_venue_chatbot/shared/widgets/floating_card.dart';
+import 'package:sports_venue_chatbot/shared/widgets/loading_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -42,125 +44,100 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             padding: EdgeInsets.symmetric(horizontal: hPadding),
             child: ResponsiveContainer(
               maxWidth: 420,
-              child: Card(
-                elevation: 0,
-                color: AppColors.surface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: const BorderSide(color: AppColors.border, width: 1),
+              child: FloatingCard(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                border: Border.all(
+                  color: AppColors.border,
+                  width: 1,
                 ),
-                margin: EdgeInsets.zero,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 28,
-                    vertical: 36,
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Logo / icon
-                        Icon(
-                          Icons.sports_tennis,
-                          size: 72,
-                          color: colorScheme.primary,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.sports_tennis,
+                        size: 72,
+                        color: colorScheme.primary,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        'Sports Venue Chatbot',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: colorScheme.primary,
+                                ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        'Đăng nhập để tiếp tục',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: AppColors.textSecondary),
+                      ),
+                      const SizedBox(height: AppSpacing.xl + AppSpacing.sm),
+                      TextFormField(
+                        controller: _phoneController,
+                        enabled: !loginState.isLoading,
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
+                        decoration: const InputDecoration(
+                          labelText: 'Số điện thoại',
+                          hintText: 'Nhập số điện thoại',
+                          prefixIcon: Icon(Icons.phone_outlined),
                         ),
-                        const SizedBox(height: 16),
-
-                        // App title
-                        Text(
-                          'Sports Venue Chatbot',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.primary,
-                              ),
-                          textAlign: TextAlign.center,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Vui lòng nhập số điện thoại';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      TextFormField(
+                        controller: _passwordController,
+                        enabled: !loginState.isLoading,
+                        obscureText: true,
+                        textInputAction: TextInputAction.done,
+                        decoration: const InputDecoration(
+                          labelText: 'Mật khẩu',
+                          hintText: 'Nhập mật khẩu',
+                          prefixIcon: Icon(Icons.lock_outline),
                         ),
-                        const SizedBox(height: 8),
-
-                        Text(
-                          'Đăng nhập để tiếp tục',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(color: AppColors.textSecondary),
-                        ),
-                        const SizedBox(height: 40),
-
-                        // Phone number field
-                        TextFormField(
-                          controller: _phoneController,
-                          enabled: !loginState.isLoading,
-                          keyboardType: TextInputType.phone,
-                          textInputAction: TextInputAction.next,
-                          decoration: const InputDecoration(
-                            labelText: 'Số điện thoại',
-                            hintText: 'Nhập số điện thoại',
-                            prefixIcon: Icon(Icons.phone_outlined),
-                            border: OutlineInputBorder(),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Vui lòng nhập mật khẩu';
+                          }
+                          return null;
+                        },
+                        onFieldSubmitted: (_) {
+                          if (!loginState.isLoading) {
+                            _handleLogin();
+                          }
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      if (loginState.error != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: AppSpacing.sm),
+                          child: Text(
+                            loginState.error!,
+                            style: TextStyle(color: colorScheme.error),
+                            textAlign: TextAlign.center,
                           ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Vui lòng nhập số điện thoại';
-                            }
-                            return null;
-                          },
                         ),
-                        const SizedBox(height: 16),
-
-                        // Password field
-                        TextFormField(
-                          controller: _passwordController,
-                          enabled: !loginState.isLoading,
-                          obscureText: true,
-                          textInputAction: TextInputAction.done,
-                          decoration: const InputDecoration(
-                            labelText: 'Mật khẩu',
-                            hintText: 'Nhập mật khẩu',
-                            prefixIcon: Icon(Icons.lock_outline),
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Vui lòng nhập mật khẩu';
-                            }
-                            return null;
-                          },
-                          onFieldSubmitted: (_) {
-                            if (!loginState.isLoading) {
-                              _handleLogin();
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 8),
-
-                        // Error message
-                        if (loginState.error != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Text(
-                              loginState.error!,
-                              style: TextStyle(color: colorScheme.error),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-
-                        const SizedBox(height: 24),
-
-                        // Login button
-                        LoadingButton(
-                          label: 'Đăng nhập',
-                          onPressed: _handleLogin,
-                          isLoading: loginState.isLoading,
-                          width: double.infinity,
-                          height: 48,
-                        ),
-                      ],
-                    ),
+                      const SizedBox(height: AppSpacing.lg),
+                      LoadingButton(
+                        label: 'Đăng nhập',
+                        onPressed: _handleLogin,
+                        isLoading: loginState.isLoading,
+                        width: double.infinity,
+                        height: 48,
+                      ),
+                    ],
                   ),
                 ),
               ),
