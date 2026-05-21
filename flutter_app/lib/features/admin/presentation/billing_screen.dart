@@ -5,6 +5,7 @@ import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/admin/data/admin_models.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/billing_provider.dart';
+import 'package:sports_venue_chatbot/shared/widgets/pagination_footer.dart';
 
 /// Screen for admin/staff to view billing and transactions.
 ///
@@ -78,6 +79,13 @@ class _BillingScreenState extends ConsumerState<BillingScreen> {
         );
       }
     }
+  }
+
+  bool _handlePagination(ScrollNotification notification) {
+    if (notification.metrics.extentAfter < 360) {
+      ref.read(billingProvider.notifier).loadMoreOrders();
+    }
+    return false;
   }
 
   @override
@@ -164,7 +172,7 @@ class _BillingScreenState extends ConsumerState<BillingScreen> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            color: AppColors.error.withOpacity(0.08),
+            color: AppColors.error.withValues(alpha: 0.08),
             child: ResponsiveContainer(
               maxWidth: 900,
               child: Row(
@@ -229,7 +237,7 @@ class _BillingScreenState extends ConsumerState<BillingScreen> {
           children: [
             Expanded(
               child: _SummaryMiniCard(
-                label: 'Doanh thu hôm nay',
+                label: 'Doanh thu đã tải',
                 value: '${_currencyFormat.format(todayRevenue.round())}đ',
                 icon: Icons.attach_money,
                 color: AppColors.success,
@@ -238,7 +246,7 @@ class _BillingScreenState extends ConsumerState<BillingScreen> {
             const SizedBox(width: 10),
             Expanded(
               child: _SummaryMiniCard(
-                label: 'Tổng đơn',
+                label: 'Đơn đã tải',
                 value: '$totalOrders',
                 icon: Icons.receipt,
                 color: AppColors.info,
@@ -264,12 +272,7 @@ class _BillingScreenState extends ConsumerState<BillingScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // Apply client-side filter if a status filter is set
-    final orders = state.filterStatus == null
-        ? state.orders
-        : state.orders
-            .where((o) => o.status.name == state.filterStatus)
-            .toList();
+    final orders = state.orders;
 
     if (orders.isEmpty) {
       return ListView(
@@ -292,20 +295,31 @@ class _BillingScreenState extends ConsumerState<BillingScreen> {
       );
     }
 
-    return ListView.builder(
-      padding: EdgeInsets.all(Responsive.horizontalPadding(context)),
-      itemCount: orders.length,
-      itemBuilder: (context, index) => ResponsiveContainer(
-        maxWidth: 900,
-        child: _OrderCard(
-          order: orders[index],
-          currencyFormat: _currencyFormat,
-          onStatusUpdate: (newStatus) => _updateOrderStatus(
-            context,
-            orders[index].id,
-            newStatus,
-          ),
-        ),
+    return NotificationListener<ScrollNotification>(
+      onNotification: _handlePagination,
+      child: ListView.builder(
+        padding: EdgeInsets.all(Responsive.horizontalPadding(context)),
+        itemCount: orders.length + 1,
+        itemBuilder: (context, index) {
+          if (index == orders.length) {
+            return PaginationFooter(
+              isLoading: state.isLoadingMore,
+              hasMore: state.hasMore,
+            );
+          }
+          return ResponsiveContainer(
+            maxWidth: 900,
+            child: _OrderCard(
+              order: orders[index],
+              currencyFormat: _currencyFormat,
+              onStatusUpdate: (newStatus) => _updateOrderStatus(
+                context,
+                orders[index].id,
+                newStatus,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -331,9 +345,9 @@ class _SummaryMiniCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,7 +418,7 @@ class _OrderCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _statusColor.withOpacity(0.12),
+                    color: _statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -449,9 +463,25 @@ class _OrderCard extends StatelessWidget {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                if (order.tableNumber > 0) ...[
+                if (order.resourceLabel != null &&
+                    order.resourceLabel!.isNotEmpty) ...[
                   const SizedBox(width: 12),
-                  Icon(Icons.table_restaurant,
+                  const Icon(Icons.location_on_outlined,
+                      size: 14, color: AppColors.textHint),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      order.resourceLabel!,
+                      style: const TextStyle(
+                        color: AppColors.textHint,
+                        fontSize: 12,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ] else if (order.tableNumber > 0) ...[
+                  const SizedBox(width: 12),
+                  const Icon(Icons.table_restaurant,
                       size: 14, color: AppColors.textHint),
                   const SizedBox(width: 4),
                   Text(
