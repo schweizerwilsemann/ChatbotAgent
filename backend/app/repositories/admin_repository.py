@@ -2,7 +2,7 @@ import uuid
 from datetime import date, datetime
 from decimal import Decimal
 
-from sqlalchemy import Date, String, and_, cast, func, select
+from sqlalchemy import Date, String, and_, cast, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -10,6 +10,7 @@ from app.models.booking import Booking
 from app.models.menu import MenuItem
 from app.models.order import Order
 from app.models.user import User
+from app.models.venue import ResourceStatus, ServiceResource
 
 
 class AdminRepository:
@@ -78,6 +79,13 @@ class AdminRepository:
         result = await self._session.execute(stmt)
         return result.scalar() or 0
 
+    async def count_active_resources(self) -> int:
+        stmt = select(func.count(ServiceResource.id)).where(
+            ServiceResource.status == ResourceStatus.ACTIVE
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar() or 0
+
     # ------------------------------------------------------------------
     # Bookings with user info
     # ------------------------------------------------------------------
@@ -88,6 +96,10 @@ class AdminRepository:
         date_filter: date | None = None,
         court_type: str | None = None,
         status: str | None = None,
+        venue_scope_ids: set[uuid.UUID] | None = None,
+        resource_ids: set[uuid.UUID] | None = None,
+        limit: int | None = None,
+        offset: int = 0,
     ) -> list[dict]:
         """Return bookings joined with user name, with optional filters."""
         stmt = (
@@ -108,6 +120,15 @@ class AdminRepository:
             stmt = stmt.where(Booking.court_type == court_type)
         if status:
             stmt = stmt.where(Booking.status == status)
+        scope_conditions = []
+        if venue_scope_ids:
+            scope_conditions.append(Booking.venue_id.in_(list(venue_scope_ids)))
+        if resource_ids:
+            scope_conditions.append(Booking.resource_id.in_(list(resource_ids)))
+        if scope_conditions:
+            stmt = stmt.where(or_(*scope_conditions))
+        if limit is not None:
+            stmt = stmt.offset(offset).limit(limit)
 
         result = await self._session.execute(stmt)
         rows = result.all()
@@ -147,6 +168,10 @@ class AdminRepository:
         self,
         *,
         status: str | None = None,
+        venue_scope_ids: set[uuid.UUID] | None = None,
+        resource_ids: set[uuid.UUID] | None = None,
+        limit: int | None = None,
+        offset: int = 0,
     ) -> list[Order]:
         """Return all orders with items, optionally filtered by status."""
         stmt = (
@@ -156,6 +181,15 @@ class AdminRepository:
         )
         if status:
             stmt = stmt.where(Order.status == status)
+        scope_conditions = []
+        if venue_scope_ids:
+            scope_conditions.append(Order.venue_id.in_(list(venue_scope_ids)))
+        if resource_ids:
+            scope_conditions.append(Order.resource_id.in_(list(resource_ids)))
+        if scope_conditions:
+            stmt = stmt.where(or_(*scope_conditions))
+        if limit is not None:
+            stmt = stmt.offset(offset).limit(limit)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -167,11 +201,25 @@ class AdminRepository:
         self,
         *,
         category_key: str | None = None,
+        query: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
     ) -> list[MenuItem]:
         """Return all menu items including unavailable ones."""
         stmt = select(MenuItem).order_by(MenuItem.category_key, MenuItem.name)
         if category_key:
             stmt = stmt.where(MenuItem.category_key == category_key)
+        if query:
+            like_query = f"%{query}%"
+            stmt = stmt.where(
+                or_(
+                    MenuItem.name.ilike(like_query),
+                    MenuItem.category_name.ilike(like_query),
+                    MenuItem.description.ilike(like_query),
+                )
+            )
+        if limit is not None:
+            stmt = stmt.offset(offset).limit(limit)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

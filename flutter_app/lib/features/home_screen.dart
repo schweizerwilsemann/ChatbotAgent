@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/shared/widgets/floating_bottom_nav.dart';
 
 /// Home screen with bottom navigation bar for **customers only**.
 ///
@@ -74,26 +75,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: widget.child,
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: FloatingBottomNav(
         selectedIndex: _currentIndex >= _navItems.length ? 0 : _currentIndex,
-        onDestinationSelected: _onTabTapped,
-        backgroundColor: AppColors.surface,
-        indicatorColor: AppColors.primarySurface,
-        elevation: 0,
-        shadowColor: AppColors.shadow,
-        height: 65,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        destinations: _navItems.map((item) {
-          final isSelected = _navItems.indexOf(item) == _currentIndex;
-          return NavigationDestination(
-            icon: Icon(
-              item.icon,
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
-            ),
-            selectedIcon: Icon(item.selectedIcon, color: AppColors.primary),
-            label: item.label,
-          );
-        }).toList(),
+        onTap: _onTabTapped,
+        items: _navItems
+            .map(
+              (item) => FloatingBottomNavItem(
+                icon: item.icon,
+                selectedIcon: item.selectedIcon,
+                label: item.label,
+                color: AppColors.primary,
+              ),
+            )
+            .toList(),
       ),
     );
   }

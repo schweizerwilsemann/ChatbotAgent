@@ -9,6 +9,7 @@ from app.core.database import get_db
 from app.models.user import User
 from app.repositories.admin_repository import AdminRepository
 from app.repositories.notification_repository import NotificationRepository
+from app.repositories.venue_repository import VenueRepository
 from app.schemas.admin import (
     AdminBookingResponse,
     AnalyticsResponse,
@@ -29,8 +30,6 @@ from app.services.notification_service import NotificationService
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
-
-TOTAL_COURTS = 8
 
 VALID_BOOKING_TRANSITIONS = {
     "confirmed": {"cancelled", "completed"},
@@ -73,6 +72,11 @@ def _booking_response(entry: dict) -> AdminBookingResponse:
         id=str(booking.id),
         user_id=booking.user_id,
         user_name=user_name,
+        venue_id=str(booking.venue_id) if getattr(booking, "venue_id", None) else None,
+        resource_id=str(booking.resource_id)
+        if getattr(booking, "resource_id", None)
+        else None,
+        resource_label=getattr(booking, "resource_label", None),
         court_type=booking.court_type,
         court_number=booking.court_number,
         date=booking.start_time.date(),
@@ -100,6 +104,11 @@ def _order_response(order) -> OrderResponse:
     return OrderResponse(
         id=str(order.id),
         user_id=order.user_id,
+        venue_id=str(order.venue_id) if getattr(order, "venue_id", None) else None,
+        resource_id=str(order.resource_id)
+        if getattr(order, "resource_id", None)
+        else None,
+        resource_label=getattr(order, "resource_label", None),
         table_number=order.table_number,
         status=order.status,
         total_price=order.total_price,
@@ -121,6 +130,11 @@ def _staff_order_response(order) -> StaffOrderResponse:
     return StaffOrderResponse(
         id=str(order.id),
         user_id=order.user_id,
+        venue_id=str(order.venue_id) if getattr(order, "venue_id", None) else None,
+        resource_id=str(order.resource_id)
+        if getattr(order, "resource_id", None)
+        else None,
+        resource_label=getattr(order, "resource_label", None),
         table_number=order.table_number,
         status=order.status,
         notes=order.notes,
@@ -164,6 +178,7 @@ async def dashboard(
         order_revenue = await repo.sum_order_revenue_today(today)
         booking_revenue = await repo.sum_booking_revenue_today(today)
         active_courts = await repo.count_active_courts(now)
+        total_courts = await repo.count_active_resources()
 
         total_revenue = order_revenue + booking_revenue
 
@@ -172,7 +187,7 @@ async def dashboard(
             bookings_today=bookings_today,
             orders_today=orders_today,
             active_courts=active_courts,
-            total_courts=TOTAL_COURTS,
+            total_courts=total_courts,
         )
     except Exception as exc:
         logger.exception("Error fetching dashboard")
@@ -184,17 +199,45 @@ async def get_all_bookings(
     date: date | None = Query(None, description="Filter by date"),
     court_type: str | None = Query(None, description="Filter by court type"),
     status: str | None = Query(None, description="Filter by status"),
+    limit: int = Query(30, ge=1, le=100, description="Maximum rows to return"),
+    offset: int = Query(0, ge=0, description="Rows to skip"),
     user: User = Depends(require_roles("STAFF", "ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> list[AdminBookingResponse]:
     """Get all bookings with optional filters, including user name."""
     try:
         repo = _admin_repo(session)
-        entries = await repo.get_all_bookings(
-            date_filter=date,
-            court_type=court_type,
-            status=status,
-        )
+        role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
+        if role_value == "STAFF":
+            venue_repo = VenueRepository(session)
+            access = await venue_repo.get_staff_access(str(user.id))
+            if access.has_assignments:
+                resource_ids = await venue_repo.expand_accessible_resource_ids(access)
+                entries = await repo.get_all_bookings(
+                    date_filter=date,
+                    court_type=court_type,
+                    status=status,
+                    venue_scope_ids=access.venue_scope_ids,
+                    resource_ids=resource_ids,
+                    limit=limit,
+                    offset=offset,
+                )
+            else:
+                entries = await repo.get_all_bookings(
+                    date_filter=date,
+                    court_type=court_type,
+                    status=status,
+                    limit=limit,
+                    offset=offset,
+                )
+        else:
+            entries = await repo.get_all_bookings(
+                date_filter=date,
+                court_type=court_type,
+                status=status,
+                limit=limit,
+                offset=offset,
+            )
         return [_booking_response(entry) for entry in entries]
     except Exception as exc:
         logger.exception("Error fetching all bookings")
@@ -215,6 +258,22 @@ async def update_booking_status(
         booking = await repo.get_booking_by_id(booking_id)
         if not booking:
             raise HTTPException(status_code=404, detail="Booking not found")
+        role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
+        if role_value == "STAFF":
+            venue_repo = VenueRepository(session)
+            access = await venue_repo.get_staff_access(str(user.id))
+            if access.has_assignments:
+                resource_ids = await venue_repo.expand_accessible_resource_ids(access)
+                can_update = False
+                if booking.resource_id and booking.resource_id in resource_ids:
+                    can_update = True
+                if booking.venue_id and booking.venue_id in access.venue_scope_ids:
+                    can_update = True
+                if not can_update:
+                    raise HTTPException(
+                        status_code=403,
+                        detail="Booking is outside your assigned tables/courts",
+                    )
 
         current_status = booking.status
         allowed = VALID_BOOKING_TRANSITIONS.get(current_status, set())
@@ -240,7 +299,10 @@ async def update_booking_status(
         )
 
         # Send notification on status change
-        notification_service = NotificationService(NotificationRepository(session))
+        notification_service = NotificationService(
+            NotificationRepository(session),
+            VenueRepository(session),
+        )
         status_label = {
             "confirmed": "xác nhận",
             "cancelled": "hủy",
@@ -275,6 +337,13 @@ async def update_booking_status(
             id=str(updated.id),
             user_id=updated.user_id,
             user_name=user_name,
+            venue_id=str(updated.venue_id)
+            if getattr(updated, "venue_id", None)
+            else None,
+            resource_id=str(updated.resource_id)
+            if getattr(updated, "resource_id", None)
+            else None,
+            resource_label=getattr(updated, "resource_label", None),
             court_type=updated.court_type,
             court_number=updated.court_number,
             date=updated.start_time.date(),
@@ -296,13 +365,19 @@ async def update_booking_status(
 @router.get("/orders", response_model=list[OrderResponse])
 async def get_all_orders(
     status: str | None = Query(None, description="Filter by status"),
+    limit: int = Query(30, ge=1, le=100, description="Maximum rows to return"),
+    offset: int = Query(0, ge=0, description="Rows to skip"),
     user: User = Depends(require_roles("ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> list[OrderResponse]:
     """Get all orders with optional status filter (ADMIN only - includes revenue)."""
     try:
         repo = _admin_repo(session)
-        orders = await repo.get_all_orders(status=status)
+        orders = await repo.get_all_orders(
+            status=status,
+            limit=limit,
+            offset=offset,
+        )
         return [_order_response(order) for order in orders]
     except Exception as exc:
         logger.exception("Error fetching all orders")
@@ -312,13 +387,39 @@ async def get_all_orders(
 @router.get("/orders/staff", response_model=list[StaffOrderResponse])
 async def get_staff_orders(
     status: str | None = Query(None, description="Filter by status"),
+    limit: int = Query(30, ge=1, le=100, description="Maximum rows to return"),
+    offset: int = Query(0, ge=0, description="Rows to skip"),
     user: User = Depends(require_roles("STAFF", "ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> list[StaffOrderResponse]:
     """Get orders for staff view (no revenue details)."""
     try:
         repo = _admin_repo(session)
-        orders = await repo.get_all_orders(status=status)
+        role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
+        if role_value == "STAFF":
+            venue_repo = VenueRepository(session)
+            access = await venue_repo.get_staff_access(str(user.id))
+            if access.has_assignments:
+                resource_ids = await venue_repo.expand_accessible_resource_ids(access)
+                orders = await repo.get_all_orders(
+                    status=status,
+                    venue_scope_ids=access.venue_scope_ids,
+                    resource_ids=resource_ids,
+                    limit=limit,
+                    offset=offset,
+                )
+            else:
+                orders = await repo.get_all_orders(
+                    status=status,
+                    limit=limit,
+                    offset=offset,
+                )
+        else:
+            orders = await repo.get_all_orders(
+                status=status,
+                limit=limit,
+                offset=offset,
+            )
         return [_staff_order_response(order) for order in orders]
     except Exception as exc:
         logger.exception("Error fetching staff orders")
@@ -328,13 +429,22 @@ async def get_staff_orders(
 @router.get("/menu", response_model=list[MenuItemResponse])
 async def get_all_menu_items(
     category_key: str | None = Query(None, description="Filter by category key"),
+    q: str | None = Query(None, max_length=100, description="Search menu items"),
+    limit: int = Query(30, ge=1, le=100, description="Maximum rows to return"),
+    offset: int = Query(0, ge=0, description="Rows to skip"),
     user: User = Depends(require_roles("STAFF", "ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> list[MenuItemResponse]:
     """Get ALL menu items including unavailable ones."""
     try:
         repo = _admin_repo(session)
-        items = await repo.get_all_menu_items(category_key=category_key)
+        query = q.strip() if q else None
+        items = await repo.get_all_menu_items(
+            category_key=category_key,
+            query=query,
+            limit=limit,
+            offset=offset,
+        )
         return [_menu_item_response(item) for item in items]
     except Exception as exc:
         logger.exception("Error fetching all menu items")

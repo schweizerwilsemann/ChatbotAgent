@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.staff_request_repository import StaffRequestRepository
+from app.repositories.venue_repository import VenueRepository
 from app.schemas.notification import NotificationResponse
 from app.schemas.staff_request import StaffRequestResponse
 from app.services.notification_service import NotificationService
@@ -23,9 +24,11 @@ class StaffRequestService:
         self,
         repo: StaffRequestRepository,
         notification_service: NotificationService,
+        venue_repo: VenueRepository | None = None,
     ) -> None:
         self._repo = repo
         self._notification_service = notification_service
+        self._venue_repo = venue_repo
 
     async def create_request(
         self,
@@ -35,13 +38,44 @@ class StaffRequestService:
         request_type: str,
         description: str | None,
         table_number: int | None,
+        venue_id: str | None = None,
+        resource_id: str | None = None,
+        resource_label: str | None = None,
+        user=None,
     ) -> StaffRequestResponse:
+        if self._venue_repo:
+            resolved_venue_id = await self._venue_repo.resolve_user_venue_id(
+                user,
+                explicit_venue_id=venue_id,
+            )
+            venue_id = str(resolved_venue_id) if resolved_venue_id else venue_id
+
+            resource = None
+            if resource_id:
+                resource = await self._venue_repo.get_resource_by_id(resource_id)
+                if not resource:
+                    raise ValueError("Selected table/court was not found")
+            elif table_number is not None and table_number > 0:
+                resource = await self._venue_repo.resolve_legacy_resource(
+                    venue_id=venue_id,
+                    table_number=table_number,
+                )
+
+            if resource:
+                venue_id = str(resource.venue_id)
+                resource_id = str(resource.id)
+                resource_label = resource_label or resource.name
+                table_number = resource.number
+
         request = await self._repo.create(
             user_id=user_id,
             user_name=user_name,
             request_type=request_type,
             description=description,
             table_number=table_number,
+            venue_id=venue_id,
+            resource_id=resource_id,
+            resource_label=resource_label,
         )
 
         type_label = REQUEST_TYPE_LABELS.get(request_type, request_type)
@@ -49,7 +83,9 @@ class StaffRequestService:
         parts = []
         if user_name:
             parts.append(f"Khách: {user_name}")
-        if table_number and table_number > 0:
+        if resource_label:
+            parts.append(f"Vị trí: {resource_label}")
+        elif table_number and table_number > 0:
             parts.append(f"Bàn: {table_number}")
         if description:
             parts.append(f"Yêu cầu: {description}")
@@ -64,6 +100,9 @@ class StaffRequestService:
                 "request_id": str(request.id),
                 "user_id": user_id,
                 "user_name": user_name or "",
+                "venue_id": venue_id or "",
+                "resource_id": resource_id or "",
+                "resource_label": resource_label or "",
                 "request_type": request_type,
                 "description": description or "",
                 "table_number": table_number or 0,
@@ -75,6 +114,22 @@ class StaffRequestService:
 
     async def get_pending_requests(self) -> list[StaffRequestResponse]:
         requests = await self._repo.get_pending()
+        return [self.to_response(r) for r in requests]
+
+    async def get_pending_requests_for_staff(
+        self,
+        staff_id: str,
+    ) -> list[StaffRequestResponse]:
+        if not self._venue_repo:
+            return await self.get_pending_requests()
+        access = await self._venue_repo.get_staff_access(staff_id)
+        if not access.has_assignments:
+            return await self.get_pending_requests()
+        resource_ids = await self._venue_repo.expand_accessible_resource_ids(access)
+        requests = await self._repo.get_pending_for_assignment(
+            venue_scope_ids=access.venue_scope_ids,
+            resource_ids=resource_ids,
+        )
         return [self.to_response(r) for r in requests]
 
     async def get_user_requests(self, user_id: str) -> list[StaffRequestResponse]:
@@ -102,6 +157,9 @@ class StaffRequestService:
             payload={
                 "request_id": str(request.id),
                 "user_id": request.user_id,
+                "venue_id": str(request.venue_id) if request.venue_id else "",
+                "resource_id": str(request.resource_id) if request.resource_id else "",
+                "resource_label": request.resource_label or "",
                 "accepted_by": staff_id,
                 "accepted_by_name": staff_name or "",
                 "status": "accepted",
@@ -128,6 +186,13 @@ class StaffRequestService:
             id=str(request.id),
             user_id=request.user_id,
             user_name=request.user_name,
+            venue_id=str(request.venue_id)
+            if getattr(request, "venue_id", None)
+            else None,
+            resource_id=str(request.resource_id)
+            if getattr(request, "resource_id", None)
+            else None,
+            resource_label=getattr(request, "resource_label", None),
             request_type=request.request_type,
             description=request.description,
             table_number=request.table_number,

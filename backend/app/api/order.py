@@ -10,6 +10,7 @@ from app.models.user import User
 from app.repositories.menu_repository import MenuRepository
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.order_repository import OrderRepository
+from app.repositories.venue_repository import VenueRepository
 from app.schemas.order import OrderCreate, OrderResponse, OrderStatusUpdate
 from app.services.notification_service import NotificationService
 from app.services.order_service import OrderService
@@ -24,8 +25,12 @@ async def _get_order_service(
 ) -> OrderService:
     repo = OrderRepository(session)
     menu_repo = MenuRepository(session)
-    notification_service = NotificationService(NotificationRepository(session))
-    return OrderService(repo, menu_repo, notification_service)
+    venue_repo = VenueRepository(session)
+    notification_service = NotificationService(
+        NotificationRepository(session),
+        venue_repo,
+    )
+    return OrderService(repo, menu_repo, notification_service, venue_repo)
 
 
 @router.post("", response_model=OrderResponse, status_code=201)
@@ -38,7 +43,7 @@ async def create_order(
     """Create a new food/drink order."""
     try:
         data.user_id = str(user.id)
-        order = await service.create_order(data)
+        order = await service.create_order(data, user=user)
         return order
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -88,10 +93,34 @@ async def update_order_status(
     order_id: str,
     data: OrderStatusUpdate,
     user: User = Depends(require_roles("STAFF", "ADMIN")),
+    session: AsyncSession = Depends(get_db),
     service: OrderService = Depends(_get_order_service),
 ) -> OrderResponse:
     """Update the status of an order."""
     try:
+        existing = await service.get_order(order_id)
+        if not existing:
+            raise HTTPException(status_code=404, detail="Order not found")
+        role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
+        if role_value == "STAFF":
+            venue_repo = VenueRepository(session)
+            access = await venue_repo.get_staff_access(str(user.id))
+            if access.has_assignments:
+                resource_ids = await venue_repo.expand_accessible_resource_ids(access)
+                can_update = False
+                if existing.resource_id and existing.resource_id in {
+                    str(item) for item in resource_ids
+                }:
+                    can_update = True
+                if existing.venue_id and existing.venue_id in {
+                    str(item) for item in access.venue_scope_ids
+                }:
+                    can_update = True
+                if not can_update:
+                    raise HTTPException(
+                        status_code=403,
+                        detail="Order is outside your assigned tables/courts",
+                    )
         order = await service.update_status(order_id, data.status)
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")

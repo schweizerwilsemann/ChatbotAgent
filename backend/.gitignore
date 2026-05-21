@@ -103,7 +103,7 @@ logs/
 *.pth
 *.bin
 *.safetensors
-models/
+/models/
 
 # Temporary files
 *.tmp

@@ -22,6 +22,9 @@ class AdminBookingResponse(BaseModel):
     id: str
     user_id: str
     user_name: str | None = None
+    venue_id: str | None = None
+    resource_id: str | None = None
+    resource_label: str | None = None
     court_type: str
     court_number: int
     date: DateType

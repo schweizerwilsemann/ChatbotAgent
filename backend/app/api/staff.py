@@ -8,6 +8,7 @@ from app.core.database import get_db
 from app.core.rate_limit import rate_limit
 from app.models.user import User
 from app.repositories.notification_repository import NotificationRepository
+from app.repositories.venue_repository import VenueRepository
 from app.schemas.notification import StaffNotifyRequest, StaffNotifyResponse
 from app.services.notification_service import NotificationService
 
@@ -22,7 +23,8 @@ async def notify_staff(
     session: AsyncSession = Depends(get_db),
 ) -> StaffNotifyResponse:
     """Send a realtime notification to staff and managers."""
-    service = NotificationService(NotificationRepository(session))
+    venue_repo = VenueRepository(session)
+    service = NotificationService(NotificationRepository(session), venue_repo)
     notification = await service.notify_operations(
         event_type="staff.requested",
         title="Khách cần hỗ trợ",
@@ -30,6 +32,9 @@ async def notify_staff(
         source="customer",
         payload={
             "user_id": str(user.id),
+            "venue_id": request.venue_id or "",
+            "resource_id": request.resource_id or "",
+            "resource_label": request.resource_label or "",
             "table_number": request.table_number,
             "message": request.message,
         },

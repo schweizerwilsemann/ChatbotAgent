@@ -21,6 +21,8 @@ class UserResponse(BaseModel):
     phone: str
     name: str
     email: str | None = None
+    business_id: uuid.UUID | None = None
+    default_venue_id: uuid.UUID | None = None
     role: UserRole
     created_at: datetime
     updated_at: datetime

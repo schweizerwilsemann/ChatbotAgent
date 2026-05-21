@@ -11,6 +11,13 @@ class OrderItemCreate(BaseModel):
 
 class OrderCreate(BaseModel):
     user_id: str = Field("current_user", min_length=1, max_length=128)
+    venue_id: str | None = Field(None, description="Venue/branch identifier")
+    resource_id: str | None = Field(None, description="Selected table/court resource")
+    resource_label: str | None = Field(
+        None,
+        max_length=255,
+        description="Human-readable table/court label",
+    )
     table_number: int = Field(0, ge=0)
     items: list[OrderItemCreate] = Field(..., min_length=1)
     notes: str | None = Field("", max_length=500)
@@ -30,6 +37,9 @@ class OrderItemResponse(BaseModel):
 class OrderResponse(BaseModel):
     id: str
     user_id: str
+    venue_id: str | None = None
+    resource_id: str | None = None
+    resource_label: str | None = None
     table_number: int
     status: str
     total_price: Decimal
@@ -65,6 +75,9 @@ class StaffOrderItemResponse(BaseModel):
 class StaffOrderResponse(BaseModel):
     id: str
     user_id: str
+    venue_id: str | None = None
+    resource_id: str | None = None
+    resource_label: str | None = None
     table_number: int
     status: str
     notes: str | None = None

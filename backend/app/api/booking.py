@@ -11,6 +11,7 @@ from app.core.rate_limit import rate_limit
 from app.models.user import User
 from app.repositories.booking_repository import BookingRepository
 from app.repositories.notification_repository import NotificationRepository
+from app.repositories.venue_repository import VenueRepository
 from app.schemas.booking import (
     AvailabilityResponse,
     BookingCreate,
@@ -28,8 +29,12 @@ async def _get_booking_service(
     session: AsyncSession = Depends(get_db),
 ) -> BookingService:
     repo = BookingRepository(session)
-    notification_service = NotificationService(NotificationRepository(session))
-    return BookingService(repo, notification_service)
+    venue_repo = VenueRepository(session)
+    notification_service = NotificationService(
+        NotificationRepository(session),
+        venue_repo,
+    )
+    return BookingService(repo, notification_service, venue_repo)
 
 
 @router.post("", response_model=BookingResponse, status_code=201)
@@ -41,7 +46,7 @@ async def create_booking(
 ) -> BookingResponse:
     """Create a new court booking."""
     try:
-        booking = await service.create_booking(data, str(user.id))
+        booking = await service.create_booking(data, str(user.id), user=user)
         return booking
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -54,6 +59,7 @@ async def create_booking(
 async def check_availability(
     court_type: str = Query(..., description="Court type"),
     court_number: int = Query(..., ge=1, description="Court number"),
+    resource_id: str | None = Query(None, description="Table/court resource ID"),
     start_time: datetime = Query(..., description="Start time (ISO 8601)"),
     end_time: datetime = Query(..., description="End time (ISO 8601)"),
     service: BookingService = Depends(_get_booking_service),
@@ -61,7 +67,11 @@ async def check_availability(
     """Check if a court is available for the given time slot."""
     try:
         available = await service.check_availability(
-            court_type, court_number, start_time, end_time
+            court_type,
+            court_number,
+            start_time,
+            end_time,
+            resource_id=resource_id,
         )
         return available
     except ValueError as exc:
@@ -89,12 +99,13 @@ async def get_bookings(
 @router.get("/availability", response_model=AvailabilityResponse)
 async def get_day_availability(
     court_type: str = Query(..., description="Court type"),
+    venue_id: str | None = Query(None, description="Venue ID"),
     date: DateType = Query(..., description="Date"),
     service: BookingService = Depends(_get_booking_service),
 ) -> AvailabilityResponse:
     """Return available slots/courts for a court type on a specific date."""
     try:
-        return await service.get_day_availability(court_type, date)
+        return await service.get_day_availability(court_type, date, venue_id=venue_id)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

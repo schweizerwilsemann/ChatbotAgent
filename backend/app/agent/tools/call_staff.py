@@ -7,6 +7,7 @@ from app.agent.context import current_user_id
 from app.core.database import async_session_factory
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.staff_request_repository import StaffRequestRepository
+from app.repositories.venue_repository import VenueRepository
 from app.schemas.staff_request import StaffRequestCreate
 from app.services.notification_service import NotificationService
 from app.services.staff_request_service import StaffRequestService
@@ -63,11 +64,14 @@ async def call_staff(message: str, table_number: int = 0, request_type: str = "h
                 normalized_type = "other"
 
         async with async_session_factory() as session:
+            venue_repo = VenueRepository(session)
             service = StaffRequestService(
                 repo=StaffRequestRepository(session),
                 notification_service=NotificationService(
-                    NotificationRepository(session)
+                    NotificationRepository(session),
+                    venue_repo,
                 ),
+                venue_repo=venue_repo,
             )
 
             try:
@@ -82,7 +86,10 @@ async def call_staff(message: str, table_number: int = 0, request_type: str = "h
             except Exception:
                 # Fallback: if DB fails, still notify via notification service
                 logger.warning("StaffRequest DB create failed, using notification-only fallback", exc_info=True)
-                notif_service = NotificationService(NotificationRepository(session))
+                notif_service = NotificationService(
+                    NotificationRepository(session),
+                    venue_repo,
+                )
                 await notif_service.notify_operations(
                     event_type="staff.requested",
                     title="Khách cần hỗ trợ",

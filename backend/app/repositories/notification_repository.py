@@ -38,11 +38,14 @@ class NotificationRepository:
         self,
         roles: list[str],
         limit: int = 50,
+        offset: int = 0,
     ) -> list[Notification]:
+        start = max(offset, 0)
+        end = start + limit
         stmt = (
             select(Notification)
             .order_by(Notification.created_at.desc())
-            .limit(max(limit * 4, limit))
+            .limit(max(end * 4, end))
         )
         result = await self._session.execute(stmt)
         role_set = set(roles)
@@ -51,7 +54,7 @@ class NotificationRepository:
             for notification in result.scalars().all()
             if role_set.intersection(notification.target_roles or [])
         ]
-        return notifications[:limit]
+        return notifications[start:end]
 
     async def mark_as_read(self, notification_id: str) -> Notification | None:
         """Mark a single notification as read."""

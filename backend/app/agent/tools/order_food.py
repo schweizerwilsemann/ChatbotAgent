@@ -9,6 +9,7 @@ from app.core.database import async_session_factory
 from app.repositories.menu_repository import MenuRepository
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.order_repository import OrderRepository
+from app.repositories.venue_repository import VenueRepository
 from app.schemas.order import OrderCreate, OrderItemCreate
 from app.services.notification_service import NotificationService
 from app.services.order_service import OrderService
@@ -133,8 +134,12 @@ async def order_food(items: str, notes: str = "") -> str:
         async with async_session_factory() as session:
             repo = OrderRepository(session)
             menu_repo = MenuRepository(session)
-            notification_service = NotificationService(NotificationRepository(session))
-            service = OrderService(repo, menu_repo, notification_service)
+            venue_repo = VenueRepository(session)
+            notification_service = NotificationService(
+                NotificationRepository(session),
+                venue_repo,
+            )
+            service = OrderService(repo, menu_repo, notification_service, venue_repo)
 
             order_data = OrderCreate(
                 user_id=current_user_id.get(),

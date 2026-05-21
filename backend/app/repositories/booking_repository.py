@@ -19,10 +19,16 @@ class BookingRepository:
         start_time: datetime,
         end_time: datetime,
         notes: str = "",
+        venue_id: str | uuid.UUID | None = None,
+        resource_id: str | uuid.UUID | None = None,
+        resource_label: str | None = None,
     ) -> Booking:
         booking = Booking(
             id=uuid.uuid4(),
             user_id=user_id,
+            venue_id=_to_uuid_or_none(venue_id),
+            resource_id=_to_uuid_or_none(resource_id),
+            resource_label=resource_label,
             court_type=court_type,
             court_number=court_number,
             start_time=start_time,
@@ -63,15 +69,23 @@ class BookingRepository:
         start_time: datetime,
         end_time: datetime,
         exclude_id: str | None = None,
+        resource_id: str | uuid.UUID | None = None,
     ) -> bool:
         """Return True if a conflicting booking exists."""
         conditions = [
-            Booking.court_type == court_type,
-            Booking.court_number == court_number,
             Booking.status == "confirmed",
             Booking.start_time < end_time,
             Booking.end_time > start_time,
         ]
+        if resource_id:
+            conditions.append(Booking.resource_id == _to_uuid_or_none(resource_id))
+        else:
+            conditions.extend(
+                [
+                    Booking.court_type == court_type,
+                    Booking.court_number == court_number,
+                ]
+            )
         if exclude_id:
             conditions.append(Booking.id != uuid.UUID(exclude_id))
 
@@ -103,3 +117,11 @@ class BookingRepository:
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
+
+
+def _to_uuid_or_none(value: str | uuid.UUID | None) -> uuid.UUID | None:
+    if value is None:
+        return None
+    if isinstance(value, uuid.UUID):
+        return value
+    return uuid.UUID(str(value))

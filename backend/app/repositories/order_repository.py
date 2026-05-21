@@ -19,10 +19,16 @@ class OrderRepository:
         items_data: list[dict],
         menu_prices: dict[str, Decimal],
         notes: str = "",
+        venue_id: str | uuid.UUID | None = None,
+        resource_id: str | uuid.UUID | None = None,
+        resource_label: str | None = None,
     ) -> Order:
         order = Order(
             id=uuid.uuid4(),
             user_id=user_id,
+            venue_id=_to_uuid_or_none(venue_id),
+            resource_id=_to_uuid_or_none(resource_id),
+            resource_label=resource_label,
             table_number=table_number,
             status="pending",
             total_price=Decimal("0"),
@@ -86,3 +92,11 @@ class OrderRepository:
         order.status = status
         await self._session.flush()
         return order
+
+
+def _to_uuid_or_none(value: str | uuid.UUID | None) -> uuid.UUID | None:
+    if value is None:
+        return None
+    if isinstance(value, uuid.UUID):
+        return value
+    return uuid.UUID(str(value))

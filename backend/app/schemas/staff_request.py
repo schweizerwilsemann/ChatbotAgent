@@ -4,6 +4,13 @@ from pydantic import BaseModel, Field
 
 
 class StaffRequestCreate(BaseModel):
+    venue_id: str | None = Field(None, description="Venue/branch identifier")
+    resource_id: str | None = Field(None, description="Table/court resource ID")
+    resource_label: str | None = Field(
+        None,
+        max_length=255,
+        description="Human-readable table/court label",
+    )
     request_type: str = Field(
         ...,
         description="Type of request: order, payment, help, maintenance, other",
@@ -18,6 +25,9 @@ class StaffRequestResponse(BaseModel):
     id: str
     user_id: str
     user_name: str | None = None
+    venue_id: str | None = None
+    resource_id: str | None = None
+    resource_label: str | None = None
     request_type: str
     description: str | None = None
     table_number: int | None = None

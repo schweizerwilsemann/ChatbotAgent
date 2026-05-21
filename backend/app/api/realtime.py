@@ -14,6 +14,7 @@ from app.api.auth import get_current_user_from_token, require_roles
 from app.core.database import async_session_factory, get_db
 from app.models.user import UserRole
 from app.repositories.notification_repository import NotificationRepository
+from app.repositories.venue_repository import VenueRepository
 from app.schemas.notification import NotificationResponse
 from app.services.notification_service import NotificationService
 from app.services.realtime import realtime_manager
@@ -50,7 +51,7 @@ async def staff_notifications_socket(
             pass
         return
 
-    await realtime_manager.connect(websocket, role)
+    await realtime_manager.connect(websocket, role, str(user.id))
     try:
         while True:
             await websocket.receive_text()
@@ -63,11 +64,15 @@ async def staff_notifications_socket(
 @router.get("/notifications", response_model=list[NotificationResponse])
 async def list_notifications(
     limit: int = Query(50, ge=1, le=100),
-    _=Depends(require_roles("STAFF", "ADMIN")),
+    offset: int = Query(0, ge=0),
+    user=Depends(require_roles("STAFF", "ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> list[NotificationResponse]:
-    service = NotificationService(NotificationRepository(session))
-    return await service.list_for_operations(limit=limit)
+    service = NotificationService(
+        NotificationRepository(session),
+        VenueRepository(session),
+    )
+    return await service.list_for_operations(limit=limit, offset=offset, user=user)
 
 
 @router.patch("/notifications/{notification_id}/read")

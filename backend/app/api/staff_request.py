@@ -7,6 +7,7 @@ from app.core.rate_limit import rate_limit
 from app.models.user import User
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.staff_request_repository import StaffRequestRepository
+from app.repositories.venue_repository import VenueRepository
 from app.schemas.staff_request import (
     StaffRequestActionResponse,
     StaffRequestCreate,
@@ -19,9 +20,14 @@ router = APIRouter(prefix="/api/staff/requests", tags=["staff-requests"])
 
 
 def _get_service(session: AsyncSession) -> StaffRequestService:
+    venue_repo = VenueRepository(session)
     return StaffRequestService(
         repo=StaffRequestRepository(session),
-        notification_service=NotificationService(NotificationRepository(session)),
+        notification_service=NotificationService(
+            NotificationRepository(session),
+            venue_repo,
+        ),
+        venue_repo=venue_repo,
     )
 
 
@@ -55,6 +61,10 @@ async def create_staff_request(
         request_type=data.request_type,
         description=data.description,
         table_number=data.table_number,
+        venue_id=data.venue_id,
+        resource_id=data.resource_id,
+        resource_label=data.resource_label,
+        user=user,
     )
     await session.commit()
     return result
@@ -72,11 +82,14 @@ async def get_my_requests(
 
 @router.get("/pending", response_model=list[StaffRequestResponse])
 async def get_pending_requests(
-    _: User = Depends(require_roles("STAFF", "ADMIN")),
+    user: User = Depends(require_roles("STAFF", "ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> list[StaffRequestResponse]:
     """Get all pending staff requests (staff/admin only)."""
     service = _get_service(session)
+    role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
+    if role_value == "STAFF":
+        return await service.get_pending_requests_for_staff(str(user.id))
     return await service.get_pending_requests()
 
 
@@ -88,6 +101,26 @@ async def accept_staff_request(
 ) -> StaffRequestResponse:
     """Accept a pending staff request (staff/admin only)."""
     service = _get_service(session)
+    request_repo = StaffRequestRepository(session)
+    request = await request_repo.get_by_id(request_id)
+    if not request:
+        raise HTTPException(status_code=404, detail="Request not found")
+    role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
+    if role_value == "STAFF":
+        venue_repo = VenueRepository(session)
+        access = await venue_repo.get_staff_access(str(user.id))
+        if access.has_assignments:
+            resource_ids = await venue_repo.expand_accessible_resource_ids(access)
+            can_accept = False
+            if request.resource_id and request.resource_id in resource_ids:
+                can_accept = True
+            if request.venue_id and request.venue_id in access.venue_scope_ids:
+                can_accept = True
+            if not can_accept:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Request is outside your assigned tables/courts",
+                )
     try:
         result = await service.accept_request(
             request_id, str(user.id), user.name

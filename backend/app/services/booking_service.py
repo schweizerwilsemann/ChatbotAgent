@@ -2,6 +2,7 @@ import logging
 from datetime import date, datetime, time, timedelta
 
 from app.repositories.booking_repository import BookingRepository
+from app.repositories.venue_repository import VenueRepository
 from app.schemas.booking import (
     AvailabilityResponse,
     BookingCreate,
@@ -20,12 +21,14 @@ class BookingService:
         self,
         repo: BookingRepository,
         notification_service: NotificationService | None = None,
+        venue_repo: VenueRepository | None = None,
     ) -> None:
         self._repo = repo
         self._notification_service = notification_service
+        self._venue_repo = venue_repo
 
     async def create_booking(
-        self, data: BookingCreate, user_id: str
+        self, data: BookingCreate, user_id: str, user=None
     ) -> BookingResponse:
         """Create a new booking after validating business rules."""
         if data.court_type not in VALID_COURT_TYPES:
@@ -46,22 +49,59 @@ class BookingService:
         if duration_hours < 0.5:
             raise ValueError("Booking duration must be at least 30 minutes")
 
+        venue_id = data.venue_id
+        resource_id = data.resource_id
+        resource_label = data.resource_label
+        court_type = data.court_type
+        court_number = data.court_number
+
+        if self._venue_repo:
+            resolved_venue_id = await self._venue_repo.resolve_user_venue_id(
+                user,
+                explicit_venue_id=venue_id,
+            )
+            venue_id = str(resolved_venue_id) if resolved_venue_id else venue_id
+
+            resource = None
+            if resource_id:
+                resource = await self._venue_repo.get_resource_by_id(resource_id)
+                if not resource:
+                    raise ValueError("Selected table/court was not found")
+            else:
+                resource = await self._venue_repo.resolve_legacy_resource(
+                    venue_id=venue_id,
+                    court_type=court_type,
+                    court_number=court_number,
+                )
+
+            if resource:
+                venue_id = str(resource.venue_id)
+                resource_id = str(resource.id)
+                resource_label = data.resource_label or resource.name
+                court_number = resource.number
+                if resource.sport_type in VALID_COURT_TYPES:
+                    court_type = resource.sport_type
+
         has_conflict = await self._repo.check_conflict(
-            court_type=data.court_type,
-            court_number=data.court_number,
+            court_type=court_type,
+            court_number=court_number,
             start_time=start_time,
             end_time=end_time,
+            resource_id=resource_id,
         )
         if has_conflict:
             raise ValueError(
-                f"Court {data.court_type} #{data.court_number} is already booked "
+                f"{resource_label or f'Court {court_type} #{court_number}'} is already booked "
                 f"for the requested time slot"
             )
 
         booking = await self._repo.create(
             user_id=user_id,
-            court_type=data.court_type,
-            court_number=data.court_number,
+            venue_id=venue_id,
+            resource_id=resource_id,
+            resource_label=resource_label,
+            court_type=court_type,
+            court_number=court_number,
             start_time=start_time,
             end_time=end_time,
             notes=data.notes,
@@ -74,8 +114,8 @@ class BookingService:
                 event_type="booking.created",
                 title="Đặt sân mới",
                 message=(
-                    f"Khách vừa đặt {response.court_type} sân "
-                    f"{response.court_number} từ {response.start_time} đến {response.end_time}"
+                    f"Khách vừa đặt {response.resource_label or response.court_type} "
+                    f"từ {response.start_time} đến {response.end_time}"
                 ),
                 source="booking",
                 payload=response.model_dump(mode="json"),
@@ -119,6 +159,7 @@ class BookingService:
         court_number: int,
         start_time: datetime,
         end_time: datetime,
+        resource_id: str | None = None,
     ) -> bool:
         """Check if a court is available for the given time slot."""
         if court_type not in VALID_COURT_TYPES:
@@ -132,6 +173,7 @@ class BookingService:
             court_number=court_number,
             start_time=start_time,
             end_time=end_time,
+            resource_id=resource_id,
         )
         return not has_conflict
 
@@ -139,12 +181,27 @@ class BookingService:
         self,
         court_type: str,
         selected_date: date,
+        venue_id: str | None = None,
     ) -> AvailabilityResponse:
         """Return simple hourly availability for the selected court type/date."""
         if court_type not in VALID_COURT_TYPES:
             raise ValueError(f"Invalid court type: {court_type}")
 
         court_numbers = list(range(1, 5))
+        resource_ids_by_number: dict[int, str] = {}
+        if self._venue_repo:
+            resource_rows = await self._venue_repo.list_resources(
+                venue_id=venue_id,
+                sport_type=court_type,
+                status="active",
+            )
+            resources = [row["resource"] for row in resource_rows]
+            if resources:
+                court_numbers = [resource.number for resource in resources]
+                resource_ids_by_number = {
+                    resource.number: str(resource.id) for resource in resources
+                }
+
         slots: list[TimeSlotResponse] = []
         available_courts: set[int] = set()
 
@@ -159,6 +216,7 @@ class BookingService:
                     court_number=court_number,
                     start_time=current,
                     end_time=next_time,
+                    resource_id=resource_ids_by_number.get(court_number),
                 )
                 if is_available:
                     slot_available = True
@@ -185,6 +243,11 @@ class BookingService:
         return BookingResponse(
             id=str(booking.id),
             user_id=booking.user_id,
+            venue_id=str(booking.venue_id) if getattr(booking, "venue_id", None) else None,
+            resource_id=str(booking.resource_id)
+            if getattr(booking, "resource_id", None)
+            else None,
+            resource_label=getattr(booking, "resource_label", None),
             court_type=booking.court_type,
             court_number=booking.court_number,
             date=booking.start_time.date(),

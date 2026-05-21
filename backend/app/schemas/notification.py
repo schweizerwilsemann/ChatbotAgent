@@ -7,6 +7,9 @@ class StaffNotifyRequest(BaseModel):
     message: str = Field(
         ..., min_length=1, max_length=1000, description="Notification message"
     )
+    venue_id: str | None = Field(None, description="Venue/branch identifier")
+    resource_id: str | None = Field(None, description="Selected table/court resource")
+    resource_label: str | None = Field(None, max_length=255)
     table_number: int = Field(0, ge=0, description="Table number (0 if not applicable)")
 
 

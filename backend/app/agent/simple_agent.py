@@ -8,6 +8,7 @@ from app.repositories.menu_repository import MenuRepository
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.order_repository import OrderRepository
 from app.repositories.staff_request_repository import StaffRequestRepository
+from app.repositories.venue_repository import VenueRepository
 from app.schemas.order import OrderCreate, OrderItemCreate
 from app.services.notification_service import NotificationService
 from app.services.order_service import OrderService
@@ -185,10 +186,12 @@ class SimpleVenueAgent:
             if not matched_items:
                 return None
 
+            venue_repo = VenueRepository(session)
             service = OrderService(
                 OrderRepository(session),
                 menu_repo,
-                NotificationService(NotificationRepository(session)),
+                NotificationService(NotificationRepository(session), venue_repo),
+                venue_repo,
             )
             order = await service.create_order(
                 OrderCreate(
@@ -237,11 +240,14 @@ class SimpleVenueAgent:
             request_type = "maintenance"
 
         async with async_session_factory() as session:
+            venue_repo = VenueRepository(session)
             service = StaffRequestService(
                 repo=StaffRequestRepository(session),
                 notification_service=NotificationService(
-                    NotificationRepository(session)
+                    NotificationRepository(session),
+                    venue_repo,
                 ),
+                venue_repo=venue_repo,
             )
             try:
                 result = await service.create_request(
@@ -263,7 +269,10 @@ class SimpleVenueAgent:
             except Exception:
                 await session.rollback()
                 # Fallback to notification-only
-                notif_service = NotificationService(NotificationRepository(session))
+                notif_service = NotificationService(
+                    NotificationRepository(session),
+                    venue_repo,
+                )
                 await notif_service.notify_operations(
                     event_type="staff.requested",
                     title="Khách cần hỗ trợ",

@@ -24,15 +24,18 @@ from app.api.order import router as order_router
 from app.api.realtime import router as realtime_router
 from app.api.staff import router as staff_router
 from app.api.staff_request import router as staff_request_router
+from app.api.venue import router as venue_router
 from app.core.config import settings
 from app.core.database import async_session_factory, engine
 from app.core.neo4j_client import Neo4jClient
 from app.core.redis_client import redis_client
 from app.core.seed import (
+    ensure_multi_tenant_columns,
     ensure_user_password_column,
     seed_admin_user,
     seed_customer_user,
     seed_default_menu,
+    seed_default_venue,
     seed_staff_user,
 )
 from app.kg.embeddings import NodeEmbedder
@@ -62,10 +65,17 @@ async def lifespan(app: FastAPI):
         await conn.run_sync(Base.metadata.create_all)
     logger.info("PostgreSQL tables ensured.")
     await ensure_user_password_column(engine)
+    await ensure_multi_tenant_columns(engine)
     async with async_session_factory() as session:
-        await seed_admin_user(session)
-        await seed_staff_user(session)
-        await seed_customer_user(session)
+        admin_user = await seed_admin_user(session)
+        staff_user = await seed_staff_user(session)
+        customer_user = await seed_customer_user(session)
+        await seed_default_venue(
+            session,
+            admin_user=admin_user,
+            staff_user=staff_user,
+            customer_user=customer_user,
+        )
         await seed_default_menu(session)
         await session.commit()
 
@@ -157,6 +167,7 @@ app.include_router(order_router)
 app.include_router(menu_router)
 app.include_router(staff_router)
 app.include_router(staff_request_router)
+app.include_router(venue_router)
 app.include_router(realtime_router)
 app.include_router(admin_router)
 

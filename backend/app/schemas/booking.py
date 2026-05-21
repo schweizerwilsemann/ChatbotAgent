@@ -5,6 +5,13 @@ from pydantic import BaseModel, Field, field_validator
 
 
 class BookingCreate(BaseModel):
+    venue_id: str | None = Field(None, description="Venue/branch identifier")
+    resource_id: str | None = Field(None, description="Selected table/court resource")
+    resource_label: str | None = Field(
+        None,
+        max_length=255,
+        description="Human-readable table/court label",
+    )
     court_type: str = Field(
         ..., description="Type of court: billiards, pickleball, badminton"
     )
@@ -41,6 +48,9 @@ class BookingCreate(BaseModel):
 class BookingResponse(BaseModel):
     id: str
     user_id: str
+    venue_id: str | None = None
+    resource_id: str | None = None
+    resource_label: str | None = None
     court_type: str
     court_number: int
     date: DateType
