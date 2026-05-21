@@ -16,6 +16,9 @@ class StaffRequestRepository {
     required StaffRequestType requestType,
     String? description,
     int? tableNumber,
+    String? venueId,
+    String? resourceId,
+    String? resourceLabel,
   }) async {
     if (requestType == StaffRequestType.other &&
         (description == null || description.trim().isEmpty)) {
@@ -26,6 +29,9 @@ class StaffRequestRepository {
 
     try {
       return await _api.createRequest(StaffRequestCreate(
+        venueId: venueId,
+        resourceId: resourceId,
+        resourceLabel: resourceLabel,
         requestType: requestType,
         description: description?.trim(),
         tableNumber: tableNumber,

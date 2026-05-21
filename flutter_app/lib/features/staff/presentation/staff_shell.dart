@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/core/constants/app_spacing.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/staff/presentation/staff_notifications_provider.dart';
+import 'package:sports_venue_chatbot/shared/widgets/floating_bottom_nav.dart';
+import 'package:sports_venue_chatbot/shared/widgets/glass_app_bar.dart';
 
 /// Shell screen for Staff role.
 ///
@@ -82,19 +85,16 @@ class _StaffShellState extends ConsumerState<StaffShell> {
     final user = ref.watch(authStateProvider).valueOrNull;
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Row(
+      appBar: GlassAppBar(
+        title: const Row(
           children: [
-            const Icon(Icons.support_agent, color: AppColors.primary, size: 24),
-            const SizedBox(width: 8),
-            const Text('Nhân viên'),
+            Icon(Icons.support_agent, color: AppColors.primary, size: 24),
+            SizedBox(width: AppSpacing.sm),
+            Flexible(child: Text('Nhân viên')),
           ],
         ),
         actions: [
-          // Notifications bell with badge
           _NotificationBell(onTap: () => context.go('/staff/notifications')),
-          // Profile menu
           PopupMenuButton<String>(
             icon: CircleAvatar(
               radius: 16,
@@ -166,30 +166,22 @@ class _StaffShellState extends ConsumerState<StaffShell> {
               ),
             ],
           ),
-          const SizedBox(width: 8),
         ],
       ),
       body: widget.child,
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: FloatingBottomNav(
         selectedIndex: _currentIndex >= _navItems.length ? 0 : _currentIndex,
-        onDestinationSelected: _onTabTapped,
-        backgroundColor: AppColors.surface,
-        indicatorColor: AppColors.primarySurface,
-        elevation: 0,
-        shadowColor: AppColors.shadow,
-        height: 65,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        destinations: _navItems.map((item) {
-          final isSelected = _navItems.indexOf(item) == _currentIndex;
-          return NavigationDestination(
-            icon: Icon(
-              item.icon,
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
-            ),
-            selectedIcon: Icon(item.selectedIcon, color: AppColors.primary),
-            label: item.label,
-          );
-        }).toList(),
+        onTap: _onTabTapped,
+        items: _navItems
+            .map(
+              (item) => FloatingBottomNavItem(
+                icon: item.icon,
+                selectedIcon: item.selectedIcon,
+                label: item.label,
+                color: AppColors.primary,
+              ),
+            )
+            .toList(),
       ),
     );
   }

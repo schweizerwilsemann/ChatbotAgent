@@ -93,6 +93,9 @@ class StaffRequestNotifier extends StateNotifier<StaffRequestState> {
     required StaffRequestType requestType,
     String? description,
     int? tableNumber,
+    String? venueId,
+    String? resourceId,
+    String? resourceLabel,
   }) async {
     state =
         state.copyWith(isLoading: true, clearError: true, clearSuccess: true);
@@ -102,6 +105,9 @@ class StaffRequestNotifier extends StateNotifier<StaffRequestState> {
         requestType: requestType,
         description: description,
         tableNumber: tableNumber,
+        venueId: venueId,
+        resourceId: resourceId,
+        resourceLabel: resourceLabel,
       );
       state = state.copyWith(
         activeRequest: request,

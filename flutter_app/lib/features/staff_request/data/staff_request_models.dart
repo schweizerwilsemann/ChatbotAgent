@@ -78,6 +78,9 @@ class StaffRequest {
   final String id;
   final String userId;
   final String? userName;
+  final String? venueId;
+  final String? resourceId;
+  final String? resourceLabel;
   final StaffRequestType requestType;
   final String? description;
   final int? tableNumber;
@@ -92,6 +95,9 @@ class StaffRequest {
     required this.id,
     required this.userId,
     this.userName,
+    this.venueId,
+    this.resourceId,
+    this.resourceLabel,
     required this.requestType,
     this.description,
     this.tableNumber,
@@ -112,6 +118,9 @@ class StaffRequest {
     String? id,
     String? userId,
     String? userName,
+    String? venueId,
+    String? resourceId,
+    String? resourceLabel,
     StaffRequestType? requestType,
     String? description,
     int? tableNumber,
@@ -126,6 +135,9 @@ class StaffRequest {
       id: id ?? this.id,
       userId: userId ?? this.userId,
       userName: userName ?? this.userName,
+      venueId: venueId ?? this.venueId,
+      resourceId: resourceId ?? this.resourceId,
+      resourceLabel: resourceLabel ?? this.resourceLabel,
       requestType: requestType ?? this.requestType,
       description: description ?? this.description,
       tableNumber: tableNumber ?? this.tableNumber,
@@ -141,11 +153,17 @@ class StaffRequest {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class StaffRequestCreate {
+  final String? venueId;
+  final String? resourceId;
+  final String? resourceLabel;
   final StaffRequestType requestType;
   final String? description;
   final int? tableNumber;
 
   const StaffRequestCreate({
+    this.venueId,
+    this.resourceId,
+    this.resourceLabel,
     required this.requestType,
     this.description,
     this.tableNumber,

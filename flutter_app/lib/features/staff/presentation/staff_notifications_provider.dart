@@ -29,6 +29,8 @@ class StaffNotificationsState {
   final List<StaffNotification> notifications;
   final bool isConnected;
   final bool isLoading;
+  final bool isLoadingMore;
+  final bool hasMore;
   final String? error;
   final Map<String, String> resolvedStatuses;
 
@@ -36,6 +38,8 @@ class StaffNotificationsState {
     this.notifications = const [],
     this.isConnected = false,
     this.isLoading = false,
+    this.isLoadingMore = false,
+    this.hasMore = true,
     this.error,
     this.resolvedStatuses = const {},
   });
@@ -57,6 +61,8 @@ class StaffNotificationsState {
     List<StaffNotification>? notifications,
     bool? isConnected,
     bool? isLoading,
+    bool? isLoadingMore,
+    bool? hasMore,
     String? error,
     Map<String, String>? resolvedStatuses,
     bool clearError = false,
@@ -65,6 +71,8 @@ class StaffNotificationsState {
       notifications: notifications ?? this.notifications,
       isConnected: isConnected ?? this.isConnected,
       isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasMore: hasMore ?? this.hasMore,
       error: clearError ? null : (error ?? this.error),
       resolvedStatuses: resolvedStatuses ?? this.resolvedStatuses,
     );
@@ -79,6 +87,7 @@ class StaffNotificationsNotifier
   WebSocketChannel? _channel;
   StreamSubscription<dynamic>? _subscription;
   bool _started = false;
+  static const int _pageSize = 30;
 
   StaffNotificationsNotifier({
     required DioClient dioClient,
@@ -97,10 +106,19 @@ class StaffNotificationsNotifier
   }
 
   Future<void> refresh() async {
-    state = state.copyWith(isLoading: true, clearError: true);
+    state = state.copyWith(
+      isLoading: true,
+      isLoadingMore: false,
+      hasMore: true,
+      clearError: true,
+    );
     try {
       final response = await _dioClient.get<List<dynamic>>(
         ApiConstants.realtimeNotificationsEndpoint,
+        queryParameters: const {
+          'limit': _pageSize,
+          'offset': 0,
+        },
       );
       final data = response.data ?? const [];
       final notifications = data
@@ -110,11 +128,41 @@ class StaffNotificationsNotifier
       state = state.copyWith(
         notifications: notifications,
         isLoading: false,
+        hasMore: notifications.length == _pageSize,
       );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: 'Không thể tải thông báo vận hành.',
+      );
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (state.isLoading || state.isLoadingMore || !state.hasMore) return;
+    state = state.copyWith(isLoadingMore: true, clearError: true);
+    try {
+      final response = await _dioClient.get<List<dynamic>>(
+        ApiConstants.realtimeNotificationsEndpoint,
+        queryParameters: {
+          'limit': _pageSize,
+          'offset': state.notifications.length,
+        },
+      );
+      final data = response.data ?? const [];
+      final nextPage = data
+          .map((item) =>
+              StaffNotification.fromJson(item as Map<String, dynamic>))
+          .toList();
+      state = state.copyWith(
+        notifications: _mergeNotifications(state.notifications, nextPage),
+        isLoadingMore: false,
+        hasMore: nextPage.length == _pageSize,
+      );
+    } catch (_) {
+      state = state.copyWith(
+        isLoadingMore: false,
+        error: 'Không thể tải thêm thông báo.',
       );
     }
   }
@@ -163,9 +211,8 @@ class StaffNotificationsNotifier
       final notification = StaffNotification.fromJson(decoded);
       final exists =
           state.notifications.any((item) => item.id == notification.id);
-      final updated = exists
-          ? state.notifications
-          : [notification, ...state.notifications].take(100).toList();
+      final updated =
+          exists ? state.notifications : [notification, ...state.notifications];
       state = state.copyWith(notifications: updated);
       _localNotifications.showOperationNotification(
         title: notification.title,
@@ -265,4 +312,16 @@ class StaffNotificationsNotifier
     stop();
     super.dispose();
   }
+}
+
+List<StaffNotification> _mergeNotifications(
+  List<StaffNotification> current,
+  List<StaffNotification> nextPage,
+) {
+  final seen = current.map((notification) => notification.id).toSet();
+  return [
+    ...current,
+    for (final notification in nextPage)
+      if (seen.add(notification.id)) notification,
+  ];
 }

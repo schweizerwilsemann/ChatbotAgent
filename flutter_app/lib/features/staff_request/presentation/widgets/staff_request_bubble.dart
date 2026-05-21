@@ -47,6 +47,9 @@ class StaffRequestBubble extends ConsumerWidget {
             requestType: result.requestType,
             description: result.description,
             tableNumber: result.tableNumber,
+            venueId: result.venueId,
+            resourceId: result.resourceId,
+            resourceLabel: result.resourceLabel,
           );
     }
   }
@@ -78,7 +81,12 @@ class StaffRequestBubble extends ConsumerWidget {
               const SizedBox(height: 8),
               _infoRow(Icons.notes, 'Ghi chú', request.description!),
             ],
-            if (request.tableNumber != null) ...[
+            if (request.resourceLabel != null &&
+                request.resourceLabel!.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              _infoRow(Icons.location_on_outlined, 'Bàn / sân',
+                  request.resourceLabel!),
+            ] else if (request.tableNumber != null) ...[
               const SizedBox(height: 8),
               _infoRow(Icons.table_restaurant, 'Bàn / sân',
                   '${request.tableNumber}'),

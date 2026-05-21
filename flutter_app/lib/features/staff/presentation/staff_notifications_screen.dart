@@ -9,6 +9,7 @@ import 'package:sports_venue_chatbot/features/staff/presentation/staff_notificat
 import 'package:sports_venue_chatbot/features/staff_request/domain/staff_request_repository.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_section_title.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
+import 'package:sports_venue_chatbot/shared/widgets/pagination_footer.dart';
 
 class StaffNotificationsScreen extends ConsumerStatefulWidget {
   const StaffNotificationsScreen({super.key});
@@ -20,6 +21,13 @@ class StaffNotificationsScreen extends ConsumerStatefulWidget {
 
 class _StaffNotificationsScreenState
     extends ConsumerState<StaffNotificationsScreen> {
+  bool _handlePagination(ScrollNotification scrollInfo) {
+    if (scrollInfo.metrics.extentAfter < 360) {
+      ref.read(staffNotificationsProvider.notifier).loadMore();
+    }
+    return false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -51,43 +59,55 @@ class _StaffNotificationsScreenState
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () =>
-            ref.read(staffNotificationsProvider.notifier).refresh(),
-        child: ListView(
-          padding: EdgeInsets.all(Responsive.horizontalPadding(context)),
-          children: [
-            ResponsiveContainer(
-              maxWidth: 720,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _ConnectionBanner(isConnected: state.isConnected),
-                  const SizedBox(height: 20),
-                  const AppSectionTitle('Thông báo mới'),
-                  const SizedBox(height: 8),
-                  if (state.isLoading && state.notifications.isEmpty)
-                    const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(32),
-                        child: CircularProgressIndicator(),
-                      ),
-                    )
-                  else if (state.notifications.isEmpty)
-                    const _EmptyNotifications()
-                  else
-                    ...state.notifications.map(
-                      (notification) => _NotificationTile(
-                        notification: notification,
-                        onMarkRead: () => ref
-                            .read(staffNotificationsProvider.notifier)
-                            .markAsRead(notification.id),
-                      ),
-                    ),
-                ],
-              ),
+      body: NotificationListener<ScrollNotification>(
+        onNotification: _handlePagination,
+        child: RefreshIndicator(
+          onRefresh: () =>
+              ref.read(staffNotificationsProvider.notifier).refresh(),
+          child: ListView(
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
             ),
-          ],
+            padding: EdgeInsets.all(Responsive.horizontalPadding(context)),
+            children: [
+              ResponsiveContainer(
+                maxWidth: 720,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _ConnectionBanner(isConnected: state.isConnected),
+                    const SizedBox(height: 20),
+                    const AppSectionTitle('Thông báo mới'),
+                    const SizedBox(height: 8),
+                    if (state.isLoading && state.notifications.isEmpty)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(32),
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    else if (state.notifications.isEmpty)
+                      const _EmptyNotifications()
+                    else ...[
+                      ...state.notifications.map(
+                        (notification) => _NotificationTile(
+                          notification: notification,
+                          onMarkRead: () => ref
+                              .read(staffNotificationsProvider.notifier)
+                              .markAsRead(notification.id),
+                        ),
+                      ),
+                      PaginationFooter(
+                        isLoading: state.isLoadingMore,
+                        hasMore: state.hasMore,
+                        endLabel: 'Đã tải hết thông báo',
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -157,11 +177,12 @@ class _NotificationTile extends ConsumerWidget {
         decoration: BoxDecoration(
           color: isRead
               ? AppColors.surface
-              : AppColors.primarySurface.withOpacity(0.4),
+              : AppColors.primarySurface.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color:
-                isRead ? AppColors.border : AppColors.primary.withOpacity(0.3),
+            color: isRead
+                ? AppColors.border
+                : AppColors.primary.withValues(alpha: 0.3),
           ),
         ),
         child: Column(
@@ -227,7 +248,22 @@ class _NotificationTile extends ConsumerWidget {
                               : AppColors.textPrimary,
                         ),
                       ),
-                      if (notification.payload['table_number'] != null &&
+                      if (notification.payload['resource_label'] != null &&
+                          notification.payload['resource_label']
+                              .toString()
+                              .isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            notification.payload['resource_label'].toString(),
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        )
+                      else if (notification.payload['table_number'] != null &&
                           notification.payload['table_number'] != 0)
                         Padding(
                           padding: const EdgeInsets.only(top: 6),
@@ -294,10 +330,10 @@ class _NotificationTile extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.success.withOpacity(0.1),
+                        color: AppColors.success.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                            color: AppColors.success.withOpacity(0.3)),
+                            color: AppColors.success.withValues(alpha: 0.3)),
                       ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,

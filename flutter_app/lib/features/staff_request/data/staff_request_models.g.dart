@@ -10,6 +10,9 @@ StaffRequest _$StaffRequestFromJson(Map<String, dynamic> json) => StaffRequest(
       id: json['id'] as String,
       userId: json['user_id'] as String,
       userName: json['user_name'] as String?,
+      venueId: json['venue_id'] as String?,
+      resourceId: json['resource_id'] as String?,
+      resourceLabel: json['resource_label'] as String?,
       requestType: $enumDecode(_$StaffRequestTypeEnumMap, json['request_type']),
       description: json['description'] as String?,
       tableNumber: json['table_number'] as int?,
@@ -30,6 +33,9 @@ Map<String, dynamic> _$StaffRequestToJson(StaffRequest instance) =>
       'id': instance.id,
       'user_id': instance.userId,
       'user_name': instance.userName,
+      'venue_id': instance.venueId,
+      'resource_id': instance.resourceId,
+      'resource_label': instance.resourceLabel,
       'request_type': _$StaffRequestTypeEnumMap[instance.requestType]!,
       'description': instance.description,
       'table_number': instance.tableNumber,
@@ -58,6 +64,9 @@ const _$StaffRequestStatusEnumMap = {
 
 StaffRequestCreate _$StaffRequestCreateFromJson(Map<String, dynamic> json) =>
     StaffRequestCreate(
+      venueId: json['venue_id'] as String?,
+      resourceId: json['resource_id'] as String?,
+      resourceLabel: json['resource_label'] as String?,
       requestType: $enumDecode(_$StaffRequestTypeEnumMap, json['request_type']),
       description: json['description'] as String?,
       tableNumber: json['table_number'] as int?,
@@ -65,6 +74,9 @@ StaffRequestCreate _$StaffRequestCreateFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$StaffRequestCreateToJson(StaffRequestCreate instance) =>
     <String, dynamic>{
+      'venue_id': instance.venueId,
+      'resource_id': instance.resourceId,
+      'resource_label': instance.resourceLabel,
       'request_type': _$StaffRequestTypeEnumMap[instance.requestType]!,
       'description': instance.description,
       'table_number': instance.tableNumber,

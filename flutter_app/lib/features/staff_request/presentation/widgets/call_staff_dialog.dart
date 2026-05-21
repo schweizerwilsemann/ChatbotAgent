@@ -1,30 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/features/staff_request/data/staff_request_models.dart';
+import 'package:sports_venue_chatbot/features/venue/data/venue_models.dart';
+import 'package:sports_venue_chatbot/features/venue/presentation/venue_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_dialog.dart';
 
 class CallStaffResult {
+  final String? venueId;
+  final String? resourceId;
+  final String? resourceLabel;
   final StaffRequestType requestType;
   final String? description;
   final int? tableNumber;
 
   const CallStaffResult({
+    this.venueId,
+    this.resourceId,
+    this.resourceLabel,
     required this.requestType,
     this.description,
     this.tableNumber,
   });
 }
 
-class _CallStaffDialogContent extends StatefulWidget {
+class _CallStaffDialogContent extends ConsumerStatefulWidget {
   const _CallStaffDialogContent();
 
   @override
-  State<_CallStaffDialogContent> createState() =>
+  ConsumerState<_CallStaffDialogContent> createState() =>
       _CallStaffDialogContentState();
 }
 
-class _CallStaffDialogContentState extends State<_CallStaffDialogContent> {
+class _CallStaffDialogContentState
+    extends ConsumerState<_CallStaffDialogContent> {
   StaffRequestType? _selectedType;
+  VenueResource? _selectedResource;
   late final TextEditingController _tableController;
   late final TextEditingController _descController;
 
@@ -44,6 +55,8 @@ class _CallStaffDialogContentState extends State<_CallStaffDialogContent> {
 
   @override
   Widget build(BuildContext context) {
+    final resourcesAsync = ref.watch(venueResourcesProvider);
+
     return Dialog(
       backgroundColor: AppColors.surface,
       elevation: 0,
@@ -108,9 +121,8 @@ class _CallStaffDialogContentState extends State<_CallStaffDialogContent> {
                         fontSize: 13,
                       ),
                       side: BorderSide(
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.border,
+                        color:
+                            isSelected ? AppColors.primary : AppColors.border,
                       ),
                     );
                   }).toList(),
@@ -118,19 +130,55 @@ class _CallStaffDialogContentState extends State<_CallStaffDialogContent> {
 
                 const SizedBox(height: 16),
 
-                // Table number
+                resourcesAsync.when(
+                  loading: () => const LinearProgressIndicator(minHeight: 2),
+                  error: (_, __) => const SizedBox.shrink(),
+                  data: (resources) => DropdownButtonFormField<VenueResource>(
+                    initialValue: resources.contains(_selectedResource)
+                        ? _selectedResource
+                        : null,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Bàn / sân',
+                      prefixIcon: Icon(Icons.location_on_outlined, size: 20),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                    ),
+                    hint: const Text('Chọn vị trí phục vụ'),
+                    items: resources
+                        .map(
+                          (resource) => DropdownMenuItem(
+                            value: resource,
+                            child: Text(
+                              resource.displayLabel,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (resource) {
+                      setState(() {
+                        _selectedResource = resource;
+                        if (resource != null) {
+                          _tableController.text = resource.number.toString();
+                        }
+                      });
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
                 TextField(
                   controller: _tableController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Số bàn / sân (tùy chọn)',
                     hintText: 'VD: 3',
-                    prefixIcon:
-                        const Icon(Icons.table_restaurant, size: 20),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
+                    prefixIcon: Icon(Icons.table_restaurant, size: 20),
+                    contentPadding: EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 10,
                     ),
@@ -144,14 +192,11 @@ class _CallStaffDialogContentState extends State<_CallStaffDialogContent> {
                 TextField(
                   controller: _descController,
                   maxLines: 2,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Mô tả thêm (tùy chọn)',
                     hintText: 'VD: Mang thêm 2 lon nước ngọt',
-                    prefixIcon: const Icon(Icons.edit_note, size: 20),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
+                    prefixIcon: Icon(Icons.edit_note, size: 20),
+                    contentPadding: EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 10,
                     ),
@@ -175,18 +220,20 @@ class _CallStaffDialogContentState extends State<_CallStaffDialogContent> {
                       onPressed: _selectedType == null
                           ? null
                           : () {
-                              final tableNum =
-                                  _tableController.text.trim().isEmpty
-                                      ? null
-                                      : int.tryParse(
-                                          _tableController.text.trim());
+                              final tableNum = _tableController.text
+                                      .trim()
+                                      .isEmpty
+                                  ? null
+                                  : int.tryParse(_tableController.text.trim());
                               Navigator.of(context, rootNavigator: true)
                                   .pop(CallStaffResult(
+                                venueId: _selectedResource?.venueId,
+                                resourceId: _selectedResource?.id,
+                                resourceLabel: _selectedResource?.displayLabel,
                                 requestType: _selectedType!,
-                                description:
-                                    _descController.text.trim().isEmpty
-                                        ? null
-                                        : _descController.text.trim(),
+                                description: _descController.text.trim().isEmpty
+                                    ? null
+                                    : _descController.text.trim(),
                                 tableNumber: tableNum,
                               ));
                             },
