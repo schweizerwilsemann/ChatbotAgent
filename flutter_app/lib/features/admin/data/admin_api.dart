@@ -33,12 +33,16 @@ class AdminApi {
     String? date,
     String? courtType,
     String? status,
+    int? limit,
+    int? offset,
   }) async {
     try {
       final queryParams = <String, dynamic>{};
       if (date != null) queryParams['date'] = date;
       if (courtType != null) queryParams['court_type'] = courtType;
       if (status != null) queryParams['status'] = status;
+      if (limit != null) queryParams['limit'] = limit;
+      if (offset != null) queryParams['offset'] = offset;
 
       final response = await _dioClient.get<List<dynamic>>(
         ApiConstants.adminBookingsEndpoint,
@@ -72,10 +76,16 @@ class AdminApi {
   // ─── Orders ─────────────────────────────────────────────────────────────
 
   /// Fetch orders with optional status filter.
-  Future<List<AdminOrder>> getOrders({String? status}) async {
+  Future<List<AdminOrder>> getOrders({
+    String? status,
+    int? limit,
+    int? offset,
+  }) async {
     try {
       final queryParams = <String, dynamic>{};
       if (status != null) queryParams['status'] = status;
+      if (limit != null) queryParams['limit'] = limit;
+      if (offset != null) queryParams['offset'] = offset;
 
       final response = await _dioClient.get<List<dynamic>>(
         ApiConstants.adminOrdersEndpoint,
@@ -106,10 +116,20 @@ class AdminApi {
   // ─── Menu ───────────────────────────────────────────────────────────────
 
   /// Fetch menu items with optional category filter.
-  Future<List<AdminMenuItem>> getMenuItems({String? categoryKey}) async {
+  Future<List<AdminMenuItem>> getMenuItems({
+    String? categoryKey,
+    String? query,
+    int? limit,
+    int? offset,
+  }) async {
     try {
       final queryParams = <String, dynamic>{};
       if (categoryKey != null) queryParams['category_key'] = categoryKey;
+      if (query != null && query.trim().isNotEmpty) {
+        queryParams['q'] = query.trim();
+      }
+      if (limit != null) queryParams['limit'] = limit;
+      if (offset != null) queryParams['offset'] = offset;
 
       final response = await _dioClient.get<List<dynamic>>(
         ApiConstants.adminMenuEndpoint,

@@ -181,6 +181,9 @@ class AdminBooking {
   final String id;
   final String userId;
   final String userName;
+  final String? venueId;
+  final String? resourceId;
+  final String? resourceLabel;
   final String courtType;
   final int courtNumber;
   final DateTime date;
@@ -196,6 +199,9 @@ class AdminBooking {
     required this.id,
     required this.userId,
     required this.userName,
+    this.venueId,
+    this.resourceId,
+    this.resourceLabel,
     required this.courtType,
     required this.courtNumber,
     required this.date,
@@ -213,6 +219,9 @@ class AdminBooking {
       id: json['id'] as String,
       userId: json['user_id'] as String,
       userName: json['user_name'] as String? ?? '',
+      venueId: json['venue_id'] as String?,
+      resourceId: json['resource_id'] as String?,
+      resourceLabel: json['resource_label'] as String?,
       courtType: json['court_type'] as String,
       courtNumber: _toInt(json['court_number']),
       date: DateTime.parse(json['date'] as String),
@@ -232,6 +241,9 @@ class AdminBooking {
       'id': id,
       'user_id': userId,
       'user_name': userName,
+      'venue_id': venueId,
+      'resource_id': resourceId,
+      'resource_label': resourceLabel,
       'court_type': courtType,
       'court_number': courtNumber,
       'date':
@@ -250,6 +262,9 @@ class AdminBooking {
     String? id,
     String? userId,
     String? userName,
+    String? venueId,
+    String? resourceId,
+    String? resourceLabel,
     String? courtType,
     int? courtNumber,
     DateTime? date,
@@ -265,6 +280,9 @@ class AdminBooking {
       id: id ?? this.id,
       userId: userId ?? this.userId,
       userName: userName ?? this.userName,
+      venueId: venueId ?? this.venueId,
+      resourceId: resourceId ?? this.resourceId,
+      resourceLabel: resourceLabel ?? this.resourceLabel,
       courtType: courtType ?? this.courtType,
       courtNumber: courtNumber ?? this.courtNumber,
       date: date ?? this.date,
@@ -322,6 +340,9 @@ class AdminOrderItem {
 class AdminOrder {
   final String id;
   final String userId;
+  final String? venueId;
+  final String? resourceId;
+  final String? resourceLabel;
   final int tableNumber;
   final AdminOrderStatus status;
   final double totalPrice;
@@ -332,6 +353,9 @@ class AdminOrder {
   const AdminOrder({
     required this.id,
     required this.userId,
+    this.venueId,
+    this.resourceId,
+    this.resourceLabel,
     required this.tableNumber,
     required this.status,
     required this.totalPrice,
@@ -344,6 +368,9 @@ class AdminOrder {
     return AdminOrder(
       id: json['id'] as String,
       userId: json['user_id'] as String,
+      venueId: json['venue_id'] as String?,
+      resourceId: json['resource_id'] as String?,
+      resourceLabel: json['resource_label'] as String?,
       tableNumber: _toInt(json['table_number']),
       status: _parseOrderStatus(json['status'] as String),
       totalPrice: _toDouble(json['total_price']),
@@ -360,6 +387,9 @@ class AdminOrder {
     return {
       'id': id,
       'user_id': userId,
+      'venue_id': venueId,
+      'resource_id': resourceId,
+      'resource_label': resourceLabel,
       'table_number': tableNumber,
       'status': _orderStatusToString(status),
       'total_price': totalPrice,
@@ -372,6 +402,9 @@ class AdminOrder {
   AdminOrder copyWith({
     String? id,
     String? userId,
+    String? venueId,
+    String? resourceId,
+    String? resourceLabel,
     int? tableNumber,
     AdminOrderStatus? status,
     double? totalPrice,
@@ -382,6 +415,9 @@ class AdminOrder {
     return AdminOrder(
       id: id ?? this.id,
       userId: userId ?? this.userId,
+      venueId: venueId ?? this.venueId,
+      resourceId: resourceId ?? this.resourceId,
+      resourceLabel: resourceLabel ?? this.resourceLabel,
       tableNumber: tableNumber ?? this.tableNumber,
       status: status ?? this.status,
       totalPrice: totalPrice ?? this.totalPrice,
