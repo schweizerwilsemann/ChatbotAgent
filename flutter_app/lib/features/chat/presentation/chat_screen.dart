@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_provider.dart';
+import 'package:sports_venue_chatbot/features/chat/presentation/voice_input_provider.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/widgets/chat_bubble.dart';
+import 'package:sports_venue_chatbot/features/chat/presentation/widgets/voice_input_overlay.dart';
 import 'package:sports_venue_chatbot/features/staff_request/presentation/widgets/staff_request_bubble.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_confirm_dialog.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
@@ -19,10 +21,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
+  bool _showVoiceOverlay = false;
 
   @override
   void initState() {
     super.initState();
+    _textController.addListener(() => setState(() {}));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
     });
@@ -93,7 +97,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Container(
               width: 36,
               height: 36,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.border,
                 shape: BoxShape.circle,
               ),
@@ -116,7 +120,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   chatState.isLoading || chatState.isStreaming
                       ? 'Đang trả lời...'
                       : 'Trực tuyến',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
                   ),
@@ -180,11 +184,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ),
 
           // Call staff floating bubble
-          Positioned(
+          const Positioned(
             right: 16,
             bottom: 80,
-            child: const StaffRequestBubble(),
+            child: StaffRequestBubble(),
           ),
+
+          // Voice input overlay
+          if (_showVoiceOverlay)
+            Positioned.fill(
+              child: VoiceInputOverlay(
+                onClose: _closeVoiceOverlay,
+                onTextReady: _onVoiceTextReady,
+              ),
+            ),
         ],
       ),
     );
@@ -202,7 +215,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               Container(
                 width: 80,
                 height: 80,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.primarySurface,
                   shape: BoxShape.circle,
                 ),
@@ -301,7 +314,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget _buildStreamingPreview(ChatState chatState) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: AppColors.primarySurface.withOpacity(0.3),
+      color: AppColors.primarySurface.withValues(alpha: 0.3),
       child: Row(
         children: [
           const SizedBox(
@@ -318,7 +331,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               chatState.streamingContent.length > 100
                   ? '${chatState.streamingContent.substring(0, 100)}...'
                   : chatState.streamingContent,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
                 fontStyle: FontStyle.italic,
@@ -337,13 +350,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 8,
-            offset: const Offset(0, -2),
+            offset: Offset(0, -2),
           ),
         ],
       ),
@@ -398,17 +411,46 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ),
               child: IconButton(
                 icon: Icon(
-                  isLoading ? Icons.hourglass_empty : Icons.send,
+                  isLoading
+                      ? Icons.hourglass_empty
+                      : (_textController.text.trim().isEmpty
+                          ? Icons.mic
+                          : Icons.send),
                   color: Colors.white,
                   size: 20,
                 ),
-                onPressed: isLoading ? null : _handleSend,
+                onPressed: isLoading
+                    ? null
+                    : (_textController.text.trim().isEmpty
+                        ? _openVoiceOverlay
+                        : _handleSend),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _openVoiceOverlay() {
+    setState(() => _showVoiceOverlay = true);
+    _focusNode.unfocus();
+  }
+
+  void _closeVoiceOverlay() {
+    ref.read(voiceInputProvider.notifier).cancelListening();
+    setState(() => _showVoiceOverlay = false);
+  }
+
+  void _onVoiceTextReady(String text) {
+    setState(() => _showVoiceOverlay = false);
+    if (text.isNotEmpty) {
+      _textController.text = text;
+      _textController.selection = TextSelection.fromPosition(
+        TextPosition(offset: text.length),
+      );
+      _focusNode.requestFocus();
+    }
   }
 
   void _showNewChatDialog() async {

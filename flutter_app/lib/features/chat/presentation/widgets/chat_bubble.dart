@@ -47,11 +47,11 @@ class ChatBubble extends StatelessWidget {
                       bottomLeft: Radius.circular(isUser ? 18 : 4),
                       bottomRight: Radius.circular(isUser ? 4 : 18),
                     ),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         color: AppColors.shadow,
                         blurRadius: 4,
-                        offset: const Offset(0, 2),
+                        offset: Offset(0, 2),
                       ),
                     ],
                     border: isUser
@@ -97,14 +97,14 @@ class ChatBubble extends StatelessWidget {
                                 ),
                                 code: TextStyle(
                                   backgroundColor: AppColors.botBubbleBorder
-                                      .withOpacity(0.3),
+                                      .withValues(alpha: 0.3),
                                   color: AppColors.botBubbleText,
                                   fontSize: 13,
                                   fontFamily: 'monospace',
                                 ),
                                 codeblockDecoration: BoxDecoration(
                                   color: AppColors.botBubbleBorder
-                                      .withOpacity(0.2),
+                                      .withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 h1: const TextStyle(
@@ -138,7 +138,10 @@ class ChatBubble extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Text(
                       VietnameseDateUtils.formatTime(message.timestamp),
-                      style: TextStyle(color: AppColors.textHint, fontSize: 11),
+                      style: const TextStyle(
+                        color: AppColors.textHint,
+                        fontSize: 11,
+                      ),
                     ),
                   ),
                 ],
@@ -158,11 +161,11 @@ class ChatBubble extends StatelessWidget {
       decoration: BoxDecoration(
         color: message.isUser ? AppColors.secondary : AppColors.primary,
         shape: BoxShape.circle,
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 4,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -182,10 +185,10 @@ class ChatBubble extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: _getToolColor(tool).withOpacity(0.1),
+            color: _getToolColor(tool).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: _getToolColor(tool).withOpacity(0.3),
+              color: _getToolColor(tool).withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -329,14 +332,14 @@ class _TypingIndicatorState extends State<TypingIndicator>
           Container(
             width: 32,
             height: 32,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.primary,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
                   color: AppColors.shadow,
                   blurRadius: 4,
-                  offset: const Offset(0, 2),
+                  offset: Offset(0, 2),
                 ),
               ],
             ),
@@ -354,11 +357,11 @@ class _TypingIndicatorState extends State<TypingIndicator>
                 bottomLeft: Radius.circular(4),
               ),
               border: Border.all(color: AppColors.botBubbleBorder),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: AppColors.shadow,
                   blurRadius: 4,
-                  offset: const Offset(0, 2),
+                  offset: Offset(0, 2),
                 ),
               ],
             ),
@@ -377,7 +380,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
                     margin: const EdgeInsets.symmetric(horizontal: 2),
                     width: 8,
                     height: 8,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppColors.textHint,
                       shape: BoxShape.circle,
                     ),
