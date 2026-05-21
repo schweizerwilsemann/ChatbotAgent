@@ -46,12 +46,16 @@ dependencies:
   uuid: 4.2.2
   equatable: 2.0.5
 
+  # Voice / Speech-to-Text
+  speech_to_text: ^7.0.0
+
   # UI Components
   flutter_animate: 4.3.0
   shimmer: 3.0.0
   badges: 3.1.2
   flutter_slidable: 3.0.1
   device_info_plus: 12.4.0
+  google_fonts: ^8.1.0
 
 dev_dependencies:
   flutter_test:

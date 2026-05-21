@@ -8,30 +8,47 @@ import 'package:sports_venue_chatbot/features/admin/data/admin_models.dart';
 class MenuManagementState {
   final List<AdminMenuItem> items;
   final bool isLoading;
+  final bool isLoadingMore;
+  final bool hasMore;
   final String? error;
   final String? successMessage;
+  final String? categoryKey;
+  final String query;
 
   const MenuManagementState({
     this.items = const [],
     this.isLoading = false,
+    this.isLoadingMore = false,
+    this.hasMore = true,
     this.error,
     this.successMessage,
+    this.categoryKey,
+    this.query = '',
   });
 
   MenuManagementState copyWith({
     List<AdminMenuItem>? items,
     bool? isLoading,
+    bool? isLoadingMore,
+    bool? hasMore,
     String? error,
     String? successMessage,
+    String? categoryKey,
+    String? query,
     bool clearError = false,
     bool clearSuccess = false,
+    bool clearCategoryKey = false,
   }) {
     return MenuManagementState(
       items: items ?? this.items,
       isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasMore: hasMore ?? this.hasMore,
       error: clearError ? null : (error ?? this.error),
       successMessage:
           clearSuccess ? null : (successMessage ?? this.successMessage),
+      categoryKey: clearCategoryKey ? null : (categoryKey ?? this.categoryKey),
+      query: query ?? this.query,
     );
   }
 }
@@ -39,25 +56,63 @@ class MenuManagementState {
 // ─── Notifier ───────────────────────────────────────────────────────────────
 
 class MenuManagementNotifier extends StateNotifier<MenuManagementState> {
+  static const int _pageSize = 30;
+
   final AdminApi _adminApi;
 
   MenuManagementNotifier(this._adminApi) : super(const MenuManagementState());
 
   /// Load all menu items from the API.
-  Future<void> loadItems({String? categoryKey}) async {
-    state = state.copyWith(isLoading: true, clearError: true);
+  Future<void> loadItems({
+    String? categoryKey,
+    String? query,
+    bool clearCategoryKey = false,
+    bool reset = true,
+  }) async {
+    if (!reset) {
+      if (state.isLoading || state.isLoadingMore || !state.hasMore) return;
+      state = state.copyWith(isLoadingMore: true, clearError: true);
+    } else {
+      state = state.copyWith(
+        isLoading: true,
+        isLoadingMore: false,
+        hasMore: true,
+        categoryKey: categoryKey,
+        query: query,
+        clearCategoryKey: clearCategoryKey,
+        clearError: true,
+      );
+    }
+
     try {
-      final items = await _adminApi.getMenuItems(categoryKey: categoryKey);
-      state = state.copyWith(items: items, isLoading: false);
+      final items = await _adminApi.getMenuItems(
+        categoryKey: state.categoryKey,
+        query: state.query,
+        limit: _pageSize,
+        offset: reset ? 0 : state.items.length,
+      );
+      state = state.copyWith(
+        items: reset ? items : [...state.items, ...items],
+        isLoading: false,
+        isLoadingMore: false,
+        hasMore: items.length == _pageSize,
+      );
     } on ApiException catch (e) {
-      state = state.copyWith(isLoading: false, error: e.message);
+      state = state.copyWith(
+        isLoading: false,
+        isLoadingMore: false,
+        error: e.message,
+      );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
+        isLoadingMore: false,
         error: 'Không thể tải danh sách thực đơn.',
       );
     }
   }
+
+  Future<void> loadMoreItems() => loadItems(reset: false);
 
   /// Create a new menu item.
   Future<bool> createItem(MenuItemCreate data) async {

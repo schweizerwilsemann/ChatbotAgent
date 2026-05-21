@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/core/constants/app_spacing.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/admin/data/admin_models.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/menu_management_provider.dart';
+import 'package:sports_venue_chatbot/shared/widgets/pagination_footer.dart';
 
 // ─── Category helpers ───────────────────────────────────────────────────────
 
@@ -42,6 +46,7 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _searchController = TextEditingController();
+  Timer? _searchDebounce;
   String _searchQuery = '';
 
   @override
@@ -49,6 +54,7 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
     super.initState();
     _tabController =
         TabController(length: _defaultTabLabels.length, vsync: this);
+    _tabController.addListener(_handleTabChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(menuManagementProvider.notifier).loadItems();
     });
@@ -56,6 +62,8 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
+    _tabController.removeListener(_handleTabChanged);
     _tabController.dispose();
     _searchController.dispose();
     super.dispose();
@@ -63,28 +71,40 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
 
   // ── Helpers ────────────────────────────────────────────────────────
 
-  List<AdminMenuItem> _getFilteredItems(List<AdminMenuItem> items) {
+  String? get _selectedCategoryKey {
     final selectedTab = _defaultTabLabels[_tabController.index];
-    var filtered = items;
+    if (selectedTab == 'Tất cả') return null;
+    return _defaultCategoryKeyMap[selectedTab];
+  }
 
-    // Category filter — match by category name or categoryKey
-    if (selectedTab != 'Tất cả') {
-      final expectedKey = _defaultCategoryKeyMap[selectedTab];
-      filtered = filtered.where((item) {
-        return item.category == selectedTab ||
-            (expectedKey != null && item.categoryKey == expectedKey);
-      }).toList();
+  void _handleTabChanged() {
+    if (_tabController.indexIsChanging) return;
+    final categoryKey = _selectedCategoryKey;
+    ref.read(menuManagementProvider.notifier).loadItems(
+          categoryKey: categoryKey,
+          clearCategoryKey: categoryKey == null,
+          query: _searchQuery,
+        );
+  }
+
+  void _handleSearchChanged(String value) {
+    setState(() => _searchQuery = value.trim());
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 350), () {
+      final categoryKey = _selectedCategoryKey;
+      ref.read(menuManagementProvider.notifier).loadItems(
+            categoryKey: categoryKey,
+            clearCategoryKey: categoryKey == null,
+            query: _searchQuery,
+          );
+    });
+  }
+
+  bool _handlePagination(ScrollNotification notification) {
+    if (notification.metrics.extentAfter < 360) {
+      ref.read(menuManagementProvider.notifier).loadMoreItems();
     }
-
-    // Search filter
-    if (_searchQuery.isNotEmpty) {
-      final query = _searchQuery.toLowerCase();
-      filtered = filtered
-          .where((item) => item.name.toLowerCase().contains(query))
-          .toList();
-    }
-
-    return filtered;
+    return false;
   }
 
   String _formatPrice(double price) {
@@ -191,12 +211,17 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       builder: (ctx) {
         final bottomInset = MediaQuery.of(ctx).viewInsets.bottom;
         return Padding(
-          padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + bottomInset),
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg + bottomInset,
+          ),
           child: Form(
             key: formKey,
             child: SingleChildScrollView(
@@ -209,7 +234,7 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
                     child: Container(
                       width: 40,
                       height: 4,
-                      margin: const EdgeInsets.only(bottom: 16),
+                      margin: const EdgeInsets.only(bottom: AppSpacing.md),
                       decoration: BoxDecoration(
                         color: AppColors.border,
                         borderRadius: BorderRadius.circular(2),
@@ -231,7 +256,6 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
                     controller: nameCtrl,
                     decoration: const InputDecoration(
                       labelText: 'Tên món *',
-                      border: OutlineInputBorder(),
                     ),
                     validator: (v) =>
                         (v == null || v.trim().isEmpty) ? 'Nhập tên món' : null,
@@ -240,16 +264,17 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
 
                   // Category dropdown
                   DropdownButtonFormField<String>(
-                    value: selectedCategory,
+                    initialValue: selectedCategory,
                     decoration: const InputDecoration(
                       labelText: 'Danh mục *',
-                      border: OutlineInputBorder(),
                     ),
                     items: categoryOptions
                         .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                         .toList(),
                     onChanged: (v) {
-                      if (v != null) selectedCategory = v;
+                      if (v != null) {
+                        selectedCategory = v;
+                      }
                     },
                   ),
                   const SizedBox(height: 14),
@@ -261,13 +286,15 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
                         const TextInputType.numberWithOptions(decimal: false),
                     decoration: const InputDecoration(
                       labelText: 'Giá (VNĐ) *',
-                      border: OutlineInputBorder(),
                       suffixText: 'đ',
                     ),
                     validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Nhập giá';
-                      if (double.tryParse(v.trim()) == null)
+                      if (v == null || v.trim().isEmpty) {
+                        return 'Nhập giá';
+                      }
+                      if (double.tryParse(v.trim()) == null) {
                         return 'Giá không hợp lệ';
+                      }
                       return null;
                     },
                   ),
@@ -279,7 +306,6 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
                     maxLines: 3,
                     decoration: const InputDecoration(
                       labelText: 'Mô tả',
-                      border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -345,12 +371,7 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
       }
     });
 
-    // Re-filter when tab changes
-    _tabController.addListener(() {
-      if (mounted) setState(() {});
-    });
-
-    final filteredItems = _getFilteredItems(state.items);
+    final items = state.items;
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
@@ -387,9 +408,17 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
               child: state.isLoading && state.items.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : RefreshIndicator(
-                      onRefresh: () =>
-                          ref.read(menuManagementProvider.notifier).loadItems(),
-                      child: filteredItems.isEmpty
+                      onRefresh: () {
+                        final categoryKey = _selectedCategoryKey;
+                        return ref
+                            .read(menuManagementProvider.notifier)
+                            .loadItems(
+                              categoryKey: categoryKey,
+                              clearCategoryKey: categoryKey == null,
+                              query: _searchQuery,
+                            );
+                      },
+                      child: items.isEmpty
                           ? ListView(
                               children: [
                                 SizedBox(
@@ -404,7 +433,7 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
                                           color: AppColors.textHint
                                               .withValues(alpha: 0.5)),
                                       const SizedBox(height: 12),
-                                      Text(
+                                      const Text(
                                         'Không có món nào',
                                         style: TextStyle(
                                           color: AppColors.textSecondary,
@@ -416,17 +445,28 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
                                 ),
                               ],
                             )
-                          : ListView.builder(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
-                              itemCount: filteredItems.length,
-                              itemBuilder: (ctx, i) => _MenuItemManagementCard(
-                                item: filteredItems[i],
-                                formatPrice: _formatPrice,
-                                onEdit: () => _handleEdit(filteredItems[i]),
-                                onDelete: () => _handleDelete(filteredItems[i]),
-                                onToggleAvailability: () =>
-                                    _handleToggleAvailability(filteredItems[i]),
+                          : NotificationListener<ScrollNotification>(
+                              onNotification: _handlePagination,
+                              child: ListView.builder(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                itemCount: items.length + 1,
+                                itemBuilder: (ctx, i) {
+                                  if (i == items.length) {
+                                    return PaginationFooter(
+                                      isLoading: state.isLoadingMore,
+                                      hasMore: state.hasMore,
+                                    );
+                                  }
+                                  return _MenuItemManagementCard(
+                                    item: items[i],
+                                    formatPrice: _formatPrice,
+                                    onEdit: () => _handleEdit(items[i]),
+                                    onDelete: () => _handleDelete(items[i]),
+                                    onToggleAvailability: () =>
+                                        _handleToggleAvailability(items[i]),
+                                  );
+                                },
                               ),
                             ),
                     ),
@@ -446,14 +486,14 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
         controller: _searchController,
         decoration: InputDecoration(
           hintText: 'Tìm kiếm món...',
-          hintStyle: TextStyle(color: AppColors.textHint),
+          hintStyle: const TextStyle(color: AppColors.textHint),
           prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
                   icon: const Icon(Icons.clear, color: AppColors.textSecondary),
                   onPressed: () {
                     _searchController.clear();
-                    setState(() => _searchQuery = '');
+                    _handleSearchChanged('');
                   },
                 )
               : null,
@@ -461,20 +501,8 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
           fillColor: AppColors.surface,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.border),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.border),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-          ),
         ),
-        onChanged: (v) => setState(() => _searchQuery = v.trim()),
+        onChanged: _handleSearchChanged,
       ),
     );
   }
