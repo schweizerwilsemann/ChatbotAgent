@@ -1,4 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: unused_element
 
 part of 'menu_models.dart';
 
@@ -65,6 +66,9 @@ Map<String, dynamic> _$OrderItemToJson(OrderItem instance) => <String, dynamic>{
 
 OrderCreate _$OrderCreateFromJson(Map<String, dynamic> json) => OrderCreate(
       userId: json['user_id'] as String,
+      venueId: json['venue_id'] as String?,
+      resourceId: json['resource_id'] as String?,
+      resourceLabel: json['resource_label'] as String?,
       tableNumber: json['table_number'] as int? ?? 0,
       items: (json['items'] as List<dynamic>)
           .map((e) => OrderItemCreate.fromJson(e as Map<String, dynamic>))
@@ -76,6 +80,9 @@ OrderCreate _$OrderCreateFromJson(Map<String, dynamic> json) => OrderCreate(
 Map<String, dynamic> _$OrderCreateToJson(OrderCreate instance) =>
     <String, dynamic>{
       'user_id': instance.userId,
+      'venue_id': instance.venueId,
+      'resource_id': instance.resourceId,
+      'resource_label': instance.resourceLabel,
       'table_number': instance.tableNumber,
       'items': instance.items,
       'booking_id': instance.bookingId,
@@ -84,6 +91,9 @@ Map<String, dynamic> _$OrderCreateToJson(OrderCreate instance) =>
 
 Order _$OrderFromJson(Map<String, dynamic> json) => Order(
       id: json['id'] as String,
+      venueId: json['venue_id'] as String?,
+      resourceId: json['resource_id'] as String?,
+      resourceLabel: json['resource_label'] as String?,
       items: (json['items'] as List<dynamic>)
           .map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -95,6 +105,9 @@ Order _$OrderFromJson(Map<String, dynamic> json) => Order(
 
 Map<String, dynamic> _$OrderToJson(Order instance) => <String, dynamic>{
       'id': instance.id,
+      'venue_id': instance.venueId,
+      'resource_id': instance.resourceId,
+      'resource_label': instance.resourceLabel,
       'items': instance.items,
       'total_price': instance.totalPrice,
       'status': _$OrderStatusEnumMap[instance.status]!,

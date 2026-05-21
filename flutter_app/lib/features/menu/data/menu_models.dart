@@ -122,6 +122,9 @@ class OrderItem {
 @JsonSerializable(fieldRename: FieldRename.snake)
 class OrderCreate {
   final String userId;
+  final String? venueId;
+  final String? resourceId;
+  final String? resourceLabel;
   final int tableNumber;
   final List<OrderItemCreate> items;
   final String? bookingId;
@@ -129,6 +132,9 @@ class OrderCreate {
 
   const OrderCreate({
     required this.userId,
+    this.venueId,
+    this.resourceId,
+    this.resourceLabel,
     this.tableNumber = 0,
     required this.items,
     this.bookingId,
@@ -143,6 +149,9 @@ class OrderCreate {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'user_id': userId,
+      'venue_id': venueId,
+      'resource_id': resourceId,
+      'resource_label': resourceLabel,
       'table_number': tableNumber,
       'items': items.map((e) => e.toJson()).toList(),
       'notes': notes ?? '',
@@ -185,6 +194,9 @@ extension OrderStatusExtension on OrderStatus {
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Order {
   final String id;
+  final String? venueId;
+  final String? resourceId;
+  final String? resourceLabel;
   final List<OrderItem> items;
   final double totalPrice;
   final OrderStatus status;
@@ -193,6 +205,9 @@ class Order {
 
   const Order({
     required this.id,
+    this.venueId,
+    this.resourceId,
+    this.resourceLabel,
     required this.items,
     required this.totalPrice,
     required this.status,
@@ -203,6 +218,9 @@ class Order {
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
       id: json['id'] as String,
+      venueId: json['venue_id'] as String?,
+      resourceId: json['resource_id'] as String?,
+      resourceLabel: json['resource_label'] as String?,
       items: (json['items'] as List<dynamic>)
           .map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
           .toList(),

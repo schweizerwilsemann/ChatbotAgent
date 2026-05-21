@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:sports_venue_chatbot/core/constants/app_spacing.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/menu/data/menu_models.dart';
 import 'package:sports_venue_chatbot/features/menu/presentation/menu_provider.dart';
+import 'package:sports_venue_chatbot/features/venue/data/venue_models.dart';
+import 'package:sports_venue_chatbot/features/venue/presentation/venue_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
 
 /// Vietnamese currency formatter
@@ -354,7 +357,7 @@ class _CartSummaryBar extends ConsumerWidget {
         color: colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -423,7 +426,8 @@ class _CartSummaryBar extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppSpacing.xl)),
       ),
       builder: (_) => _OrderConfirmationSheet(cart: cart),
     );
@@ -447,6 +451,7 @@ class _OrderConfirmationSheet extends ConsumerStatefulWidget {
 class _OrderConfirmationSheetState
     extends ConsumerState<_OrderConfirmationSheet> {
   final _notesController = TextEditingController();
+  VenueResource? _selectedResource;
 
   @override
   void dispose() {
@@ -458,6 +463,7 @@ class _OrderConfirmationSheetState
   Widget build(BuildContext context) {
     final orderState = ref.watch(createOrderProvider);
     final colorScheme = Theme.of(context).colorScheme;
+    final resourcesAsync = ref.watch(venueResourcesProvider);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -534,13 +540,43 @@ class _OrderConfirmationSheetState
           ),
           const SizedBox(height: 16),
 
+          resourcesAsync.when(
+            loading: () => const LinearProgressIndicator(minHeight: 2),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (resources) => DropdownButtonFormField<VenueResource>(
+              initialValue: resources
+                  .where((resource) => resource.id == _selectedResource?.id)
+                  .firstOrNull,
+              isExpanded: true,
+              decoration: const InputDecoration(
+                labelText: 'Bàn / sân giao hàng',
+                isDense: true,
+              ),
+              hint: const Text('Chọn vị trí của bạn'),
+              items: resources
+                  .map(
+                    (resource) => DropdownMenuItem(
+                      value: resource,
+                      child: Text(
+                        resource.displayLabel,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (resource) {
+                setState(() => _selectedResource = resource);
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
+
           // Notes field
           TextField(
             controller: _notesController,
             decoration: const InputDecoration(
               labelText: 'Ghi chú (tuỳ chọn)',
               hintText: 'Ví dụ: không đá, ít đường...',
-              border: OutlineInputBorder(),
               isDense: true,
             ),
             maxLines: 2,
@@ -574,10 +610,20 @@ class _OrderConfirmationSheetState
   }
 
   Future<void> _submitOrder() async {
+    final resources = ref.read(venueResourcesProvider).valueOrNull ?? const [];
+    if (resources.isNotEmpty && _selectedResource == null) {
+      AppSnackBar.showWarning(context, 'Vui lòng chọn bàn / sân giao hàng.');
+      return;
+    }
+
     final userId =
         ref.read(authStateProvider).valueOrNull?.id ?? 'current_user';
     final orderCreate = OrderCreate(
       userId: userId,
+      venueId: _selectedResource?.venueId,
+      resourceId: _selectedResource?.id,
+      resourceLabel: _selectedResource?.displayLabel,
+      tableNumber: _selectedResource?.number ?? 0,
       items: widget.cart.toOrderItems(),
       notes: _notesController.text.trim().isEmpty
           ? null
