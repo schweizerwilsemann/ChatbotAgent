@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/voice_input_provider.dart';
 
@@ -26,6 +27,14 @@ class VoiceInputOverlay extends ConsumerWidget {
           SnackBar(
             content: Text(next.errorMessage!),
             backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 5),
+            action: next.errorMessage!.contains('Cài đặt')
+                ? SnackBarAction(
+                    label: 'Mở Cài đặt',
+                    textColor: Colors.white,
+                    onPressed: () => openAppSettings(),
+                  )
+                : null,
           ),
         );
         notifier.clearError();
@@ -127,16 +136,20 @@ class VoiceInputOverlay extends ConsumerWidget {
 
   Widget _buildTranscript(VoiceInputData data) {
     final text = data.recognizedText;
+    final isError = data.state == VoiceInputState.error;
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(minHeight: 48),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: isError
+            ? AppColors.error.withValues(alpha: 0.1)
+            : AppColors.surfaceVariant,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.divider),
+        border:
+            Border.all(color: isError ? AppColors.error : AppColors.divider),
       ),
-      child: text.isEmpty
+      child: text.isEmpty && !isError
           ? const Text(
               'Văn bản sẽ hiển thị ở đây...',
               style: TextStyle(
@@ -147,8 +160,8 @@ class VoiceInputOverlay extends ConsumerWidget {
             )
           : Text(
               text,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: isError ? AppColors.error : AppColors.textPrimary,
                 fontSize: 15,
               ),
             ),
@@ -162,6 +175,17 @@ class VoiceInputOverlay extends ConsumerWidget {
   ) {
     final isActive = data.state == VoiceInputState.listening;
     final hasText = data.recognizedText.trim().isNotEmpty;
+    final isError = data.state == VoiceInputState.error;
+    final needsSettings = data.errorMessage?.contains('Cài đặt') ?? false;
+
+    if (isError && needsSettings) {
+      return _ControlButton(
+        icon: Icons.settings,
+        label: 'Mở Cài đặt',
+        color: AppColors.primary,
+        onTap: () => openAppSettings(),
+      );
+    }
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

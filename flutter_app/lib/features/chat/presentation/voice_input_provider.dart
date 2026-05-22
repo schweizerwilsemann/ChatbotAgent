@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
@@ -51,32 +53,96 @@ class VoiceInputNotifier extends StateNotifier<VoiceInputData> {
 
   Future<bool> _ensureInitialized() async {
     if (_initialized) return true;
+
+    final micStatus = await Permission.microphone.status;
+    debugPrint('[VoiceInput] Mic permission status: $micStatus');
+    if (micStatus.isDenied) {
+      final result = await Permission.microphone.request();
+      debugPrint('[VoiceInput] Mic permission request result: $result');
+      if (result.isDenied || result.isPermanentlyDenied) {
+        state = state.copyWith(
+          state: VoiceInputState.error,
+          errorMessage: 'Cần cấp quyền microphone trong Cài đặt.',
+        );
+        return false;
+      }
+    } else if (micStatus.isPermanentlyDenied) {
+      state = state.copyWith(
+        state: VoiceInputState.error,
+        errorMessage:
+            'Quyền microphone bị từ chối. Vào Cài đặt > Ứng dụng > Sports Venue Chatbot > Quyền để cấp lại.',
+      );
+      return false;
+    }
+
     try {
+      debugPrint('[VoiceInput] Initializing speech_to_text...');
       _initialized = await _speech.initialize(
         onError: (error) {
+          debugPrint('[VoiceInput] onError: ${error.errorMsg}');
           state = state.copyWith(
             state: VoiceInputState.error,
-            errorMessage: error.errorMsg,
+            errorMessage: 'Lỗi nhận diện: ${error.errorMsg}',
           );
           _stopLevelTimer();
         },
         onStatus: (status) {
-          if (status == 'done' || status == 'notListening') {
-            _stopLevelTimer();
-            if (state.state == VoiceInputState.listening) {
-              state = state.copyWith(state: VoiceInputState.idle);
-            }
-          }
+          debugPrint('[VoiceInput] onStatus: $status');
         },
       );
-      return _initialized;
-    } catch (e) {
+      debugPrint('[VoiceInput] Initialized: $_initialized');
+
+      if (!_initialized) {
+        state = state.copyWith(
+          state: VoiceInputState.error,
+          errorMessage:
+              'Nhận dạng giọng nói không khả dụng. Kiểm tra Google Speech Services.',
+        );
+        return false;
+      }
+
+      return true;
+    } catch (e, st) {
+      debugPrint('[VoiceInput] Init exception: $e\n$st');
       state = state.copyWith(
         state: VoiceInputState.error,
-        errorMessage: 'Không thể khởi tạo nhận diện giọng nói.',
+        errorMessage: 'Không thể khởi tạo nhận diện giọng nói: $e',
       );
       return false;
     }
+  }
+
+  String _findVietnameseLocale(List<LocaleName> locales) {
+    debugPrint(
+        '[VoiceInput] Available locales: ${locales.map((l) => l.localeId).toList()}');
+
+    for (final pattern in ['vi_VN', 'vi-VN', 'vie_VN', 'vi']) {
+      final match = locales.firstWhere(
+        (l) => l.localeId == pattern,
+        orElse: () => LocaleName('', ''),
+      );
+      if (match.localeId.isNotEmpty) {
+        debugPrint('[VoiceInput] Found Vietnamese locale: ${match.localeId}');
+        return match.localeId;
+      }
+    }
+
+    for (final l in locales) {
+      if (l.localeId.toLowerCase().startsWith('vi')) {
+        debugPrint('[VoiceInput] Found locale (partial): ${l.localeId}');
+        return l.localeId;
+      }
+    }
+
+    if (locales.isNotEmpty) {
+      final fallback = locales.first.localeId;
+      debugPrint(
+          '[VoiceInput] No Vietnamese locale. Falling back to: $fallback');
+      return fallback;
+    }
+
+    debugPrint('[VoiceInput] No locales available, using vi_VN');
+    return 'vi_VN';
   }
 
   Future<void> startListening() async {
@@ -89,15 +155,30 @@ class VoiceInputNotifier extends StateNotifier<VoiceInputData> {
       audioLevels: [],
     );
 
-    await _speech.listen(
-      onResult: _onResult,
-      listenOptions: SpeechListenOptions(
-        localeId: 'vi_VN',
-        listenMode: ListenMode.dictation,
-        cancelOnError: true,
-        partialResults: true,
-      ),
-    );
+    final locales = await _speech.locales();
+    final localeId = _findVietnameseLocale(locales);
+    debugPrint('[VoiceInput] Using locale: $localeId');
+
+    try {
+      debugPrint('[VoiceInput] Starting listen...');
+
+      // Use the simplest possible listen call
+      _speech.listen(
+        onResult: _onResult,
+        localeId: localeId,
+        listenFor: const Duration(seconds: 30),
+        pauseFor: const Duration(seconds: 3),
+      );
+
+      debugPrint('[VoiceInput] listen() called');
+      debugPrint('[VoiceInput] isListening: ${_speech.isListening}');
+    } catch (e, st) {
+      debugPrint('[VoiceInput] listen() exception: $e\n$st');
+      state = state.copyWith(
+        state: VoiceInputState.error,
+        errorMessage: 'Lỗi bắt đầu nghe: $e',
+      );
+    }
 
     _startLevelTimer();
   }
@@ -115,6 +196,11 @@ class VoiceInputNotifier extends StateNotifier<VoiceInputData> {
   }
 
   void _onResult(SpeechRecognitionResult result) {
+    debugPrint('[VoiceInput] ====== onResult CALLED ======');
+    debugPrint('[VoiceInput] recognizedWords: "${result.recognizedWords}"');
+    debugPrint('[VoiceInput] finalResult: ${result.finalResult}');
+    debugPrint('[VoiceInput] confidence: ${result.confidence}');
+
     final text = result.recognizedWords;
     state = state.copyWith(
       recognizedText: text,

@@ -13,7 +13,7 @@ class FlavorConfig {
   FlavorConfig._();
 
   static const String _androidEmulatorDevBaseUrl = 'http://10.0.2.2:8000';
-  static const String _physicalDeviceDevBaseUrl = 'http://192.168.1.6:8000';
+  static const String _physicalDeviceDevBaseUrl = 'http://192.168.1.7:8000';
   static Flavor _flavor = Flavor.appDev;
   static const String _apiBaseUrlOverride =
       String.fromEnvironment('API_BASE_URL');

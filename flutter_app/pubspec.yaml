@@ -48,6 +48,7 @@ dependencies:
 
   # Voice / Speech-to-Text
   speech_to_text: ^7.0.0
+  permission_handler: ^11.3.0
 
   # UI Components
   flutter_animate: 4.3.0
