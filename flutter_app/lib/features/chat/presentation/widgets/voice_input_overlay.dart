@@ -6,7 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/voice_input_provider.dart';
 
-class VoiceInputOverlay extends ConsumerWidget {
+class VoiceInputOverlay extends ConsumerStatefulWidget {
   final VoidCallback onClose;
   final ValueChanged<String> onTextReady;
 
@@ -17,7 +17,31 @@ class VoiceInputOverlay extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<VoiceInputOverlay> createState() => _VoiceInputOverlayState();
+}
+
+class _VoiceInputOverlayState extends ConsumerState<VoiceInputOverlay> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      final notifier = ref.read(voiceInputProvider.notifier);
+      await notifier.startListening();
+      if (!mounted) {
+        await notifier.cancelListening();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    ref.read(voiceInputProvider.notifier).cancelListening();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final voiceData = ref.watch(voiceInputProvider);
     final notifier = ref.read(voiceInputProvider.notifier);
 
@@ -105,7 +129,7 @@ class VoiceInputOverlay extends ConsumerWidget {
         const Spacer(),
         IconButton(
           icon: const Icon(Icons.close),
-          onPressed: onClose,
+          onPressed: widget.onClose,
           color: AppColors.textSecondary,
         ),
       ],
@@ -198,7 +222,7 @@ class VoiceInputOverlay extends ConsumerWidget {
             onTap: () {
               final text = data.recognizedText.trim();
               notifier.stopListening();
-              onTextReady(text);
+              widget.onTextReady(text);
             },
           ),
         if (hasText) const SizedBox(width: 16),
