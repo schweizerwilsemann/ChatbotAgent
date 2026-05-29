@@ -11,8 +11,10 @@ final chatRepositoryProvider = Provider<ChatRepository>((ref) {
 
 /// Abstract chat repository interface
 abstract class IChatRepository {
-  Future<ChatResponse> sendMessage(String message, String? sessionId);
-  Stream<StreamChunk> sendMessageStream(String message, String? sessionId);
+  Future<ChatResponse> sendMessage(String message, String? sessionId,
+      {Map<String, dynamic>? context});
+  Stream<StreamChunk> sendMessageStream(String message, String? sessionId,
+      {Map<String, dynamic>? context});
   Future<List<ChatMessage>> getChatHistory(String sessionId);
   Future<void> deleteSession(String sessionId);
 }
@@ -24,12 +26,14 @@ class ChatRepository implements IChatRepository {
   ChatRepository(this._chatApi);
 
   @override
-  Future<ChatResponse> sendMessage(String message, String? sessionId) async {
+  Future<ChatResponse> sendMessage(String message, String? sessionId,
+      {Map<String, dynamic>? context}) async {
     try {
       if (message.trim().isEmpty) {
         throw ValidationException(message: 'Tin nhắn không được để trống');
       }
-      return await _chatApi.sendMessage(message.trim(), sessionId);
+      return await _chatApi.sendMessage(message.trim(), sessionId,
+          context: context);
     } on ApiException {
       rethrow;
     } catch (e) {
@@ -41,13 +45,15 @@ class ChatRepository implements IChatRepository {
   }
 
   @override
-  Stream<StreamChunk> sendMessageStream(String message, String? sessionId) {
+  Stream<StreamChunk> sendMessageStream(String message, String? sessionId,
+      {Map<String, dynamic>? context}) {
     if (message.trim().isEmpty) {
       return Stream.error(
         ValidationException(message: 'Tin nhắn không được để trống'),
       );
     }
-    return _chatApi.sendMessageStream(message.trim(), sessionId);
+    return _chatApi.sendMessageStream(message.trim(), sessionId,
+        context: context);
   }
 
   @override

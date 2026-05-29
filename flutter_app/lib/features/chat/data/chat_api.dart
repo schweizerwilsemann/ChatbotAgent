@@ -17,9 +17,11 @@ class ChatApi {
   ChatApi(this._dioClient);
 
   /// Send a message to the AI chatbot and receive a response
-  Future<ChatResponse> sendMessage(String message, String? sessionId) async {
+  Future<ChatResponse> sendMessage(String message, String? sessionId,
+      {Map<String, dynamic>? context}) async {
     try {
-      final request = ChatRequest(message: message, sessionId: sessionId);
+      final request =
+          ChatRequest(message: message, sessionId: sessionId, context: context);
 
       final response = await _dioClient.post<Map<String, dynamic>>(
         ApiConstants.chatEndpoint,
@@ -39,9 +41,11 @@ class ChatApi {
   /// Send a message with streaming response using SSE
   Stream<StreamChunk> sendMessageStream(
     String message,
-    String? sessionId,
-  ) async* {
-    final request = ChatRequest(message: message, sessionId: sessionId);
+    String? sessionId, {
+    Map<String, dynamic>? context,
+  }) async* {
+    final request =
+        ChatRequest(message: message, sessionId: sessionId, context: context);
 
     try {
       final response = await _dioClient.dio.post(

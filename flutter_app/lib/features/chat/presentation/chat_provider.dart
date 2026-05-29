@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/network/api_exception.dart';
 import 'package:sports_venue_chatbot/features/chat/data/chat_models.dart';
 import 'package:sports_venue_chatbot/features/chat/domain/chat_repository.dart';
+import 'package:sports_venue_chatbot/features/venue/presentation/selected_venue_provider.dart';
 import 'package:uuid/uuid.dart';
 
 /// State class for chat
@@ -47,10 +48,20 @@ class ChatState {
 /// Chat StateNotifier managing the chat state
 class ChatNotifier extends StateNotifier<ChatState> {
   final ChatRepository _repository;
+  final Ref _ref;
   StreamSubscription<StreamChunk>? _streamSubscription;
   static const _uuid = Uuid();
 
-  ChatNotifier(this._repository) : super(const ChatState());
+  ChatNotifier(this._repository, this._ref) : super(const ChatState());
+
+  Map<String, dynamic>? _buildVenueContext() {
+    final venue = _ref.read(selectedVenueProvider);
+    if (venue == null) return null;
+    return {
+      'venue_id': venue.id,
+      'venue_name': venue.name,
+    };
+  }
 
   /// Send a message and receive a response
   Future<void> sendMessage(String content) async {
@@ -70,7 +81,11 @@ class ChatNotifier extends StateNotifier<ChatState> {
     );
 
     try {
-      final response = await _repository.sendMessage(content, state.sessionId);
+      final response = await _repository.sendMessage(
+        content,
+        state.sessionId,
+        context: _buildVenueContext(),
+      );
 
       final assistantMessage = ChatMessage.assistant(
         content: response.response,
@@ -118,80 +133,81 @@ class ChatNotifier extends StateNotifier<ChatState> {
     List<String> toolsUsed = [];
 
     _streamSubscription = _repository
-        .sendMessageStream(content, state.sessionId)
+        .sendMessageStream(content, state.sessionId,
+            context: _buildVenueContext())
         .listen(
-          (chunk) {
-            if (chunk.isDone) {
-              // Finalize the streaming message
-              final assistantMessage = ChatMessage(
-                id: _uuid.v4(),
-                role: 'assistant',
-                content: buffer.toString(),
-                timestamp: DateTime.now(),
-                toolsUsed: toolsUsed.isNotEmpty ? toolsUsed : null,
-                sessionId: state.sessionId,
-              );
+      (chunk) {
+        if (chunk.isDone) {
+          // Finalize the streaming message
+          final assistantMessage = ChatMessage(
+            id: _uuid.v4(),
+            role: 'assistant',
+            content: buffer.toString(),
+            timestamp: DateTime.now(),
+            toolsUsed: toolsUsed.isNotEmpty ? toolsUsed : null,
+            sessionId: state.sessionId,
+          );
 
-              state = state.copyWith(
-                messages: [...state.messages, assistantMessage],
-                isStreaming: false,
-                streamingContent: '',
-              );
-              return;
-            }
+          state = state.copyWith(
+            messages: [...state.messages, assistantMessage],
+            isStreaming: false,
+            streamingContent: '',
+          );
+          return;
+        }
 
-            if (chunk.error != null) {
-              state = state.copyWith(
-                isStreaming: false,
-                streamingContent: '',
-                error: chunk.error,
-              );
-              return;
-            }
+        if (chunk.error != null) {
+          state = state.copyWith(
+            isStreaming: false,
+            streamingContent: '',
+            error: chunk.error,
+          );
+          return;
+        }
 
-            if (chunk.toolName != null) {
-              toolsUsed.add(chunk.toolName!);
-            }
+        if (chunk.toolName != null) {
+          toolsUsed.add(chunk.toolName!);
+        }
 
-            buffer.write(chunk.content);
-            state = state.copyWith(streamingContent: buffer.toString());
-          },
-          onError: (error) {
+        buffer.write(chunk.content);
+        state = state.copyWith(streamingContent: buffer.toString());
+      },
+      onError: (error) {
+        state = state.copyWith(
+          isStreaming: false,
+          streamingContent: '',
+          error: error is ApiException
+              ? error.message
+              : 'Đã xảy ra lỗi khi nhận phản hồi.',
+        );
+      },
+      onDone: () {
+        // Ensure streaming is marked as complete
+        if (state.isStreaming) {
+          if (buffer.isNotEmpty) {
+            final assistantMessage = ChatMessage(
+              id: _uuid.v4(),
+              role: 'assistant',
+              content: buffer.toString(),
+              timestamp: DateTime.now(),
+              toolsUsed: toolsUsed.isNotEmpty ? toolsUsed : null,
+              sessionId: state.sessionId,
+            );
+
+            state = state.copyWith(
+              messages: [...state.messages, assistantMessage],
+              isStreaming: false,
+              streamingContent: '',
+            );
+          } else {
             state = state.copyWith(
               isStreaming: false,
               streamingContent: '',
-              error: error is ApiException
-                  ? error.message
-                  : 'Đã xảy ra lỗi khi nhận phản hồi.',
             );
-          },
-          onDone: () {
-            // Ensure streaming is marked as complete
-            if (state.isStreaming) {
-              if (buffer.isNotEmpty) {
-                final assistantMessage = ChatMessage(
-                  id: _uuid.v4(),
-                  role: 'assistant',
-                  content: buffer.toString(),
-                  timestamp: DateTime.now(),
-                  toolsUsed: toolsUsed.isNotEmpty ? toolsUsed : null,
-                  sessionId: state.sessionId,
-                );
-
-                state = state.copyWith(
-                  messages: [...state.messages, assistantMessage],
-                  isStreaming: false,
-                  streamingContent: '',
-                );
-              } else {
-                state = state.copyWith(
-                  isStreaming: false,
-                  streamingContent: '',
-                );
-              }
-            }
-          },
-        );
+          }
+        }
+      },
+    );
   }
 
   /// Clear all messages and start a new session
@@ -237,7 +253,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
 
 /// Provider for the ChatNotifier
 final chatProvider = StateNotifierProvider<ChatNotifier, ChatState>((ref) {
-  return ChatNotifier(ref.watch(chatRepositoryProvider));
+  return ChatNotifier(ref.watch(chatRepositoryProvider), ref);
 });
 
 /// Provider for sending a single message (FutureProvider.family)
@@ -247,5 +263,8 @@ final sendMessageProvider = FutureProvider.family<ChatResponse, String>((
 ) async {
   final repository = ref.watch(chatRepositoryProvider);
   final sessionId = ref.watch(chatProvider).sessionId;
-  return repository.sendMessage(message, sessionId);
+  final venue = ref.watch(selectedVenueProvider);
+  final context =
+      venue != null ? {'venue_id': venue.id, 'venue_name': venue.name} : null;
+  return repository.sendMessage(message, sessionId, context: context);
 });
