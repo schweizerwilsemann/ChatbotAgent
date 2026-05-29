@@ -32,11 +32,9 @@ from app.core.redis_client import redis_client
 from app.core.seed import (
     ensure_multi_tenant_columns,
     ensure_user_password_column,
-    seed_admin_user,
     seed_customer_user,
     seed_default_menu,
     seed_default_venue,
-    seed_staff_user,
 )
 from app.kg.embeddings import NodeEmbedder
 from app.models.base import Base
@@ -67,16 +65,17 @@ async def lifespan(app: FastAPI):
     await ensure_user_password_column(engine)
     await ensure_multi_tenant_columns(engine)
     async with async_session_factory() as session:
-        admin_user = await seed_admin_user(session)
-        staff_user = await seed_staff_user(session)
         customer_user = await seed_customer_user(session)
-        await seed_default_venue(
+        billiards_venue, pickleball_venue, badminton_venue = await seed_default_venue(
             session,
-            admin_user=admin_user,
-            staff_user=staff_user,
             customer_user=customer_user,
         )
-        await seed_default_menu(session)
+        await seed_default_menu(
+            session,
+            billiards_venue=billiards_venue,
+            pickleball_venue=pickleball_venue,
+            badminton_venue=badminton_venue,
+        )
         await session.commit()
 
     neo4j_client = Neo4jClient(

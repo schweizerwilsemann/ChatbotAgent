@@ -134,6 +134,13 @@ class BookingService:
         bookings = await self._repo.get_by_user_id(user_id)
         return [self._to_response(b) for b in bookings]
 
+    async def get_active_user_booking(self, user_id: str) -> BookingResponse | None:
+        """Get the user's current active booking (now between start and end)."""
+        booking = await self._repo.get_active_booking(user_id)
+        if not booking:
+            return None
+        return self._to_response(booking)
+
     async def cancel_booking(self, booking_id: str) -> BookingResponse | None:
         """Cancel an existing booking."""
         booking = await self._repo.get_by_id(booking_id)

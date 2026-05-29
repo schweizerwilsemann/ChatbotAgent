@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import and_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -92,6 +92,23 @@ class BookingRepository:
         stmt = select(Booking).where(and_(*conditions)).limit(1)
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none() is not None
+
+    async def get_active_booking(self, user_id: str) -> Booking | None:
+        """Return the user's current active booking (now between start and end)."""
+        now = datetime.now(timezone.utc)
+        stmt = (
+            select(Booking)
+            .where(
+                Booking.user_id == user_id,
+                Booking.status == "confirmed",
+                Booking.start_time <= now,
+                Booking.end_time > now,
+            )
+            .order_by(Booking.start_time.desc())
+            .limit(1)
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def get_schedule(
         self,

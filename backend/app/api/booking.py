@@ -55,6 +55,19 @@ async def create_booking(
         raise HTTPException(status_code=500, detail="Internal server error") from exc
 
 
+@router.get("/active", response_model=BookingResponse | None)
+async def get_active_booking(
+    user: User = Depends(get_current_user),
+    service: BookingService = Depends(_get_booking_service),
+) -> BookingResponse | None:
+    """Get the current user's active booking (now between start and end)."""
+    try:
+        return await service.get_active_user_booking(str(user.id))
+    except Exception as exc:
+        logger.exception("Error fetching active booking")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
 @router.get("/available/", response_model=bool)
 async def check_availability(
     court_type: str = Query(..., description="Court type"),
