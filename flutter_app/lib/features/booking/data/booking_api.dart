@@ -53,6 +53,19 @@ class BookingApi {
     }
   }
 
+  /// Get the current user's active booking (now between start and end)
+  Future<Booking?> getActiveBooking() async {
+    try {
+      final response = await _dioClient.get<Map<String, dynamic>>(
+        '${ApiConstants.bookingEndpoint}/active',
+      );
+      if (response.data == null) return null;
+      return Booking.fromJson(response.data!);
+    } catch (e) {
+      return null;
+    }
+  }
+
   /// Cancel a booking
   Future<Booking> cancelBooking(String bookingId) async {
     try {

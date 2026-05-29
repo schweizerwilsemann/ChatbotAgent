@@ -7,6 +7,7 @@ import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.da
 import 'package:sports_venue_chatbot/features/booking/data/booking_models.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_provider.dart';
 import 'package:sports_venue_chatbot/features/venue/data/venue_models.dart';
+import 'package:sports_venue_chatbot/features/venue/presentation/selected_venue_provider.dart';
 import 'package:sports_venue_chatbot/features/venue/presentation/venue_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_confirm_dialog.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_section_title.dart';
@@ -35,6 +36,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadBookings();
+      _syncCourtTypeWithVenue();
       _checkAvailability();
     });
   }
@@ -51,6 +53,36 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   String get _currentUserId =>
       ref.read(authStateProvider).valueOrNull?.id ?? 'current_user';
+
+  void _syncCourtTypeWithVenue() {
+    final resources = ref.read(venueResourcesProvider).valueOrNull ?? [];
+    if (resources.isNotEmpty) {
+      final sportTypes =
+          resources.map((r) => r.sportType).whereType<String>().toSet();
+      final matched =
+          CourtType.values.where((ct) => sportTypes.contains(ct.name)).toList();
+      if (matched.isNotEmpty && !matched.contains(_selectedCourtType)) {
+        setState(() {
+          _selectedCourtType = matched.first;
+          _selectedResource = null;
+        });
+      }
+    }
+  }
+
+  /// Returns only the court types available at the selected venue.
+  List<CourtType> _availableCourtTypes() {
+    final resourcesAsync = ref.read(venueResourcesProvider);
+    // Return empty list while loading to prevent flash
+    if (resourcesAsync.isLoading || resourcesAsync.hasError) return [];
+    final resources = resourcesAsync.valueOrNull ?? [];
+    if (resources.isEmpty) return CourtType.values;
+    final sportTypes =
+        resources.map((r) => r.sportType).whereType<String>().toSet();
+    final available =
+        CourtType.values.where((ct) => sportTypes.contains(ct.name)).toList();
+    return available.isEmpty ? CourtType.values : available;
+  }
 
   void _checkAvailability() {
     ref
@@ -150,11 +182,26 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       }
     });
 
+    // Sync court type when venue changes
+    ref.listen(selectedVenueProvider, (previous, next) {
+      if (previous?.id != next?.id) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _syncCourtTypeWithVenue();
+          _checkAvailability();
+        });
+      }
+    });
+
+    final availableTypes = _availableCourtTypes();
+    final showCourtTypeSelector = availableTypes.length > 1;
+    final isResourcesLoading = ref.watch(venueResourcesProvider).isLoading;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Đặt sân')),
       body: RefreshIndicator(
         onRefresh: () async {
           _loadBookings();
+          _syncCourtTypeWithVenue();
           _checkAvailability();
         },
         child: SingleChildScrollView(
@@ -167,11 +214,27 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Court type selector
-                const AppSectionTitle('Loại sân'),
-                const SizedBox(height: 8),
-                _buildCourtTypeSelector(),
-                const SizedBox(height: 24),
+                // Loading state while resources are being fetched
+                if (isResourcesLoading) ...[
+                  const SizedBox(height: 32),
+                  const Center(child: CircularProgressIndicator()),
+                  const SizedBox(height: 16),
+                  const Center(
+                    child: Text(
+                      'Đang tải thông tin sân...',
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                ],
+
+                // Court type selector (only when multiple types available)
+                if (!isResourcesLoading && showCourtTypeSelector) ...[
+                  const AppSectionTitle('Loại sân'),
+                  const SizedBox(height: 8),
+                  _buildCourtTypeSelector(availableTypes),
+                  const SizedBox(height: 24),
+                ],
 
                 // Date picker
                 const AppSectionTitle('Ngày đặt'),
@@ -215,16 +278,16 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     );
   }
 
-  Widget _buildCourtTypeSelector() {
+  Widget _buildCourtTypeSelector(List<CourtType> availableTypes) {
     return Row(
-      children: CourtType.values.map((type) {
+      children: availableTypes.map((type) {
         final isSelected = _selectedCourtType == type;
         final color = _getCourtTypeColor(type);
 
         return Expanded(
           child: Padding(
             padding: EdgeInsets.only(
-              right: type != CourtType.values.last ? 8 : 0,
+              right: type != availableTypes.last ? 8 : 0,
             ),
             child: GestureDetector(
               onTap: () {
