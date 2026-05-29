@@ -1,3 +1,4 @@
+import uuid
 from decimal import Decimal
 
 from sqlalchemy import func, select
@@ -10,22 +11,49 @@ class MenuRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def list_available(self) -> list[MenuItem]:
+    async def list_available(
+        self,
+        venue_id: str | uuid.UUID | None = None,
+    ) -> list[MenuItem]:
         stmt = (
             select(MenuItem)
-            .where(MenuItem.is_available.is_(True))
+            .where(
+                MenuItem.is_available.is_(True),
+                MenuItem.is_deleted.is_(False),
+            )
             .order_by(MenuItem.category_key, MenuItem.name)
         )
+        if venue_id is not None:
+            stmt = stmt.where(
+                (MenuItem.venue_id == _to_uuid(venue_id))
+                | (MenuItem.venue_id.is_(None))
+            )
+        else:
+            stmt = stmt.where(MenuItem.venue_id.is_(None))
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def top_selling(self, limit: int = 5) -> list[MenuItem]:
+    async def top_selling(
+        self,
+        limit: int = 5,
+        venue_id: str | uuid.UUID | None = None,
+    ) -> list[MenuItem]:
         stmt = (
             select(MenuItem)
-            .where(MenuItem.is_available.is_(True))
+            .where(
+                MenuItem.is_available.is_(True),
+                MenuItem.is_deleted.is_(False),
+            )
             .order_by(MenuItem.sales_count.desc(), MenuItem.name)
             .limit(limit)
         )
+        if venue_id is not None:
+            stmt = stmt.where(
+                (MenuItem.venue_id == _to_uuid(venue_id))
+                | (MenuItem.venue_id.is_(None))
+            )
+        else:
+            stmt = stmt.where(MenuItem.venue_id.is_(None))
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -33,17 +61,24 @@ class MenuRepository:
         normalized = [name.lower() for name in names]
         stmt = select(MenuItem).where(
             MenuItem.is_available.is_(True),
+            MenuItem.is_deleted.is_(False),
             func.lower(MenuItem.name).in_(normalized),
         )
         result = await self._session.execute(stmt)
         return {item.name.lower(): item for item in result.scalars().all()}
 
-    async def search(self, query: str, limit: int = 8) -> list[MenuItem]:
+    async def search(
+        self,
+        query: str,
+        limit: int = 8,
+        venue_id: str | uuid.UUID | None = None,
+    ) -> list[MenuItem]:
         normalized = f"%{query.strip().lower()}%"
         stmt = (
             select(MenuItem)
             .where(
                 MenuItem.is_available.is_(True),
+                MenuItem.is_deleted.is_(False),
                 (
                     func.lower(MenuItem.name).like(normalized)
                     | func.lower(MenuItem.description).like(normalized)
@@ -54,6 +89,13 @@ class MenuRepository:
             .order_by(MenuItem.sales_count.desc(), MenuItem.name)
             .limit(limit)
         )
+        if venue_id is not None:
+            stmt = stmt.where(
+                (MenuItem.venue_id == _to_uuid(venue_id))
+                | (MenuItem.venue_id.is_(None))
+            )
+        else:
+            stmt = stmt.where(MenuItem.venue_id.is_(None))
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -78,12 +120,19 @@ class MenuRepository:
         price: Decimal,
         tags: str,
         sales_count: int,
+        venue_id: str | uuid.UUID | None = None,
     ) -> MenuItem:
-        stmt = select(MenuItem).where(func.lower(MenuItem.name) == name.lower())
+        venue_uuid = _to_uuid(venue_id) if venue_id else None
+        stmt = select(MenuItem).where(
+            func.lower(MenuItem.name) == name.lower(),
+            MenuItem.venue_id == venue_uuid,
+            MenuItem.is_deleted.is_(False),
+        )
         result = await self._session.execute(stmt)
         item = result.scalar_one_or_none()
         if item is None:
             item = MenuItem(
+                venue_id=venue_uuid,
                 name=name,
                 category_key=category_key,
                 category_name=category_name,
@@ -107,3 +156,11 @@ class MenuRepository:
                 item.sales_count = sales_count
         await self._session.flush()
         return item
+
+
+def _to_uuid(value: str | uuid.UUID | None) -> uuid.UUID | None:
+    if value is None:
+        return None
+    if isinstance(value, uuid.UUID):
+        return value
+    return uuid.UUID(str(value))

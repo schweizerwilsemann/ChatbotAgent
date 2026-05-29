@@ -1,15 +1,22 @@
 from decimal import Decimal
 
-from sqlalchemy import Boolean, Integer, Numeric, String, Text
+from sqlalchemy import Boolean, ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
 
 
-class MenuItem(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+class MenuItem(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     __tablename__ = "menu_items"
 
-    name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    venue_id: Mapped[str | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("venues.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
     category_key: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     category_name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False, default="")

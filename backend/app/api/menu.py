@@ -55,10 +55,11 @@ def _group_menu(items: list) -> list[MenuCategoryResponse]:
 
 @router.get("/", response_model=list[MenuCategoryResponse])
 async def get_menu(
+    venue_id: str | None = Query(None, description="Filter menu by venue"),
     session: AsyncSession = Depends(get_db),
 ) -> list[MenuCategoryResponse]:
     """Return menu grouped by category from PostgreSQL."""
-    cache_key = f"menu:{settings.MENU_CACHE_VERSION}"
+    cache_key = f"menu:{settings.MENU_CACHE_VERSION}:{venue_id or 'global'}"
     try:
         cached = await redis_client.get_json(cache_key)
         if cached is not None:
@@ -67,7 +68,7 @@ async def get_menu(
         logger.debug("Menu cache read skipped", exc_info=True)
 
     repo = MenuRepository(session)
-    payload = _group_menu(await repo.list_available())
+    payload = _group_menu(await repo.list_available(venue_id=venue_id))
     try:
         await redis_client.set_json(
             cache_key,
