@@ -17,6 +17,8 @@ final _vndFormat = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
 const _categoryTabs = <String, String>{
   'Đồ uống': '🥤',
   'Đồ ăn': '🍔',
+  'Dịch vụ': '🎾',
+  'Cho thuê': '🔄',
   'Phụ kiện': '🎒',
 };
 
