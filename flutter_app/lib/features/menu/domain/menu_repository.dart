@@ -22,9 +22,9 @@ class MenuRepository implements IMenuRepository {
   MenuRepository(this._menuApi);
 
   @override
-  Future<List<MenuCategory>> getMenu() async {
+  Future<List<MenuCategory>> getMenu({String? venueId}) async {
     try {
-      return await _menuApi.getMenu();
+      return await _menuApi.getMenu(venueId: venueId);
     } on ApiException {
       rethrow;
     } catch (e) {

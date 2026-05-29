@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/network/api_exception.dart';
 import 'package:sports_venue_chatbot/features/menu/data/menu_models.dart';
 import 'package:sports_venue_chatbot/features/menu/domain/menu_repository.dart';
+import 'package:sports_venue_chatbot/features/venue/presentation/selected_venue_provider.dart';
 
 // ---------------------------------------------------------------------------
 // Menu data provider
@@ -10,7 +11,8 @@ import 'package:sports_venue_chatbot/features/menu/domain/menu_repository.dart';
 /// Async provider that fetches the full menu from the API
 final menuProvider = FutureProvider<List<MenuCategory>>((ref) async {
   final repository = ref.watch(menuRepositoryProvider);
-  return repository.getMenu();
+  final selectedVenue = ref.watch(selectedVenueProvider);
+  return repository.getMenu(venueId: selectedVenue?.id);
 });
 
 // ---------------------------------------------------------------------------
@@ -189,5 +191,5 @@ class OrderCreateNotifier extends StateNotifier<OrderCreateState> {
 /// Provider for the OrderCreateNotifier
 final createOrderProvider =
     StateNotifierProvider<OrderCreateNotifier, OrderCreateState>((ref) {
-      return OrderCreateNotifier(ref.watch(menuRepositoryProvider));
-    });
+  return OrderCreateNotifier(ref.watch(menuRepositoryProvider));
+});

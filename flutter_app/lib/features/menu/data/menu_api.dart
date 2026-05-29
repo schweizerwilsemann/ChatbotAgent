@@ -13,10 +13,13 @@ class MenuApi {
   MenuApi(this._dioClient);
 
   /// Fetch the full menu grouped by categories
-  Future<List<MenuCategory>> getMenu() async {
+  Future<List<MenuCategory>> getMenu({String? venueId}) async {
     try {
       final response = await _dioClient.get<dynamic>(
         ApiConstants.menuEndpoint,
+        queryParameters: {
+          if (venueId != null) 'venue_id': venueId,
+        },
       );
       final data = response.data;
       if (data == null) return [];
