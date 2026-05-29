@@ -206,7 +206,9 @@ class AdminRepository:
         offset: int = 0,
     ) -> list[MenuItem]:
         """Return all menu items including unavailable ones."""
-        stmt = select(MenuItem).order_by(MenuItem.category_key, MenuItem.name)
+        stmt = select(MenuItem).where(
+            MenuItem.is_deleted.is_(False)
+        ).order_by(MenuItem.category_key, MenuItem.name)
         if category_key:
             stmt = stmt.where(MenuItem.category_key == category_key)
         if query:
@@ -224,7 +226,10 @@ class AdminRepository:
         return list(result.scalars().all())
 
     async def get_menu_item_by_id(self, item_id: str) -> MenuItem | None:
-        stmt = select(MenuItem).where(MenuItem.id == uuid.UUID(item_id))
+        stmt = select(MenuItem).where(
+            MenuItem.id == uuid.UUID(item_id),
+            MenuItem.is_deleted.is_(False),
+        )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 

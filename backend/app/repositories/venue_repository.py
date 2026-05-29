@@ -34,12 +34,17 @@ class VenueRepository:
         return result.scalar_one_or_none()
 
     async def get_default_venue(self) -> Venue | None:
-        stmt = select(Venue).order_by(Venue.created_at.asc()).limit(1)
+        stmt = select(Venue).where(
+            Venue.is_deleted.is_(False)
+        ).order_by(Venue.created_at.asc()).limit(1)
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
     async def get_venue_by_id(self, venue_id: str | uuid.UUID) -> Venue | None:
-        stmt = select(Venue).where(Venue.id == _to_uuid(venue_id))
+        stmt = select(Venue).where(
+            Venue.id == _to_uuid(venue_id),
+            Venue.is_deleted.is_(False),
+        )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
@@ -51,7 +56,10 @@ class VenueRepository:
             resource_uuid = _to_uuid(resource_id)
         except ValueError:
             return None
-        stmt = select(ServiceResource).where(ServiceResource.id == resource_uuid)
+        stmt = select(ServiceResource).where(
+            ServiceResource.id == resource_uuid,
+            ServiceResource.is_deleted.is_(False),
+        )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
@@ -75,7 +83,10 @@ class VenueRepository:
         role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
         business_id = getattr(user, "business_id", None)
 
-        stmt = select(Venue).where(Venue.is_active.is_(True))
+        stmt = select(Venue).where(
+            Venue.is_active.is_(True),
+            Venue.is_deleted.is_(False),
+        )
         if business_id:
             stmt = stmt.where(Venue.business_id == _to_uuid(business_id))
 
@@ -99,6 +110,7 @@ class VenueRepository:
         stmt = (
             select(ServiceResource, VenueArea.name.label("area_name"))
             .outerjoin(VenueArea, ServiceResource.area_id == VenueArea.id)
+            .where(ServiceResource.is_deleted.is_(False))
             .order_by(
                 ServiceResource.resource_type.asc(),
                 ServiceResource.number.asc(),
@@ -142,6 +154,7 @@ class VenueRepository:
             ServiceResource.venue_id == _to_uuid(venue_id),
             ServiceResource.number == number,
             ServiceResource.status == ResourceStatus.ACTIVE,
+            ServiceResource.is_deleted.is_(False),
         ]
         if court_type:
             resource_type = COURT_TYPE_TO_RESOURCE_TYPE.get(court_type)

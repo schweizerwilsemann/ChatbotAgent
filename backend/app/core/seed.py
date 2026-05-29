@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from app.repositories.menu_repository import MenuRepository
 from app.core.security import hash_password, verify_password
+from app.models.menu import MenuItem
 from app.models.user import User, UserRole
 from app.models.venue import (
     Business,
@@ -19,14 +20,18 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 logger = logging.getLogger(__name__)
 
-ADMIN_PHONE = "0123456789"
-ADMIN_PASSWORD = "123456"
-STAFF_PHONE = "0987654321"
-STAFF_PASSWORD = "123456"
+DEFAULT_PASSWORD = "123456"
+
 CUSTOMER_PHONE = "0900000000"
-CUSTOMER_PASSWORD = "123456"
+
+ADMIN_BIDA_PHONE = "0111111111"
+STAFF_BIDA_PHONE = "0111111112"
+ADMIN_PICKLEBALL_PHONE = "0222222222"
+STAFF_PICKLEBALL_PHONE = "0222222223"
+ADMIN_CAULONG_PHONE = "0333333333"
+STAFF_CAULONG_PHONE = "0333333334"
+
 DEFAULT_BUSINESS_SLUG = "default-sports-venue"
-DEFAULT_VENUE_NAME = "Cơ sở chính"
 
 DEFAULT_MENU_ITEMS = [
     {
@@ -189,10 +194,13 @@ DEFAULT_MENU_ITEMS = [
         "tags": "ăn vặt, chua cay",
         "sales_count": 125,
     },
+]
+
+BILLIARDS_MENU_ITEMS = [
     {
         "name": "Bida lỗ (1 giờ)",
-        "category_key": "billiards",
-        "category_name": "Phụ kiện",
+        "category_key": "services",
+        "category_name": "Dịch vụ",
         "description": "Giá chơi bida lỗ theo giờ",
         "unit": "VND/giờ",
         "price": Decimal("50000"),
@@ -201,8 +209,8 @@ DEFAULT_MENU_ITEMS = [
     },
     {
         "name": "Bida phăng (1 giờ)",
-        "category_key": "billiards",
-        "category_name": "Phụ kiện",
+        "category_key": "services",
+        "category_name": "Dịch vụ",
         "description": "Giá chơi bida phăng theo giờ",
         "unit": "VND/giờ",
         "price": Decimal("40000"),
@@ -211,22 +219,78 @@ DEFAULT_MENU_ITEMS = [
     },
     {
         "name": "Gậy cơ cho thuê",
-        "category_key": "billiards",
-        "category_name": "Phụ kiện",
+        "category_key": "rental",
+        "category_name": "Cho thuê",
         "description": "Gậy cơ cho khách thuê",
         "unit": "VND/cây",
         "price": Decimal("20000"),
         "tags": "bida, phụ kiện, gậy",
         "sales_count": 0,
     },
+]
+
+PICKLEBALL_MENU_ITEMS = [
     {
-        "name": "Phấn bida",
-        "category_key": "billiards",
-        "category_name": "Phụ kiện",
-        "description": "Phấn bida theo hộp",
-        "unit": "VND/hộp",
-        "price": Decimal("10000"),
-        "tags": "bida, phụ kiện, phấn",
+        "name": "Sân pickleball (1 giờ)",
+        "category_key": "services",
+        "category_name": "Dịch vụ",
+        "description": "Giá thuê sân pickleball theo giờ",
+        "unit": "VND/giờ",
+        "price": Decimal("80000"),
+        "tags": "pickleball, sân, dịch vụ",
+        "sales_count": 0,
+    },
+    {
+        "name": "Vợt cho thuê",
+        "category_key": "rental",
+        "category_name": "Cho thuê",
+        "description": "Vợt pickleball cho khách thuê",
+        "unit": "VND/cây",
+        "price": Decimal("30000"),
+        "tags": "pickleball, vợt, thuê",
+        "sales_count": 0,
+    },
+    {
+        "name": "Ống bóng (3 quả)",
+        "category_key": "rental",
+        "category_name": "Cho thuê",
+        "description": "Bóng pickleball Dura",
+        "unit": "VND/ống",
+        "price": Decimal("50000"),
+        "tags": "pickleball, bóng",
+        "sales_count": 0,
+    },
+]
+
+BADMINTON_MENU_ITEMS = [
+    {
+        "name": "Sân cầu lông (1 giờ)",
+        "category_key": "services",
+        "category_name": "Dịch vụ",
+        "description": "Giá thuê sân cầu lông theo giờ",
+        "unit": "VND/giờ",
+        "price": Decimal("100000"),
+        "tags": "cầu lông, sân, dịch vụ",
+        "sales_count": 0,
+    },
+    {
+        "name": "Vợt cho thuê",
+        "category_key": "rental",
+        "category_name": "Cho thuê",
+        "description": "Vợt cầu lông cho khách thuê",
+        "unit": "VND/cây",
+        "price": Decimal("30000"),
+        "tags": "cầu lông, vợt, thuê",
+        "sales_count": 0,
+    },
+    {
+        "name": "Ống cầu (12 quả)",
+        "category_key": "rental",
+        "category_name": "Cho thuê",
+        "description": "Cầu lông thi đấu",
+        "unit": "VND/ống",
+        "price": Decimal("120000"),
+        "tags": "cầu lông, cầu, thuê",
         "sales_count": 0,
     },
 ]
@@ -261,93 +325,92 @@ async def ensure_multi_tenant_columns(engine: AsyncEngine) -> None:
             "ALTER TABLE staff_requests ADD COLUMN IF NOT EXISTS resource_label VARCHAR(255)",
             "CREATE INDEX IF NOT EXISTS ix_staff_requests_venue_id ON staff_requests (venue_id)",
             "CREATE INDEX IF NOT EXISTS ix_staff_requests_resource_id ON staff_requests (resource_id)",
+            "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS venue_id UUID",
+            "CREATE INDEX IF NOT EXISTS ix_menu_items_venue_id ON menu_items (venue_id)",
+            "ALTER TABLE menu_items DROP CONSTRAINT IF EXISTS menu_items_name_key",
+            # Soft delete columns
+            "ALTER TABLE venues ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN NOT NULL DEFAULT FALSE",
+            "ALTER TABLE venues ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ",
+            "CREATE INDEX IF NOT EXISTS ix_venues_is_deleted ON venues (is_deleted)",
+            "ALTER TABLE service_resources ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN NOT NULL DEFAULT FALSE",
+            "ALTER TABLE service_resources ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ",
+            "CREATE INDEX IF NOT EXISTS ix_service_resources_is_deleted ON service_resources (is_deleted)",
+            "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN NOT NULL DEFAULT FALSE",
+            "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ",
+            "CREATE INDEX IF NOT EXISTS ix_menu_items_is_deleted ON menu_items (is_deleted)",
         ]
         for statement in statements:
             await conn.execute(text(statement))
 
 
-async def seed_admin_user(session: AsyncSession) -> User:
-    result = await session.execute(select(User).where(User.phone == ADMIN_PHONE))
+async def _ensure_user(
+    session: AsyncSession,
+    *,
+    phone: str,
+    name: str,
+    role: UserRole,
+    business: Business | None = None,
+    venue: Venue | None = None,
+) -> User:
+    result = await session.execute(select(User).where(User.phone == phone))
     user = result.scalar_one_or_none()
 
     if user is None:
         user = User(
-            phone=ADMIN_PHONE,
-            name="Quản lý",
-            role=UserRole.ADMIN,
-            password_hash=hash_password(ADMIN_PASSWORD),
+            phone=phone,
+            name=name,
+            role=role,
+            password_hash=hash_password(DEFAULT_PASSWORD),
         )
         session.add(user)
         await session.flush()
-        logger.info("Seeded admin user: %s", ADMIN_PHONE)
-        return user
 
-    user.name = "Quản lý"
-    user.role = UserRole.ADMIN
-    if not verify_password(ADMIN_PASSWORD, user.password_hash):
-        user.password_hash = hash_password(ADMIN_PASSWORD)
+    user.name = name
+    user.role = role
+    if not verify_password(DEFAULT_PASSWORD, user.password_hash):
+        user.password_hash = hash_password(DEFAULT_PASSWORD)
+    if business:
+        user.business_id = business.id
+    if venue:
+        user.default_venue_id = venue.id
     await session.flush()
-    logger.info("Admin user ensured: %s", ADMIN_PHONE)
-    return user
-
-
-async def seed_staff_user(session: AsyncSession) -> User:
-    result = await session.execute(select(User).where(User.phone == STAFF_PHONE))
-    user = result.scalar_one_or_none()
-
-    if user is None:
-        user = User(
-            phone=STAFF_PHONE,
-            name="Nhân viên",
-            role=UserRole.STAFF,
-            password_hash=hash_password(STAFF_PASSWORD),
-        )
-        session.add(user)
-        await session.flush()
-        logger.info("Seeded staff user: %s", STAFF_PHONE)
-        return user
-
-    user.name = "Nhân viên"
-    user.role = UserRole.STAFF
-    if not verify_password(STAFF_PASSWORD, user.password_hash):
-        user.password_hash = hash_password(STAFF_PASSWORD)
-    await session.flush()
-    logger.info("Staff user ensured: %s", STAFF_PHONE)
     return user
 
 
 async def seed_customer_user(session: AsyncSession) -> User:
-    result = await session.execute(select(User).where(User.phone == CUSTOMER_PHONE))
-    user = result.scalar_one_or_none()
+    return await _ensure_user(
+        session,
+        phone=CUSTOMER_PHONE,
+        name="Khách hàng",
+        role=UserRole.CUSTOMER,
+    )
 
-    if user is None:
-        user = User(
-            phone=CUSTOMER_PHONE,
-            name="Khách hàng",
-            role=UserRole.CUSTOMER,
-            password_hash=hash_password(CUSTOMER_PASSWORD),
-        )
-        session.add(user)
-        await session.flush()
-        logger.info("Seeded customer user: %s", CUSTOMER_PHONE)
-        return user
 
-    user.name = "Khách hàng"
-    user.role = UserRole.CUSTOMER
-    if not verify_password(CUSTOMER_PASSWORD, user.password_hash):
-        user.password_hash = hash_password(CUSTOMER_PASSWORD)
-    await session.flush()
-    logger.info("Customer user ensured: %s", CUSTOMER_PHONE)
-    return user
+async def seed_admin_user(session: AsyncSession) -> User:
+    return await _ensure_user(
+        session,
+        phone="0123456789",
+        name="Quản lý",
+        role=UserRole.ADMIN,
+    )
+
+
+async def seed_staff_user(session: AsyncSession) -> User:
+    return await _ensure_user(
+        session,
+        phone="0987654321",
+        name="Nhân viên",
+        role=UserRole.STAFF,
+    )
 
 
 async def seed_default_venue(
     session: AsyncSession,
     *,
-    admin_user: User,
-    staff_user: User,
     customer_user: User,
-) -> Venue:
+) -> tuple[Venue, Venue, Venue]:
+    from datetime import datetime, timezone
+
     result = await session.execute(
         select(Business).where(Business.slug == DEFAULT_BUSINESS_SLUG)
     )
@@ -356,44 +419,140 @@ async def seed_default_venue(
         business = Business(
             name="Sports Venue Demo",
             slug=DEFAULT_BUSINESS_SLUG,
-            owner_user_id=str(admin_user.id),
+            owner_user_id=str(customer_user.id),
             is_active=True,
         )
         session.add(business)
         await session.flush()
 
+    # Soft delete old venues not in the new list
+    new_venue_names = {
+        "CLB Bida Sài Gòn",
+        "Sân Pickleball Thủ Đức",
+        "Nhà thi đấu Cầu lông Bình Thạnh",
+    }
+    old_venues = await session.execute(
+        select(Venue).where(
+            Venue.business_id == business.id,
+            Venue.is_deleted.is_(False),
+            Venue.name.notin_(new_venue_names),
+        )
+    )
+    now = datetime.now(timezone.utc)
+    for old_venue in old_venues.scalars().all():
+        old_venue.is_deleted = True
+        old_venue.deleted_at = now
+        # Cascade soft delete to child resources
+        resources = await session.execute(
+            select(ServiceResource).where(
+                ServiceResource.venue_id == old_venue.id,
+                ServiceResource.is_deleted.is_(False),
+            )
+        )
+        for res in resources.scalars().all():
+            res.is_deleted = True
+            res.deleted_at = now
+    await session.flush()
+
+    billiards_venue = await _seed_billiards_venue(session, business)
+    pickleball_venue = await _seed_pickleball_venue(session, business)
+    badminton_venue = await _seed_badminton_venue(session, business)
+
+    admin_bida = await _ensure_user(
+        session,
+        phone=ADMIN_BIDA_PHONE,
+        name="Quản lý Bida",
+        role=UserRole.ADMIN,
+        business=business,
+        venue=billiards_venue,
+    )
+    staff_bida = await _ensure_user(
+        session,
+        phone=STAFF_BIDA_PHONE,
+        name="NV Bida",
+        role=UserRole.STAFF,
+        business=business,
+        venue=billiards_venue,
+    )
+
+    admin_pickleball = await _ensure_user(
+        session,
+        phone=ADMIN_PICKLEBALL_PHONE,
+        name="Quản lý Pickleball",
+        role=UserRole.ADMIN,
+        business=business,
+        venue=pickleball_venue,
+    )
+    staff_pickleball = await _ensure_user(
+        session,
+        phone=STAFF_PICKLEBALL_PHONE,
+        name="NV Pickleball",
+        role=UserRole.STAFF,
+        business=business,
+        venue=pickleball_venue,
+    )
+
+    admin_caulong = await _ensure_user(
+        session,
+        phone=ADMIN_CAULONG_PHONE,
+        name="Quản lý Cầu lông",
+        role=UserRole.ADMIN,
+        business=business,
+        venue=badminton_venue,
+    )
+    staff_caulong = await _ensure_user(
+        session,
+        phone=STAFF_CAULONG_PHONE,
+        name="NV Cầu lông",
+        role=UserRole.STAFF,
+        business=business,
+        venue=badminton_venue,
+    )
+
+    customer_user.business_id = business.id
+    customer_user.default_venue_id = billiards_venue.id
+    await session.flush()
+
+    await _ensure_staff_venue_assignment(session, staff_bida, billiards_venue)
+    await _ensure_staff_venue_assignment(session, staff_pickleball, pickleball_venue)
+    await _ensure_staff_venue_assignment(session, staff_caulong, badminton_venue)
+
+    await session.flush()
+    logger.info("All venues seeded: bida=%s, pickleball=%s, cầu lông=%s",
+                billiards_venue.name, pickleball_venue.name, badminton_venue.name)
+    return billiards_venue, pickleball_venue, badminton_venue
+
+
+async def _seed_billiards_venue(
+    session: AsyncSession,
+    business: Business,
+) -> Venue:
     result = await session.execute(
         select(Venue).where(
             Venue.business_id == business.id,
-            Venue.name == DEFAULT_VENUE_NAME,
+            Venue.name == "CLB Bida Sài Gòn",
         )
     )
     venue = result.scalar_one_or_none()
     if venue is None:
         venue = Venue(
             business_id=business.id,
-            name=DEFAULT_VENUE_NAME,
-            address="Demo",
+            name="CLB Bida Sài Gòn",
+            address="123 Nguyễn Huệ, Q.1, TP.HCM",
             timezone="Asia/Ho_Chi_Minh",
             is_active=True,
         )
         session.add(venue)
         await session.flush()
 
-    for user in (admin_user, staff_user, customer_user):
-        user.business_id = business.id
-        user.default_venue_id = venue.id
+    area = await _ensure_area(session, venue, "Khu chơi bida", 1)
 
-    billiards_area = await _ensure_area(session, venue, "Khu bida", 1)
-    pickleball_area = await _ensure_area(session, venue, "Khu pickleball", 2)
-    badminton_area = await _ensure_area(session, venue, "Khu cầu lông", 3)
-
-    for number in range(1, 61):
+    for number in range(1, 9):
         await _ensure_resource(
             session,
             venue=venue,
-            area=billiards_area,
-            code=f"B{number:03d}",
+            area=area,
+            code=f"B{number:02d}",
             name=f"Bàn bida {number}",
             resource_type=ResourceType.BILLIARDS_TABLE,
             sport_type="billiards",
@@ -401,11 +560,39 @@ async def seed_default_venue(
             capacity=4,
         )
 
-    for number in range(1, 13):
+    logger.info("Seeded billiards venue: %s (8 bàn)", venue.name)
+    return venue
+
+
+async def _seed_pickleball_venue(
+    session: AsyncSession,
+    business: Business,
+) -> Venue:
+    result = await session.execute(
+        select(Venue).where(
+            Venue.business_id == business.id,
+            Venue.name == "Sân Pickleball Thủ Đức",
+        )
+    )
+    venue = result.scalar_one_or_none()
+    if venue is None:
+        venue = Venue(
+            business_id=business.id,
+            name="Sân Pickleball Thủ Đức",
+            address="456 Võ Văn Ngân, Thủ Đức, TP.HCM",
+            timezone="Asia/Ho_Chi_Minh",
+            is_active=True,
+        )
+        session.add(venue)
+        await session.flush()
+
+    area = await _ensure_area(session, venue, "Sân pickleball", 1)
+
+    for number in range(1, 7):
         await _ensure_resource(
             session,
             venue=venue,
-            area=pickleball_area,
+            area=area,
             code=f"P{number:02d}",
             name=f"Sân pickleball {number}",
             resource_type=ResourceType.PICKLEBALL_COURT,
@@ -414,11 +601,39 @@ async def seed_default_venue(
             capacity=4,
         )
 
-    for number in range(1, 9):
+    logger.info("Seeded pickleball venue: %s (6 sân)", venue.name)
+    return venue
+
+
+async def _seed_badminton_venue(
+    session: AsyncSession,
+    business: Business,
+) -> Venue:
+    result = await session.execute(
+        select(Venue).where(
+            Venue.business_id == business.id,
+            Venue.name == "Nhà thi đấu Cầu lông Bình Thạnh",
+        )
+    )
+    venue = result.scalar_one_or_none()
+    if venue is None:
+        venue = Venue(
+            business_id=business.id,
+            name="Nhà thi đấu Cầu lông Bình Thạnh",
+            address="789 Xô Viết Nghệ Tĩnh, Bình Thạnh, TP.HCM",
+            timezone="Asia/Ho_Chi_Minh",
+            is_active=True,
+        )
+        session.add(venue)
+        await session.flush()
+
+    area = await _ensure_area(session, venue, "Sân cầu lông", 1)
+
+    for number in range(1, 7):
         await _ensure_resource(
             session,
             venue=venue,
-            area=badminton_area,
+            area=area,
             code=f"C{number:02d}",
             name=f"Sân cầu lông {number}",
             resource_type=ResourceType.BADMINTON_COURT,
@@ -427,9 +642,7 @@ async def seed_default_venue(
             capacity=4,
         )
 
-    await _ensure_staff_venue_assignment(session, staff_user, venue)
-    await session.flush()
-    logger.info("Default venue/resources ensured: %s", venue.name)
+    logger.info("Seeded badminton venue: %s (6 sân)", venue.name)
     return venue
 
 
@@ -520,8 +733,56 @@ async def _ensure_staff_venue_assignment(
     return assignment
 
 
-async def seed_default_menu(session: AsyncSession) -> None:
+async def seed_default_menu(
+    session: AsyncSession,
+    *,
+    billiards_venue: Venue | None = None,
+    pickleball_venue: Venue | None = None,
+    badminton_venue: Venue | None = None,
+) -> None:
+    from datetime import datetime, timezone
+
+    # Soft delete old menu items without venue_id (from previous seed)
+    old_items = await session.execute(
+        select(MenuItem).where(
+            MenuItem.venue_id.is_(None),
+            MenuItem.is_deleted.is_(False),
+        )
+    )
+    now = datetime.now(timezone.utc)
+    for item in old_items.scalars().all():
+        item.is_deleted = True
+        item.deleted_at = now
+    await session.flush()
+
+    # Clear menu cache in Redis
+    try:
+        from app.core.redis_client import redis_client
+        cache_keys = await redis_client.keys("menu:*")
+        if cache_keys:
+            await redis_client.delete(*cache_keys)
+    except Exception:
+        pass
+
     repo = MenuRepository(session)
     for item in DEFAULT_MENU_ITEMS:
         await repo.upsert_seed_item(**item)
-    logger.info("Default menu ensured: %d items", len(DEFAULT_MENU_ITEMS))
+
+    if billiards_venue:
+        for item in BILLIARDS_MENU_ITEMS:
+            await repo.upsert_seed_item(venue_id=billiards_venue.id, **item)
+    if pickleball_venue:
+        for item in PICKLEBALL_MENU_ITEMS:
+            await repo.upsert_seed_item(venue_id=pickleball_venue.id, **item)
+    if badminton_venue:
+        for item in BADMINTON_MENU_ITEMS:
+            await repo.upsert_seed_item(venue_id=badminton_venue.id, **item)
+
+    total = len(DEFAULT_MENU_ITEMS)
+    if billiards_venue:
+        total += len(BILLIARDS_MENU_ITEMS)
+    if pickleball_venue:
+        total += len(PICKLEBALL_MENU_ITEMS)
+    if badminton_venue:
+        total += len(BADMINTON_MENU_ITEMS)
+    logger.info("Menu ensured: %d items", total)

@@ -14,7 +14,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
 
 
 class ResourceType(str, enum.Enum):
@@ -46,7 +46,7 @@ class Business(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
 
-class Venue(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+class Venue(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     __tablename__ = "venues"
 
     business_id: Mapped[uuid.UUID] = mapped_column(
@@ -81,7 +81,7 @@ class VenueArea(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
 
-class ServiceResource(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+class ServiceResource(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     __tablename__ = "service_resources"
     __table_args__ = (
         UniqueConstraint("venue_id", "code", name="uq_service_resources_venue_code"),
