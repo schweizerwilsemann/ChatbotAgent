@@ -21,11 +21,19 @@ class ChatService:
         message: str,
         session_id: str,
         user_id: str = "chatbot_user",
+        context: dict | None = None,
     ) -> ChatResponse:
         """Process a chat message, maintaining conversation history in Redis."""
         history = await self._load_history(session_id)
 
-        history.append({"role": "user", "content": message})
+        # Prepend venue context to the message if available
+        enriched_message = message
+        if context and context.get("venue_id"):
+            venue_name = context.get("venue_name", "")
+            venue_hint = f"[Venue: {venue_name}] " if venue_name else ""
+            enriched_message = f"{venue_hint}{message}"
+
+        history.append({"role": "user", "content": enriched_message})
 
         try:
             token = current_user_id.set(user_id)

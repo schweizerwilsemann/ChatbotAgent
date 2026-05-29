@@ -37,10 +37,20 @@ async def chat(
     """Process a chat message through the AI agent and return a response."""
     try:
         session_id = request.session_id or str(uuid.uuid4())
+
+        # Build context with venue info
+        context = dict(request.context) if request.context else {}
+        context.setdefault("user_id", str(user.id))
+        context.setdefault("user_name", user.name or "")
+        if request.context and "venue_id" in request.context:
+            context["venue_id"] = request.context["venue_id"]
+            context["venue_name"] = request.context.get("venue_name", "")
+
         result = await chat_service.process_message(
             message=request.message,
             session_id=session_id,
             user_id=str(user.id),
+            context=context,
         )
         return result
     except Exception as exc:

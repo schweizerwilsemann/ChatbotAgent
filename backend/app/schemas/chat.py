@@ -6,6 +6,9 @@ class ChatRequest(BaseModel):
     session_id: str | None = Field(
         None, description="Session ID for conversation continuity"
     )
+    context: dict | None = Field(
+        None, description="Additional context (venue_id, venue_name, etc.)"
+    )
 
 
 class ChatResponse(BaseModel):
