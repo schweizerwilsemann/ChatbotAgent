@@ -646,6 +646,29 @@ SECRET_KEY=your_secret_key
 
 ---
 
+## Demo Accounts
+
+Seed data tạo sẵn 3 venue theo loại sân, mỗi venue có admin + staff riêng.
+
+| Vai trò | Tên | Số điện thoại | Mật khẩu | Venue |
+|---------|-----|---------------|-----------|-------|
+| **Admin Bida** | Quản lý Bida | `0111111111` | `123456` | CLB Bida Sài Gòn |
+| **Staff Bida** | NV Bida | `0111111112` | `123456` | CLB Bida Sài Gòn |
+| **Admin Pickleball** | Quản lý Pickleball | `0222222222` | `123456` | Sân Pickleball Thủ Đức |
+| **Staff Pickleball** | NV Pickleball | `0222222223` | `123456` | Sân Pickleball Thủ Đức |
+| **Admin Cầu lông** | Quản lý Cầu lông | `0333333333` | `123456` | Nhà thi đấu Cầu lông Bình Thạnh |
+| **Staff Cầu lông** | NV Cầu lông | `0333333334` | `123456` | Nhà thi đấu Cầu lông Bình Thạnh |
+| **Khách hàng** | Khách hàng | `0900000000` | `123456` | (mặc định: CLB Bida) |
+
+**Seed data:**
+- **CLB Bida Sài Gòn** — 8 bàn bida (B01–B08)
+- **Sân Pickleball Thủ Đức** — 6 sân pickleball (P01–P06)
+- **Nhà thi đấu Cầu lông Bình Thạnh** — 6 sân cầu lông (C01–C06)
+
+Staff chỉ thấy request từ venue mình được assign. Khách gọi nhân viên sẽ tự động detect từ booking đang active.
+
+---
+
 ## License
 
 Academic project — Sports Venue AI Chatbot.
