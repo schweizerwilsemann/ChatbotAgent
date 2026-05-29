@@ -2,25 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/features/staff_request/data/staff_request_models.dart';
-import 'package:sports_venue_chatbot/features/venue/data/venue_models.dart';
-import 'package:sports_venue_chatbot/features/venue/presentation/venue_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_dialog.dart';
 
 class CallStaffResult {
-  final String? venueId;
-  final String? resourceId;
-  final String? resourceLabel;
   final StaffRequestType requestType;
   final String? description;
-  final int? tableNumber;
 
   const CallStaffResult({
-    this.venueId,
-    this.resourceId,
-    this.resourceLabel,
     required this.requestType,
     this.description,
-    this.tableNumber,
   });
 }
 
@@ -35,28 +25,22 @@ class _CallStaffDialogContent extends ConsumerStatefulWidget {
 class _CallStaffDialogContentState
     extends ConsumerState<_CallStaffDialogContent> {
   StaffRequestType? _selectedType;
-  VenueResource? _selectedResource;
-  late final TextEditingController _tableController;
   late final TextEditingController _descController;
 
   @override
   void initState() {
     super.initState();
-    _tableController = TextEditingController();
     _descController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _tableController.dispose();
     _descController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final resourcesAsync = ref.watch(venueResourcesProvider);
-
     return Dialog(
       backgroundColor: AppColors.surface,
       elevation: 0,
@@ -130,64 +114,6 @@ class _CallStaffDialogContentState
 
                 const SizedBox(height: 16),
 
-                resourcesAsync.when(
-                  loading: () => const LinearProgressIndicator(minHeight: 2),
-                  error: (_, __) => const SizedBox.shrink(),
-                  data: (resources) => DropdownButtonFormField<VenueResource>(
-                    initialValue: resources.contains(_selectedResource)
-                        ? _selectedResource
-                        : null,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Bàn / sân',
-                      prefixIcon: Icon(Icons.location_on_outlined, size: 20),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                    ),
-                    hint: const Text('Chọn vị trí phục vụ'),
-                    items: resources
-                        .map(
-                          (resource) => DropdownMenuItem(
-                            value: resource,
-                            child: Text(
-                              resource.displayLabel,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (resource) {
-                      setState(() {
-                        _selectedResource = resource;
-                        if (resource != null) {
-                          _tableController.text = resource.number.toString();
-                        }
-                      });
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                TextField(
-                  controller: _tableController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Số bàn / sân (tùy chọn)',
-                    hintText: 'VD: 3',
-                    prefixIcon: Icon(Icons.table_restaurant, size: 20),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                  ),
-                  style: const TextStyle(fontSize: 14),
-                ),
-
-                const SizedBox(height: 12),
-
                 // Description
                 TextField(
                   controller: _descController,
@@ -220,21 +146,12 @@ class _CallStaffDialogContentState
                       onPressed: _selectedType == null
                           ? null
                           : () {
-                              final tableNum = _tableController.text
-                                      .trim()
-                                      .isEmpty
-                                  ? null
-                                  : int.tryParse(_tableController.text.trim());
                               Navigator.of(context, rootNavigator: true)
                                   .pop(CallStaffResult(
-                                venueId: _selectedResource?.venueId,
-                                resourceId: _selectedResource?.id,
-                                resourceLabel: _selectedResource?.displayLabel,
                                 requestType: _selectedType!,
                                 description: _descController.text.trim().isEmpty
                                     ? null
                                     : _descController.text.trim(),
-                                tableNumber: tableNum,
                               ));
                             },
                       icon: const Icon(Icons.send, size: 18),

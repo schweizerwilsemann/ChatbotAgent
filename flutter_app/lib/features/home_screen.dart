@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/features/venue/data/venue_model.dart';
+import 'package:sports_venue_chatbot/features/venue/presentation/selected_venue_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/floating_bottom_nav.dart';
 
-/// Home screen with bottom navigation bar for **customers only**.
-///
-/// Admin / Staff users are redirected to [AdminShell] by the router
-/// and never see this screen.
-///
-/// Used as a [ShellRoute] wrapper in [GoRouter].
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   final Widget child;
 
   const HomeScreen({super.key, required this.child});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
 
   static const List<_NavigationItem> _navItems = [
@@ -50,18 +47,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onTabTapped(int index) {
     if (index == _currentIndex || index >= _navItems.length) return;
-
     setState(() {
       _currentIndex = index;
     });
-
     context.go(_navItems[index].route);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Sync the current index with the router location
     final location = GoRouterState.of(context).matchedLocation;
     final index = _navItems.indexWhere((item) => item.route == location);
     if (index != -1 && index != _currentIndex) {
@@ -73,7 +67,42 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final venuesAsync = ref.watch(venuesProvider);
+    final selectedVenue = ref.watch(selectedVenueProvider);
+
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 0,
+        title: venuesAsync.when(
+          loading: () => const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+          error: (_, __) => const Text('Chọn sân'),
+          data: (venues) {
+            if (venues.isEmpty) return const Text('Không có sân');
+            // Show loading until auto-select completes
+            if (selectedVenue == null) {
+              return const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              );
+            }
+            return _VenueDropdown(
+              venues: venues,
+              selected: selectedVenue,
+              onChanged: (venue) {
+                ref.read(selectedVenueProvider.notifier).select(venue);
+              },
+            );
+          },
+        ),
+        centerTitle: false,
+      ),
       body: widget.child,
       bottomNavigationBar: FloatingBottomNav(
         selectedIndex: _currentIndex >= _navItems.length ? 0 : _currentIndex,
@@ -88,6 +117,83 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             )
             .toList(),
+      ),
+    );
+  }
+}
+
+class _VenueDropdown extends StatelessWidget {
+  final List<Venue> venues;
+  final Venue? selected;
+  final ValueChanged<Venue> onChanged;
+
+  const _VenueDropdown({
+    required this.venues,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (venues.isEmpty) {
+      return const Text('Không có sân nào');
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<Venue>(
+          value: selected,
+          isDense: true,
+          icon: const Icon(Icons.keyboard_arrow_down,
+              size: 20, color: AppColors.textPrimary),
+          dropdownColor: AppColors.surface,
+          hint: const Text(
+            'Chọn sân',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+          items: venues.map((venue) {
+            return DropdownMenuItem<Venue>(
+              value: venue,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.location_on,
+                      size: 16, color: AppColors.primary),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      venue.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+          onChanged: (venue) {
+            if (venue != null) onChanged(venue);
+          },
+        ),
       ),
     );
   }

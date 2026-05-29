@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/features/booking/data/booking_api.dart';
 import 'package:sports_venue_chatbot/features/staff_request/data/staff_request_models.dart';
 import 'package:sports_venue_chatbot/features/staff_request/presentation/staff_request_provider.dart';
 import 'package:sports_venue_chatbot/features/staff_request/presentation/widgets/call_staff_dialog.dart';
+import 'package:sports_venue_chatbot/features/venue/presentation/selected_venue_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
 
 class StaffRequestBubble extends ConsumerWidget {
@@ -42,15 +44,34 @@ class StaffRequestBubble extends ConsumerWidget {
 
   Future<void> _handleCallStaff(BuildContext context, WidgetRef ref) async {
     final result = await CallStaffDialog.show(context);
-    if (result != null && context.mounted) {
+    if (result == null || !context.mounted) return;
+
+    final bookingApi = ref.read(bookingApiProvider);
+    final activeBooking = await bookingApi.getActiveBooking();
+    final selectedVenue = ref.read(selectedVenueProvider);
+
+    if (!context.mounted) return;
+
+    if (activeBooking != null) {
       await ref.read(staffRequestProvider.notifier).createRequest(
             requestType: result.requestType,
             description: result.description,
-            tableNumber: result.tableNumber,
-            venueId: result.venueId,
-            resourceId: result.resourceId,
-            resourceLabel: result.resourceLabel,
+            venueId: activeBooking.venueId,
+            resourceId: activeBooking.resourceId,
+            resourceLabel: activeBooking.resourceLabel,
+            tableNumber: activeBooking.courtNumber,
           );
+    } else if (selectedVenue != null) {
+      await ref.read(staffRequestProvider.notifier).createRequest(
+            requestType: result.requestType,
+            description: result.description,
+            venueId: selectedVenue.id,
+          );
+    } else {
+      AppSnackBar.showError(
+        context,
+        'Vui lòng chọn sân hoặc đặt sân trước khi gọi nhân viên.',
+      );
     }
   }
 
