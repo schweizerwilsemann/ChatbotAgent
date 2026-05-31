@@ -108,6 +108,53 @@ class ChatNotifier extends StateNotifier<ChatState> {
     }
   }
 
+  /// Send one voice-agent turn and return the assistant response for TTS.
+  Future<String?> sendVoiceTurn(String content) async {
+    if (content.trim().isEmpty) return null;
+
+    final userMessage = ChatMessage.user(
+      content: content,
+      sessionId: state.sessionId,
+    );
+
+    state = state.copyWith(
+      messages: [...state.messages, userMessage],
+      isLoading: true,
+      error: null,
+      clearError: true,
+    );
+
+    try {
+      final response = await _repository.sendMessage(
+        content,
+        state.sessionId,
+        context: const {'input_mode': 'voice_agent'},
+      );
+
+      final assistantMessage = ChatMessage.assistant(
+        content: response.response,
+        toolsUsed: response.toolsUsed,
+        sessionId: response.sessionId,
+      );
+
+      state = state.copyWith(
+        messages: [...state.messages, assistantMessage],
+        sessionId: response.sessionId ?? state.sessionId,
+        isLoading: false,
+      );
+      return response.response;
+    } on ApiException catch (e) {
+      state = state.copyWith(isLoading: false, error: e.message);
+      return null;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Đã xảy ra lỗi không xác định. Vui lòng thử lại.',
+      );
+      return null;
+    }
+  }
+
   /// Send a message with streaming response
   Future<void> sendMessageStream(String content) async {
     if (content.trim().isEmpty) return;

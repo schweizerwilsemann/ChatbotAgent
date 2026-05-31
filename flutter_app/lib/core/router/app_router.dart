@@ -11,6 +11,7 @@ import 'package:sports_venue_chatbot/features/admin/presentation/admin_notificat
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/login_screen.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_screen.dart';
+import 'package:sports_venue_chatbot/features/chat/presentation/voice_agent_call_screen.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_screen.dart';
 import 'package:sports_venue_chatbot/features/home_screen.dart';
 import 'package:sports_venue_chatbot/features/menu/presentation/menu_screen.dart';
@@ -174,6 +175,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/staff/profile',
         name: 'staff_profile',
         builder: (context, state) => const StaffProfileScreen(),
+      ),
+      GoRoute(
+        path: '/voice-agent',
+        name: 'voice_agent',
+        builder: (context, state) => const VoiceAgentCallScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
+import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_provider.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/voice_input_provider.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/widgets/chat_bubble.dart';
@@ -70,6 +72,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final chatState = ref.watch(chatProvider);
+    final authState = ref.watch(authStateProvider);
+    final canUseVoiceAgent = _canUseVoiceAgent(authState);
 
     // Listen for state changes to auto-scroll
     ref.listen<ChatState>(chatProvider, (previous, next) {
@@ -130,6 +134,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ],
         ),
         actions: [
+          if (canUseVoiceAgent)
+            IconButton(
+              icon: const Icon(Icons.phone_in_talk),
+              tooltip: 'Gọi Mimo',
+              onPressed: _openVoiceAgentCall,
+            ),
           if (chatState.messages.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.add_comment),
@@ -464,5 +474,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (confirmed == true && mounted) {
       ref.read(chatProvider.notifier).clearChat();
     }
+  }
+
+  void _openVoiceAgentCall() {
+    if (!mounted || !_canUseVoiceAgent(ref.read(authStateProvider))) return;
+
+    _focusNode.unfocus();
+    context.push('/voice-agent');
+  }
+
+  bool _canUseVoiceAgent(AsyncValue<dynamic> authState) {
+    final role = authState.valueOrNull?.role.toString().toUpperCase();
+    return role != null && role != 'ADMIN' && role != 'STAFF';
   }
 }
