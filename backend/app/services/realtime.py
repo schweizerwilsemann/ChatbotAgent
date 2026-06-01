@@ -28,11 +28,7 @@ class RealtimeConnectionManager:
         target_user_ids = _target_user_ids(payload)
         for role in roles:
             for websocket, user_id in list(self._connections.get(role, {}).items()):
-                if (
-                    target_user_ids
-                    and role != "ADMIN"
-                    and user_id not in target_user_ids
-                ):
+                if target_user_ids and user_id not in target_user_ids:
                     continue
                 try:
                     await websocket.send_text(encoded)
