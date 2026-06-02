@@ -267,7 +267,7 @@ class _MenuItemCard extends ConsumerWidget {
 
   Widget _imagePlaceholder() {
     return const Center(
-      child: Icon(Icons.fastfood, size: 40, color: Colors.grey),
+      child: Icon(Icons.inventory_2_outlined, size: 40, color: Colors.grey),
     );
   }
 }

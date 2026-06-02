@@ -545,7 +545,7 @@ class _MenuItemManagementCard extends StatelessWidget {
                 color: AppColors.primarySurface,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.fastfood,
+              child: const Icon(Icons.inventory_2_outlined,
                   color: AppColors.primary, size: 28),
             ),
             const SizedBox(width: 14),
