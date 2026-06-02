@@ -19,7 +19,10 @@ Booking _$BookingFromJson(Map<String, dynamic> json) => Booking(
       startTime: json['start_time'] as String,
       endTime: json['end_time'] as String,
       status: $enumDecode(_$BookingStatusEnumMap, json['status']),
-      totalPrice: (json['total_price'] as num?)?.toDouble(),
+      totalPrice: (json['total_price'] as num?)?.toDouble() ??
+          (json['total_price'] is String
+              ? double.tryParse(json['total_price'] as String)
+              : null),
       notes: json['notes'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] == null

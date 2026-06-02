@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
+import 'package:sports_venue_chatbot/features/admin/data/admin_api.dart';
 import 'package:sports_venue_chatbot/features/admin/data/admin_models.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/booking_management_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/pagination_footer.dart';
@@ -174,6 +176,37 @@ class _BookingManagementScreenState
     );
   }
 
+  Future<void> _showBookingBill(AdminBooking booking) async {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final bill = await ref.read(adminApiProvider).getBookingBill(booking.id);
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      await showDialog<void>(
+        context: context,
+        builder: (_) => _BookingBillDialog(bill: bill),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Không thể tải bill của lượt đặt sân này'),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+    }
+  }
+
   bool _handlePagination(ScrollNotification notification) {
     if (notification.metrics.extentAfter < 360) {
       ref.read(bookingManagementProvider.notifier).loadMoreBookings();
@@ -195,6 +228,13 @@ class _BookingManagementScreenState
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         elevation: 0.5,
+        actions: [
+          IconButton(
+            tooltip: 'Cấu hình giá sân',
+            icon: const Icon(Icons.attach_money),
+            onPressed: () => context.push('/admin/resource-pricing'),
+          ),
+        ],
       ),
       body: ResponsiveContainer(
         maxWidth: 900,
@@ -401,6 +441,7 @@ class _BookingManagementScreenState
                   return _BookingCard(
                     booking: state.bookings[index],
                     onAction: _updateStatus,
+                    onShowBill: _showBookingBill,
                   );
                 },
               ),
@@ -473,10 +514,12 @@ class _FilterDropdown extends StatelessWidget {
 class _BookingCard extends StatelessWidget {
   final AdminBooking booking;
   final Future<void> Function(String id, String newStatus) onAction;
+  final Future<void> Function(AdminBooking booking) onShowBill;
 
   const _BookingCard({
     required this.booking,
     required this.onAction,
+    required this.onShowBill,
   });
 
   @override
@@ -627,6 +670,25 @@ class _BookingCard extends StatelessWidget {
             ),
           ],
 
+          const SizedBox(height: 14),
+          Align(
+            alignment: Alignment.centerRight,
+            child: OutlinedButton.icon(
+              onPressed: () => onShowBill(booking),
+              icon: const Icon(Icons.receipt_long, size: 18),
+              label: const Text('Tính tiền'),
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+              ),
+            ),
+          ),
+
           // ── Action buttons
           if (booking.status == AdminBookingStatus.pending ||
               booking.status == AdminBookingStatus.confirmed) ...[
@@ -693,6 +755,157 @@ class _BookingCard extends StatelessWidget {
               ],
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _BookingBillDialog extends StatelessWidget {
+  final BookingBill bill;
+
+  const _BookingBillDialog({required this.bill});
+
+  @override
+  Widget build(BuildContext context) {
+    final money = NumberFormat.currency(
+      locale: 'vi_VN',
+      symbol: 'đ',
+      decimalDigits: 0,
+    );
+    final booking = bill.booking;
+
+    return AlertDialog(
+      title: const Text('Tính tiền lượt chơi'),
+      content: SizedBox(
+        width: 420,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                booking.userName.isEmpty ? 'Khách hàng' : booking.userName,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${booking.resourceLabel ?? _courtTypeDisplay(booking.courtType)} · ${booking.startTime} - ${booking.endTime}',
+                style: const TextStyle(color: AppColors.textSecondary),
+              ),
+              const Divider(height: 24),
+              _BillLine(
+                label: 'Tiền sân',
+                value: bill.bookingTotal == null
+                    ? 'Chưa cấu hình'
+                    : money.format(bill.bookingTotal),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Đồ / dịch vụ trong lượt chơi',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (bill.orders.isEmpty)
+                const Text(
+                  'Chưa có order nào trong khung giờ đặt sân.',
+                  style: TextStyle(color: AppColors.textSecondary),
+                )
+              else
+                ...bill.orders.expand(
+                  (order) => [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6, bottom: 4),
+                      child: Text(
+                        DateFormat('HH:mm dd/MM').format(order.createdAt),
+                        style: const TextStyle(
+                          color: AppColors.textHint,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    ...order.items.map(
+                      (item) => _BillLine(
+                        label: '${item.itemName} x${item.quantity}',
+                        value: money.format(item.totalPrice),
+                      ),
+                    ),
+                  ],
+                ),
+              const Divider(height: 24),
+              _BillLine(
+                label: 'Tổng đồ / dịch vụ',
+                value: money.format(bill.orderTotal),
+              ),
+              const SizedBox(height: 6),
+              _BillLine(
+                label: bill.bookingTotal == null ? 'Tạm tính' : 'Tổng cần thu',
+                value: money.format(bill.grandTotal),
+                emphasized: true,
+              ),
+              if (bill.bookingTotal == null) ...[
+                const SizedBox(height: 8),
+                const Text(
+                  'Chưa cộng tiền sân vì booking chưa có giá sân.',
+                  style: TextStyle(
+                    color: AppColors.warning,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Đóng'),
+        ),
+      ],
+    );
+  }
+}
+
+class _BillLine extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool emphasized;
+
+  const _BillLine({
+    required this.label,
+    required this.value,
+    this.emphasized = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final style = TextStyle(
+      color: emphasized ? AppColors.primary : AppColors.textPrimary,
+      fontWeight: emphasized ? FontWeight.w800 : FontWeight.w600,
+      fontSize: emphasized ? 16 : 14,
+    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: emphasized ? AppColors.primary : AppColors.textSecondary,
+                fontWeight: emphasized ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ),
+          Text(value, style: style),
         ],
       ),
     );
