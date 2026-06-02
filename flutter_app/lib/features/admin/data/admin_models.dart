@@ -428,6 +428,37 @@ class AdminOrder {
   }
 }
 
+class BookingBill {
+  final AdminBooking booking;
+  final List<AdminOrder> orders;
+  final double orderTotal;
+  final double? bookingTotal;
+  final double grandTotal;
+
+  const BookingBill({
+    required this.booking,
+    required this.orders,
+    required this.orderTotal,
+    required this.bookingTotal,
+    required this.grandTotal,
+  });
+
+  factory BookingBill.fromJson(Map<String, dynamic> json) {
+    return BookingBill(
+      booking: AdminBooking.fromJson(json['booking'] as Map<String, dynamic>),
+      orders: (json['orders'] as List<dynamic>?)
+              ?.map((item) => AdminOrder.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [],
+      orderTotal: _toDouble(json['order_total']),
+      bookingTotal: json['booking_total'] != null
+          ? _toDouble(json['booking_total'])
+          : null,
+      grandTotal: _toDouble(json['grand_total']),
+    );
+  }
+}
+
 // ─── Admin Menu Item ────────────────────────────────────────────────────────
 
 class AdminMenuItem {

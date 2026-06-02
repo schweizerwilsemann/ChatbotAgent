@@ -11,7 +11,7 @@ import 'package:sports_venue_chatbot/shared/widgets/glass_app_bar.dart';
 /// Shell screen for Admin / Staff role.
 ///
 /// Provides a separate bottom-navigation and app-bar from the customer
-/// [HomeScreen].  Customer-oriented actions (Đặt sân, Order đồ ăn, Chat AI)
+/// [HomeScreen].  Customer-oriented actions (Đặt sân, Đặt hàng, Chat AI)
 /// are NOT accessible from here.
 class AdminShell extends ConsumerStatefulWidget {
   final Widget child;
@@ -119,6 +119,9 @@ class _AdminShellState extends ConsumerState<AdminShell> {
                 case 'analytics':
                   context.push('/admin/analytics');
                   break;
+                case 'resource_pricing':
+                  context.push('/admin/resource-pricing');
+                  break;
                 case 'profile':
                   context.push('/admin/profile');
                   break;
@@ -157,6 +160,15 @@ class _AdminShellState extends ConsumerState<AdminShell> {
                 child: ListTile(
                   leading: Icon(Icons.bar_chart),
                   title: Text('Biểu đồ'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'resource_pricing',
+                child: ListTile(
+                  leading: Icon(Icons.attach_money),
+                  title: Text('Cấu hình giá sân'),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),

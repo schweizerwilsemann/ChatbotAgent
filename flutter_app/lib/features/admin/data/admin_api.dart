@@ -73,6 +73,17 @@ class AdminApi {
     }
   }
 
+  Future<BookingBill> getBookingBill(String bookingId) async {
+    try {
+      final response = await _dioClient.get<Map<String, dynamic>>(
+        '${ApiConstants.adminBookingsEndpoint}/$bookingId/bill',
+      );
+      return BookingBill.fromJson(response.data!);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // ─── Orders ─────────────────────────────────────────────────────────────
 
   /// Fetch orders with optional status filter.

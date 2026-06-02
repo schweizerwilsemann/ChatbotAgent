@@ -252,7 +252,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
               // ── Order trends ──────────────────────────────────
               _ChartCard(
-                title: 'Đơn đồ ăn',
+                title: 'Đơn hàng',
                 subtitle: 'Số lượng đơn theo ngày',
                 child: _OrderTrendChart(
                   data: analytics.orderCountByDay,
@@ -709,9 +709,9 @@ class _SummaryTable extends StatelessWidget {
             color: AppColors.info,
           ),
           _SummaryRow(
-            label: 'Tổng đơn đồ ăn',
+            label: 'Tổng đơn hàng',
             value: '$totalOrders đơn',
-            icon: Icons.restaurant,
+            icon: Icons.shopping_bag_outlined,
             color: AppColors.warning,
           ),
           _SummaryRow(
