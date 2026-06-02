@@ -1,6 +1,8 @@
 import logging
 from datetime import date, datetime, time, timedelta
+from zoneinfo import ZoneInfo
 
+from app.core.config import settings
 from app.repositories.booking_repository import BookingRepository
 from app.repositories.venue_repository import VenueRepository
 from app.schemas.booking import (
@@ -41,6 +43,8 @@ class BookingService:
 
         if end_time <= start_time:
             raise ValueError("end_time must be after start_time")
+        if start_time < _now_for(start_time) - timedelta(minutes=5):
+            raise ValueError("Cannot book a time slot in the past")
 
         duration_hours = (end_time - start_time).total_seconds() / 3600
         if duration_hours > 12:
@@ -95,6 +99,11 @@ class BookingService:
                 f"for the requested time slot"
             )
 
+        total_price = None
+        if resource and resource.hourly_rate is not None:
+            duration_hours = (end_time - start_time).total_seconds() / 3600
+            total_price = float(resource.hourly_rate) * duration_hours
+
         booking = await self._repo.create(
             user_id=user_id,
             venue_id=venue_id,
@@ -105,6 +114,7 @@ class BookingService:
             start_time=start_time,
             end_time=end_time,
             notes=data.notes,
+            total_price=total_price,
         )
 
         logger.info("Booking created: %s for user %s", booking.id, user_id)
@@ -212,8 +222,8 @@ class BookingService:
         slots: list[TimeSlotResponse] = []
         available_courts: set[int] = set()
 
-        current = datetime.combine(selected_date, time(hour=8))
-        closing = datetime.combine(selected_date, time(hour=22))
+        current = datetime.combine(selected_date, time(hour=8), tzinfo=ZoneInfo(settings.DEFAULT_TIMEZONE))
+        closing = datetime.combine(selected_date, time(hour=22), tzinfo=ZoneInfo(settings.DEFAULT_TIMEZONE))
         while current < closing:
             next_time = current + timedelta(hours=1)
             slot_available = False
@@ -247,6 +257,9 @@ class BookingService:
 
     @staticmethod
     def _to_response(booking) -> BookingResponse:
+        local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
+        start_local = booking.start_time.astimezone(local_tz) if booking.start_time.tzinfo else booking.start_time
+        end_local = booking.end_time.astimezone(local_tz) if booking.end_time.tzinfo else booking.end_time
         return BookingResponse(
             id=str(booking.id),
             user_id=booking.user_id,
@@ -257,12 +270,18 @@ class BookingService:
             resource_label=getattr(booking, "resource_label", None),
             court_type=booking.court_type,
             court_number=booking.court_number,
-            date=booking.start_time.date(),
-            start_time=booking.start_time.strftime("%H:%M"),
-            end_time=booking.end_time.strftime("%H:%M"),
+            date=start_local.date(),
+            start_time=start_local.strftime("%H:%M"),
+            end_time=end_local.strftime("%H:%M"),
             status=booking.status,
-            total_price=None,
+            total_price=float(booking.total_price) if booking.total_price is not None else None,
             notes=booking.notes,
             created_at=booking.created_at if hasattr(booking, "created_at") else None,
             updated_at=booking.updated_at if hasattr(booking, "updated_at") else None,
         )
+
+
+def _now_for(value: datetime) -> datetime:
+    if value.tzinfo is not None and value.utcoffset() is not None:
+        return datetime.now(value.tzinfo)
+    return datetime.now(ZoneInfo(settings.DEFAULT_TIMEZONE)).replace(tzinfo=None)

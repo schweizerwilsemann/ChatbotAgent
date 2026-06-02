@@ -8,6 +8,7 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     Integer,
+    Numeric,
     String,
     UniqueConstraint,
 )
@@ -126,6 +127,11 @@ class ServiceResource(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base
         JSONB,
         nullable=False,
         default=dict,
+    )
+    hourly_rate: Mapped[float | None] = mapped_column(
+        Numeric(precision=12, scale=2),
+        nullable=True,
+        default=None,
     )
 
 

@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from sqlalchemy import and_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.models.venue import (
     Business,
     ResourceStatus,
@@ -178,6 +178,7 @@ class VenueRepository:
         capacity: int | None,
         status: str,
         metadata: dict,
+        hourly_rate=None,
     ) -> ServiceResource:
         resource = ServiceResource(
             id=uuid.uuid4(),
@@ -191,8 +192,23 @@ class VenueRepository:
             capacity=capacity,
             status=ResourceStatus(status),
             resource_metadata=metadata,
+            hourly_rate=hourly_rate,
         )
         self._session.add(resource)
+        await self._session.flush()
+        return resource
+
+    async def update_resource(
+        self,
+        resource_id: str | uuid.UUID,
+        **fields,
+    ) -> ServiceResource | None:
+        resource = await self.get_resource_by_id(resource_id)
+        if not resource:
+            return None
+        for key, value in fields.items():
+            if value is not None and hasattr(resource, key):
+                setattr(resource, key, value)
         await self._session.flush()
         return resource
 
@@ -311,7 +327,19 @@ class VenueRepository:
             or_(*scope_conditions),
         )
         result = await self._session.execute(stmt)
-        return sorted(set(result.scalars().all()))
+        target_user_ids = set(result.scalars().all())
+        if venue_id is not None:
+            default_venue_user_stmt = select(User.id).where(
+                User.role.in_([UserRole.STAFF, UserRole.ADMIN]),
+                User.default_venue_id == _to_uuid(venue_id),
+            )
+            default_venue_user_result = await self._session.execute(
+                default_venue_user_stmt
+            )
+            target_user_ids.update(
+                str(user_id) for user_id in default_venue_user_result.scalars()
+            )
+        return sorted(target_user_ids)
 
 
 class StaffAccess:

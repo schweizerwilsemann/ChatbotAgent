@@ -1,12 +1,16 @@
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
+from zoneinfo import ZoneInfo
 
-from sqlalchemy import Date, String, and_, cast, func, or_, select
+from sqlalchemy import Date, String, and_, cast, false, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.config import settings
 from app.models.booking import Booking
+
+_local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
 from app.models.menu import MenuItem
 from app.models.order import Order
 from app.models.user import User
@@ -21,36 +25,56 @@ class AdminRepository:
     # Dashboard helpers
     # ------------------------------------------------------------------
 
-    async def count_bookings_today(self, today: date) -> int:
+    async def count_bookings_today(
+        self,
+        today: date,
+        *,
+        venue_scope_ids: set[uuid.UUID] | None = None,
+        resource_ids: set[uuid.UUID] | None = None,
+    ) -> int:
         """Count bookings whose start_time falls on the given date."""
-        day_start = datetime.combine(today, datetime.min.time())
-        day_end = datetime.combine(today, datetime.max.time())
+        day_start = datetime.combine(today, datetime.min.time(), tzinfo=_local_tz)
+        day_end = datetime.combine(today, datetime.max.time(), tzinfo=_local_tz)
         stmt = select(func.count(Booking.id)).where(
             and_(
                 Booking.start_time >= day_start,
                 Booking.start_time <= day_end,
             )
         )
+        stmt = _apply_booking_scope(stmt, venue_scope_ids, resource_ids)
         result = await self._session.execute(stmt)
         return result.scalar() or 0
 
-    async def count_orders_today(self, today: date) -> int:
+    async def count_orders_today(
+        self,
+        today: date,
+        *,
+        venue_scope_ids: set[uuid.UUID] | None = None,
+        resource_ids: set[uuid.UUID] | None = None,
+    ) -> int:
         """Count orders whose created_at falls on the given date."""
-        day_start = datetime.combine(today, datetime.min.time())
-        day_end = datetime.combine(today, datetime.max.time())
+        day_start = datetime.combine(today, datetime.min.time(), tzinfo=_local_tz)
+        day_end = datetime.combine(today, datetime.max.time(), tzinfo=_local_tz)
         stmt = select(func.count(Order.id)).where(
             and_(
                 Order.created_at >= day_start,
                 Order.created_at <= day_end,
             )
         )
+        stmt = _apply_order_scope(stmt, venue_scope_ids, resource_ids)
         result = await self._session.execute(stmt)
         return result.scalar() or 0
 
-    async def sum_order_revenue_today(self, today: date) -> Decimal:
+    async def sum_order_revenue_today(
+        self,
+        today: date,
+        *,
+        venue_scope_ids: set[uuid.UUID] | None = None,
+        resource_ids: set[uuid.UUID] | None = None,
+    ) -> Decimal:
         """Sum total_price for delivered/completed orders today."""
-        day_start = datetime.combine(today, datetime.min.time())
-        day_end = datetime.combine(today, datetime.max.time())
+        day_start = datetime.combine(today, datetime.min.time(), tzinfo=_local_tz)
+        day_end = datetime.combine(today, datetime.max.time(), tzinfo=_local_tz)
         stmt = select(func.coalesce(func.sum(Order.total_price), 0)).where(
             and_(
                 Order.status.in_(["delivered"]),
@@ -58,16 +82,31 @@ class AdminRepository:
                 Order.created_at <= day_end,
             )
         )
+        stmt = _apply_order_scope(stmt, venue_scope_ids, resource_ids)
         result = await self._session.execute(stmt)
         return result.scalar() or Decimal("0")
 
     async def sum_booking_revenue_today(self, today: date) -> Decimal:
-        """Placeholder for booking revenue.
-        The Booking model has no total_price column, so this returns 0.
-        """
-        return Decimal("0")
+        """Sum total_price for bookings whose start_time falls on the given date."""
+        day_start = datetime.combine(today, datetime.min.time(), tzinfo=_local_tz)
+        day_end = datetime.combine(today, datetime.max.time(), tzinfo=_local_tz)
+        stmt = select(func.coalesce(func.sum(Booking.total_price), 0)).where(
+            and_(
+                Booking.status.in_(["confirmed", "completed"]),
+                Booking.start_time >= day_start,
+                Booking.start_time <= day_end,
+            )
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar() or Decimal("0")
 
-    async def count_active_courts(self, now: datetime) -> int:
+    async def count_active_courts(
+        self,
+        now: datetime,
+        *,
+        venue_scope_ids: set[uuid.UUID] | None = None,
+        resource_ids: set[uuid.UUID] | None = None,
+    ) -> int:
         """Count bookings that are currently active (confirmed and now between start/end)."""
         stmt = select(func.count(Booking.id)).where(
             and_(
@@ -76,13 +115,20 @@ class AdminRepository:
                 Booking.end_time >= now,
             )
         )
+        stmt = _apply_booking_scope(stmt, venue_scope_ids, resource_ids)
         result = await self._session.execute(stmt)
         return result.scalar() or 0
 
-    async def count_active_resources(self) -> int:
+    async def count_active_resources(
+        self,
+        *,
+        venue_scope_ids: set[uuid.UUID] | None = None,
+        resource_ids: set[uuid.UUID] | None = None,
+    ) -> int:
         stmt = select(func.count(ServiceResource.id)).where(
             ServiceResource.status == ResourceStatus.ACTIVE
         )
+        stmt = _apply_resource_scope(stmt, venue_scope_ids, resource_ids)
         result = await self._session.execute(stmt)
         return result.scalar() or 0
 
@@ -108,8 +154,9 @@ class AdminRepository:
             .order_by(Booking.start_time.desc())
         )
         if date_filter:
-            day_start = datetime.combine(date_filter, datetime.min.time())
-            day_end = datetime.combine(date_filter, datetime.max.time())
+            local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
+            day_start = datetime.combine(date_filter, datetime.min.time(), tzinfo=local_tz)
+            day_end = datetime.combine(date_filter, datetime.max.time(), tzinfo=local_tz)
             stmt = stmt.where(
                 and_(
                     Booking.start_time >= day_start,
@@ -120,13 +167,7 @@ class AdminRepository:
             stmt = stmt.where(Booking.court_type == court_type)
         if status:
             stmt = stmt.where(Booking.status == status)
-        scope_conditions = []
-        if venue_scope_ids:
-            scope_conditions.append(Booking.venue_id.in_(list(venue_scope_ids)))
-        if resource_ids:
-            scope_conditions.append(Booking.resource_id.in_(list(resource_ids)))
-        if scope_conditions:
-            stmt = stmt.where(or_(*scope_conditions))
+        stmt = _apply_booking_scope(stmt, venue_scope_ids, resource_ids)
         if limit is not None:
             stmt = stmt.offset(offset).limit(limit)
 
@@ -181,15 +222,32 @@ class AdminRepository:
         )
         if status:
             stmt = stmt.where(Order.status == status)
-        scope_conditions = []
-        if venue_scope_ids:
-            scope_conditions.append(Order.venue_id.in_(list(venue_scope_ids)))
-        if resource_ids:
-            scope_conditions.append(Order.resource_id.in_(list(resource_ids)))
-        if scope_conditions:
-            stmt = stmt.where(or_(*scope_conditions))
+        stmt = _apply_order_scope(stmt, venue_scope_ids, resource_ids)
         if limit is not None:
             stmt = stmt.offset(offset).limit(limit)
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_orders_during_booking(self, booking: Booking) -> list[Order]:
+        """Return non-cancelled orders created by this customer during a booking."""
+        stmt = (
+            select(Order)
+            .options(selectinload(Order.items))
+            .where(
+                Order.user_id == booking.user_id,
+                Order.status != "cancelled",
+                Order.created_at >= booking.start_time,
+                Order.created_at <= booking.end_time,
+            )
+            .order_by(Order.created_at.asc())
+        )
+        scope_conditions = []
+        if booking.resource_id:
+            scope_conditions.append(Order.resource_id == booking.resource_id)
+        if booking.venue_id:
+            scope_conditions.append(Order.venue_id == booking.venue_id)
+        if scope_conditions:
+            stmt = stmt.where(or_(*scope_conditions))
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -202,6 +260,7 @@ class AdminRepository:
         *,
         category_key: str | None = None,
         query: str | None = None,
+        venue_scope_ids: set[uuid.UUID] | None = None,
         limit: int | None = None,
         offset: int = 0,
     ) -> list[MenuItem]:
@@ -220,6 +279,16 @@ class AdminRepository:
                     MenuItem.description.ilike(like_query),
                 )
             )
+        if venue_scope_ids is not None:
+            if not venue_scope_ids:
+                stmt = stmt.where(false())
+            else:
+                stmt = stmt.where(
+                    or_(
+                        MenuItem.venue_id.in_(list(venue_scope_ids)),
+                        MenuItem.venue_id.is_(None),
+                    )
+                )
         if limit is not None:
             stmt = stmt.offset(offset).limit(limit)
         result = await self._session.execute(stmt)
@@ -300,10 +369,17 @@ class AdminRepository:
     # Analytics
     # ------------------------------------------------------------------
 
-    async def revenue_by_day(self, start: date, end: date) -> list[dict]:
+    async def revenue_by_day(
+        self,
+        start: date,
+        end: date,
+        *,
+        venue_scope_ids: set[uuid.UUID] | None = None,
+        resource_ids: set[uuid.UUID] | None = None,
+    ) -> list[dict]:
         """Sum of delivered order totals per day."""
-        day_start = datetime.combine(start, datetime.min.time())
-        day_end = datetime.combine(end, datetime.max.time())
+        day_start = datetime.combine(start, datetime.min.time(), tzinfo=_local_tz)
+        day_end = datetime.combine(end, datetime.max.time(), tzinfo=_local_tz)
         stmt = (
             select(
                 cast(Order.created_at, Date).label("day"),
@@ -319,13 +395,21 @@ class AdminRepository:
             .group_by(cast(Order.created_at, Date))
             .order_by(cast(Order.created_at, Date))
         )
+        stmt = _apply_order_scope(stmt, venue_scope_ids, resource_ids)
         result = await self._session.execute(stmt)
         return [{"date": row[0], "revenue": row[1]} for row in result.all()]
 
-    async def bookings_by_court(self, start: date, end: date) -> list[dict]:
+    async def bookings_by_court(
+        self,
+        start: date,
+        end: date,
+        *,
+        venue_scope_ids: set[uuid.UUID] | None = None,
+        resource_ids: set[uuid.UUID] | None = None,
+    ) -> list[dict]:
         """Count bookings grouped by court_type and court_number."""
-        day_start = datetime.combine(start, datetime.min.time())
-        day_end = datetime.combine(end, datetime.max.time())
+        day_start = datetime.combine(start, datetime.min.time(), tzinfo=_local_tz)
+        day_end = datetime.combine(end, datetime.max.time(), tzinfo=_local_tz)
         stmt = (
             select(
                 Booking.court_type,
@@ -341,6 +425,7 @@ class AdminRepository:
             .group_by(Booking.court_type, Booking.court_number)
             .order_by(Booking.court_type, Booking.court_number)
         )
+        stmt = _apply_booking_scope(stmt, venue_scope_ids, resource_ids)
         result = await self._session.execute(stmt)
         return [
             {
@@ -351,10 +436,17 @@ class AdminRepository:
             for row in result.all()
         ]
 
-    async def orders_by_hour(self, start: date, end: date) -> list[dict]:
+    async def orders_by_hour(
+        self,
+        start: date,
+        end: date,
+        *,
+        venue_scope_ids: set[uuid.UUID] | None = None,
+        resource_ids: set[uuid.UUID] | None = None,
+    ) -> list[dict]:
         """Count orders grouped by hour of day (peak hours)."""
-        day_start = datetime.combine(start, datetime.min.time())
-        day_end = datetime.combine(end, datetime.max.time())
+        day_start = datetime.combine(start, datetime.min.time(), tzinfo=_local_tz)
+        day_end = datetime.combine(end, datetime.max.time(), tzinfo=_local_tz)
         stmt = (
             select(
                 func.extract("hour", Order.created_at).label("hour"),
@@ -369,13 +461,21 @@ class AdminRepository:
             .group_by(func.extract("hour", Order.created_at))
             .order_by(func.extract("hour", Order.created_at))
         )
+        stmt = _apply_order_scope(stmt, venue_scope_ids, resource_ids)
         result = await self._session.execute(stmt)
         return [{"hour": int(row[0]), "count": row[1]} for row in result.all()]
 
-    async def order_count_by_day(self, start: date, end: date) -> list[dict]:
+    async def order_count_by_day(
+        self,
+        start: date,
+        end: date,
+        *,
+        venue_scope_ids: set[uuid.UUID] | None = None,
+        resource_ids: set[uuid.UUID] | None = None,
+    ) -> list[dict]:
         """Count orders per day."""
-        day_start = datetime.combine(start, datetime.min.time())
-        day_end = datetime.combine(end, datetime.max.time())
+        day_start = datetime.combine(start, datetime.min.time(), tzinfo=_local_tz)
+        day_end = datetime.combine(end, datetime.max.time(), tzinfo=_local_tz)
         stmt = (
             select(
                 cast(Order.created_at, Date).label("day"),
@@ -390,5 +490,45 @@ class AdminRepository:
             .group_by(cast(Order.created_at, Date))
             .order_by(cast(Order.created_at, Date))
         )
+        stmt = _apply_order_scope(stmt, venue_scope_ids, resource_ids)
         result = await self._session.execute(stmt)
         return [{"date": row[0], "count": row[1]} for row in result.all()]
+
+
+def _apply_booking_scope(stmt, venue_scope_ids, resource_ids):
+    if venue_scope_ids is None and resource_ids is None:
+        return stmt
+    scope_conditions = []
+    if venue_scope_ids:
+        scope_conditions.append(Booking.venue_id.in_(list(venue_scope_ids)))
+    if resource_ids:
+        scope_conditions.append(Booking.resource_id.in_(list(resource_ids)))
+    if scope_conditions:
+        return stmt.where(or_(*scope_conditions))
+    return stmt.where(false())
+
+
+def _apply_order_scope(stmt, venue_scope_ids, resource_ids):
+    if venue_scope_ids is None and resource_ids is None:
+        return stmt
+    scope_conditions = []
+    if venue_scope_ids:
+        scope_conditions.append(Order.venue_id.in_(list(venue_scope_ids)))
+    if resource_ids:
+        scope_conditions.append(Order.resource_id.in_(list(resource_ids)))
+    if scope_conditions:
+        return stmt.where(or_(*scope_conditions))
+    return stmt.where(false())
+
+
+def _apply_resource_scope(stmt, venue_scope_ids, resource_ids):
+    if venue_scope_ids is None and resource_ids is None:
+        return stmt
+    scope_conditions = []
+    if venue_scope_ids:
+        scope_conditions.append(ServiceResource.venue_id.in_(list(venue_scope_ids)))
+    if resource_ids:
+        scope_conditions.append(ServiceResource.id.in_(list(resource_ids)))
+    if scope_conditions:
+        return stmt.where(or_(*scope_conditions))
+    return stmt.where(false())

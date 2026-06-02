@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     APP_ENV: str = "development"
     DEBUG: bool = False
+    DEFAULT_TIMEZONE: str = "Asia/Ho_Chi_Minh"
 
     # PostgreSQL
     DATABASE_URL: str = "postgresql+asyncpg://user:password@localhost:5432/sports_venue"

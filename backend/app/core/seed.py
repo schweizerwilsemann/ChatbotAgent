@@ -558,6 +558,13 @@ async def ensure_multi_tenant_columns(engine: AsyncEngine) -> None:
             "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN NOT NULL DEFAULT FALSE",
             "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ",
             "CREATE INDEX IF NOT EXISTS ix_menu_items_is_deleted ON menu_items (is_deleted)",
+            # Pricing columns
+            "ALTER TABLE service_resources ADD COLUMN IF NOT EXISTS hourly_rate NUMERIC(12, 2) DEFAULT NULL",
+            "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS total_price NUMERIC(12, 2) DEFAULT NULL",
+            # Seed default pricing for existing resources
+            "UPDATE service_resources SET hourly_rate = 80000  WHERE sport_type = 'billiards'  AND hourly_rate IS NULL",
+            "UPDATE service_resources SET hourly_rate = 120000 WHERE sport_type = 'pickleball' AND hourly_rate IS NULL",
+            "UPDATE service_resources SET hourly_rate = 100000 WHERE sport_type = 'badminton'  AND hourly_rate IS NULL",
         ]
         for statement in statements:
             await conn.execute(text(statement))
@@ -778,6 +785,7 @@ async def _seed_billiards_venue(
             sport_type="billiards",
             number=number,
             capacity=4,
+            hourly_rate=80000,
         )
 
     logger.info("Seeded billiards venue: %s (8 bàn)", venue.name)
@@ -819,6 +827,7 @@ async def _seed_pickleball_venue(
             sport_type="pickleball",
             number=number,
             capacity=4,
+            hourly_rate=120000,
         )
 
     logger.info("Seeded pickleball venue: %s (6 sân)", venue.name)
@@ -860,6 +869,7 @@ async def _seed_badminton_venue(
             sport_type="badminton",
             number=number,
             capacity=4,
+            hourly_rate=100000,
         )
 
     logger.info("Seeded badminton venue: %s (6 sân)", venue.name)
@@ -894,6 +904,7 @@ async def _ensure_resource(
     sport_type: str,
     number: int,
     capacity: int,
+    hourly_rate=None,
 ) -> ServiceResource:
     result = await session.execute(
         select(ServiceResource).where(
@@ -914,6 +925,7 @@ async def _ensure_resource(
             capacity=capacity,
             status=ResourceStatus.ACTIVE,
             resource_metadata={},
+            hourly_rate=hourly_rate,
         )
         session.add(resource)
     else:
@@ -923,6 +935,8 @@ async def _ensure_resource(
         resource.sport_type = sport_type
         resource.number = number
         resource.capacity = capacity
+        if hourly_rate is not None:
+            resource.hourly_rate = hourly_rate
     await session.flush()
     return resource
 

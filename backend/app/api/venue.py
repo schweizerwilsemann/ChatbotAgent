@@ -8,6 +8,7 @@ from app.repositories.venue_repository import VenueRepository
 from app.schemas.venue import (
     ServiceResourceCreate,
     ServiceResourceResponse,
+    ServiceResourceUpdate,
     StaffAssignmentCreate,
     StaffAssignmentResponse,
     VenueResponse,
@@ -49,6 +50,7 @@ def _resource_response(entry: dict) -> ServiceResourceResponse:
         if hasattr(resource.status, "value")
         else str(resource.status),
         metadata=resource.resource_metadata or {},
+        hourly_rate=resource.hourly_rate,
     )
 
 
@@ -129,6 +131,27 @@ async def create_resource(
     if not venue:
         raise HTTPException(status_code=404, detail="Venue not found")
     resource = await repo.create_resource(**data.model_dump())
+    await session.commit()
+    return _resource_response({"resource": resource, "area_name": None})
+
+
+@router.patch(
+    "/admin/resources/{resource_id}",
+    response_model=ServiceResourceResponse,
+)
+async def update_resource(
+    resource_id: str,
+    data: ServiceResourceUpdate,
+    _: User = Depends(require_roles("ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> ServiceResourceResponse:
+    repo = VenueRepository(session)
+    update_data = data.model_dump(exclude_unset=True)
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    resource = await repo.update_resource(resource_id, **update_data)
+    if not resource:
+        raise HTTPException(status_code=404, detail="Resource not found")
     await session.commit()
     return _resource_response({"resource": resource, "area_name": None})
 
