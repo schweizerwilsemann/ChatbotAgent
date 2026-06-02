@@ -8,6 +8,7 @@ import 'package:sports_venue_chatbot/features/admin/presentation/booking_managem
 import 'package:sports_venue_chatbot/features/admin/presentation/menu_management_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/billing_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/admin_notifications_screen.dart';
+import 'package:sports_venue_chatbot/features/admin/presentation/resource_pricing_screen.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/login_screen.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_screen.dart';
@@ -64,7 +65,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       // Customer on management routes → home
-      if (isLoggedIn && userRole != 'ADMIN' && userRole != 'STAFF' && isManagementRoute) {
+      if (isLoggedIn &&
+          userRole != 'ADMIN' &&
+          userRole != 'STAFF' &&
+          isManagementRoute) {
         return '/home';
       }
 
@@ -85,27 +89,32 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/home',
             name: 'home',
-            pageBuilder: (context, state) => const NoTransitionPage(child: ChatScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ChatScreen()),
           ),
           GoRoute(
             path: '/chat',
             name: 'chat',
-            pageBuilder: (context, state) => const NoTransitionPage(child: ChatScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ChatScreen()),
           ),
           GoRoute(
             path: '/booking',
             name: 'booking',
-            pageBuilder: (context, state) => const NoTransitionPage(child: BookingScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: BookingScreen()),
           ),
           GoRoute(
             path: '/menu',
             name: 'menu',
-            pageBuilder: (context, state) => const NoTransitionPage(child: MenuScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: MenuScreen()),
           ),
           GoRoute(
             path: '/profile',
             name: 'profile',
-            pageBuilder: (context, state) => const NoTransitionPage(child: ProfileScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ProfileScreen()),
           ),
         ],
       ),
@@ -118,39 +127,46 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/admin/dashboard',
             name: 'admin_dashboard',
-            pageBuilder: (context, state) => const NoTransitionPage(child: DashboardScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: DashboardScreen()),
           ),
           GoRoute(
             path: '/admin/bookings',
             name: 'admin_bookings',
-            pageBuilder: (context, state) => const NoTransitionPage(child: BookingManagementScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: BookingManagementScreen()),
           ),
           GoRoute(
             path: '/admin/menu',
             name: 'admin_menu',
-            pageBuilder: (context, state) => const NoTransitionPage(child: MenuManagementScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: MenuManagementScreen()),
           ),
           GoRoute(
             path: '/admin/billing',
             name: 'admin_billing',
-            pageBuilder: (context, state) => const NoTransitionPage(child: BillingScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: BillingScreen()),
           ),
 
           // Staff routes
           GoRoute(
             path: '/staff/bookings',
             name: 'staff_bookings',
-            pageBuilder: (context, state) => const NoTransitionPage(child: BookingManagementScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: BookingManagementScreen()),
           ),
           GoRoute(
             path: '/staff/menu',
             name: 'staff_menu',
-            pageBuilder: (context, state) => const NoTransitionPage(child: MenuManagementScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: MenuManagementScreen()),
           ),
           GoRoute(
             path: '/staff/notifications',
             name: 'staff_notifications',
-            pageBuilder: (context, state) => const NoTransitionPage(child: StaffNotificationsScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: StaffNotificationsScreen()),
           ),
         ],
       ),
@@ -160,6 +176,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/admin/analytics',
         name: 'admin_analytics',
         builder: (context, state) => const AnalyticsScreen(),
+      ),
+      GoRoute(
+        path: '/admin/resource-pricing',
+        name: 'admin_resource_pricing',
+        builder: (context, state) => const ResourcePricingScreen(),
       ),
       GoRoute(
         path: '/admin/notifications',

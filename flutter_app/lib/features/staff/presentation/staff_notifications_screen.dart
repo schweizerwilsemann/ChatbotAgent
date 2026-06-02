@@ -164,6 +164,7 @@ class _NotificationTile extends ConsumerWidget {
         .format(notification.createdAt.toLocal());
     final isStaffRequest = notification.eventType == 'staff.requested' ||
         notification.eventType == 'staff_request';
+    final isOrder = notification.eventType.startsWith('order');
     final notifState = ref.watch(staffNotificationsProvider);
     final effectiveStatus =
         isStaffRequest ? notifState.getEffectiveStatus(notification) : null;
@@ -275,6 +276,10 @@ class _NotificationTile extends ConsumerWidget {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
+                        ),
+                      if (isOrder)
+                        _OrderNotificationSummary(
+                          payload: notification.payload,
                         ),
                     ],
                   ),
@@ -529,7 +534,7 @@ class _NotificationTile extends ConsumerWidget {
   }
 
   IconData _eventIcon(String eventType) {
-    if (eventType.startsWith('order')) return Icons.restaurant;
+    if (eventType.startsWith('order')) return Icons.shopping_bag_outlined;
     if (eventType.startsWith('booking')) return Icons.sports_tennis;
     if (eventType == 'staff.requested' || eventType == 'staff_request') {
       return Icons.support_agent;
@@ -544,6 +549,127 @@ class _NotificationTile extends ConsumerWidget {
       return AppColors.primary;
     }
     return AppColors.textSecondary;
+  }
+}
+
+class _OrderNotificationSummary extends StatelessWidget {
+  final Map<String, dynamic> payload;
+
+  const _OrderNotificationSummary({required this.payload});
+
+  @override
+  Widget build(BuildContext context) {
+    final rawItems = payload['items'];
+    if (rawItems is! List || rawItems.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final orderId = payload['id']?.toString();
+    final shortOrderId = orderId == null || orderId.length <= 8
+        ? orderId
+        : orderId.substring(0, 8);
+    final status = payload['status']?.toString();
+    final total = _moneyText(payload['total_price']);
+
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if ((orderId != null && orderId.isNotEmpty) ||
+              (status != null && status.isNotEmpty))
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                [
+                  if (orderId != null && orderId.isNotEmpty) 'Mã $shortOrderId',
+                  if (status != null && status.isNotEmpty) status,
+                ].join(' · '),
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ...rawItems.whereType<Map>().map((rawItem) {
+            final item = Map<String, dynamic>.from(rawItem);
+            final name = item['item_name']?.toString() ?? 'Món';
+            final quantity = item['quantity']?.toString() ?? '1';
+            final lineTotal = _moneyText(item['total_price']);
+            return Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '$name x$quantity',
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  if (lineTotal != null)
+                    Text(
+                      lineTotal,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
+                    ),
+                ],
+              ),
+            );
+          }),
+          if (total != null) ...[
+            const Divider(height: 14),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Tổng',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                Text(
+                  total,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  static String? _moneyText(Object? raw) {
+    final value = _numberValue(raw);
+    if (value == null) return null;
+    return NumberFormat.currency(
+      locale: 'vi_VN',
+      symbol: 'đ',
+      decimalDigits: 0,
+    ).format(value);
+  }
+
+  static num? _numberValue(Object? raw) {
+    if (raw is num) return raw;
+    if (raw is String) return num.tryParse(raw.replaceAll(',', ''));
+    return null;
   }
 }
 

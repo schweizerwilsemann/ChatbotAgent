@@ -143,8 +143,8 @@ class _StatsGrid extends StatelessWidget {
         trendUp: true,
       ),
       _StatData(
-        icon: Icons.restaurant,
-        label: 'Đơn đồ ăn',
+        icon: Icons.shopping_bag_outlined,
+        label: 'Đơn hàng',
         value: '${stats.ordersToday}',
         color: AppColors.warning,
         trend: '', // No trend data from API yet
@@ -367,9 +367,9 @@ class _RecentActivitySection extends StatelessWidget {
         color: AppColors.billiardsColor,
       ),
       _ActivityItem(
-        icon: Icons.restaurant,
-        title: 'Order đồ ăn - Bàn #5',
-        subtitle: '2x Cà phê sữa, 1x Bánh mì',
+        icon: Icons.shopping_bag_outlined,
+        title: 'Order item - Bàn #5',
+        subtitle: '2x Cà phê sữa, 1x thuê vợt',
         time: '12 phút trước',
         color: AppColors.warning,
       ),
