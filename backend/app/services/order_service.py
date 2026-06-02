@@ -27,27 +27,6 @@ class OrderService:
         if not data.items:
             raise ValueError("Order must contain at least one item")
 
-        item_names = [item.item_name for item in data.items]
-        menu_items = await self._menu_repo.find_available_by_names(item_names)
-
-        items_data = []
-        quantities_by_name: dict[str, int] = {}
-        menu_prices = {}
-        for item in data.items:
-            menu_item = menu_items.get(item.item_name.lower())
-            if menu_item is None:
-                raise ValueError(f"Item not found on menu: {item.item_name}")
-            menu_prices[item.item_name.lower()] = menu_item.price
-            quantities_by_name[item.item_name] = (
-                quantities_by_name.get(item.item_name, 0) + item.quantity
-            )
-            items_data.append(
-                {
-                    "item_name": item.item_name,
-                    "quantity": item.quantity,
-                }
-            )
-
         venue_id = data.venue_id
         resource_id = data.resource_id
         resource_label = data.resource_label
@@ -76,6 +55,30 @@ class OrderService:
                 resource_label = data.resource_label or resource.name
                 table_number = resource.number
 
+        item_names = [item.item_name for item in data.items]
+        menu_items = await self._menu_repo.find_available_by_names(
+            item_names,
+            venue_id=venue_id,
+        )
+
+        items_data = []
+        quantities_by_name: dict[str, int] = {}
+        menu_prices = {}
+        for item in data.items:
+            menu_item = menu_items.get(item.item_name.lower())
+            if menu_item is None:
+                raise ValueError(f"Item not found on menu: {item.item_name}")
+            menu_prices[item.item_name.lower()] = menu_item.price
+            quantities_by_name[item.item_name] = (
+                quantities_by_name.get(item.item_name, 0) + item.quantity
+            )
+            items_data.append(
+                {
+                    "item_name": item.item_name,
+                    "quantity": item.quantity,
+                }
+            )
+
         order = await self._repo.create(
             user_id=data.user_id,
             venue_id=venue_id,
@@ -86,7 +89,7 @@ class OrderService:
             menu_prices=menu_prices,
             notes=data.notes,
         )
-        await self._menu_repo.increment_sales(quantities_by_name)
+        await self._menu_repo.increment_sales(quantities_by_name, venue_id=venue_id)
 
         logger.info(
             "Order created: %s for user %s, total=%s VND",
@@ -98,7 +101,7 @@ class OrderService:
         if self._notification_service:
             await self._notification_service.notify_operations(
                 event_type="order.created",
-                title="Đơn đồ ăn mới",
+                title="Đơn hàng mới",
                 message=(
                     f"Khách vừa đặt {len(response.items)} món"
                     f"{f' tại {response.resource_label}' if response.resource_label else ''}, "

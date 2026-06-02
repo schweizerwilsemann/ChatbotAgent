@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text, func
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, Numeric, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -40,3 +40,6 @@ class Booking(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         server_default="confirmed",
     )
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    total_price: Mapped[float | None] = mapped_column(
+        Numeric(precision=12, scale=2), nullable=True, default=None
+    )

@@ -7,7 +7,7 @@ from app.agent.tools import (
     book_court,
     call_staff,
     check_schedule,
-    order_food,
+    order_menu_items,
     query_knowledge,
     recommend_menu,
 )
@@ -103,7 +103,7 @@ async def lifespan(app: FastAPI):
             tools=[
                 query_knowledge,
                 book_court,
-                order_food,
+                order_menu_items,
                 call_staff,
                 check_schedule,
                 recommend_menu,

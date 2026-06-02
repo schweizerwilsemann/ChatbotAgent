@@ -22,6 +22,7 @@ class BookingRepository:
         venue_id: str | uuid.UUID | None = None,
         resource_id: str | uuid.UUID | None = None,
         resource_label: str | None = None,
+        total_price: float | None = None,
     ) -> Booking:
         booking = Booking(
             id=uuid.uuid4(),
@@ -35,6 +36,7 @@ class BookingRepository:
             end_time=end_time,
             status="confirmed",
             notes=notes or None,
+            total_price=total_price,
         )
         self._session.add(booking)
         await self._session.flush()
@@ -114,6 +116,7 @@ class BookingRepository:
         self,
         date: datetime,
         court_type: str = "",
+        venue_id: str | uuid.UUID | None = None,
     ) -> list[Booking]:
         """Get all confirmed bookings for a given date."""
         day_start = date.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -126,6 +129,8 @@ class BookingRepository:
         ]
         if court_type:
             conditions.append(Booking.court_type == court_type)
+        if venue_id:
+            conditions.append(Booking.venue_id == _to_uuid_or_none(venue_id))
 
         stmt = (
             select(Booking)

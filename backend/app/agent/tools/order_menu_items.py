@@ -4,8 +4,9 @@ from difflib import SequenceMatcher
 
 from langchain_core.tools import tool
 
-from app.agent.context import current_user_id
+from app.agent.context import current_chat_context, current_user_id
 from app.core.database import async_session_factory
+from app.repositories.booking_repository import BookingRepository
 from app.repositories.menu_repository import MenuRepository
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.order_repository import OrderRepository
@@ -83,12 +84,13 @@ def _resolve_item_name(raw_name: str, menu_items: list) -> tuple[str, str | None
 
 
 @tool
-async def order_food(items: str, notes: str = "") -> str:
-    """Đặt đồ ăn/thức uống cho khách. Nhận danh sách món dưới dạng JSON.
+async def order_menu_items(items: str, notes: str = "") -> str:
+    """Đặt item trong thực đơn cho khách. Nhận danh sách item dạng JSON.
 
     Args:
-        items: Danh sách món dạng JSON string, ví dụ: '[{"item_name": "Cà phê đen", "quantity": 2}, {"item_name": "Khô bò", "quantity": 1}]'
-        notes: Ghi chú thêm (tùy chọn), ví dụ: "ít đá", "không đường"
+        items: Danh sách item dạng JSON string, ví dụ:
+            '[{"item_name": "Cà phê đen", "quantity": 2}, {"item_name": "Vợt cho thuê", "quantity": 1}]'
+        notes: Ghi chú thêm (tùy chọn), ví dụ: "ít đá", "thuê trong 2 giờ"
 
     Returns:
         Xác nhận đặt hàng hoặc thông báo lỗi
@@ -100,10 +102,14 @@ async def order_food(items: str, notes: str = "") -> str:
     except json.JSONDecodeError:
         return '❌ Định dạng JSON không hợp lệ. Ví dụ: [{"item_name": "Cà phê đen", "quantity": 2}]'
 
+    chat_context = current_chat_context.get() or {}
+    selected_venue_id = _optional_str(chat_context.get("venue_id"))
+    selected_venue_name = _optional_str(chat_context.get("venue_name"))
+
     # ── Pre-process: resolve fuzzy item names ─────────────────────
     async with async_session_factory() as session:
         menu_repo = MenuRepository(session)
-        all_available = await menu_repo.list_available()
+        all_available = await menu_repo.list_available(venue_id=selected_venue_id)
 
     resolved_items: list[dict] = []
     match_notes: list[str] = []
@@ -141,9 +147,32 @@ async def order_food(items: str, notes: str = "") -> str:
             )
             service = OrderService(repo, menu_repo, notification_service, venue_repo)
 
+            venue_id = selected_venue_id
+            resource_id = None
+            resource_label = None
+            table_number = 0
+            active_booking = await BookingRepository(session).get_active_booking(
+                str(current_user_id.get())
+            )
+            if active_booking and (
+                not selected_venue_id
+                or str(active_booking.venue_id) == str(selected_venue_id)
+            ):
+                venue_id = str(active_booking.venue_id) if active_booking.venue_id else venue_id
+                resource_id = (
+                    str(active_booking.resource_id)
+                    if active_booking.resource_id
+                    else None
+                )
+                resource_label = active_booking.resource_label
+                table_number = active_booking.court_number
+
             order_data = OrderCreate(
                 user_id=current_user_id.get(),
-                table_number=0,
+                venue_id=venue_id,
+                resource_id=resource_id,
+                resource_label=resource_label,
+                table_number=table_number,
                 items=order_items,
                 notes=notes,
             )
@@ -159,9 +188,15 @@ async def order_food(items: str, notes: str = "") -> str:
             resolved_note = ""
             if match_notes:
                 resolved_note = "\n📝 Đã khớp: " + ", ".join(match_notes)
+            venue_text = f"📍 Quán: {selected_venue_name}\n" if selected_venue_name else ""
+            resource_text = (
+                f"📍 Vị trí: {order.resource_label}\n" if order.resource_label else ""
+            )
 
             return (
                 f"✅ Đặt hàng thành công!\n"
+                f"{venue_text}"
+                f"{resource_text}"
                 f"📋 Mã đơn hàng: {order.id}\n"
                 f"🍽️ Chi tiết:\n{items_summary}\n"
                 f"💰 Tổng cộng: {order.total_price:,.0f} VND\n"
@@ -187,7 +222,9 @@ async def order_food(items: str, notes: str = "") -> str:
 
             async with async_session_factory() as suggest_session:
                 suggest_repo = MenuRepository(suggest_session)
-                all_items = await suggest_repo.list_available()
+                all_items = await suggest_repo.list_available(
+                    venue_id=selected_venue_id
+                )
 
             suggestion_lines: list[str] = []
             for name in unavailable_names:
@@ -227,5 +264,12 @@ async def order_food(items: str, notes: str = "") -> str:
         return f"❌ Không thể đặt hàng: {exc}"
 
     except Exception as exc:
-        logger.exception("Error in order_food tool")
+        logger.exception("Error in order_menu_items tool")
         return f"❌ Lỗi hệ thống khi đặt hàng: {exc}"
+
+
+def _optional_str(value) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None

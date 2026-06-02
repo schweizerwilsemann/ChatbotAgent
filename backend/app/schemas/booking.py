@@ -1,7 +1,10 @@
 from datetime import date as DateType
 from datetime import datetime, time
+from zoneinfo import ZoneInfo
 
 from pydantic import BaseModel, Field, field_validator
+
+from app.core.config import settings
 
 
 class BookingCreate(BaseModel):
@@ -101,9 +104,13 @@ class AvailabilityResponse(BaseModel):
 
 
 def _combine_date_time(value_date: DateType | None, value: datetime | str) -> datetime:
+    tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
     if isinstance(value, datetime):
+        if value.tzinfo is None:
+            return value.replace(tzinfo=tz)
         return value
     if value_date is None:
-        return datetime.fromisoformat(value)
+        dt = datetime.fromisoformat(value)
+        return dt.replace(tzinfo=tz) if dt.tzinfo is None else dt
     parsed_time = time.fromisoformat(value)
-    return datetime.combine(value_date, parsed_time)
+    return datetime.combine(value_date, parsed_time, tzinfo=tz)

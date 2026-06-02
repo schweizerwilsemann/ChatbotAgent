@@ -57,13 +57,24 @@ class MenuRepository:
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def find_available_by_names(self, names: list[str]) -> dict[str, MenuItem]:
+    async def find_available_by_names(
+        self,
+        names: list[str],
+        venue_id: str | uuid.UUID | None = None,
+    ) -> dict[str, MenuItem]:
         normalized = [name.lower() for name in names]
         stmt = select(MenuItem).where(
             MenuItem.is_available.is_(True),
             MenuItem.is_deleted.is_(False),
             func.lower(MenuItem.name).in_(normalized),
         )
+        if venue_id is not None:
+            stmt = stmt.where(
+                (MenuItem.venue_id == _to_uuid(venue_id))
+                | (MenuItem.venue_id.is_(None))
+            )
+        else:
+            stmt = stmt.where(MenuItem.venue_id.is_(None))
         result = await self._session.execute(stmt)
         return {item.name.lower(): item for item in result.scalars().all()}
 
@@ -99,10 +110,17 @@ class MenuRepository:
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def increment_sales(self, quantities_by_name: dict[str, int]) -> None:
+    async def increment_sales(
+        self,
+        quantities_by_name: dict[str, int],
+        venue_id: str | uuid.UUID | None = None,
+    ) -> None:
         if not quantities_by_name:
             return
-        items = await self.find_available_by_names(list(quantities_by_name.keys()))
+        items = await self.find_available_by_names(
+            list(quantities_by_name.keys()),
+            venue_id=venue_id,
+        )
         for normalized_name, quantity in quantities_by_name.items():
             item = items.get(normalized_name.lower())
             if item is not None:
