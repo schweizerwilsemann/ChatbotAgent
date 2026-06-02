@@ -166,6 +166,14 @@ class IntentRouter:
         "cho tôi cà phê đen",
         "gọi 2 phần khô bò",
         "lấy thêm nước suối",
+        "thuê vợt cầu lông",
+        "thuê vợt pickleball",
+        "lấy băng đeo tay",
+        "mua quấn cán vợt",
+        "cần ống cầu lông",
+        "thuê cơ bida",
+        "thue vot cau long",
+        "lay bang deo tay",
         "khoai tây chiên 1 phần",
         "cafe sữa đi",
         "trà đá và đậu phộng",
@@ -253,6 +261,8 @@ class IntentRouter:
         "gọi đồ",
         "gọi món",
         "đặt hàng",
+        "thuê",
+        "thue",
         "nhân viên",
         "staff",
         "hỗ trợ",
@@ -308,6 +318,16 @@ class IntentRouter:
         "đậu phộng",
         "bánh tráng",
         "sting",
+        "vợt",
+        "vot",
+        "băng đeo tay",
+        "bang deo tay",
+        "quấn cán",
+        "quan can",
+        "cầu lông",
+        "cau long",
+        "thuê vợt",
+        "thue vot",
         "phần",
         "cho tôi",
         "cho mình",
@@ -460,7 +480,7 @@ class IntentRouter:
         # 4. Off-topic → DO NOT block. Let the LLM handle it.
         #    The LLM's system prompt already constrains the domain.
         #    Blocking here prevents semantic understanding of messages
-        #    like food orders that don't match predefined patterns.
+        #    like menu item orders that don't match predefined patterns.
         if off_sim >= self._OFF_TOPIC_THRESHOLD and off_sim > domain_sim:
             logger.info(
                 "Possible off-topic (embedding, score=%.3f) but passing to LLM: %s",
@@ -488,7 +508,7 @@ class IntentRouter:
         # 2. Domain relevance check — pass through to LLM even if not matched.
         #    The LLM's system prompt constrains the domain; we no longer block
         #    messages that don't match keywords, because that prevents the LLM
-        #    from semantically understanding messages like food orders.
+        #    from semantically understanding messages like menu item orders.
         if not self._kw_is_relevant(text, norm):
             logger.info(
                 "Possible off-topic (keyword) but passing to LLM: %s", text[:80]

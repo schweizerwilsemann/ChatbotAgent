@@ -271,7 +271,7 @@ class VenueAgent:
         """Remove trailing plain-text tool name leaks from output.
 
         Some LLMs output the tool name as plain text instead of calling it
-        (e.g. 'order food' instead of invoking the order_food tool).
+        (e.g. 'order menu items' instead of invoking the tool).
         Strip these from the final output so the user doesn't see them.
         """
         lines = output.strip().split("\n")
@@ -279,9 +279,9 @@ class VenueAgent:
         tool_aliases: dict[str, str] = {}
         for tn in tool_names:
             tool_aliases[tn] = tn
-            # "order_food" also matches "order food"
+            # "order_menu_items" also matches "order menu items"
             tool_aliases[tn.replace("_", " ")] = tn
-            # bare first word: "order" matches "order_food"
+            # bare first word: "order" matches "order_menu_items"
             tool_aliases[tn.split("_")[0]] = tn
 
         if lines:

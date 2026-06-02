@@ -2,8 +2,9 @@ import json
 import re
 
 from app.agent.agent import AgentResponse
-from app.agent.context import current_user_id
+from app.agent.context import current_chat_context, current_user_id
 from app.core.database import async_session_factory
+from app.repositories.booking_repository import BookingRepository
 from app.repositories.menu_repository import MenuRepository
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.order_repository import OrderRepository
@@ -42,6 +43,21 @@ class SimpleVenueAgent:
         if self._is_staff_request(text):
             return await self._try_call_staff(message)
         if "đặt sân" in text or "dat san" in text:
+            chat_context = current_chat_context.get() or {}
+            court_type = chat_context.get("court_type")
+            if court_type:
+                court_type_name = chat_context.get("court_type_name") or court_type
+                venue_name = chat_context.get("venue_name")
+                venue_text = f" ở {venue_name}" if venue_name else ""
+                resource_kind = "bàn" if court_type == "billiards" else "sân"
+                return AgentResponse(
+                    output=(
+                        f"Mình sẽ đặt {court_type_name}{venue_text}. "
+                        f"Bạn cho mình số {resource_kind}, ngày, giờ bắt đầu và giờ kết thúc. "
+                        f"Ví dụ: đặt {resource_kind} số 1 ngày 2026-05-10 từ 19:00 đến 20:00."
+                    ),
+                    tools_used=[],
+                )
             return AgentResponse(
                 output=(
                     "Bạn cho mình loại sân, số sân, ngày, giờ bắt đầu và giờ kết thúc. "
@@ -64,10 +80,24 @@ class SimpleVenueAgent:
 
     @staticmethod
     def _is_order_request(text: str) -> bool:
-        # Explicit ordering verbs
-        if any(kw in text for kw in ("đặt", "dat", "gọi", "goi", "mua")):
+        order_verbs = ("đặt", "dat", "gọi", "goi", "mua", "thuê", "thue", "lấy")
+        menu_context = any(
+            kw in text
+            for kw in (
+                "thực đơn",
+                "menu",
+                "món",
+                "đồ ăn",
+                "đồ uống",
+                "dịch vụ",
+                "dich vu",
+            )
+        )
+        item_context = SimpleVenueAgent._has_menu_item_context(text) or menu_context
+        if any(kw in text for kw in order_verbs) and item_context:
             return True
-        # Implicit: mentions a quantity word + any food context
+
+        # Implicit: mentions a quantity word + any menu item context
         # e.g. "2 phần", "1 ly", "3 chai", "cho tôi", "cho mình", "lấy"
         quantity_words = (
             "phần",
@@ -82,7 +112,11 @@ class SimpleVenueAgent:
             "lấy",
         )
         has_quantity = any(qw in text for qw in quantity_words)
-        food_context = any(
+        return has_quantity and item_context
+
+    @staticmethod
+    def _has_menu_item_context(text: str) -> bool:
+        return any(
             kw in text
             for kw in (
                 "khoai",
@@ -98,9 +132,20 @@ class SimpleVenueAgent:
                 "bánh",
                 "sting",
                 "mì",
+                "vợt",
+                "vot",
+                "băng",
+                "bang",
+                "quấn cán",
+                "quan can",
+                "cầu lông",
+                "cau long",
+                "cơ bida",
+                "co bida",
+                "phụ kiện",
+                "phu kien",
             )
         )
-        return has_quantity and food_context
 
     @staticmethod
     def _is_staff_request(text: str) -> bool:
@@ -125,13 +170,15 @@ class SimpleVenueAgent:
         async with async_session_factory() as session:
             repo = MenuRepository(session)
             query = self._extract_preference_query(message)
+            chat_context = current_chat_context.get() or {}
+            venue_id = self._optional_str(chat_context.get("venue_id"))
             items = (
-                await repo.search(query, limit=5)
+                await repo.search(query, limit=5, venue_id=venue_id)
                 if query
-                else await repo.top_selling(5)
+                else await repo.top_selling(5, venue_id=venue_id)
             )
             if not items:
-                items = await repo.top_selling(5)
+                items = await repo.top_selling(5, venue_id=venue_id)
 
         if not items:
             return "Thực đơn hiện chưa có dữ liệu."
@@ -172,7 +219,9 @@ class SimpleVenueAgent:
     async def _try_create_order(self, message: str) -> AgentResponse | None:
         async with async_session_factory() as session:
             menu_repo = MenuRepository(session)
-            menu_items = await menu_repo.list_available()
+            chat_context = current_chat_context.get() or {}
+            venue_id = self._optional_str(chat_context.get("venue_id"))
+            menu_items = await menu_repo.list_available(venue_id=venue_id)
             matched_items: list[OrderItemCreate] = []
             lowered = message.lower()
             for item in menu_items:
@@ -193,10 +242,36 @@ class SimpleVenueAgent:
                 NotificationService(NotificationRepository(session), venue_repo),
                 venue_repo,
             )
+            user_id = str(current_user_id.get() or "current_user")
+            resource_id = None
+            resource_label = None
+            table_number = 0
+            if user_id != "current_user":
+                active_booking = await BookingRepository(session).get_active_booking(
+                    user_id
+                )
+                if active_booking and (
+                    not venue_id or str(active_booking.venue_id) == str(venue_id)
+                ):
+                    venue_id = (
+                        str(active_booking.venue_id)
+                        if active_booking.venue_id
+                        else venue_id
+                    )
+                    resource_id = (
+                        str(active_booking.resource_id)
+                        if active_booking.resource_id
+                        else None
+                    )
+                    resource_label = active_booking.resource_label
+                    table_number = active_booking.court_number
             order = await service.create_order(
                 OrderCreate(
-                    user_id=current_user_id.get(),
-                    table_number=0,
+                    user_id=user_id,
+                    venue_id=venue_id,
+                    resource_id=resource_id,
+                    resource_label=resource_label,
+                    table_number=table_number,
                     items=matched_items,
                     notes="Đặt qua chatbot dev fallback",
                 )
@@ -213,7 +288,7 @@ class SimpleVenueAgent:
                 f"{summary}\n"
                 f"Tổng cộng: {order.total_price:,.0f} VND. Nhân viên đã nhận thông báo."
             ),
-            tools_used=["order_food"],
+            tools_used=["order_menu_items"],
         )
 
     @staticmethod
@@ -228,6 +303,13 @@ class SimpleVenueAgent:
             if match:
                 return max(1, min(int(match.group(1)), 99))
         return 1
+
+    @staticmethod
+    def _optional_str(value) -> str | None:
+        if value is None:
+            return None
+        text = str(value).strip()
+        return text or None
 
     async def _try_call_staff(self, message: str) -> AgentResponse:
         text = message.lower()
