@@ -243,6 +243,7 @@ class ChatBubble extends StatelessWidget {
         return Icons.restaurant_menu;
       case 'order':
       case 'create_order':
+      case 'order_menu_items':
         return Icons.shopping_cart;
       case 'notify_staff':
         return Icons.notifications_active;
@@ -264,6 +265,7 @@ class ChatBubble extends StatelessWidget {
         return 'Thực đơn';
       case 'order':
       case 'create_order':
+      case 'order_menu_items':
         return 'Đặt hàng';
       case 'notify_staff':
         return 'Thông báo';

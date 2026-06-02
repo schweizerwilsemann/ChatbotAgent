@@ -125,10 +125,14 @@ class ChatNotifier extends StateNotifier<ChatState> {
     );
 
     try {
+      final context = {
+        ...?_buildVenueContext(),
+        'input_mode': 'voice_agent',
+      };
       final response = await _repository.sendMessage(
         content,
         state.sessionId,
-        context: const {'input_mode': 'voice_agent'},
+        context: context,
       );
 
       final assistantMessage = ChatMessage.assistant(

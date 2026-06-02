@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'chat_models.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class ChatMessage {
   final String id;
   final String role;
@@ -77,7 +77,7 @@ class ChatMessage {
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class ChatResponse {
   final String response;
   final String? sessionId;
@@ -99,7 +99,7 @@ class ChatResponse {
   Map<String, dynamic> toJson() => _$ChatResponseToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class ChatRequest {
   final String message;
   final String? sessionId;
@@ -119,7 +119,7 @@ class ChatRequest {
   Map<String, dynamic> toJson() => _$ChatRequestToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class StreamChunk {
   final String content;
   final bool isDone;
