@@ -40,7 +40,7 @@ async def create_order(
     user: User = Depends(get_current_user),
     service: OrderService = Depends(_get_order_service),
 ) -> OrderResponse:
-    """Create a new food/drink order."""
+    """Create a new menu item order."""
     try:
         data.user_id = str(user.id)
         order = await service.create_order(data, user=user)
@@ -58,7 +58,7 @@ async def get_orders(
     user: User = Depends(get_current_user),
     service: OrderService = Depends(_get_order_service),
 ) -> list[OrderResponse]:
-    """Get all food/drink orders for a user."""
+    """Get all menu item orders for a user."""
     try:
         role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
         target_user_id = (
