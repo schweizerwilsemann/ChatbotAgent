@@ -1,3 +1,10 @@
+double? _toDouble(dynamic v) {
+  if (v == null) return null;
+  if (v is num) return v.toDouble();
+  if (v is String) return double.tryParse(v);
+  return null;
+}
+
 class VenueResource {
   final String id;
   final String venueId;
@@ -11,6 +18,7 @@ class VenueResource {
   final int number;
   final int? capacity;
   final String status;
+  final double? hourlyRate;
 
   const VenueResource({
     required this.id,
@@ -25,6 +33,7 @@ class VenueResource {
     required this.number,
     this.capacity,
     required this.status,
+    this.hourlyRate,
   });
 
   factory VenueResource.fromJson(Map<String, dynamic> json) {
@@ -41,6 +50,7 @@ class VenueResource {
       number: (json['number'] as num?)?.toInt() ?? 0,
       capacity: (json['capacity'] as num?)?.toInt(),
       status: json['status']?.toString() ?? 'active',
+      hourlyRate: _toDouble(json['hourly_rate']),
     );
   }
 
