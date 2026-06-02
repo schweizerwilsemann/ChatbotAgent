@@ -1,8 +1,11 @@
 import logging
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from langchain_core.tools import tool
 
+from app.agent.context import current_chat_context
+from app.core.config import settings
 from app.core.database import async_session_factory
 from app.repositories.booking_repository import BookingRepository
 
@@ -20,8 +23,9 @@ async def check_schedule(date: str, court_type: str = "") -> str:
     """Kiểm tra lịch đặt sân cho một ngày cụ thể.
 
     Args:
-        date: Ngày cần kiểm tra (định dạng YYYY-MM-DD, ví dụ: 2024-01-15)
-        court_type: Loại sân cần kiểm tra (tùy chọn): billiards, pickleball, hoặc badminton. Để trống sẽ hiển thị tất cả.
+        date: Ngày cần kiểm tra (định dạng YYYY-MM-DD)
+        court_type: Loại sân cần kiểm tra (tùy chọn): billiards,
+            pickleball, hoặc badminton. Để trống sẽ hiển thị tất cả.
 
     Returns:
         Lịch đặt sân dạng văn bản
@@ -29,27 +33,37 @@ async def check_schedule(date: str, court_type: str = "") -> str:
     try:
         check_date = datetime.strptime(date, "%Y-%m-%d")
     except ValueError:
-        return "❌ Định dạng ngày không hợp lệ. Vui lòng dùng YYYY-MM-DD (ví dụ: 2024-01-15)."
+        return "❌ Định dạng ngày không hợp lệ. Vui lòng dùng YYYY-MM-DD."
 
-    if court_type and court_type.lower() not in COURT_TYPE_VIETNAMESE:
-        return f"❌ Loại sân không hợp lệ: {court_type}. Chọn: billiards, pickleball, hoặc badminton."
+    chat_context = current_chat_context.get() or {}
+    selected_venue_id = chat_context.get("venue_id")
+    selected_venue_name = chat_context.get("venue_name")
+    normalized_court_type = (court_type or chat_context.get("court_type") or "").lower()
+
+    if normalized_court_type and normalized_court_type not in COURT_TYPE_VIETNAMESE:
+        return (
+            f"❌ Loại sân không hợp lệ: {normalized_court_type}. "
+            "Chọn: billiards, pickleball, hoặc badminton."
+        )
 
     try:
         async with async_session_factory() as session:
             repo = BookingRepository(session)
             bookings = await repo.get_schedule(
                 date=check_date,
-                court_type=court_type.lower() if court_type else "",
+                court_type=normalized_court_type,
+                venue_id=selected_venue_id,
             )
 
         if not bookings:
             type_text = (
-                f" {COURT_TYPE_VIETNAMESE.get(court_type.lower(), court_type)}"
-                if court_type
+                f" {COURT_TYPE_VIETNAMESE.get(normalized_court_type, normalized_court_type)}"
+                if normalized_court_type
                 else ""
             )
+            venue_text = f" tại {selected_venue_name}" if selected_venue_name else ""
             return (
-                f"📅 Lịch đặt sân{type_text} ngày {check_date.strftime('%d/%m/%Y')}:\n"
+                f"📅 Lịch đặt sân{type_text}{venue_text} ngày {check_date.strftime('%d/%m/%Y')}:\n"
                 f"Không có đặt sân nào. Tất cả các sân đều trống!"
             )
 
@@ -61,14 +75,19 @@ async def check_schedule(date: str, court_type: str = "") -> str:
                 type_name = COURT_TYPE_VIETNAMESE.get(current_type, current_type)
                 schedule_lines.append(f"\n🏆 **{type_name}**:")
 
-            start = booking.start_time.strftime("%H:%M")
-            end = booking.end_time.strftime("%H:%M")
+            local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
+            start_local = booking.start_time.astimezone(local_tz) if booking.start_time.tzinfo else booking.start_time
+            end_local = booking.end_time.astimezone(local_tz) if booking.end_time.tzinfo else booking.end_time
+            start = start_local.strftime("%H:%M")
+            end = end_local.strftime("%H:%M")
             schedule_lines.append(
                 f"  Sân {booking.court_number}: {start} - {end} ({booking.status})"
             )
 
-        return f"📅 Lịch đặt sân ngày {check_date.strftime('%d/%m/%Y')}:\n" + "\n".join(
-            schedule_lines
+        venue_text = f" tại {selected_venue_name}" if selected_venue_name else ""
+        return (
+            f"📅 Lịch đặt sân{venue_text} ngày {check_date.strftime('%d/%m/%Y')}:\n"
+            + "\n".join(schedule_lines)
         )
 
     except Exception as exc:

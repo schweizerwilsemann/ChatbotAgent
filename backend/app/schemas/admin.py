@@ -4,6 +4,8 @@ from decimal import Decimal
 
 from pydantic import BaseModel, Field, field_validator
 
+from app.schemas.order import OrderResponse
+
 # --- Dashboard ---
 
 
@@ -52,6 +54,14 @@ class BookingStatusUpdate(BaseModel):
         if v.lower() not in allowed:
             raise ValueError(f"status must be one of {allowed}")
         return v.lower()
+
+
+class BookingBillResponse(BaseModel):
+    booking: AdminBookingResponse
+    orders: list[OrderResponse]
+    order_total: Decimal
+    booking_total: Decimal | None = None
+    grand_total: Decimal
 
 
 # --- Menu ---

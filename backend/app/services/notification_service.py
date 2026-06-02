@@ -62,7 +62,12 @@ class NotificationService:
         role_value = user.role.value if user and hasattr(user.role, "value") else (
             str(user.role) if user else None
         )
-        if not user or not self._venue_repo or role_value == "ADMIN":
+        default_venue_id = getattr(user, "default_venue_id", None) if user else None
+        if (
+            not user
+            or not self._venue_repo
+            or (role_value == "ADMIN" and not default_venue_id)
+        ):
             notifications = await self._repo.list_for_roles(
                 OPERATIONS_ROLES,
                 limit=limit,
@@ -70,7 +75,7 @@ class NotificationService:
             )
             return [self.to_response(notification) for notification in notifications]
 
-        if role_value != "STAFF":
+        if role_value not in {"STAFF", "ADMIN"}:
             return []
 
         visible: list[NotificationResponse] = []
@@ -87,7 +92,10 @@ class NotificationService:
                 break
             for notification in batch:
                 response = self.to_response(notification)
-                if await self._is_visible_to_staff(str(user.id), response.payload):
+                if await self._is_visible_to_operations_user(
+                    user,
+                    response.payload,
+                ):
                     visible.append(response)
                     if len(visible) >= target_count:
                         break
@@ -124,19 +132,46 @@ class NotificationService:
             read_at=notification.read_at,
         )
 
-    async def _is_visible_to_staff(self, staff_id: str, payload: dict[str, Any]) -> bool:
+    async def _is_visible_to_operations_user(
+        self,
+        user,
+        payload: dict[str, Any],
+    ) -> bool:
+        user_id = str(user.id)
+        role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
         target_user_ids = payload.get("target_user_ids")
         if isinstance(target_user_ids, list) and target_user_ids:
-            return staff_id in {str(user_id) for user_id in target_user_ids}
+            return user_id in {str(target_id) for target_id in target_user_ids}
 
         resource_id = _optional_payload_id(payload.get("resource_id"))
         venue_id = _optional_payload_id(payload.get("venue_id"))
         if not resource_id and not venue_id:
             return True
 
-        access = await self._venue_repo.get_staff_access(staff_id)
+        if role_value == "ADMIN":
+            default_venue_id = getattr(user, "default_venue_id", None)
+            if not default_venue_id:
+                return True
+            default_venue_id = str(default_venue_id)
+            if venue_id and venue_id == default_venue_id:
+                return True
+            if resource_id:
+                resource = await self._venue_repo.get_resource_by_id(resource_id)
+                return bool(resource and str(resource.venue_id) == default_venue_id)
+            return False
+
+        access = await self._venue_repo.get_staff_access(user_id)
         if not access.has_assignments:
-            return True
+            default_venue_id = getattr(user, "default_venue_id", None)
+            if not default_venue_id:
+                return False
+            default_venue_id = str(default_venue_id)
+            if venue_id and venue_id == default_venue_id:
+                return True
+            if resource_id:
+                resource = await self._venue_repo.get_resource_by_id(resource_id)
+                return bool(resource and str(resource.venue_id) == default_venue_id)
+            return False
 
         resource_ids = await self._venue_repo.expand_accessible_resource_ids(access)
         if resource_id and resource_id in {str(item) for item in resource_ids}:

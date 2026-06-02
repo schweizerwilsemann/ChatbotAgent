@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -40,6 +41,7 @@ class ServiceResourceResponse(BaseModel):
     capacity: int | None = None
     status: str
     metadata: dict = Field(default_factory=dict)
+    hourly_rate: Decimal | None = None
 
 
 class ServiceResourceCreate(BaseModel):
@@ -53,6 +55,7 @@ class ServiceResourceCreate(BaseModel):
     capacity: int | None = Field(None, ge=1)
     status: str = "active"
     metadata: dict = Field(default_factory=dict)
+    hourly_rate: Decimal | None = Field(None, ge=0)
 
     @field_validator("resource_type")
     @classmethod
@@ -72,6 +75,24 @@ class ServiceResourceCreate(BaseModel):
     @field_validator("status")
     @classmethod
     def validate_status(cls, value: str) -> str:
+        allowed = {"active", "maintenance", "inactive"}
+        normalized = value.lower()
+        if normalized not in allowed:
+            raise ValueError(f"status must be one of {allowed}")
+        return normalized
+
+
+class ServiceResourceUpdate(BaseModel):
+    name: str | None = Field(None, min_length=1, max_length=255)
+    area_id: str | None = None
+    status: str | None = None
+    hourly_rate: Decimal | None = None
+
+    @field_validator("status")
+    @classmethod
+    def validate_status(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
         allowed = {"active", "maintenance", "inactive"}
         normalized = value.lower()
         if normalized not in allowed:
