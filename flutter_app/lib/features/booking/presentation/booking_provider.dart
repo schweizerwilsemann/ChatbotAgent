@@ -12,6 +12,7 @@ class BookingState {
   final bool isCreating;
   final String? error;
   final String? successMessage;
+  final Booking? lastCreatedBooking;
 
   const BookingState({
     this.bookings = const [],
@@ -20,6 +21,7 @@ class BookingState {
     this.isCreating = false,
     this.error,
     this.successMessage,
+    this.lastCreatedBooking,
   });
 
   BookingState copyWith({
@@ -29,9 +31,11 @@ class BookingState {
     bool? isCreating,
     String? error,
     String? successMessage,
+    Booking? lastCreatedBooking,
     bool clearError = false,
     bool clearSuccess = false,
     bool clearAvailability = false,
+    bool clearLastCreated = false,
   }) {
     return BookingState(
       bookings: bookings ?? this.bookings,
@@ -44,6 +48,8 @@ class BookingState {
       successMessage: clearSuccess
           ? null
           : (successMessage ?? this.successMessage),
+      lastCreatedBooking:
+          clearLastCreated ? null : (lastCreatedBooking ?? this.lastCreatedBooking),
     );
   }
 }
@@ -103,8 +109,9 @@ class BookingNotifier extends StateNotifier<BookingState> {
       final newBooking = await _repository.createBooking(booking);
       state = state.copyWith(
         isCreating: false,
-        bookings: [...state.bookings, newBooking],
+        bookings: [newBooking, ...state.bookings],
         successMessage: 'Đặt sân thành công!',
+        lastCreatedBooking: newBooking,
       );
       return true;
     } on ApiException catch (e) {

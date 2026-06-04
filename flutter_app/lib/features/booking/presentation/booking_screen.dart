@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/booking/data/booking_models.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_provider.dart';
+import 'package:sports_venue_chatbot/features/payment/presentation/payment_provider.dart';
+import 'package:sports_venue_chatbot/features/payment/presentation/stripe_provider.dart';
 import 'package:sports_venue_chatbot/features/venue/data/venue_models.dart';
 import 'package:sports_venue_chatbot/features/venue/presentation/selected_venue_provider.dart';
 import 'package:sports_venue_chatbot/features/venue/presentation/venue_provider.dart';
@@ -61,11 +64,16 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           resources.map((r) => r.sportType).whereType<String>().toSet();
       final matched =
           CourtType.values.where((ct) => sportTypes.contains(ct.name)).toList();
-      if (matched.isNotEmpty && !matched.contains(_selectedCourtType)) {
-        setState(() {
-          _selectedCourtType = matched.first;
-          _selectedResource = null;
-        });
+      if (matched.isNotEmpty) {
+        final newType = matched.first;
+        if (newType != _selectedCourtType || _selectedResource == null) {
+          setState(() {
+            _selectedCourtType = newType;
+            _selectedResource = null;
+            _selectedStartTime = null;
+            _selectedEndTime = null;
+          });
+        }
       }
     }
   }
@@ -162,6 +170,122 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         _selectedStartTime = null;
         _selectedEndTime = null;
       });
+      _showPaymentDialog(booking);
+    }
+  }
+
+  void _showPaymentDialog(BookingCreate bookingData) async {
+    final bookingState = ref.read(bookingProvider);
+    final createdBooking = bookingState.lastCreatedBooking;
+    final totalPrice = createdBooking?.totalPrice;
+    if (totalPrice == null || totalPrice <= 0) return;
+
+    final amount = totalPrice.round();
+    final label = createdBooking?.resourceLabel ??
+        '${createdBooking?.courtType.displayName ?? bookingData.courtType.displayName} - Sân ${createdBooking?.courtNumber ?? bookingData.courtNumber}';
+
+    final confirmed = await AppConfirmDialog.show(
+      context: context,
+      title: 'Thanh toán ngay',
+      content:
+          'Bạn có muốn thanh toán $label?\nTổng: ${NumberFormat('#,###', 'vi_VN').format(amount)}đ',
+      confirmLabel: 'Thanh toán',
+      cancelLabel: 'Để sau',
+    );
+
+    if (confirmed == true && mounted) {
+      final orderId = createdBooking?.id;
+      if (orderId == null) {
+        AppSnackBar.showError(context, 'Không tìm thấy thông tin đặt sân.');
+        return;
+      }
+
+      if (!mounted) return;
+      final paymentMethod = await _showPaymentMethodDialog();
+      if (paymentMethod == null) return;
+
+      if (paymentMethod == 'stripe') {
+        await _processStripePayment(orderId, amount, label);
+      } else {
+        await _processVnpayPayment(orderId, amount, label);
+      }
+    }
+  }
+
+  Future<String?> _showPaymentMethodDialog() async {
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Chọn phương thức thanh toán'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.credit_card, color: AppColors.primary),
+              title: const Text('Stripe (Thẻ quốc tế)'),
+              subtitle: const Text('Visa, Mastercard, JCB'),
+              onTap: () => Navigator.pop(context, 'stripe'),
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.account_balance, color: AppColors.success),
+              title: const Text('VNPay (Ngân hàng VN)'),
+              subtitle: const Text('ATM, Internet Banking, QR'),
+              onTap: () => Navigator.pop(context, 'vnpay'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _processStripePayment(
+      String orderId, int amount, String label) async {
+    final stripeNotifier = ref.read(stripeProvider.notifier);
+    final success = await stripeNotifier.createCheckout(
+      orderId: orderId,
+      amount: amount,
+      description: 'Dat san $label',
+    );
+
+    if (success && mounted) {
+      final stripeState = ref.read(stripeProvider);
+      if (stripeState.checkoutUrl != null) {
+        context.push('/stripe-checkout', extra: {
+          'checkoutUrl': stripeState.checkoutUrl!,
+          'orderId': orderId,
+        });
+      }
+    } else if (mounted) {
+      final error = ref.read(stripeProvider).error;
+      if (error != null) {
+        AppSnackBar.showError(context, error);
+      }
+    }
+  }
+
+  Future<void> _processVnpayPayment(
+      String orderId, int amount, String label) async {
+    final notifier = ref.read(paymentProvider.notifier);
+    final paymentSuccess = await notifier.createPayment(
+      orderId: orderId,
+      amount: amount,
+      description: 'Dat san $label',
+    );
+
+    if (paymentSuccess && mounted) {
+      final paymentState = ref.read(paymentProvider);
+      if (paymentState.paymentUrl != null) {
+        context.push('/payment', extra: {
+          'paymentUrl': paymentState.paymentUrl!,
+          'orderId': orderId,
+        });
+      }
+    } else if (mounted) {
+      final error = ref.read(paymentProvider).error;
+      if (error != null) {
+        AppSnackBar.showError(context, error);
+      }
     }
   }
 
