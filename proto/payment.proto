@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package payment;
+
+option java_multiple_files = true;
+option java_package = "com.venue.payment.proto";
+
+service PaymentService {
+  rpc CreatePayment (CreatePaymentRequest) returns (CreatePaymentResponse);
+  rpc VerifyCallback (VerifyCallbackRequest) returns (VerifyCallbackResponse);
+  rpc QueryTransaction (QueryTransactionRequest) returns (QueryTransactionResponse);
+}
+
+message CreatePaymentRequest {
+  string order_id     = 1;
+  int64  amount       = 2;
+  string order_info   = 3;
+  string return_url   = 4;
+  string ip_address   = 5;
+  string order_type   = 6;
+}
+
+message CreatePaymentResponse {
+  bool   success       = 1;
+  string payment_url   = 2;
+  string error_message = 3;
+}
+
+message VerifyCallbackRequest {
+  map<string, string> vnpay_params = 1;
+}
+
+message VerifyCallbackResponse {
+  bool   is_valid        = 1;
+  bool   is_success      = 2;
+  string transaction_no  = 3;
+  string order_id        = 4;
+  int64  amount          = 5;
+  string response_code   = 6;
+  string bank_code       = 7;
+}
+
+message QueryTransactionRequest {
+  string order_id    = 1;
+  string create_date = 2;
+  string ip_address  = 3;
+}
+
+message QueryTransactionResponse {
+  bool   success          = 1;
+  string transaction_no   = 2;
+  string transaction_type = 3;
+  string pay_date         = 4;
+  string response_code    = 5;
+  string message          = 6;
+}
