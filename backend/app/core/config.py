@@ -46,6 +46,16 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = "models/text-embedding-004"
     EMBEDDING_DIMENSION: int = 768
 
+    # Payment Service (gRPC)
+    PAYMENT_SERVICE_HOST: str = "localhost"
+    PAYMENT_SERVICE_PORT: str = "9090"
+    INTERNAL_API_KEY: str = ""
+
+    # Stripe
+    STRIPE_SECRET_KEY: str = ""
+    STRIPE_PUBLISHABLE_KEY: str = ""
+    STRIPE_WEBHOOK_SECRET: str = ""
+
     # Secret
     SECRET_KEY: str = "change-me-in-production"
 

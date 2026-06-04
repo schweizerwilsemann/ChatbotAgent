@@ -21,9 +21,11 @@ from app.api.chat import router as chat_router
 from app.api.chat import set_chat_service
 from app.api.menu import router as menu_router
 from app.api.order import router as order_router
+from app.api.payment import router as payment_router
 from app.api.realtime import router as realtime_router
 from app.api.staff import router as staff_router
 from app.api.staff_request import router as staff_request_router
+from app.api.stripe import router as stripe_router
 from app.api.venue import router as venue_router
 from app.core.config import settings
 from app.core.database import async_session_factory, engine
@@ -38,6 +40,7 @@ from app.core.seed import (
 )
 from app.kg.embeddings import NodeEmbedder
 from app.models.base import Base
+from app.models.payment import PaymentTransaction  # noqa: F401 — register table
 from app.services.chat_service import ChatService
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -169,6 +172,8 @@ app.include_router(staff_request_router)
 app.include_router(venue_router)
 app.include_router(realtime_router)
 app.include_router(admin_router)
+app.include_router(payment_router)
+app.include_router(stripe_router)
 
 
 @app.get("/health")
