@@ -62,6 +62,7 @@ class BookingRepository:
             return None
         booking.status = "cancelled"
         await self._session.flush()
+        await self._session.refresh(booking)  
         return booking
 
     async def check_conflict(
