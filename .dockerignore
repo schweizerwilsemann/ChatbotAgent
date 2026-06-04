@@ -1,0 +1,8 @@
+*
+!java-payment-service/
+!java-payment-service/Dockerfile
+!java-payment-service/pom.xml
+!java-payment-service/src/
+!java-payment-service/src/**
+!proto/
+!proto/**
