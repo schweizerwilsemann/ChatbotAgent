@@ -1,10 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sports_venue_chatbot/features/auth/domain/auth_repository.dart';
+import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/venue/data/venue_api.dart';
 import 'package:sports_venue_chatbot/features/venue/data/venue_model.dart';
 
 final venuesProvider = FutureProvider<List<Venue>>((ref) async {
+  final user = ref.watch(authStateProvider).valueOrNull;
+  if (user == null) {
+    await ref.read(selectedVenueProvider.notifier).clear();
+    return const <Venue>[];
+  }
+
   final venues = await ref.watch(venueApiProvider).getVenues();
   await ref.read(selectedVenueProvider.notifier).restore(venues);
   return venues;
