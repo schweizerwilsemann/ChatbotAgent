@@ -23,7 +23,12 @@ class ApiConstants {
       '/api/realtime/notifications/read-all';
   static const String authLoginEndpoint = '/api/auth/login';
   static const String authVerifyEndpoint = '/api/auth/verify';
+  static const String authChangePasswordEndpoint = '/api/auth/change-password';
   static const String userProfileEndpoint = '/api/user/profile';
+
+  // Payment endpoints
+  static const String paymentCreateEndpoint = '/api/payment/create';
+  static const String paymentCallbackEndpoint = '/api/payment/callback';
 
   // Admin endpoints
   static const String adminDashboardEndpoint = '/api/admin/dashboard';
