@@ -55,7 +55,9 @@ class StaffRequestNotifier extends StateNotifier<StaffRequestState> {
   final StaffRequestRepository _repository;
   Timer? _pollTimer;
 
-  StaffRequestNotifier(this._repository) : super(const StaffRequestState());
+  StaffRequestNotifier(this._repository) : super(const StaffRequestState()) {
+    _loadActiveRequest();
+  }
 
   static const _pollInterval = Duration(seconds: 5);
 

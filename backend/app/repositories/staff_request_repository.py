@@ -96,7 +96,7 @@ class StaffRequestRepository:
             select(StaffRequest)
             .where(
                 StaffRequest.user_id == user_id,
-                StaffRequest.status == "pending",
+                StaffRequest.status.in_(["pending", "accepted"]),
             )
             .order_by(StaffRequest.created_at.desc())
             .limit(1)
@@ -117,14 +117,6 @@ class StaffRequestRepository:
         await self._session.flush()
         return request
 
-
-def _to_uuid_or_none(value: str | uuid.UUID | None) -> uuid.UUID | None:
-    if value is None:
-        return None
-    if isinstance(value, uuid.UUID):
-        return value
-    return uuid.UUID(str(value))
-
     async def complete(self, request_id: str) -> StaffRequest | None:
         request = await self.get_by_id(request_id)
         if not request or request.status != "accepted":
@@ -141,3 +133,11 @@ def _to_uuid_or_none(value: str | uuid.UUID | None) -> uuid.UUID | None:
         request.status = "cancelled"
         await self._session.flush()
         return request
+
+
+def _to_uuid_or_none(value: str | uuid.UUID | None) -> uuid.UUID | None:
+    if value is None:
+        return None
+    if isinstance(value, uuid.UUID):
+        return value
+    return uuid.UUID(str(value))
