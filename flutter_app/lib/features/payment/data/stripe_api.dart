@@ -9,6 +9,7 @@ class StripeApi {
     required String orderId,
     required int amount,
     required String description,
+    String orderType = 'booking',
   }) async {
     final response = await _dioClient.post<Map<String, dynamic>>(
       '/api/stripe/create-checkout',
@@ -16,6 +17,7 @@ class StripeApi {
         'order_id': orderId,
         'amount': amount,
         'description': description,
+        'order_type': orderType,
       },
     );
     return response.data as Map<String, dynamic>;

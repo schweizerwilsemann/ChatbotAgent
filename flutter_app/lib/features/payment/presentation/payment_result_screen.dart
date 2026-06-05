@@ -6,12 +6,14 @@ import 'package:sports_venue_chatbot/shared/widgets/loading_button.dart';
 class PaymentResultScreen extends StatelessWidget {
   final bool success;
   final String orderId;
+  final String orderType;
   final String? code;
 
   const PaymentResultScreen({
     super.key,
     required this.success,
     required this.orderId,
+    this.orderType = 'booking',
     this.code,
   });
 
@@ -26,9 +28,7 @@ class PaymentResultScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  success
-                      ? Icons.check_circle_outline
-                      : Icons.error_outline,
+                  success ? Icons.check_circle_outline : Icons.error_outline,
                   size: 96,
                   color: success ? AppColors.success : AppColors.error,
                 ),
@@ -53,16 +53,17 @@ class PaymentResultScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
                 LoadingButton(
-                  onPressed: () => context.go('/home'),
+                  onPressed: () => context.go('/billing'),
                   isLoading: false,
-                  icon: Icons.home,
-                  label: 'Về trang chủ',
+                  icon: Icons.receipt_long,
+                  label: 'Xem đơn đã đặt',
                   backgroundColor: AppColors.primary,
                 ),
                 if (!success) ...[
                   const SizedBox(height: 12),
                   TextButton(
-                    onPressed: () => context.go('/booking'),
+                    onPressed: () =>
+                        context.go(orderType == 'order' ? '/menu' : '/booking'),
                     child: const Text('Thử lại'),
                   ),
                 ],

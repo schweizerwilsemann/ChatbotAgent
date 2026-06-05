@@ -40,6 +40,7 @@ class StripeNotifier extends StateNotifier<StripeState> {
     required String orderId,
     required int amount,
     required String description,
+    String orderType = 'booking',
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -47,6 +48,7 @@ class StripeNotifier extends StateNotifier<StripeState> {
         orderId: orderId,
         amount: amount,
         description: description,
+        orderType: orderType,
       );
       state = state.copyWith(
         isLoading: false,

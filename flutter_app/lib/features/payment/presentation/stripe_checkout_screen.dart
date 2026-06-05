@@ -6,11 +6,13 @@ import 'package:webview_flutter/webview_flutter.dart';
 class StripeCheckoutScreen extends StatefulWidget {
   final String checkoutUrl;
   final String orderId;
+  final String orderType;
 
   const StripeCheckoutScreen({
     super.key,
     required this.checkoutUrl,
     required this.orderId,
+    this.orderType = 'booking',
   });
 
   @override
@@ -40,6 +42,7 @@ class _StripeCheckoutScreenState extends State<StripeCheckoutScreen> {
               context.go('/payment/result', extra: {
                 'success': true,
                 'orderId': widget.orderId,
+                'orderType': widget.orderType,
               });
               return NavigationDecision.prevent;
             }
@@ -47,6 +50,7 @@ class _StripeCheckoutScreenState extends State<StripeCheckoutScreen> {
               context.go('/payment/result', extra: {
                 'success': false,
                 'orderId': widget.orderId,
+                'orderType': widget.orderType,
                 'code': 'cancelled',
               });
               return NavigationDecision.prevent;
@@ -69,6 +73,7 @@ class _StripeCheckoutScreenState extends State<StripeCheckoutScreen> {
             context.go('/payment/result', extra: {
               'success': false,
               'orderId': widget.orderId,
+              'orderType': widget.orderType,
               'code': 'cancelled',
             });
           },

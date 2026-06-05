@@ -9,6 +9,8 @@ from app.api.auth import get_current_user
 from app.core.database import get_db
 from app.core.rate_limit import rate_limit
 from app.models.user import User
+from app.repositories.booking_repository import BookingRepository
+from app.repositories.order_repository import OrderRepository
 from app.repositories.payment_repository import PaymentRepository
 from app.schemas.payment import (
     CreatePaymentRequest,
@@ -32,7 +34,9 @@ async def _get_payment_service(
     session: AsyncSession = Depends(get_db),
 ) -> PaymentService:
     repo = PaymentRepository(session)
-    return PaymentService(repo)
+    booking_repo = BookingRepository(session)
+    order_repo = OrderRepository(session)
+    return PaymentService(repo, booking_repo, order_repo)
 
 
 @router.post("/create", response_model=CreatePaymentResponse)

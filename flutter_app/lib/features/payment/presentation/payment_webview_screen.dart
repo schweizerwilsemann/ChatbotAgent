@@ -8,11 +8,13 @@ import 'package:sports_venue_chatbot/features/payment/data/vnpay_native.dart';
 class PaymentWebviewScreen extends StatefulWidget {
   final String paymentUrl;
   final String orderId;
+  final String orderType;
 
   const PaymentWebviewScreen({
     super.key,
     required this.paymentUrl,
     required this.orderId,
+    this.orderType = 'booking',
   });
 
   @override
@@ -20,7 +22,6 @@ class PaymentWebviewScreen extends StatefulWidget {
 }
 
 class _PaymentWebviewScreenState extends State<PaymentWebviewScreen> {
-  bool _isLoading = true;
   bool _sdkStarted = false;
 
   @override
@@ -52,12 +53,14 @@ class _PaymentWebviewScreenState extends State<PaymentWebviewScreen> {
           context.go('/payment/result', extra: {
             'success': true,
             'orderId': widget.orderId,
+            'orderType': widget.orderType,
           });
           break;
         case 'failed':
           context.go('/payment/result', extra: {
             'success': false,
             'orderId': widget.orderId,
+            'orderType': widget.orderType,
             'code': 'failed',
           });
           break;
@@ -65,6 +68,7 @@ class _PaymentWebviewScreenState extends State<PaymentWebviewScreen> {
           context.go('/payment/result', extra: {
             'success': false,
             'orderId': widget.orderId,
+            'orderType': widget.orderType,
             'code': 'cancelled',
           });
           break;
@@ -72,6 +76,7 @@ class _PaymentWebviewScreenState extends State<PaymentWebviewScreen> {
           context.go('/payment/result', extra: {
             'success': false,
             'orderId': widget.orderId,
+            'orderType': widget.orderType,
             'code': 'processing',
           });
           break;
@@ -79,14 +84,16 @@ class _PaymentWebviewScreenState extends State<PaymentWebviewScreen> {
           context.go('/payment/result', extra: {
             'success': false,
             'orderId': widget.orderId,
+            'orderType': widget.orderType,
             'code': 'unknown',
           });
       }
-    } on PlatformException catch (e) {
+    } on PlatformException {
       if (!mounted) return;
       context.go('/payment/result', extra: {
         'success': false,
         'orderId': widget.orderId,
+        'orderType': widget.orderType,
         'code': 'error',
       });
     } catch (e) {
@@ -94,6 +101,7 @@ class _PaymentWebviewScreenState extends State<PaymentWebviewScreen> {
       context.go('/payment/result', extra: {
         'success': false,
         'orderId': widget.orderId,
+        'orderType': widget.orderType,
         'code': 'error',
       });
     }
@@ -110,6 +118,7 @@ class _PaymentWebviewScreenState extends State<PaymentWebviewScreen> {
             context.go('/payment/result', extra: {
               'success': false,
               'orderId': widget.orderId,
+              'orderType': widget.orderType,
               'code': 'cancelled',
             });
           },
