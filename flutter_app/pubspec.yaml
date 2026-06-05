@@ -46,6 +46,9 @@ dependencies:
   uuid: 4.2.2
   equatable: 2.0.5
 
+  # WebView (VNPay payment)
+  webview_flutter: ^4.7.0
+
   # Voice / Speech-to-Text
   speech_to_text: ^7.0.0
   permission_handler: ^11.3.0

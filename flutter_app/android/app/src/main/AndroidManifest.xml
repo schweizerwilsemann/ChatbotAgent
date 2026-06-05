@@ -34,6 +34,11 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- VNPay SDK result activity (deep-link callback from bank apps) -->
+        <activity
+            android:name="com.vnpay.authentication.VNP_AuthenticationActivity"
+            android:exported="false" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

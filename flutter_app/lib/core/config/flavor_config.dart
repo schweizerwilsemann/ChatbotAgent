@@ -113,4 +113,26 @@ class FlavorConfig {
         return false;
     }
   }
+
+  /// VNPay TMN code for payment.
+  static String get vnpayTmnCode {
+    switch (_flavor) {
+      case Flavor.appDev:
+      case Flavor.appDevRelease:
+        return '2QX1S61M';
+      case Flavor.appProd:
+        return 'YOUR_PRODUCTION_TMN_CODE';
+    }
+  }
+
+  /// Whether VNPay is in sandbox mode.
+  static bool get isSandbox {
+    switch (_flavor) {
+      case Flavor.appDev:
+      case Flavor.appDevRelease:
+        return true;
+      case Flavor.appProd:
+        return false;
+    }
+  }
 }

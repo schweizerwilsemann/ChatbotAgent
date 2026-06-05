@@ -65,6 +65,21 @@ android {
     }
 }
 
+dependencies {
+    implementation(files("libs/merchant-1.0.25.aar"))
+    implementation("com.google.code.gson:gson:2.8.5")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("androidx.fragment:fragment:1.3.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("com.squareup.okhttp3:okhttp:4.12.0")
+    }
+}
+
 flutter {
     source = "../.."
 }

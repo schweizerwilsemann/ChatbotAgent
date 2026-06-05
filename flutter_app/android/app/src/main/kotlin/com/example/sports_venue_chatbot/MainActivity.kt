@@ -10,14 +10,18 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
+import android.util.Log
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
     private val channelName = "sports_venue_chatbot/notifications"
+    private val vnpayChannelName = "sports_venue_chatbot/vnpay"
     private val notificationChannelId = "operations_notifications"
     private val notificationPermissionRequestCode = 1701
+
+    private var vnpayResult: MethodChannel.Result? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -36,6 +40,70 @@ class MainActivity : FlutterActivity() {
                     else -> result.notImplemented()
                 }
             }
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, vnpayChannelName)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "openVnpaySdk" -> {
+                        val paymentUrl = call.argument<String>("paymentUrl") ?: ""
+                        val tmnCode = call.argument<String>("tmnCode") ?: ""
+                        val isSandbox = call.argument<Boolean>("isSandbox") ?: true
+                        openVnpaySdk(paymentUrl, tmnCode, isSandbox, result)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
+    }
+
+    private fun openVnpaySdk(
+        paymentUrl: String,
+        tmnCode: String,
+        isSandbox: Boolean,
+        result: MethodChannel.Result
+    ) {
+        vnpayResult = result
+
+        try {
+            val callbackClass = Class.forName("com.vnpay.authentication.VNP_SdkCompletedCallback")
+            val activityClass = Class.forName("com.vnpay.authentication.VNP_AuthenticationActivity")
+
+            val callbackInstance = java.lang.reflect.Proxy.newProxyInstance(
+                callbackClass.classLoader,
+                arrayOf(callbackClass)
+            ) { _, method, args ->
+                if (method.name == "sdkAction") {
+                    val action = args[0] as String
+                    Log.wtf("VNPay", "action: $action")
+                    val res = vnpayResult ?: return@newProxyInstance null
+                    vnpayResult = null
+
+                    when (action) {
+                        "SuccessBackAction" -> res.success("success")
+                        "FaildBackAction" -> res.success("failed")
+                        "AppBackAction" -> res.success("cancelled")
+                        "WebBackAction" -> res.success("cancelled")
+                        "CallMobileBankingApp" -> res.success("processing")
+                        else -> res.success("unknown")
+                    }
+                }
+                null
+            }
+
+            val setCallbackMethod = activityClass.getMethod("setSdkCompletedCallback", callbackClass)
+            setCallbackMethod.invoke(null, callbackInstance)
+
+            val intent = Intent(this, activityClass)
+            intent.putExtra("url", paymentUrl)
+            intent.putExtra("tmn_code", tmnCode)
+            intent.putExtra("scheme", "sportsvenuechatbot")
+            intent.putExtra("is_sandbox", isSandbox)
+            startActivity(intent)
+
+        } catch (e: Exception) {
+            Log.e("VNPay", "Error opening VNPay SDK", e)
+            vnpayResult?.error("VNPAY_ERROR", e.message, null)
+            vnpayResult = null
+        }
     }
 
     private fun ensureNotificationChannel() {
