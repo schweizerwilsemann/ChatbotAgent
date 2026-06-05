@@ -569,6 +569,7 @@ class _OrderNotificationSummary extends StatelessWidget {
         ? orderId
         : orderId.substring(0, 8);
     final status = payload['status']?.toString();
+    final paymentStatus = payload['payment_status']?.toString();
     final total = _moneyText(payload['total_price']);
 
     return Container(
@@ -590,6 +591,8 @@ class _OrderNotificationSummary extends StatelessWidget {
                 [
                   if (orderId != null && orderId.isNotEmpty) 'Mã $shortOrderId',
                   if (status != null && status.isNotEmpty) status,
+                  if (paymentStatus != null && paymentStatus.isNotEmpty)
+                    _paymentLabel(paymentStatus),
                 ].join(' · '),
                 style: const TextStyle(
                   color: AppColors.textSecondary,
@@ -670,6 +673,17 @@ class _OrderNotificationSummary extends StatelessWidget {
     if (raw is num) return raw;
     if (raw is String) return num.tryParse(raw.replaceAll(',', ''));
     return null;
+  }
+
+  static String _paymentLabel(String status) {
+    switch (status) {
+      case 'paid':
+        return 'Đã thanh toán';
+      case 'failed':
+        return 'Thanh toán lỗi';
+      default:
+        return 'Chưa thanh toán';
+    }
   }
 }
 
