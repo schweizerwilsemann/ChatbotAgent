@@ -47,7 +47,7 @@ class BillingState {
 // ─── Notifier ───────────────────────────────────────────────────────────────
 
 class BillingNotifier extends StateNotifier<BillingState> {
-  static const int _pageSize = 30;
+  static const int _pageSize = 10;
 
   final AdminApi _adminApi;
 

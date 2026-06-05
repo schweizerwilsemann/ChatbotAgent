@@ -56,7 +56,7 @@ class BookingManagementState {
 // ─── Notifier ───────────────────────────────────────────────────────────────
 
 class BookingManagementNotifier extends StateNotifier<BookingManagementState> {
-  static const int _pageSize = 30;
+  static const int _pageSize = 10;
 
   final AdminApi _adminApi;
 

@@ -56,7 +56,7 @@ class MenuManagementState {
 // ─── Notifier ───────────────────────────────────────────────────────────────
 
 class MenuManagementNotifier extends StateNotifier<MenuManagementState> {
-  static const int _pageSize = 30;
+  static const int _pageSize = 10;
 
   final AdminApi _adminApi;
 
