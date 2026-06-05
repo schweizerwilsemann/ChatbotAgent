@@ -19,6 +19,10 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 abstract class IAuthRepository {
   Future<User> login(String phone, String password);
   Future<User> getProfile(String userId);
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
   Future<void> logout();
   Future<bool> isLoggedIn();
   Future<User?> tryAutoLogin();
@@ -70,6 +74,32 @@ class AuthRepository implements IAuthRepository {
     } catch (e) {
       throw ServerException(
         message: 'Không thể tải thông tin người dùng.',
+        statusCode: 500,
+      );
+    }
+  }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      if (currentPassword.isEmpty) {
+        throw ValidationException(message: 'Vui lòng nhập mật khẩu hiện tại');
+      }
+      if (newPassword.length < 8) {
+        throw ValidationException(message: 'Mật khẩu mới tối thiểu 8 ký tự');
+      }
+      await _authApi.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(
+        message: 'Không thể đổi mật khẩu. Vui lòng thử lại.',
         statusCode: 500,
       );
     }

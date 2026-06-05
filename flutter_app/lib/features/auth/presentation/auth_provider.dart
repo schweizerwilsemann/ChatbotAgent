@@ -22,8 +22,8 @@ final authRepoProvider = Provider<AuthRepository>((ref) {
 /// On app start it attempts auto-login from the persisted secure-storage token.
 final authStateProvider =
     StateNotifierProvider<AuthStateNotifier, AsyncValue<User?>>((ref) {
-      return AuthStateNotifier(ref.watch(authRepoProvider));
-    });
+  return AuthStateNotifier(ref.watch(authRepoProvider));
+});
 
 class AuthStateNotifier extends StateNotifier<AsyncValue<User?>> {
   final AuthRepository _repository;
@@ -130,4 +130,61 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
 final loginProvider = StateNotifierProvider<LoginNotifier, LoginState>((ref) {
   return LoginNotifier(ref.watch(authStateProvider.notifier));
+});
+
+class ChangePasswordState {
+  final bool isLoading;
+  final String? error;
+
+  const ChangePasswordState({this.isLoading = false, this.error});
+
+  ChangePasswordState copyWith({
+    bool? isLoading,
+    String? error,
+    bool clearError = false,
+  }) {
+    return ChangePasswordState(
+      isLoading: isLoading ?? this.isLoading,
+      error: clearError ? null : (error ?? this.error),
+    );
+  }
+}
+
+class ChangePasswordNotifier extends StateNotifier<ChangePasswordState> {
+  final AuthRepository _repository;
+
+  ChangePasswordNotifier(this._repository) : super(const ChangePasswordState());
+
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      await _repository.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+      state = state.copyWith(isLoading: false);
+      return true;
+    } on ApiException catch (e) {
+      state = state.copyWith(isLoading: false, error: e.message);
+      return false;
+    } catch (_) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Không thể đổi mật khẩu. Vui lòng thử lại.',
+      );
+      return false;
+    }
+  }
+
+  void clearError() {
+    state = state.copyWith(clearError: true);
+  }
+}
+
+final changePasswordProvider =
+    StateNotifierProvider<ChangePasswordNotifier, ChangePasswordState>((ref) {
+  return ChangePasswordNotifier(ref.watch(authRepoProvider));
 });

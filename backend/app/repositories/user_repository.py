@@ -25,3 +25,23 @@ class UserRepository:
         stmt = select(User).where(User.phone == phone)
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def update_password_hash(self, user_id: str, password_hash: str) -> User | None:
+        user = await self.get_by_id(user_id)
+        if user is None:
+            return None
+        user.password_hash = password_hash
+        await self._session.flush()
+        return user
+
+    async def update_stripe_customer_id(
+        self,
+        user_id: str,
+        stripe_customer_id: str,
+    ) -> User | None:
+        user = await self.get_by_id(user_id)
+        if user is None:
+            return None
+        user.stripe_customer_id = stripe_customer_id
+        await self._session.flush()
+        return user

@@ -7,6 +7,7 @@ import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/auth/data/auth_models.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_dialog.dart';
+import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
 import 'package:sports_venue_chatbot/shared/widgets/floating_card.dart';
 import 'package:sports_venue_chatbot/shared/widgets/glass_app_bar.dart';
 
@@ -62,7 +63,10 @@ class ProfileScreen extends ConsumerWidget {
           if (user == null) {
             return const Center(child: Text('Bạn chưa đăng nhập'));
           }
-          return _ProfileBody(user: user);
+          return _ProfileBody(
+            user: user,
+            onChangePassword: () => _showChangePasswordDialog(context, ref),
+          );
         },
       ),
       bottomNavigationBar: SafeArea(
@@ -120,12 +124,30 @@ class ProfileScreen extends ConsumerWidget {
       if (context.mounted) context.go('/login');
     }
   }
+
+  Future<void> _showChangePasswordDialog(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    ref.read(changePasswordProvider.notifier).clearError();
+    final changed = await showDialog<bool>(
+      context: context,
+      builder: (_) => const _ChangePasswordDialog(),
+    );
+    if (changed == true && context.mounted) {
+      AppSnackBar.showSuccess(context, 'Đã đổi mật khẩu.');
+    }
+  }
 }
 
 class _ProfileBody extends StatelessWidget {
   final User user;
+  final VoidCallback onChangePassword;
 
-  const _ProfileBody({required this.user});
+  const _ProfileBody({
+    required this.user,
+    required this.onChangePassword,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -186,6 +208,12 @@ class _ProfileBody extends StatelessWidget {
               label: 'Mã người dùng',
               value: user.id,
             ),
+            _ProfileTile(
+              icon: Icons.lock_outline,
+              label: 'Mật khẩu',
+              value: 'Đổi mật khẩu đăng nhập',
+              onTap: onChangePassword,
+            ),
           ],
         );
       },
@@ -197,11 +225,13 @@ class _ProfileTile extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final VoidCallback? onTap;
 
   const _ProfileTile({
     required this.icon,
     required this.label,
     required this.value,
+    this.onTap,
   });
 
   @override
@@ -210,10 +240,123 @@ class _ProfileTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: EdgeInsets.zero,
       child: ListTile(
+        onTap: onTap,
         leading: Icon(icon, color: AppColors.primary),
         title: Text(label),
         subtitle: Text(value),
+        trailing: onTap == null
+            ? null
+            : const Icon(Icons.chevron_right, color: AppColors.textHint),
       ),
+    );
+  }
+}
+
+class _ChangePasswordDialog extends ConsumerStatefulWidget {
+  const _ChangePasswordDialog();
+
+  @override
+  ConsumerState<_ChangePasswordDialog> createState() =>
+      _ChangePasswordDialogState();
+}
+
+class _ChangePasswordDialogState extends ConsumerState<_ChangePasswordDialog> {
+  final _currentController = TextEditingController();
+  final _newController = TextEditingController();
+  final _confirmController = TextEditingController();
+  String? _localError;
+
+  @override
+  void dispose() {
+    _currentController.dispose();
+    _newController.dispose();
+    _confirmController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final current = _currentController.text;
+    final next = _newController.text;
+    final confirm = _confirmController.text;
+
+    setState(() => _localError = null);
+    if (next.length < 8) {
+      setState(() => _localError = 'Mật khẩu mới tối thiểu 8 ký tự.');
+      return;
+    }
+    if (next != confirm) {
+      setState(() => _localError = 'Xác nhận mật khẩu mới chưa khớp.');
+      return;
+    }
+
+    final success =
+        await ref.read(changePasswordProvider.notifier).changePassword(
+              currentPassword: current,
+              newPassword: next,
+            );
+    if (success && mounted) {
+      Navigator.of(context).pop(true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(changePasswordProvider);
+    final error = _localError ?? state.error;
+
+    return AlertDialog(
+      title: const Text('Đổi mật khẩu'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _currentController,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Mật khẩu hiện tại',
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          TextField(
+            controller: _newController,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Mật khẩu mới',
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          TextField(
+            controller: _confirmController,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Nhập lại mật khẩu mới',
+            ),
+          ),
+          if (error != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              error,
+              style: const TextStyle(color: AppColors.error),
+            ),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: state.isLoading ? null : () => Navigator.of(context).pop(),
+          child: const Text('Hủy'),
+        ),
+        FilledButton(
+          onPressed: state.isLoading ? null : _submit,
+          child: state.isLoading
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Cập nhật'),
+        ),
+      ],
     );
   }
 }

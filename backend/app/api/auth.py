@@ -4,10 +4,20 @@ from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.security import create_dev_token, parse_dev_token, verify_password
+from app.core.security import (
+    create_dev_token,
+    hash_password,
+    parse_dev_token,
+    verify_password,
+)
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
-from app.schemas.user import AuthResponse, UserLogin, UserResponse
+from app.schemas.user import (
+    AuthResponse,
+    PasswordChangeRequest,
+    UserLogin,
+    UserResponse,
+)
 
 router = APIRouter(prefix="/api", tags=["auth"])
 
@@ -84,6 +94,34 @@ async def verify_token(
     session: AsyncSession = Depends(get_db),
 ) -> User:
     return await _get_user_from_token(authorization, session)
+
+
+@router.post("/auth/change-password")
+async def change_password(
+    data: PasswordChangeRequest,
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> dict:
+    if user.password_hash is None or not verify_password(
+        data.current_password,
+        user.password_hash,
+    ):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+
+    if verify_password(data.new_password, user.password_hash):
+        raise HTTPException(
+            status_code=400,
+            detail="New password must be different from the current password",
+        )
+
+    repo = UserRepository(session)
+    updated = await repo.update_password_hash(
+        str(user.id),
+        hash_password(data.new_password),
+    )
+    if updated is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"success": True}
 
 
 @router.get("/user/profile/{user_id}", response_model=UserResponse)

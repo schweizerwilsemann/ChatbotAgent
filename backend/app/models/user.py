@@ -30,6 +30,11 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         nullable=True,
         unique=True,
     )
+    stripe_customer_id: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+        index=True,
+    )
     password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     business_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),

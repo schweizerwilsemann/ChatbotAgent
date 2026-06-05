@@ -48,4 +48,21 @@ class AuthApi {
       rethrow;
     }
   }
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      await _dioClient.post<Map<String, dynamic>>(
+        ApiConstants.authChangePasswordEndpoint,
+        data: {
+          'current_password': currentPassword,
+          'new_password': newPassword,
+        },
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
