@@ -311,7 +311,9 @@ def create_report():
         "theo cách thủ công, thiếu hệ thống tự động hóa để hỗ trợ khách hàng "
         "tra cứu luật chơi, kỹ thuật, đặt sân và gọi đồ uống. Việc xây dựng "
         "chatbot AI giúp giải quyết các vấn đề trên, nâng cao trải nghiệm "
-        "khách hàng và tối ưu hóa quy trình phục vụ."
+        "khách hàng và tối ưu hóa quy trình phục vụ. Bên cạnh đó, nhu cầu "
+        "thanh toán trực tuyến ngày càng cao, đòi hỏi hệ thống cần tích hợp "
+        "các cổng thanh toán phổ biến như Stripe và VNPay."
     )
 
     add_body_text(doc,
@@ -320,7 +322,8 @@ def create_report():
         "(2) hỗ trợ đặt sân theo thời gian thực; "
         "(3) đặt đồ uống từ menu; "
         "(4) gọi nhân viên hỗ trợ; "
-        "(5) cung cấp ứng dụng di động đa nền tảng."
+        "(5) tích hợp thanh toán trực tuyến (Stripe, VNPay); "
+        "(6) cung cấp ứng dụng di động đa nền tảng."
     )
 
     add_body_text(doc,
@@ -328,7 +331,8 @@ def create_report():
         "phát triển phần mềm theo mô hình Agile và ứng dụng các công nghệ AI "
         "hiện đại (LangChain, LLM, Knowledge Graph). Dữ liệu tri thức thể thao "
         "được thu thập từ các nguồn chính thức (WPA, USAPA, BWF) và xây dựng "
-        "thành Knowledge Graph trong Neo4j."
+        "thành Knowledge Graph trong Neo4j. Hệ thống được triển khai bằng "
+        "Docker Compose với kiến trúc microservice."
     )
 
     add_body_text(doc,
@@ -366,6 +370,8 @@ def create_report():
         "Thiết kế và xây dựng ứng dụng di động Flutter đa nền tảng.",
         "Tích hợp AI Agent với các tool: tra cứu kiến thức, đặt sân, gọi đồ uống, gọi nhân viên.",
         "Thiết kế cơ sở dữ liệu PostgreSQL cho dữ liệu nghiệp vụ.",
+        "Tích hợp thanh toán trực tuyến: Stripe (quốc tế) và VNPay (trong nước).",
+        "Triển khai hệ thống bằng Docker Compose.",
         "Thử nghiệm và đánh giá hệ thống.",
     ]
     for task in tasks:
@@ -378,7 +384,9 @@ def create_report():
         "Hệ thống chatbot AI hoạt động, trả lời được câu hỏi về luật chơi và kỹ thuật thể thao.",
         "Chức năng đặt sân thể thao hoạt động theo thời gian thực.",
         "Chức năng đặt đồ uống từ menu hoạt động.",
+        "Chức năng thanh toán trực tuyến hoạt động (Stripe và VNPay).",
         "Ứng dụng di động Flutter chạy được trên Android và iOS.",
+        "Hệ thống triển khai được bằng Docker Compose.",
         "Tài liệu mã nguồn và báo cáo đồ án hoàn chỉnh.",
     ]
     for req in product_reqs:
@@ -477,49 +485,55 @@ def create_report():
         ("1.3.4. Neo4j (Knowledge Graph)", "8"),
         ("1.3.5. PostgreSQL", "9"),
         ("1.3.6. Redis", "10"),
-        ("CHƯƠNG 2. PHÂN TÍCH", "11"),
-        ("2.1. Xác định yêu cầu", "11"),
-        ("2.1.1. Yêu cầu chức năng", "11"),
-        ("2.1.2. Yêu cầu phi chức năng", "12"),
-        ("2.2. Đặc tả phần mềm", "13"),
-        ("2.2.1. Phát biểu bài toán", "13"),
-        ("2.2.2. Mô hình Use Case", "14"),
-        ("2.2.3. Sơ đồ Sequence", "20"),
-        ("CHƯƠNG 3. THIẾT KẾ CƠ SỞ DỮ LIỆU", "25"),
-        ("3.1. Sơ đồ quan hệ giữa các bảng", "25"),
-        ("3.2. Chi tiết các bảng", "26"),
-        ("3.3. Kiến trúc hệ thống", "30"),
-        ("3.3.1. Tổng quan kiến trúc hệ thống", "30"),
-        ("3.3.2. Sơ đồ kiến trúc", "31"),
-        ("3.3.3. Mô tả thành phần trong kiến trúc", "32"),
-        ("3.3.4. Luồng xử lý yêu cầu", "34"),
-        ("3.3.5. Ưu điểm của kiến trúc", "35"),
-        ("3.3.6. Hạn chế và hướng phát triển", "36"),
-        ("3.4. Thiết kế API", "37"),
-        ("3.4.1. Xác thực", "37"),
-        ("3.4.2. Chat APIs", "37"),
-        ("3.4.3. Booking APIs", "38"),
-        ("3.4.4. Order APIs", "38"),
-        ("3.4.5. Menu APIs", "39"),
-        ("3.4.6. Staff APIs", "39"),
-        ("3.4.7. Mô hình bảo mật API", "39"),
-        ("CHƯƠNG 4. HIỆN THỰC CHƯƠNG TRÌNH", "40"),
-        ("4.1. Cấu trúc thư mục dự án", "40"),
-        ("4.2. Hiện thực Backend", "41"),
-        ("4.2.1. AI Agent Implementation", "41"),
-        ("4.2.2. Knowledge Graph Pipeline", "43"),
-        ("4.2.3. Database Models", "45"),
-        ("4.2.4. API Endpoints", "46"),
-        ("4.3. Hiện thực Frontend (Flutter App)", "47"),
-        ("4.3.1. Cấu trúc Feature-based", "47"),
-        ("4.3.2. State Management với Riverpod", "48"),
-        ("4.3.3. Navigation với GoRouter", "49"),
-        ("4.3.4. Chat UI với flutter_chat_ui", "49"),
-        ("4.4. Môi trường triển khai", "50"),
-        ("4.5. Kết quả đạt được", "51"),
-        ("4.6. Hướng phát triển", "52"),
-        ("TÀI LIỆU THAM KHẢO", "53"),
-        ("PHỤ LỤC", "54"),
+        ("1.3.7. Stripe", "11"),
+        ("1.3.8. VNPay", "12"),
+        ("1.3.9. Docker", "13"),
+        ("CHƯƠNG 2. PHÂN TÍCH", "14"),
+        ("2.1. Xác định yêu cầu", "14"),
+        ("2.1.1. Yêu cầu chức năng", "14"),
+        ("2.1.2. Yêu cầu phi chức năng", "15"),
+        ("2.2. Đặc tả phần mềm", "16"),
+        ("2.2.1. Phát biểu bài toán", "16"),
+        ("2.2.2. Mô hình Use Case", "17"),
+        ("2.2.3. Sơ đồ Sequence", "23"),
+        ("CHƯƠNG 3. THIẾT KẾ CƠ SỞ DỮ LIỆU", "28"),
+        ("3.1. Sơ đồ quan hệ giữa các bảng", "28"),
+        ("3.2. Chi tiết các bảng", "29"),
+        ("3.3. Kiến trúc hệ thống", "34"),
+        ("3.3.1. Tổng quan kiến trúc hệ thống", "34"),
+        ("3.3.2. Sơ đồ kiến trúc", "35"),
+        ("3.3.3. Mô tả thành phần trong kiến trúc", "36"),
+        ("3.3.4. Luồng xử lý yêu cầu", "38"),
+        ("3.3.5. Ưu điểm của kiến trúc", "39"),
+        ("3.3.6. Hạn chế và hướng phát triển", "40"),
+        ("3.4. Thiết kế API", "41"),
+        ("3.4.1. Xác thực", "41"),
+        ("3.4.2. Chat APIs", "41"),
+        ("3.4.3. Booking APIs", "42"),
+        ("3.4.4. Order APIs", "42"),
+        ("3.4.5. Menu APIs", "43"),
+        ("3.4.6. Staff APIs", "43"),
+        ("3.4.7. Payment APIs", "43"),
+        ("3.4.8. Mô hình bảo mật API", "44"),
+        ("CHƯƠNG 4. HIỆN THỰC CHƯƠNG TRÌNH", "45"),
+        ("4.1. Cấu trúc thư mục dự án", "45"),
+        ("4.2. Hiện thực Backend", "46"),
+        ("4.2.1. AI Agent Implementation", "46"),
+        ("4.2.2. Knowledge Graph Pipeline", "48"),
+        ("4.2.3. Database Models", "50"),
+        ("4.2.4. API Endpoints", "51"),
+        ("4.2.5. Payment Implementation", "52"),
+        ("4.2.6. Docker Deployment", "54"),
+        ("4.3. Hiện thực Frontend (Flutter App)", "55"),
+        ("4.3.1. Cấu trúc Feature-based", "55"),
+        ("4.3.2. State Management với Riverpod", "56"),
+        ("4.3.3. Navigation với GoRouter", "56"),
+        ("4.3.4. Chat UI với flutter_chat_ui", "57"),
+        ("4.4. Môi trường triển khai", "58"),
+        ("4.5. Kết quả đạt được", "59"),
+        ("4.6. Hướng phát triển", "60"),
+        ("TÀI LIỆU THAM KHẢO", "61"),
+        ("PHỤ LỤC", "62"),
     ]
 
     for entry, page in toc_entries:
@@ -561,13 +575,17 @@ def create_report():
         ("Bảng 3.3", "Bảng orders"),
         ("Bảng 3.4", "Bảng venues"),
         ("Bảng 3.5", "Bảng menu_items"),
-        ("Bảng 3.6", "Authentication APIs"),
-        ("Bảng 3.7", "Chat APIs"),
-        ("Bảng 3.8", "Booking APIs"),
-        ("Bảng 3.9", "Order APIs"),
-        ("Bảng 3.10", "Menu APIs"),
-        ("Bảng 3.11", "Staff APIs"),
+        ("Bảng 3.6", "Bảng payments"),
+        ("Bảng 3.7", "Authentication APIs"),
+        ("Bảng 3.8", "Chat APIs"),
+        ("Bảng 3.9", "Booking APIs"),
+        ("Bảng 3.10", "Order APIs"),
+        ("Bảng 3.11", "Menu APIs"),
+        ("Bảng 3.12", "Staff APIs"),
+        ("Bảng 3.13", "VNPay Payment APIs"),
+        ("Bảng 3.14", "Stripe Payment APIs"),
         ("Bảng 4.1", "Môi trường triển khai"),
+        ("Bảng 4.2", "Docker Services"),
     ]
 
     table = doc.add_table(rows=len(bang_muc) + 1, cols=2)
@@ -607,12 +625,17 @@ def create_report():
         ("Hình 2.3", "Use Case Diagram - Admin"),
         ("Hình 2.4", "Sequence Diagram - Chat"),
         ("Hình 2.5", "Sequence Diagram - Booking"),
+        ("Hình 2.6", "Sequence Diagram - Payment (Stripe)"),
+        ("Hình 2.7", "Sequence Diagram - Payment (VNPay)"),
         ("Hình 3.1", "Sơ đồ quan hệ các bảng (ERD)"),
         ("Hình 3.2", "Sơ đồ kiến trúc hệ thống"),
         ("Hình 3.3", "Luồng xử lý yêu cầu"),
         ("Hình 4.1", "Cấu trúc thư mục backend"),
         ("Hình 4.2", "Cấu trúc thư mục frontend"),
         ("Hình 4.3", "Luồng xử lý AI Agent"),
+        ("Hình 4.4", "Luồng thanh toán Stripe"),
+        ("Hình 4.5", "Luồng thanh toán VNPay"),
+        ("Hình 4.6", "Kiến trúc Docker Deployment"),
     ]
 
     table2 = doc.add_table(rows=len(hinh_muc) + 1, cols=2)
@@ -667,7 +690,7 @@ def create_report():
     add_body_text(doc,
         "Trước thực tế đó, việc xây dựng một hệ thống chatbot AI thông minh, "
         "có khả năng trả lời tự động các câu hỏi về luật chơi, kỹ thuật, "
-        "hỗ trợ đặt sân, gọi đồ uống và quản lý yêu cầu khách hàng là cần thiết. "
+        "hỗ trợ đặt sân, gọi đồ uống, thanh toán trực tuyến và quản lý yêu cầu khách hàng là cần thiết. "
         "Hệ thống không chỉ giúp tối ưu hóa quy trình phục vụ mà còn nâng cao "
         "trải nghiệm người dùng, tạo lợi thế cạnh tranh cho quán thể thao."
     )
@@ -676,7 +699,7 @@ def create_report():
         "Đồ án này tập trung vào việc xây dựng Chatbot AI cho quán thể thao "
         "tích hợp Knowledge Graph và Tool Calling với các tính năng chính: "
         "tra cứu kiến thức thể thao (luật, kỹ thuật), đặt sân, gọi đồ uống, "
-        "gọi nhân viên và quản lý yêu cầu khách hàng."
+        "gọi nhân viên, thanh toán trực tuyến (Stripe, VNPay) và quản lý yêu cầu khách hàng."
     )
 
     # 1.2. Nhiệm vụ của đồ án
@@ -696,6 +719,8 @@ def create_report():
         "Xây dựng backend API với FastAPI (Python) xử lý các nghiệp vụ: xác thực, đặt sân, đặt đồ uống, quản lý nhân viên và tích hợp AI Agent.",
         "Tích hợp công nghệ Tool Calling với LangChain để chatbot có thể tự động gọi các hàm xử lý nghiệp vụ khi phát hiện ý định người dùng.",
         "Sử dụng Knowledge Graph (Neo4j) để lưu trữ và truy vấn tri thức thể thao một cách có cấu trúc, hỗ trợ tìm kiếm ngữ nghĩa.",
+        "Tích hợp thanh toán trực tuyến qua Stripe và VNPay, hỗ trợ đa phương thức thanh toán cho khách hàng.",
+        "Triển khai hệ thống bằng Docker Compose với kiến trúc microservice.",
     ]
     for p in purposes:
         add_bullet_point(doc, p)
@@ -712,7 +737,9 @@ def create_report():
         "Gọi nhân viên hỗ trợ khi cần thiết.",
         "Xem lịch sử đặt sân và trạng thái đơn hàng.",
         "Đăng nhập/đăng ký tài khoản khách hàng.",
+        "Thanh toán trực tuyến qua Stripe hoặc VNPay.",
         "Quản lý danh sách sân, menu đồ uống cho admin.",
+        "Quản lý giá dịch vụ và xem hóa đơn chi tiết cho admin.",
         "Thông báo real-time cho nhân viên khi có yêu cầu mới.",
     ]
     for r in func_reqs:
@@ -724,6 +751,7 @@ def create_report():
         "Ứng dụng hoạt động mượt mà trên cả iOS và Android.",
         "Thời gian phản hồi chatbot nhỏ hơn 5 giây.",
         "Bảo mật thông tin người dùng (mã hóa mật khẩu, JWT authentication).",
+        "Bảo mật thanh toán (webhook signature verification, payment deduplication).",
         "Hệ thống có khả năng mở rộng (multi-tenant architecture).",
         "Giao diện thân thiện, dễ sử dụng.",
     ]
@@ -736,12 +764,14 @@ def create_report():
     env_headers = ["Thành phần", "Công nghệ / Phiên bản"]
     env_data = [
         ["Hệ điều hành", "Windows 10/11, Ubuntu (WSL2)"],
-        ["Ngôn ngữ lập trình", "Python 3.10+, Dart 3.1+"],
+        ["Ngôn ngữ lập trình", "Python 3.10+, Dart 3.1+, Java 17+"],
         ["Backend Framework", "FastAPI 0.115+"],
         ["Mobile Framework", "Flutter 3.1+"],
         ["AI Framework", "LangChain 0.3.1 + Ollama"],
         ["Cơ sở dữ liệu", "PostgreSQL 14+, Neo4j 5.x, Redis 7+"],
-        ["IDE / Editor", "VS Code, Android Studio"],
+        ["Thanh toán", "Stripe SDK (Python), VNPay SDK (Java/Flutter)"],
+        ["Triển khai", "Docker, Docker Compose"],
+        ["IDE / Editor", "VS Code, Android Studio, IntelliJ IDEA"],
     ]
     create_table_with_header(doc, env_headers, env_data)
 
@@ -843,6 +873,58 @@ def create_report():
         "quản lý thông báo nhân viên (staff notification) và caching dữ liệu."
     )
 
+    # 1.3.7. Stripe
+    add_heading_custom(doc, "1.3.7. Stripe", level=3)
+
+    add_body_text(doc,
+        "Stripe là nền tảng thanh toán trực tuyến hàng đầu thế giới, hỗ trợ "
+        "xử lý thanh toán qua thẻ tín dụng/ghi nợ (Visa, Mastercard, JCB) "
+        "và các phương thức thanh toán quốc tế. Stripe cung cấp SDK cho "
+        "nhiều nền tảng và API RESTful để tích hợp thanh toán vào ứng dụng."
+    )
+
+    add_body_text(doc,
+        "Trong đồ án này, Stripe được tích hợp để xử lý thanh toán quốc tế "
+        "cho booking và order. Backend sử dụng Stripe Python SDK để tạo "
+        "Checkout Session, frontend hiển thị trang thanh toán Stripe qua WebView. "
+        "Stripe webhook được sử dụng để xác nhận thanh toán từ server-to-server, "
+        "đảm bảo tính toàn vẹn dữ liệu thanh toán."
+    )
+
+    # 1.3.8. VNPay
+    add_heading_custom(doc, "1.3.8. VNPay", level=3)
+
+    add_body_text(doc,
+        "VNPay là cổng thanh toán trực tuyến phổ biến tại Việt Nam, hỗ trợ "
+        "thanh toán qua thẻ ATM nội địa, Internet Banking, QR code và ví điện tử. "
+        "VNPay cung cấp SDK native cho mobile và API cho web, phù hợp với "
+        "người dùng Việt Nam."
+    )
+
+    add_body_text(doc,
+        "Trong đồ án này, VNPay được tích hợp thông qua kiến trúc microservice: "
+        "một Java service đóng vai trò proxy/gateway xử lý giao thức VNPay, "
+        "giao tiếp với Python backend qua gRPC. Frontend sử dụng VNPay Native SDK "
+        "qua Flutter Method Channel để mở trang thanh toán trực tiếp trên thiết bị."
+    )
+
+    # 1.3.9. Docker
+    add_heading_custom(doc, "1.3.9. Docker", level=3)
+
+    add_body_text(doc,
+        "Docker là nền tảng containerization cho phép đóng gói ứng dụng "
+        "và các phụ thuộc vào container độc lập. Docker Compose cho phép "
+        "định nghĩa và quản lý nhiều container dịch vụ cùng lúc."
+    )
+
+    add_body_text(doc,
+        "Trong đồ án này, Docker được sử dụng để triển khai hệ thống với "
+        "4 dịch vụ: PostgreSQL (cơ sở dữ liệu), Redis (cache/message broker), "
+        "Java Payment Service (VNPay gateway), và Python Backend (FastAPI). "
+        "Tất cả giao tiếp qua mạng nội bộ (bridge network), chỉ Python Backend "
+        "được expose ra ngoài qua port 8000."
+    )
+
     add_page_break(doc)
 
     # ====================================================================
@@ -866,6 +948,8 @@ def create_report():
         ["6", "Xem lịch sử", "Xem lịch sử đặt sân, trạng thái đơn hàng."],
         ["7", "Đăng nhập/Đăng ký", "Xác thực người dùng bằng số điện thoại và mật khẩu."],
         ["8", "Quản lý (Admin)", "Quản lý sân, menu, nhân viên, thống kê doanh thu."],
+        ["9", "Thanh toán trực tuyến", "Thanh toán booking và order qua Stripe (quốc tế) hoặc VNPay (trong nước)."],
+        ["10", "Quản lý giá dịch vụ", "Admin cấu hình giá sân, xem hóa đơn chi tiết booking."],
     ]
     create_table_with_header(doc, func_headers, func_data)
 
@@ -875,10 +959,11 @@ def create_report():
     nf_headers = ["Yêu cầu", "Mô tả"]
     nf_data = [
         ["Hiệu suất", "Thời gian phản hồi chatbot nhỏ hơn 5 giây cho hầu hết các truy vấn."],
-        ["Bảo mật", "Mã hóa mật khẩu (bcrypt), JWT authentication, CORS protection."],
+        ["Bảo mật", "Mã hóa mật khẩu (bcrypt), JWT authentication, CORS protection, webhook signature verification."],
         ["Khả năng mở rộng", "Kiến trúc multi-tenant, hỗ trợ nhiều quán thể thao trên cùng hệ thống."],
         ["Đa nền tảng", "Ứng dụng chạy trên cả iOS và Android từ một codebase Flutter."],
         ["Tính sẵn sàng", "Fallback mechanism: khi LLM chính lỗi, tự chuyển sang LLM dự phòng."],
+        ["Thanh toán", "Hỗ trợ đa phương thức thanh toán: Stripe (quốc tế), VNPay (trong nước), xác nhận qua webhook."],
     ]
     create_table_with_header(doc, nf_headers, nf_data)
 
@@ -897,6 +982,7 @@ def create_report():
         "Trả lời tự động các câu hỏi về luật chơi, kỹ thuật thông qua Knowledge Graph (Neo4j) với Graph RAG.",
         "Hỗ trợ đặt sân thể thao theo thời gian thực, kiểm tra tình trạng sân trống.",
         "Hỗ trợ đặt đồ uống/đồ ăn từ menu của quán.",
+        "Tích hợp thanh toán trực tuyến qua Stripe (quốc tế) và VNPay (trong nước).",
         "Gửi yêu cầu gọi nhân viên hỗ trợ qua hệ thống thông báo real-time.",
         "Quản lý tài khoản người dùng với phân quyền: Customer, Staff, Admin.",
         "Cung cấp ứng dụng di động Flutter đa nền tảng với giao diện chat thân thiện.",
@@ -932,6 +1018,9 @@ def create_report():
         ["UC08", "Nhận thông báo yêu cầu", "Staff"],
         ["UC09", "Quản lý sân và menu", "Admin"],
         ["UC10", "Xem thống kê doanh thu", "Admin"],
+        ["UC11", "Thanh toán trực tuyến", "Customer"],
+        ["UC12", "Quản lý giá dịch vụ", "Admin"],
+        ["UC13", "Xem hóa đơn booking", "Admin"],
     ]
     create_table_with_header(doc, uc_headers, uc_data)
 
@@ -952,6 +1041,21 @@ def create_report():
 
     doc.add_paragraph()
     add_body_text(doc, "[Chèn hình Use Case Diagram tại đây]", bold=True)
+
+    doc.add_paragraph()
+    add_body_text(doc, "Mô tả chi tiết Use Case UC11 - Thanh toán trực tuyến:", bold=True)
+
+    uc_payment_headers = ["Thông tin", "Mô tả"]
+    uc_payment_data = [
+        ["Use Case", "UC11 - Thanh toán trực tuyến"],
+        ["Actor", "Customer"],
+        ["Mô tả", "Người dùng thanh toán booking hoặc order qua Stripe hoặc VNPay."],
+        ["Precondition", "Người dùng đã tạo booking/order thành công, chưa thanh toán."],
+        ["Main Flow", "1. Người dùng chọn 'Thanh toán ngay' sau khi đặt sân/đồ uống.\n2. Hệ thống hiển thị dialog chọn phương thức: Stripe hoặc VNPay.\n3a. Nếu Stripe: Hệ thống tạo Checkout Session, mở WebView thanh toán.\n3b. Nếu VNPay: Hệ thống tạo payment URL, mở VNPay Native SDK.\n4. Người dùng hoàn tất thanh toán trên cổng thanh toán.\n5. Hệ thống nhận xác nhận (webhook/callback), cập nhật trạng thái."],
+        ["Alternative Flow", "3a. Nếu Stripe lỗi, hiển thị thông báo và cho phép thử lại.\n4a. Nếu người dùng hủy thanh toán, trạng thái giữ nguyên 'unpaid'."],
+        ["Postcondition", "Trạng thái thanh toán được cập nhật: 'paid' hoặc 'failed'."],
+    ]
+    create_table_with_header(doc, uc_payment_headers, uc_payment_data)
 
     # 2.2.3. Sơ đồ Sequence
     add_heading_custom(doc, "2.2.3. Sơ đồ Sequence", level=3)
@@ -984,8 +1088,25 @@ def create_report():
         "3. Tool book_court kiểm tra sân trống trong database PostgreSQL.",
         "4. Nếu sân trống, tạo bản ghi booking mới với status 'confirmed'.",
         "5. Trả về xác nhận đặt sân cho người dùng qua chatbot.",
+        "6. Hệ thống hiển thị dialog thanh toán với 2 lựa chọn: Stripe hoặc VNPay.",
     ]
     for item in booking_seq:
+        add_body_text(doc, item)
+
+    doc.add_paragraph()
+    add_body_text(doc, "Luồng xử lý thanh toán (Payment Sequence - Stripe):")
+
+    payment_seq = [
+        "1. Người dùng chọn 'Thanh toán ngay' và chọn phương thức Stripe.",
+        "2. Frontend gọi POST /api/stripe/create-checkout với order_id, amount.",
+        "3. Backend tạo Stripe Checkout Session, trả về checkout_url.",
+        "4. Frontend mở WebView hiển thị trang thanh toán Stripe.",
+        "5. Người dùng nhập thông tin thẻ và hoàn tất thanh toán.",
+        "6. Stripe gửi webhook POST /api/stripe/webhook xác nhận.",
+        "7. Backend xác thực chữ ký, cập nhật payment_status = 'paid'.",
+        "8. Frontend redirect về trang kết quả thanh toán.",
+    ]
+    for item in payment_seq:
         add_body_text(doc, item)
 
     doc.add_paragraph()
@@ -1025,7 +1146,9 @@ def create_report():
         "venues (1) --- (N) service_resources\n"
         "orders (1) --- (N) order_items\n"
         "businesses (1) --- (N) venues\n"
-        "businesses (1) --- (N) users"
+        "businesses (1) --- (N) users\n"
+        "bookings (1) --- (N) payments\n"
+        "orders (1) --- (N) payments"
     )
 
     doc.add_paragraph()
@@ -1064,6 +1187,8 @@ def create_report():
         ["start_time", "TIMESTAMP", "NOT NULL", "Thời gian bắt đầu"],
         ["end_time", "TIMESTAMP", "NOT NULL", "Thời gian kết thúc"],
         ["status", "ENUM", "NOT NULL", "confirmed / cancelled / completed"],
+        ["total_price", "NUMERIC(12,2)", "", "Tổng tiền (VND)"],
+        ["payment_status", "VARCHAR(20)", "DEFAULT 'unpaid'", "Trạng thái thanh toán"],
     ]
     create_table_with_header(doc, bookings_headers, bookings_data)
 
@@ -1077,8 +1202,9 @@ def create_report():
         ["id", "UUID", "PK", "Khóa chính"],
         ["user_id", "VARCHAR(128)", "FK -> users", "Người đặt hàng"],
         ["venue_id", "UUID", "FK -> venues", "Quán thể thao"],
-        ["total_price", "INTEGER", "NOT NULL", "Tổng tiền (VND)"],
+        ["total_price", "NUMERIC(12,2)", "DEFAULT 0", "Tổng tiền (VND)"],
         ["status", "ENUM", "NOT NULL", "pending/preparing/ready/delivered/cancelled"],
+        ["payment_status", "VARCHAR(20)", "DEFAULT 'unpaid'", "Trạng thái thanh toán"],
         ["created_at", "TIMESTAMP", "NOT NULL", "Thời gian đặt hàng"],
     ]
     create_table_with_header(doc, orders_headers, orders_data)
@@ -1114,6 +1240,26 @@ def create_report():
     ]
     create_table_with_header(doc, menu_headers, menu_data)
 
+    doc.add_paragraph()
+
+    # Bảng payments
+    add_body_text(doc, "Bảng payments:", bold=True)
+
+    payments_headers = ["Tên cột", "Kiểu dữ liệu", "Khóa", "Mô tả"]
+    payments_data = [
+        ["id", "UUID", "PK", "Khóa chính"],
+        ["order_type", "VARCHAR(20)", "NOT NULL", "Loại đối tượng: 'booking' hoặc 'order'"],
+        ["order_id", "UUID", "NOT NULL", "ID của booking hoặc order"],
+        ["amount", "NUMERIC(12,2)", "NOT NULL", "Số tiền thanh toán (VND)"],
+        ["description", "VARCHAR(500)", "", "Mô tả thanh toán"],
+        ["bank_code", "VARCHAR(50)", "", "Mã ngân hàng/cổng thanh toán (stripe, vnpay)"],
+        ["vnp_transaction_no", "VARCHAR(100)", "", "Mã giao dịch VNPay"],
+        ["status", "VARCHAR(20)", "NOT NULL", "pending/completed/failed"],
+        ["paid_at", "TIMESTAMP", "", "Thời gian thanh toán thành công"],
+        ["created_at", "TIMESTAMP", "NOT NULL", "Thời gian tạo bản ghi"],
+    ]
+    create_table_with_header(doc, payments_headers, payments_data)
+
     # 3.3. Kiến trúc hệ thống
     add_heading_custom(doc, "3.3. Kiến trúc hệ thống", level=2)
 
@@ -1145,25 +1291,25 @@ def create_report():
         "┌─────────────────────────────────────┐\n"
         "│           Flutter App               │  Presentation Layer\n"
         "│  (Chat UI, Booking, Menu, Auth)     │\n"
+        "│  (Payment: Stripe/VNPay SDK)        │\n"
         "└──────────────┬──────────────────────┘\n"
         "               │ HTTP / WebSocket\n"
         "┌──────────────▼──────────────────────┐\n"
         "│          FastAPI Backend            │  Application Layer\n"
-        "│  /chat  /booking  /order  /staff    │\n"
-        "└──────────────┬──────────────────────┘\n"
-        "               │\n"
-        "┌──────────────▼──────────────────────┐\n"
-        "│           AI Agent Layer            │  Domain Layer\n"
-        "│  Intent → Tool Selection → Execute  │\n"
-        "│  Graph RAG (Neo4j) + Tool Calling   │\n"
-        "│  LLM: Ollama (qwen2.5-coder:7b)    │\n"
+        "│  /chat /booking /order /staff       │\n"
+        "│  /payment /stripe                   │\n"
         "└──────┬───────────────────┬──────────┘\n"
         "       │                   │\n"
         "┌──────▼──────┐    ┌───────▼─────────┐\n"
-        "│   Neo4j     │    │   PostgreSQL    │  Infrastructure\n"
-        "│  Knowledge  │    │  booking/order  │\n"
-        "│   Graph     │    │   /user data    │\n"
-        "└─────────────┘    └─────────────────┘"
+        "│  AI Agent   │    │ Payment Service │  Domain Layer\n"
+        "│  LangChain  │    │  (Java/VNPay)   │\n"
+        "│  Tool Call  │    │  Stripe SDK     │\n"
+        "└──────┬──────┘    └───────┬─────────┘\n"
+        "       │                   │\n"
+        "┌──────▼───────────────────▼─────────┐\n"
+        "│         Infrastructure Layer        │\n"
+        "│  PostgreSQL │ Neo4j │ Redis │ Docker│\n"
+        "└─────────────────────────────────────┘"
     )
 
     doc.add_paragraph()
@@ -1245,10 +1391,10 @@ def create_report():
 
     limitations = [
         "Hiện tại chỉ hỗ trợ 3 môn thể thao (bida, pickleball, cầu lông), cần mở rộng thêm.",
-        "Chức năng thanh toán online chưa được tích hợp.",
         "Chưa có hệ thống đánh giá và phản hồi từ khách hàng.",
-        "Cần bổ sung analytics và reporting cho admin.",
+        "Cần bổ sung analytics và reporting nâng cao cho admin.",
         "Hướng phát triển: tích hợp voice chat, hỗ trợ đa ngôn ngữ, thêm môn thể thao.",
+        "Hướng phát triển: triển khai lên cloud (AWS, GCP) với CI/CD pipeline.",
     ]
     for item in limitations:
         add_bullet_point(doc, item)
@@ -1316,8 +1462,34 @@ def create_report():
     ]
     create_table_with_header(doc, auth_headers, staff_data)
 
-    # 3.4.7. Mô hình bảo mật API
-    add_heading_custom(doc, "3.4.7. Mô hình bảo mật API", level=3)
+    doc.add_paragraph()
+
+    # 3.4.7. Payment APIs
+    add_heading_custom(doc, "3.4.7. Payment APIs", level=3)
+
+    add_body_text(doc, "VNPay Payment APIs:", bold=True)
+
+    vnpay_api_data = [
+        ["POST", "/api/payment/create", "Tạo URL thanh toán VNPay"],
+        ["GET", "/api/payment/callback", "Callback từ VNPay sau thanh toán"],
+        ["GET", "/api/payment/query", "Truy vấn trạng thái giao dịch VNPay"],
+    ]
+    create_table_with_header(doc, auth_headers, vnpay_api_data)
+
+    doc.add_paragraph()
+    add_body_text(doc, "Stripe Payment APIs:", bold=True)
+
+    stripe_api_data = [
+        ["POST", "/api/stripe/create-checkout", "Tạo Stripe Checkout Session"],
+        ["GET", "/api/stripe/success", "Redirect sau thanh toán Stripe thành công"],
+        ["GET", "/api/stripe/cancel", "Redirect khi hủy thanh toán Stripe"],
+        ["POST", "/api/stripe/webhook", "Webhook xác nhận thanh toán từ Stripe"],
+        ["GET", "/api/stripe/config", "Lấy Stripe publishable key"],
+    ]
+    create_table_with_header(doc, auth_headers, stripe_api_data)
+
+    # 3.4.8. Mô hình bảo mật API
+    add_heading_custom(doc, "3.4.8. Mô hình bảo mật API", level=3)
 
     add_body_text(doc, "Các biện pháp bảo mật được áp dụng:")
 
@@ -1327,6 +1499,8 @@ def create_report():
         "CORS Protection: Chỉ cho phép các origin được whitelist truy cập API.",
         "Input Validation: Tất cả request body được validate bằng Pydantic schemas.",
         "Rate Limiting: Giới hạn số request để tránh abuse (thông qua LLM provider).",
+        "Webhook Signature Verification: Xác thực chữ ký webhook từ Stripe và VNPay.",
+        "Payment Deduplication: Kiểm tra trùng lặp giao dịch bằng mã giao dịch cổng thanh toán.",
     ]
     for item in security_items:
         add_bullet_point(doc, item)
@@ -1352,24 +1526,44 @@ def create_report():
         "│   ├── main.py                 # Entry point\n"
         "│   ├── app/\n"
         "│   │   ├── api/                # API routers\n"
+        "│   │   │   ├── auth.py         # Xác thực\n"
+        "│   │   │   ├── chat.py         # Chat\n"
+        "│   │   │   ├── booking.py      # Đặt sân\n"
+        "│   │   │   ├── order.py        # Đơn hàng\n"
+        "│   │   │   ├── payment.py      # VNPay payment\n"
+        "│   │   │   ├── stripe.py       # Stripe payment\n"
+        "│   │   │   └── admin.py        # Quản trị\n"
         "│   │   ├── agent/              # AI Agent core\n"
         "│   │   ├── kg/                 # Knowledge Graph\n"
         "│   │   ├── models/             # SQLAlchemy models\n"
         "│   │   ├── schemas/            # Pydantic schemas\n"
         "│   │   ├── services/           # Business logic\n"
         "│   │   └── core/               # Config, DB, Redis\n"
-        "│   └── data_pipeline/          # KG build pipeline\n"
+        "│   ├── data_pipeline/          # KG build pipeline\n"
+        "│   └── Dockerfile              # Backend container\n"
         "│\n"
-        "└── flutter_app/                # Mobile App (Flutter)\n"
-        "    ├── lib/\n"
-        "    │   ├── features/           # Feature modules\n"
-        "    │   │   ├── chat/           # Chat feature\n"
-        "    │   │   ├── booking/        # Booking feature\n"
-        "    │   │   ├── menu/           # Menu feature\n"
-        "    │   │   └── auth/           # Authentication\n"
-        "    │   ├── core/               # Constants, theme, router\n"
-        "    │   └── shared/             # Shared widgets\n"
-        "    └── pubspec.yaml"
+        "├── java-payment-service/       # VNPay Gateway (Java)\n"
+        "│   ├── Dockerfile\n"
+        "│   ├── pom.xml\n"
+        "│   └── src/                    # gRPC + VNPay integration\n"
+        "│\n"
+        "├── flutter_app/                # Mobile App (Flutter)\n"
+        "│   ├── lib/\n"
+        "│   │   ├── features/           # Feature modules\n"
+        "│   │   │   ├── chat/           # Chat feature\n"
+        "│   │   │   ├── booking/        # Booking feature\n"
+        "│   │   │   ├── menu/           # Menu feature\n"
+        "│   │   │   ├── auth/           # Authentication\n"
+        "│   │   │   ├── payment/        # Payment (Stripe/VNPay)\n"
+        "│   │   │   ├── admin/          # Admin panel\n"
+        "│   │   │   └── profile/        # User profile\n"
+        "│   │   ├── core/               # Constants, theme, router\n"
+        "│   │   └── shared/             # Shared widgets\n"
+        "│   └── pubspec.yaml\n"
+        "│\n"
+        "├── docker-compose.yml          # Multi-service deployment\n"
+        "├── .dockerignore\n"
+        "└── proto/                      # gRPC protobuf definitions"
     )
 
     # 4.2. Hiện thực Backend
@@ -1449,12 +1643,13 @@ def create_report():
     add_body_text(doc, "Các model chính trong hệ thống (SQLAlchemy async):")
 
     model_items = [
-        "User: Quản lý tài khoản người dùng (phone, name, email, role, password_hash).",
-        "Booking: Quản lý đặt sân (user_id, venue_id, court_type, start_time, end_time, status).",
-        "Order: Quản lý đơn hàng (user_id, venue_id, total_price, status).",
+        "User: Quản lý tài khoản người dùng (phone, name, email, role, password_hash, stripe_customer_id).",
+        "Booking: Quản lý đặt sân (user_id, venue_id, court_type, start_time, end_time, status, total_price, payment_status).",
+        "Order: Quản lý đơn hàng (user_id, venue_id, total_price, status, payment_status).",
         "Venue: Quản lý quán thể thao (name, address, phone, business_id).",
         "MenuItem: Quản lý menu đồ uống (name, price, category, available).",
         "StaffRequest: Quản lý yêu cầu hỗ trợ từ khách hàng.",
+        "Payment: Quản lý giao dịch thanh toán (order_type, order_id, amount, bank_code, status, vnp_transaction_no).",
     ]
     for item in model_items:
         add_bullet_point(doc, item)
@@ -1471,10 +1666,93 @@ def create_report():
         "Order: POST /api/order/, GET /api/order/{id}, PUT /api/order/{id}/status",
         "Menu: GET /api/menu/",
         "Staff: POST /api/staff/notify, POST /api/staff-request/",
+        "VNPay Payment: POST /api/payment/create, GET /api/payment/callback, GET /api/payment/query",
+        "Stripe Payment: POST /api/stripe/create-checkout, POST /api/stripe/webhook, GET /api/stripe/config",
         "Venue: CRUD quản lý quán thể thao",
-        "Admin: Quản lý hệ thống (chỉ admin)",
+        "Admin: Quản lý hệ thống (chỉ admin), quản lý giá dịch vụ",
     ]
     for item in api_groups:
+        add_bullet_point(doc, item)
+
+    doc.add_paragraph()
+
+    # 4.2.5. Payment Implementation
+    add_heading_custom(doc, "4.2.5. Payment Implementation", level=3)
+
+    add_body_text(doc,
+        "Hệ thống thanh toán được thiết kế theo kiến trúc microservice, "
+        "hỗ trợ hai cổng thanh toán: Stripe (quốc tế) và VNPay (trong nước)."
+    )
+
+    add_body_text(doc, "Kiến trúc thanh toán:", bold=True)
+
+    payment_arch = [
+        "PaymentService: Service chính xử lý logic thanh toán, quản lý trạng thái payment.",
+        "Stripe Integration: Backend tạo Checkout Session bằng Stripe Python SDK, frontend mở WebView.",
+        "VNPay Integration: Java microservice đóng vai trò proxy VNPay, giao tiếp với backend qua gRPC.",
+        "Webhook Handling: Stripe webhook xác nhận server-to-server, VNPay callback redirect người dùng.",
+        "Payment Status Flow: unpaid -> pending -> paid/failed, cập nhật lên booking/order.",
+    ]
+    for item in payment_arch:
+        add_bullet_point(doc, item)
+
+    doc.add_paragraph()
+    add_body_text(doc, "Luồng thanh toán Stripe:", bold=True)
+
+    stripe_flow = [
+        "1. Người dùng chọn 'Thanh toán ngay' sau khi đặt sân/đồ uống.",
+        "2. Frontend gọi POST /api/stripe/create-checkout với order_id, amount.",
+        "3. Backend tạo Stripe Checkout Session, trả về checkout_url.",
+        "4. Frontend mở WebView hiển thị trang thanh toán Stripe.",
+        "5. Người dùng nhập thông tin thẻ và hoàn tất thanh toán.",
+        "6. Stripe gửi webhook POST /api/stripe/webhook xác nhận thanh toán.",
+        "7. Backend xác thực chữ ký webhook, cập nhật payment_status = 'paid'.",
+        "8. Frontend detect URL redirect, hiển thị kết quả thanh toán.",
+    ]
+    for item in stripe_flow:
+        add_body_text(doc, item)
+
+    doc.add_paragraph()
+    add_body_text(doc, "Luồng thanh toán VNPay:", bold=True)
+
+    vnpay_flow = [
+        "1. Người dùng chọn thanh toán qua VNPay.",
+        "2. Frontend gọi POST /api/payment/create với order_id, amount.",
+        "3. Backend gọi Java Payment Service tạo VNPay payment URL.",
+        "4. Frontend mở VNPay Native SDK (Method Channel) với payment URL.",
+        "5. Người dùng chọn ngân hàng và hoàn tất thanh toán.",
+        "6. VNPay redirect về callback URL, backend xác thực chữ ký.",
+        "7. Backend cập nhật payment_status = 'paid', trả kết quả.",
+    ]
+    for item in vnpay_flow:
+        add_body_text(doc, item)
+
+    # 4.2.6. Docker Deployment
+    add_heading_custom(doc, "4.2.6. Docker Deployment", level=3)
+
+    add_body_text(doc,
+        "Hệ thống được đóng gói thành 4 Docker services, quản lý bởi Docker Compose:"
+    )
+
+    docker_headers = ["Service", "Image", "Port", "Mô tả"]
+    docker_data = [
+        ["postgres", "postgres:16-alpine", "internal", "PostgreSQL database, healthcheck"],
+        ["redis", "redis:7-alpine", "internal", "Cache & message broker, healthcheck"],
+        ["java-payment", "custom build", "internal:9090", "VNPay gateway, giao tiếp gRPC"],
+        ["python-backend", "custom build", "8000:8000", "FastAPI API server"],
+    ]
+    create_table_with_header(doc, docker_headers, docker_data)
+
+    doc.add_paragraph()
+    add_body_text(doc, "Đặc điểm triển khai Docker:", bold=True)
+
+    docker_features = [
+        "Mạng nội bộ (bridge network): Các service giao tiếp qua mạng 'internal', chỉ backend expose ra ngoài.",
+        "Health checks: PostgreSQL và Redis có health check, backend chỉ khởi động khi dependencies sẵn sàng.",
+        "Volume persistence: Dữ liệu PostgreSQL được persist qua Docker volume 'pgdata'.",
+        "Environment variables: Cấu hình qua .env file, bao gồm database URL, Redis URL, Stripe keys, VNPay config.",
+    ]
+    for item in docker_features:
         add_bullet_point(doc, item)
 
     # 4.3. Hiện thực Frontend
@@ -1500,10 +1778,12 @@ def create_report():
 
     features = [
         "Chat Feature: Giao diện chat với AI, hỗ trợ markdown rendering.",
-        "Booking Feature: Chọn loại sân, thời gian, xem sân trống, xác nhận đặt.",
+        "Booking Feature: Chọn loại sân, thời gian, xem sân trống, xác nhận đặt, thanh toán.",
         "Menu Feature: Hiển thị danh sách đồ uống, đặt hàng.",
         "Auth Feature: Đăng nhập/đăng ký với số điện thoại.",
-        "Profile Feature: Quản lý thông tin cá nhân, lịch sử đặt sân.",
+        "Payment Feature: Thanh toán qua Stripe (WebView) và VNPay (Native SDK).",
+        "Profile Feature: Quản lý thông tin cá nhân, đổi mật khẩu, đăng xuất.",
+        "Admin Feature: Quản lý booking, billing, resource pricing, dashboard analytics.",
         "Staff Request Feature: Gửi yêu cầu hỗ trợ nhân viên.",
     ]
     for item in features:
@@ -1540,12 +1820,15 @@ def create_report():
 
     deploy_headers = ["Thành phần", "Mô tả"]
     deploy_data = [
-        ["Backend Server", "FastAPI chạy trên localhost:8000 (development)"],
+        ["Backend Server", "FastAPI chạy trên localhost:8000 (development), Docker container"],
         ["Ollama", "LLM local trên localhost:11434, model qwen2.5-coder:7b"],
         ["Neo4j AuraDB", "Cloud-hosted Knowledge Graph (free tier)"],
-        ["PostgreSQL", "Chạy trên WSL (Ubuntu), port 5432"],
-        ["Redis", "Chạy trên WSL (Ubuntu), port 6379"],
+        ["PostgreSQL", "Docker container (postgres:16-alpine) hoặc WSL (Ubuntu)"],
+        ["Redis", "Docker container (redis:7-alpine) hoặc WSL (Ubuntu)"],
+        ["Java Payment Service", "Docker container, port 9090, VNPay gateway"],
+        ["Stripe", "Stripe API (test mode), webhook endpoint"],
         ["Flutter App", "Chạy trên Android emulator hoặc thiết bị thật"],
+        ["Docker Compose", "Quản lý 4 services: postgres, redis, java-payment, python-backend"],
     ]
     create_table_with_header(doc, deploy_headers, deploy_data)
 
@@ -1558,8 +1841,12 @@ def create_report():
         "Chức năng đặt sân hoạt động, kiểm tra sân trống theo thời gian thực.",
         "Chức năng đặt đồ uống hoạt động, hiển thị menu với giá VND.",
         "Chức năng gọi nhân viên hoạt động qua hệ thống thông báo real-time.",
+        "Tích hợp thanh toán trực tuyến: Stripe (quốc tế) và VNPay (trong nước) hoạt động.",
+        "Hệ thống xác nhận thanh toán qua webhook (Stripe) và callback (VNPay).",
+        "Admin quản lý giá dịch vụ, xem hóa đơn chi tiết booking với tổng tiền.",
         "Ứng dụng Flutter chạy được trên cả Android và iOS.",
         "Hệ thống có fallback mechanism khi LLM chính lỗi.",
+        "Triển khai bằng Docker Compose với 4 dịch vụ containerized.",
     ]
     for item in results:
         add_bullet_point(doc, item)
@@ -1568,14 +1855,14 @@ def create_report():
     add_heading_custom(doc, "4.6. Hướng phát triển", level=2)
 
     future = [
-        "Tích hợp thanh toán online (VNPay, MoMo).",
         "Hỗ trợ voice chat (speech-to-text, text-to-speech).",
         "Thêm nhiều môn thể thao hơn (tennis, bóng bàn, v.v.).",
-        "Triển khai lên cloud (AWS, GCP) cho production.",
-        "Xây dựng hệ thống analytics và reporting cho admin.",
+        "Triển khai lên cloud (AWS, GCP) với CI/CD pipeline.",
+        "Xây dựng hệ thống analytics và reporting nâng cao cho admin.",
         "Hỗ trợ đa ngôn ngữ (Vietnamese, English).",
         "Tích hợp hệ thống đánh giá và phản hồi từ khách hàng.",
         "Phát triển ứng dụng web version (Flutter Web).",
+        "Tích hợp thêm cổng thanh toán MoMo.",
     ]
     for item in future:
         add_bullet_point(doc, item)
@@ -1607,6 +1894,10 @@ def create_report():
         "[10] WPA Rules. World Pool-Billiard Association. https://wpapool.com/",
         "[11] USAPA Rules. USA Pickleball Association. https://usapickleball.org/",
         "[12] BWF Laws. Badminton World Federation. https://bwfbadminton.com/",
+        "[13] Stripe Documentation. https://stripe.com/docs",
+        "[14] VNPay Documentation. https://sandbox.vnpayment.vn/apis/",
+        "[15] Docker Documentation. https://docs.docker.com/",
+        "[16] Docker Compose Documentation. https://docs.docker.com/compose/",
     ]
 
     for ref in references:
