@@ -73,6 +73,7 @@ def _menu_item_response(item) -> MenuItemResponse:
 def _booking_response(entry: dict) -> AdminBookingResponse:
     booking = entry["booking"]
     user_name = entry["user_name"]
+    user_phone = entry.get("user_phone")
     local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
     start_local = booking.start_time.astimezone(local_tz) if booking.start_time.tzinfo else booking.start_time
     end_local = booking.end_time.astimezone(local_tz) if booking.end_time.tzinfo else booking.end_time
@@ -80,6 +81,7 @@ def _booking_response(entry: dict) -> AdminBookingResponse:
         id=str(booking.id),
         user_id=booking.user_id,
         user_name=user_name,
+        user_phone=user_phone,
         venue_id=str(booking.venue_id) if getattr(booking, "venue_id", None) else None,
         resource_id=str(booking.resource_id)
         if getattr(booking, "resource_id", None)
@@ -91,6 +93,7 @@ def _booking_response(entry: dict) -> AdminBookingResponse:
         start_time=start_local.strftime("%H:%M"),
         end_time=end_local.strftime("%H:%M"),
         status=booking.status,
+        payment_status=getattr(booking, "payment_status", None) or "unpaid",
         total_price=float(booking.total_price) if booking.total_price is not None else None,
         notes=booking.notes,
         created_at=getattr(booking, "created_at", None),
@@ -98,7 +101,10 @@ def _booking_response(entry: dict) -> AdminBookingResponse:
     )
 
 
-def _order_response(order) -> OrderResponse:
+def _order_response(entry: dict) -> OrderResponse:
+    order = entry["order"]
+    user_name = entry.get("user_name")
+    user_phone = entry.get("user_phone")
     items = [
         OrderItemResponse(
             id=str(item.id),
@@ -112,6 +118,8 @@ def _order_response(order) -> OrderResponse:
     return OrderResponse(
         id=str(order.id),
         user_id=order.user_id,
+        user_name=user_name,
+        user_phone=user_phone,
         venue_id=str(order.venue_id) if getattr(order, "venue_id", None) else None,
         resource_id=str(order.resource_id)
         if getattr(order, "resource_id", None)
@@ -119,6 +127,7 @@ def _order_response(order) -> OrderResponse:
         resource_label=getattr(order, "resource_label", None),
         table_number=order.table_number,
         status=order.status,
+        payment_status=getattr(order, "payment_status", None) or "unpaid",
         total_price=order.total_price,
         notes=order.notes,
         items=items,
@@ -126,7 +135,10 @@ def _order_response(order) -> OrderResponse:
     )
 
 
-def _staff_order_response(order) -> StaffOrderResponse:
+def _staff_order_response(entry: dict) -> StaffOrderResponse:
+    order = entry["order"]
+    user_name = entry.get("user_name")
+    user_phone = entry.get("user_phone")
     items = [
         StaffOrderItemResponse(
             id=str(item.id),
@@ -138,6 +150,8 @@ def _staff_order_response(order) -> StaffOrderResponse:
     return StaffOrderResponse(
         id=str(order.id),
         user_id=order.user_id,
+        user_name=user_name,
+        user_phone=user_phone,
         venue_id=str(order.venue_id) if getattr(order, "venue_id", None) else None,
         resource_id=str(order.resource_id)
         if getattr(order, "resource_id", None)
@@ -145,6 +159,7 @@ def _staff_order_response(order) -> StaffOrderResponse:
         resource_label=getattr(order, "resource_label", None),
         table_number=order.table_number,
         status=order.status,
+        payment_status=getattr(order, "payment_status", None) or "unpaid",
         notes=order.notes,
         items=items,
         created_at=getattr(order, "created_at", None),
@@ -294,7 +309,7 @@ async def get_all_bookings(
     date: date | None = Query(None, description="Filter by date"),
     court_type: str | None = Query(None, description="Filter by court type"),
     status: str | None = Query(None, description="Filter by status"),
-    limit: int = Query(30, ge=1, le=100, description="Maximum rows to return"),
+    limit: int = Query(10, ge=1, le=100, description="Maximum rows to return"),
     offset: int = Query(0, ge=0, description="Rows to skip"),
     user: User = Depends(require_roles("STAFF", "ADMIN")),
     session: AsyncSession = Depends(get_db),
@@ -354,7 +369,7 @@ async def get_booking_bill(
                 for entry in entries
                 if str(entry["booking"].id) == str(booking.id)
             ),
-            {"booking": booking, "user_name": None},
+            {"booking": booking, "user_name": None, "user_phone": None},
         )
         orders = await repo.get_orders_during_booking(booking)
         order_total = sum(
@@ -366,9 +381,16 @@ async def get_booking_bill(
             if booking.total_price is not None
             else None
         )
+        # Reuse booking's user info for the order responses in this bill
+        bill_user_name = booking_entry.get("user_name")
+        bill_user_phone = booking_entry.get("user_phone")
+        order_entries = [
+            {"order": o, "user_name": bill_user_name, "user_phone": bill_user_phone}
+            for o in orders
+        ]
         return BookingBillResponse(
             booking=_booking_response(booking_entry),
-            orders=[_order_response(order) for order in orders],
+            orders=[_order_response(e) for e in order_entries],
             order_total=order_total,
             booking_total=booking_total,
             grand_total=order_total + (booking_total or Decimal("0")),
@@ -407,6 +429,13 @@ async def update_booking_status(
             )
 
         current_status = booking.status
+        ps = getattr(booking, "payment_status", None) or ""
+        if data.status == "cancelled" and ps.startswith("paid"):
+            raise HTTPException(
+                status_code=400,
+                detail="Paid bookings cannot be cancelled without a refund flow",
+            )
+
         allowed = VALID_BOOKING_TRANSITIONS.get(current_status, set())
         if data.status not in allowed:
             raise HTTPException(
@@ -486,6 +515,7 @@ async def update_booking_status(
             start_time=start_local.strftime("%H:%M"),
             end_time=end_local.strftime("%H:%M"),
             status=updated.status,
+            payment_status=getattr(updated, "payment_status", None) or "unpaid",
             total_price=float(updated.total_price) if updated.total_price is not None else None,
             notes=updated.notes,
             created_at=getattr(updated, "created_at", None),
@@ -501,7 +531,7 @@ async def update_booking_status(
 @router.get("/orders", response_model=list[OrderResponse])
 async def get_all_orders(
     status: str | None = Query(None, description="Filter by status"),
-    limit: int = Query(30, ge=1, le=100, description="Maximum rows to return"),
+    limit: int = Query(10, ge=1, le=100, description="Maximum rows to return"),
     offset: int = Query(0, ge=0, description="Rows to skip"),
     user: User = Depends(require_roles("ADMIN")),
     session: AsyncSession = Depends(get_db),
@@ -526,7 +556,7 @@ async def get_all_orders(
 @router.get("/orders/staff", response_model=list[StaffOrderResponse])
 async def get_staff_orders(
     status: str | None = Query(None, description="Filter by status"),
-    limit: int = Query(30, ge=1, le=100, description="Maximum rows to return"),
+    limit: int = Query(10, ge=1, le=100, description="Maximum rows to return"),
     offset: int = Query(0, ge=0, description="Rows to skip"),
     user: User = Depends(require_roles("STAFF", "ADMIN")),
     session: AsyncSession = Depends(get_db),
@@ -552,7 +582,7 @@ async def get_staff_orders(
 async def get_all_menu_items(
     category_key: str | None = Query(None, description="Filter by category key"),
     q: str | None = Query(None, max_length=100, description="Search menu items"),
-    limit: int = Query(30, ge=1, le=100, description="Maximum rows to return"),
+    limit: int = Query(10, ge=1, le=100, description="Maximum rows to return"),
     offset: int = Query(0, ge=0, description="Rows to skip"),
     user: User = Depends(require_roles("STAFF", "ADMIN")),
     session: AsyncSession = Depends(get_db),

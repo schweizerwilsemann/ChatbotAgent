@@ -564,23 +564,31 @@ class _BookingCard extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: _statusColor(booking.status).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  booking.status.displayName,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: _statusColor(booking.status),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color:
+                          _statusColor(booking.status).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      booking.status.displayName,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: _statusColor(booking.status),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  _PaymentBadge(paymentStatus: booking.paymentStatus),
+                ],
               ),
             ],
           ),
@@ -603,6 +611,20 @@ class _BookingCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              if (booking.userPhone != null &&
+                  booking.userPhone!.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                const Icon(Icons.phone,
+                    size: 14, color: AppColors.textSecondary),
+                const SizedBox(width: 4),
+                Text(
+                  booking.userPhone!,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 8),
@@ -697,26 +719,27 @@ class _BookingCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                // Cancel button (always visible for pending/confirmed)
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => onAction(
-                        booking.id, AdminBookingStatus.cancelled.apiValue),
-                    icon: const Icon(Icons.cancel_outlined, size: 18),
-                    label: const Text('Huỷ'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.error,
-                      side: BorderSide(
-                        color: AppColors.error.withValues(alpha: 0.4),
+                if (!booking.isPaid) ...[
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => onAction(
+                          booking.id, AdminBookingStatus.cancelled.apiValue),
+                      icon: const Icon(Icons.cancel_outlined, size: 18),
+                      label: const Text('Huỷ'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                        side: BorderSide(
+                          color: AppColors.error.withValues(alpha: 0.4),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
+                  const SizedBox(width: 12),
+                ],
                 // Confirm / Complete button
                 Expanded(
                   child: ElevatedButton.icon(
@@ -791,6 +814,17 @@ class _BookingBillDialog extends StatelessWidget {
                   color: AppColors.textPrimary,
                 ),
               ),
+              if (booking.userPhone != null &&
+                  booking.userPhone!.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  booking.userPhone!,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
               const SizedBox(height: 4),
               Text(
                 '${booking.resourceLabel ?? _courtTypeDisplay(booking.courtType)} · ${booking.startTime} - ${booking.endTime}',
@@ -822,13 +856,19 @@ class _BookingBillDialog extends StatelessWidget {
                   (order) => [
                     Padding(
                       padding: const EdgeInsets.only(top: 6, bottom: 4),
-                      child: Text(
-                        DateFormat('HH:mm dd/MM').format(order.createdAt),
-                        style: const TextStyle(
-                          color: AppColors.textHint,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      child: Row(
+                        children: [
+                          Text(
+                            DateFormat('HH:mm dd/MM').format(order.createdAt),
+                            style: const TextStyle(
+                              color: AppColors.textHint,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const Spacer(),
+                          _PaymentBadge(paymentStatus: order.paymentStatus),
+                        ],
                       ),
                     ),
                     ...order.items.map(
@@ -870,6 +910,47 @@ class _BookingBillDialog extends StatelessWidget {
           child: const Text('Đóng'),
         ),
       ],
+    );
+  }
+}
+
+class _PaymentBadge extends StatelessWidget {
+  final String paymentStatus;
+
+  const _PaymentBadge({required this.paymentStatus});
+
+  @override
+  Widget build(BuildContext context) {
+    final isPaid = paymentStatus.startsWith('paid');
+    final isFailed = paymentStatus == 'failed';
+    final color = isPaid
+        ? AppColors.success
+        : isFailed
+            ? AppColors.error
+            : AppColors.textHint;
+    final method = isPaid && paymentStatus.contains('_')
+        ? paymentStatus.split('_').last.toUpperCase()
+        : '';
+    final label = isPaid
+        ? (method.isNotEmpty ? 'Đã thanh toán ($method)' : 'Đã thanh toán')
+        : isFailed
+            ? 'Thanh toán lỗi'
+            : 'Chưa thanh toán';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
+      ),
     );
   }
 }

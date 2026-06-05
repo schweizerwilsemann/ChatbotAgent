@@ -37,11 +37,14 @@ class OrderItemResponse(BaseModel):
 class OrderResponse(BaseModel):
     id: str
     user_id: str
+    user_name: str | None = None
+    user_phone: str | None = None
     venue_id: str | None = None
     resource_id: str | None = None
     resource_label: str | None = None
     table_number: int
     status: str
+    payment_status: str = "unpaid"
     total_price: Decimal
     notes: str | None = None
     items: list[OrderItemResponse] = []
@@ -75,11 +78,14 @@ class StaffOrderItemResponse(BaseModel):
 class StaffOrderResponse(BaseModel):
     id: str
     user_id: str
+    user_name: str | None = None
+    user_phone: str | None = None
     venue_id: str | None = None
     resource_id: str | None = None
     resource_label: str | None = None
     table_number: int
     status: str
+    payment_status: str = "unpaid"
     notes: str | None = None
     items: list[StaffOrderItemResponse] = []
     created_at: datetime | None = None

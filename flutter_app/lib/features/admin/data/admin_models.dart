@@ -181,6 +181,7 @@ class AdminBooking {
   final String id;
   final String userId;
   final String userName;
+  final String? userPhone;
   final String? venueId;
   final String? resourceId;
   final String? resourceLabel;
@@ -190,6 +191,7 @@ class AdminBooking {
   final String startTime;
   final String endTime;
   final AdminBookingStatus status;
+  final String paymentStatus;
   final double? totalPrice;
   final String? notes;
   final DateTime createdAt;
@@ -199,6 +201,7 @@ class AdminBooking {
     required this.id,
     required this.userId,
     required this.userName,
+    this.userPhone,
     this.venueId,
     this.resourceId,
     this.resourceLabel,
@@ -208,6 +211,7 @@ class AdminBooking {
     required this.startTime,
     required this.endTime,
     required this.status,
+    this.paymentStatus = 'unpaid',
     this.totalPrice,
     this.notes,
     required this.createdAt,
@@ -219,6 +223,7 @@ class AdminBooking {
       id: json['id'] as String,
       userId: json['user_id'] as String,
       userName: json['user_name'] as String? ?? '',
+      userPhone: json['user_phone'] as String?,
       venueId: json['venue_id'] as String?,
       resourceId: json['resource_id'] as String?,
       resourceLabel: json['resource_label'] as String?,
@@ -228,6 +233,7 @@ class AdminBooking {
       startTime: json['start_time'] as String,
       endTime: json['end_time'] as String,
       status: _parseBookingStatus(json['status'] as String),
+      paymentStatus: json['payment_status'] as String? ?? 'unpaid',
       totalPrice:
           json['total_price'] != null ? _toDouble(json['total_price']) : null,
       notes: json['notes'] as String?,
@@ -241,6 +247,7 @@ class AdminBooking {
       'id': id,
       'user_id': userId,
       'user_name': userName,
+      'user_phone': userPhone,
       'venue_id': venueId,
       'resource_id': resourceId,
       'resource_label': resourceLabel,
@@ -251,6 +258,7 @@ class AdminBooking {
       'start_time': startTime,
       'end_time': endTime,
       'status': _bookingStatusToString(status),
+      'payment_status': paymentStatus,
       'total_price': totalPrice,
       'notes': notes,
       'created_at': createdAt.toIso8601String(),
@@ -262,6 +270,7 @@ class AdminBooking {
     String? id,
     String? userId,
     String? userName,
+    String? userPhone,
     String? venueId,
     String? resourceId,
     String? resourceLabel,
@@ -271,6 +280,7 @@ class AdminBooking {
     String? startTime,
     String? endTime,
     AdminBookingStatus? status,
+    String? paymentStatus,
     double? totalPrice,
     String? notes,
     DateTime? createdAt,
@@ -280,6 +290,7 @@ class AdminBooking {
       id: id ?? this.id,
       userId: userId ?? this.userId,
       userName: userName ?? this.userName,
+      userPhone: userPhone ?? this.userPhone,
       venueId: venueId ?? this.venueId,
       resourceId: resourceId ?? this.resourceId,
       resourceLabel: resourceLabel ?? this.resourceLabel,
@@ -289,12 +300,15 @@ class AdminBooking {
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       status: status ?? this.status,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
       totalPrice: totalPrice ?? this.totalPrice,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
+
+  bool get isPaid => paymentStatus.startsWith('paid');
 }
 
 // ─── Admin Order Item ───────────────────────────────────────────────────────
@@ -340,11 +354,14 @@ class AdminOrderItem {
 class AdminOrder {
   final String id;
   final String userId;
+  final String? userName;
+  final String? userPhone;
   final String? venueId;
   final String? resourceId;
   final String? resourceLabel;
   final int tableNumber;
   final AdminOrderStatus status;
+  final String paymentStatus;
   final double totalPrice;
   final String? notes;
   final List<AdminOrderItem> items;
@@ -353,11 +370,14 @@ class AdminOrder {
   const AdminOrder({
     required this.id,
     required this.userId,
+    this.userName,
+    this.userPhone,
     this.venueId,
     this.resourceId,
     this.resourceLabel,
     required this.tableNumber,
     required this.status,
+    this.paymentStatus = 'unpaid',
     required this.totalPrice,
     this.notes,
     required this.items,
@@ -368,11 +388,14 @@ class AdminOrder {
     return AdminOrder(
       id: json['id'] as String,
       userId: json['user_id'] as String,
+      userName: json['user_name'] as String?,
+      userPhone: json['user_phone'] as String?,
       venueId: json['venue_id'] as String?,
       resourceId: json['resource_id'] as String?,
       resourceLabel: json['resource_label'] as String?,
       tableNumber: _toInt(json['table_number']),
       status: _parseOrderStatus(json['status'] as String),
+      paymentStatus: json['payment_status'] as String? ?? 'unpaid',
       totalPrice: _toDouble(json['total_price']),
       notes: json['notes'] as String?,
       items: (json['items'] as List<dynamic>?)
@@ -387,11 +410,14 @@ class AdminOrder {
     return {
       'id': id,
       'user_id': userId,
+      'user_name': userName,
+      'user_phone': userPhone,
       'venue_id': venueId,
       'resource_id': resourceId,
       'resource_label': resourceLabel,
       'table_number': tableNumber,
       'status': _orderStatusToString(status),
+      'payment_status': paymentStatus,
       'total_price': totalPrice,
       'notes': notes,
       'items': items.map((e) => e.toJson()).toList(),
@@ -402,11 +428,14 @@ class AdminOrder {
   AdminOrder copyWith({
     String? id,
     String? userId,
+    String? userName,
+    String? userPhone,
     String? venueId,
     String? resourceId,
     String? resourceLabel,
     int? tableNumber,
     AdminOrderStatus? status,
+    String? paymentStatus,
     double? totalPrice,
     String? notes,
     List<AdminOrderItem>? items,
@@ -415,17 +444,22 @@ class AdminOrder {
     return AdminOrder(
       id: id ?? this.id,
       userId: userId ?? this.userId,
+      userName: userName ?? this.userName,
+      userPhone: userPhone ?? this.userPhone,
       venueId: venueId ?? this.venueId,
       resourceId: resourceId ?? this.resourceId,
       resourceLabel: resourceLabel ?? this.resourceLabel,
       tableNumber: tableNumber ?? this.tableNumber,
       status: status ?? this.status,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
       totalPrice: totalPrice ?? this.totalPrice,
       notes: notes ?? this.notes,
       items: items ?? this.items,
       createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  bool get isPaid => paymentStatus.startsWith('paid');
 }
 
 class BookingBill {

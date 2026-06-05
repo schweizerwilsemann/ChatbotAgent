@@ -24,6 +24,7 @@ class AdminBookingResponse(BaseModel):
     id: str
     user_id: str
     user_name: str | None = None
+    user_phone: str | None = None
     venue_id: str | None = None
     resource_id: str | None = None
     resource_label: str | None = None
@@ -33,6 +34,7 @@ class AdminBookingResponse(BaseModel):
     start_time: str
     end_time: str
     status: str
+    payment_status: str = "unpaid"
     total_price: float | None = None
     notes: str | None = None
     created_at: datetime | None = None

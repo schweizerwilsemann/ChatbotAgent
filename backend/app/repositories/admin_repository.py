@@ -149,9 +149,9 @@ class AdminRepository:
     ) -> list[dict]:
         """Return bookings joined with user name, with optional filters."""
         stmt = (
-            select(Booking, User.name.label("user_name"))
+            select(Booking, User.name.label("user_name"), User.phone.label("user_phone"))
             .outerjoin(User, Booking.user_id == cast(User.id, String))
-            .order_by(Booking.start_time.desc())
+            .order_by(Booking.updated_at.desc(), Booking.created_at.desc())
         )
         if date_filter:
             local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
@@ -177,10 +177,12 @@ class AdminRepository:
         for row in rows:
             booking = row[0]
             user_name = row[1]
+            user_phone = row[2]
             bookings.append(
                 {
                     "booking": booking,
                     "user_name": user_name,
+                    "user_phone": user_phone,
                 }
             )
         return bookings
@@ -193,6 +195,16 @@ class AdminRepository:
         if not booking:
             return None
         booking.status = new_status
+        await self._session.flush()
+        return booking
+
+    async def update_booking_payment_status(
+        self, booking_id: str, payment_status: str
+    ) -> Booking | None:
+        booking = await self.get_booking_by_id(booking_id)
+        if not booking:
+            return None
+        booking.payment_status = payment_status
         await self._session.flush()
         return booking
 
@@ -213,12 +225,13 @@ class AdminRepository:
         resource_ids: set[uuid.UUID] | None = None,
         limit: int | None = None,
         offset: int = 0,
-    ) -> list[Order]:
-        """Return all orders with items, optionally filtered by status."""
+    ) -> list[dict]:
+        """Return all orders with items and user info, optionally filtered by status."""
         stmt = (
-            select(Order)
+            select(Order, User.name.label("user_name"), User.phone.label("user_phone"))
             .options(selectinload(Order.items))
-            .order_by(Order.created_at.desc())
+            .outerjoin(User, Order.user_id == cast(User.id, String))
+            .order_by(Order.updated_at.desc(), Order.created_at.desc())
         )
         if status:
             stmt = stmt.where(Order.status == status)
@@ -226,7 +239,20 @@ class AdminRepository:
         if limit is not None:
             stmt = stmt.offset(offset).limit(limit)
         result = await self._session.execute(stmt)
-        return list(result.scalars().all())
+        rows = result.unique().all()
+        orders = []
+        for row in rows:
+            order = row[0]
+            user_name = row[1]
+            user_phone = row[2]
+            orders.append(
+                {
+                    "order": order,
+                    "user_name": user_name,
+                    "user_phone": user_phone,
+                }
+            )
+        return orders
 
     async def get_orders_during_booking(self, booking: Booking) -> list[Order]:
         """Return non-cancelled orders created by this customer during a booking."""
@@ -267,7 +293,7 @@ class AdminRepository:
         """Return all menu items including unavailable ones."""
         stmt = select(MenuItem).where(
             MenuItem.is_deleted.is_(False)
-        ).order_by(MenuItem.category_key, MenuItem.name)
+        ).order_by(MenuItem.updated_at.desc(), MenuItem.created_at.desc())
         if category_key:
             stmt = stmt.where(MenuItem.category_key == category_key)
         if query:

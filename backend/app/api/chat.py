@@ -59,6 +59,7 @@ async def chat(
         context = dict(request.context) if request.context else {}
         context.setdefault("user_id", str(user.id))
         context.setdefault("user_name", user.name or "")
+        context.setdefault("user_phone", user.phone or "")
         if request.context and "venue_id" in request.context:
             context["venue_id"] = request.context["venue_id"]
             context["venue_name"] = request.context.get("venue_name", "")

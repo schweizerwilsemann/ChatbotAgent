@@ -325,6 +325,47 @@ class _BillingScreenState extends ConsumerState<BillingScreen> {
   }
 }
 
+class _PaymentBadge extends StatelessWidget {
+  final String paymentStatus;
+
+  const _PaymentBadge({required this.paymentStatus});
+
+  @override
+  Widget build(BuildContext context) {
+    final isPaid = paymentStatus.startsWith('paid');
+    final isFailed = paymentStatus == 'failed';
+    final color = isPaid
+        ? AppColors.success
+        : isFailed
+            ? AppColors.error
+            : AppColors.textHint;
+    final method = isPaid && paymentStatus.contains('_')
+        ? paymentStatus.split('_').last.toUpperCase()
+        : '';
+    final label = isPaid
+        ? (method.isNotEmpty ? 'Đã thanh toán ($method)' : 'Đã thanh toán')
+        : isFailed
+            ? 'Lỗi thanh toán'
+            : 'Chưa thanh toán';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
 // ─── Summary mini card ──────────────────────────────────────────────────────
 
 class _SummaryMiniCard extends StatelessWidget {
@@ -448,21 +489,41 @@ class _OrderCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 6),
+            _PaymentBadge(paymentStatus: order.paymentStatus),
             const SizedBox(height: 10),
 
-            // Customer userId
+            // Customer info
             Row(
               children: [
                 const Icon(Icons.person,
                     size: 16, color: AppColors.textSecondary),
                 const SizedBox(width: 6),
-                Text(
-                  order.userId,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                Expanded(
+                  child: Text(
+                    (order.userName != null && order.userName!.isNotEmpty)
+                        ? order.userName!
+                        : order.userId,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                if (order.userPhone != null && order.userPhone!.isNotEmpty) ...[
+                  const SizedBox(width: 8),
+                  const Icon(Icons.phone,
+                      size: 14, color: AppColors.textSecondary),
+                  const SizedBox(width: 4),
+                  Text(
+                    order.userPhone!,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
                 if (order.resourceLabel != null &&
                     order.resourceLabel!.isNotEmpty) ...[
                   const SizedBox(width: 12),
@@ -562,16 +623,18 @@ class _OrderCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              OutlinedButton.icon(
-                onPressed: () => onStatusUpdate?.call('cancelled'),
-                icon: const Icon(Icons.close, size: 16),
-                label: const Text('Huỷ'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.error,
-                  side: const BorderSide(color: AppColors.error),
+              if (!order.isPaid) ...[
+                OutlinedButton.icon(
+                  onPressed: () => onStatusUpdate?.call('cancelled'),
+                  icon: const Icon(Icons.close, size: 16),
+                  label: const Text('Huỷ'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.error,
+                    side: const BorderSide(color: AppColors.error),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
+                const SizedBox(width: 8),
+              ],
               FilledButton.icon(
                 onPressed: () => onStatusUpdate?.call('preparing'),
                 icon: const Icon(Icons.kitchen, size: 16),
@@ -586,16 +649,18 @@ class _OrderCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              OutlinedButton.icon(
-                onPressed: () => onStatusUpdate?.call('cancelled'),
-                icon: const Icon(Icons.close, size: 16),
-                label: const Text('Huỷ'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.error,
-                  side: const BorderSide(color: AppColors.error),
+              if (!order.isPaid) ...[
+                OutlinedButton.icon(
+                  onPressed: () => onStatusUpdate?.call('cancelled'),
+                  icon: const Icon(Icons.close, size: 16),
+                  label: const Text('Huỷ'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.error,
+                    side: const BorderSide(color: AppColors.error),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
+                const SizedBox(width: 8),
+              ],
               FilledButton.icon(
                 onPressed: () => onStatusUpdate?.call('ready'),
                 icon: const Icon(Icons.check_circle, size: 16),
