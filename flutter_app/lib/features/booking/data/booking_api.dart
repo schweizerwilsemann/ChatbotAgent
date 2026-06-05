@@ -38,11 +38,19 @@ class BookingApi {
   }
 
   /// Get all bookings for a user
-  Future<List<Booking>> getBookingsByUser(String userId) async {
+  Future<List<Booking>> getBookingsByUser(
+    String userId, {
+    int limit = 10,
+    int offset = 0,
+  }) async {
     try {
       final response = await _dioClient.get<List<dynamic>>(
         ApiConstants.bookingEndpoint,
-        queryParameters: {'user_id': userId},
+        queryParameters: {
+          'user_id': userId,
+          'limit': limit,
+          'offset': offset,
+        },
       );
       if (response.data == null) return [];
       return response.data!
@@ -82,12 +90,14 @@ class BookingApi {
   Future<AvailabilityResponse> checkAvailability({
     required CourtType courtType,
     required DateTime date,
+    String? venueId,
   }) async {
     try {
       final response = await _dioClient.get<Map<String, dynamic>>(
         ApiConstants.bookingAvailabilityEndpoint,
         queryParameters: {
           'court_type': courtType.name,
+          if (venueId != null) 'venue_id': venueId,
           'date': date.toIso8601String().split('T')[0],
         },
       );

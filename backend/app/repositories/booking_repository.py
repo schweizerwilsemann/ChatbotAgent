@@ -35,6 +35,7 @@ class BookingRepository:
             start_time=start_time,
             end_time=end_time,
             status="confirmed",
+            payment_status="unpaid",
             notes=notes or None,
             total_price=total_price,
         )
@@ -47,11 +48,19 @@ class BookingRepository:
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_by_user_id(self, user_id: str) -> list[Booking]:
+    async def get_by_user_id(
+        self,
+        user_id: str,
+        *,
+        limit: int = 10,
+        offset: int = 0,
+    ) -> list[Booking]:
         stmt = (
             select(Booking)
             .where(Booking.user_id == user_id)
-            .order_by(Booking.start_time.desc())
+            .order_by(Booking.updated_at.desc(), Booking.created_at.desc())
+            .offset(offset)
+            .limit(limit)
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
@@ -63,6 +72,18 @@ class BookingRepository:
         booking.status = "cancelled"
         await self._session.flush()
         await self._session.refresh(booking)  
+        return booking
+
+    async def update_payment_status(
+        self,
+        booking_id: str,
+        payment_status: str,
+    ) -> Booking | None:
+        booking = await self.get_by_id(booking_id)
+        if not booking:
+            return None
+        booking.payment_status = payment_status
+        await self._session.flush()
         return booking
 
     async def check_conflict(

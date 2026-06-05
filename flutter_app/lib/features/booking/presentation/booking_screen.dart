@@ -30,6 +30,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   DateTime _selectedDate = DateTime.now();
   String? _selectedStartTime;
   String? _selectedEndTime;
+  final ScrollController _scrollController = ScrollController();
   final TextEditingController _courtNumberController = TextEditingController(
     text: '1',
   );
@@ -37,6 +38,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_handleScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadBookings();
       _syncCourtTypeWithVenue();
@@ -46,36 +48,75 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   @override
   void dispose() {
+    _scrollController
+      ..removeListener(_handleScroll)
+      ..dispose();
     _courtNumberController.dispose();
     super.dispose();
   }
 
-  void _loadBookings() {
-    ref.read(bookingProvider.notifier).loadBookings(_currentUserId);
+  Future<void> _loadBookings() {
+    return ref.read(bookingProvider.notifier).loadBookings(_currentUserId);
+  }
+
+  void _handleScroll() {
+    if (!_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 240) {
+      ref.read(bookingProvider.notifier).loadMoreBookings(_currentUserId);
+    }
   }
 
   String get _currentUserId =>
       ref.read(authStateProvider).valueOrNull?.id ?? 'current_user';
 
-  void _syncCourtTypeWithVenue() {
-    final resources = ref.read(venueResourcesProvider).valueOrNull ?? [];
-    if (resources.isNotEmpty) {
-      final sportTypes =
-          resources.map((r) => r.sportType).whereType<String>().toSet();
-      final matched =
-          CourtType.values.where((ct) => sportTypes.contains(ct.name)).toList();
-      if (matched.isNotEmpty) {
-        final newType = matched.first;
-        if (newType != _selectedCourtType || _selectedResource == null) {
-          setState(() {
-            _selectedCourtType = newType;
-            _selectedResource = null;
-            _selectedStartTime = null;
-            _selectedEndTime = null;
-          });
-        }
+  VenueResource? _resourceForCourtType(
+    List<VenueResource> resources,
+    CourtType courtType,
+  ) {
+    final matching = resources
+        .where((resource) => resource.sportType == courtType.name)
+        .toList();
+    final selectedResourceId = _selectedResource?.id;
+    if (selectedResourceId != null) {
+      for (final resource in matching) {
+        if (resource.id == selectedResourceId) return resource;
       }
     }
+    return matching.isEmpty ? null : matching.first;
+  }
+
+  bool _syncCourtTypeWithVenue([List<VenueResource>? resourcesOverride]) {
+    final resources =
+        resourcesOverride ?? ref.read(venueResourcesProvider).valueOrNull ?? [];
+    if (resources.isEmpty) return false;
+
+    final sportTypes =
+        resources.map((r) => r.sportType).whereType<String>().toSet();
+    final availableTypes =
+        CourtType.values.where((ct) => sportTypes.contains(ct.name)).toList();
+    if (availableTypes.isEmpty) return false;
+
+    final nextType = availableTypes.contains(_selectedCourtType)
+        ? _selectedCourtType
+        : availableTypes.first;
+    final nextResource = _resourceForCourtType(resources, nextType);
+    final shouldUpdate = nextType != _selectedCourtType ||
+        nextResource?.id != _selectedResource?.id;
+
+    if (shouldUpdate) {
+      setState(() {
+        _selectedCourtType = nextType;
+        _selectedResource = nextResource;
+        if (nextResource != null) {
+          _courtNumberController.text = nextResource.number.toString();
+        }
+        _selectedStartTime = null;
+        _selectedEndTime = null;
+      });
+    }
+
+    return shouldUpdate;
   }
 
   /// Returns only the court types available at the selected venue.
@@ -93,9 +134,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   void _checkAvailability() {
-    ref
-        .read(bookingProvider.notifier)
-        .checkAvailability(courtType: _selectedCourtType, date: _selectedDate);
+    final selectedVenue = ref.read(selectedVenueProvider);
+    ref.read(bookingProvider.notifier).checkAvailability(
+          courtType: _selectedCourtType,
+          date: _selectedDate,
+          venueId: selectedVenue?.id,
+        );
   }
 
   List<String> _generateTimeSlots() {
@@ -142,17 +186,21 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       return;
     }
 
+    final resources = ref.read(venueResourcesProvider).valueOrNull ?? [];
+    final selectedVenue = ref.read(selectedVenueProvider);
+    final selectedResource = _selectedResource ??
+        _resourceForCourtType(resources, _selectedCourtType);
     final courtNumber =
-        _selectedResource?.number ?? int.tryParse(_courtNumberController.text);
+        selectedResource?.number ?? int.tryParse(_courtNumberController.text);
     if (courtNumber == null || courtNumber < 1) {
       AppSnackBar.showWarning(context, 'Vui lòng chọn bàn / sân hợp lệ.');
       return;
     }
 
     final booking = BookingCreate(
-      venueId: _selectedResource?.venueId,
-      resourceId: _selectedResource?.id,
-      resourceLabel: _selectedResource?.displayLabel,
+      venueId: selectedResource?.venueId ?? selectedVenue?.id,
+      resourceId: selectedResource?.id,
+      resourceLabel: selectedResource?.displayLabel,
       courtType: _selectedCourtType,
       courtNumber: courtNumber,
       date: _selectedDate,
@@ -246,6 +294,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       orderId: orderId,
       amount: amount,
       description: 'Dat san $label',
+      orderType: 'booking',
     );
 
     if (success && mounted) {
@@ -254,6 +303,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         context.push('/stripe-checkout', extra: {
           'checkoutUrl': stripeState.checkoutUrl!,
           'orderId': orderId,
+          'orderType': 'booking',
         });
       }
     } else if (mounted) {
@@ -271,6 +321,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       orderId: orderId,
       amount: amount,
       description: 'Dat san $label',
+      orderType: 'booking',
     );
 
     if (paymentSuccess && mounted) {
@@ -279,6 +330,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         context.push('/payment', extra: {
           'paymentUrl': paymentState.paymentUrl!,
           'orderId': orderId,
+          'orderType': 'booking',
         });
       }
     } else if (mounted) {
@@ -291,6 +343,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(venuesProvider);
     final bookingState = ref.watch(bookingProvider);
 
     // Listen for errors and success messages
@@ -310,10 +363,27 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     ref.listen(selectedVenueProvider, (previous, next) {
       if (previous?.id != next?.id) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          _syncCourtTypeWithVenue();
-          _checkAvailability();
+          if (!mounted) return;
+          setState(() {
+            _selectedResource = null;
+            _selectedStartTime = null;
+            _selectedEndTime = null;
+          });
         });
       }
+    });
+
+    ref.listen<AsyncValue<List<VenueResource>>>(venueResourcesProvider, (
+      previous,
+      next,
+    ) {
+      final resources = next.valueOrNull;
+      if (resources == null) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _syncCourtTypeWithVenue(resources);
+        _checkAvailability();
+      });
     });
 
     final availableTypes = _availableCourtTypes();
@@ -324,11 +394,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       appBar: AppBar(title: const Text('Đặt sân')),
       body: RefreshIndicator(
         onRefresh: () async {
-          _loadBookings();
+          await _loadBookings();
           _syncCourtTypeWithVenue();
           _checkAvailability();
         },
         child: SingleChildScrollView(
+          controller: _scrollController,
           physics: const BouncingScrollPhysics(
             parent: AlwaysScrollableScrollPhysics(),
           ),
@@ -386,7 +457,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   label: bookingState.isCreating
                       ? 'Đang xử lý...'
                       : 'Xác nhận đặt sân',
-                  backgroundColor: _getCourtTypeColor(_selectedCourtType),
+                  backgroundColor: AppColors.primary,
                 ),
                 const SizedBox(height: 32),
 
@@ -653,10 +724,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             .where((resource) => resource.sportType == _selectedCourtType.name)
             .toList();
         if (filtered.isEmpty) return _buildLegacyCourtNumberInput();
-        final selected = filtered
-            .where((resource) => resource.id == _selectedResource?.id)
-            .firstOrNull;
+        final selected = _resourceForCourtType(filtered, _selectedCourtType);
         return DropdownButtonFormField<VenueResource>(
+          key: ValueKey('${_selectedCourtType.name}-${selected?.id ?? 'none'}'),
           initialValue: selected,
           isExpanded: true,
           decoration: const InputDecoration(
@@ -761,8 +831,24 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: bookingState.bookings.length,
+      itemCount:
+          bookingState.bookings.length + (bookingState.isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
+        if (index >= bookingState.bookings.length) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 18),
+            child: Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+          );
+        }
         final booking = bookingState.bookings[index];
         return _BookingCard(
           booking: booking,
@@ -788,6 +874,58 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     if (confirmed == true) {
       ref.read(bookingProvider.notifier).cancelBooking(booking.id);
     }
+  }
+}
+
+class _PaymentBadge extends StatelessWidget {
+  final String paymentStatus;
+
+  const _PaymentBadge({required this.paymentStatus});
+
+  @override
+  Widget build(BuildContext context) {
+    final isPaid = paymentStatus.startsWith('paid');
+    final isFailed = paymentStatus == 'failed';
+    final color = isPaid
+        ? AppColors.success
+        : isFailed
+            ? AppColors.error
+            : AppColors.textHint;
+    final method = isPaid && paymentStatus.contains('_')
+        ? paymentStatus.split('_').last.toUpperCase()
+        : '';
+    final label = isPaid
+        ? (method.isNotEmpty ? 'Đã thanh toán ($method)' : 'Đã thanh toán')
+        : isFailed
+            ? 'Thanh toán lỗi'
+            : 'Chưa thanh toán';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isPaid ? Icons.verified_outlined : Icons.payments_outlined,
+            size: 13,
+            color: color,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -838,23 +976,30 @@ class _BookingCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    booking.status.displayName,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: statusColor,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        booking.status.displayName,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: statusColor,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 4),
+                    _PaymentBadge(paymentStatus: booking.paymentStatus),
+                  ],
                 ),
               ],
             ),
@@ -875,8 +1020,9 @@ class _BookingCard extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                if (booking.status == BookingStatus.pending ||
-                    booking.status == BookingStatus.confirmed)
+                if (!booking.isPaid &&
+                    (booking.status == BookingStatus.pending ||
+                        booking.status == BookingStatus.confirmed))
                   TextButton.icon(
                     onPressed: onCancel,
                     icon: const Icon(Icons.cancel_outlined, size: 18),

@@ -6,11 +6,16 @@ import 'package:sports_venue_chatbot/features/booking/data/booking_models.dart';
 abstract class IBookingRepository {
   Future<Booking> createBooking(BookingCreate booking);
   Future<Booking> getBookingById(String bookingId);
-  Future<List<Booking>> getBookingsByUser(String userId);
+  Future<List<Booking>> getBookingsByUser(
+    String userId, {
+    int limit,
+    int offset,
+  });
   Future<Booking> cancelBooking(String bookingId);
   Future<AvailabilityResponse> checkAvailability({
     required CourtType courtType,
     required DateTime date,
+    String? venueId,
   });
   Future<Booking> updateBooking(String bookingId, BookingUpdate update);
 }
@@ -56,9 +61,17 @@ class BookingRepository implements IBookingRepository {
   }
 
   @override
-  Future<List<Booking>> getBookingsByUser(String userId) async {
+  Future<List<Booking>> getBookingsByUser(
+    String userId, {
+    int limit = 10,
+    int offset = 0,
+  }) async {
     try {
-      return await _bookingApi.getBookingsByUser(userId);
+      return await _bookingApi.getBookingsByUser(
+        userId,
+        limit: limit,
+        offset: offset,
+      );
     } on ApiException {
       rethrow;
     } catch (e) {
@@ -87,11 +100,13 @@ class BookingRepository implements IBookingRepository {
   Future<AvailabilityResponse> checkAvailability({
     required CourtType courtType,
     required DateTime date,
+    String? venueId,
   }) async {
     try {
       return await _bookingApi.checkAvailability(
         courtType: courtType,
         date: date,
+        venueId: venueId,
       );
     } on ApiException {
       rethrow;

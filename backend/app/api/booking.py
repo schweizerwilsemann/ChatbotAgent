@@ -94,6 +94,8 @@ async def check_availability(
 @router.get("", response_model=list[BookingResponse])
 async def get_bookings(
     user_id: str | None = Query(None, description="User ID"),
+    limit: int = Query(10, ge=1, le=100, description="Maximum rows to return"),
+    offset: int = Query(0, ge=0, description="Rows to skip"),
     user: User = Depends(get_current_user),
     service: BookingService = Depends(_get_booking_service),
 ) -> list[BookingResponse]:
@@ -103,7 +105,11 @@ async def get_bookings(
         target_user_id = (
             user_id if role_value in {"STAFF", "ADMIN"} and user_id else str(user.id)
         )
-        return await service.get_user_bookings(target_user_id)
+        return await service.get_user_bookings(
+            target_user_id,
+            limit=limit,
+            offset=offset,
+        )
     except Exception as exc:
         logger.exception("Error fetching user bookings")
         raise HTTPException(status_code=500, detail="Internal server error") from exc
@@ -126,6 +132,8 @@ async def get_day_availability(
 @router.get("/user/{user_id}", response_model=list[BookingResponse])
 async def get_user_bookings(
     user_id: str,
+    limit: int = Query(10, ge=1, le=100, description="Maximum rows to return"),
+    offset: int = Query(0, ge=0, description="Rows to skip"),
     user: User = Depends(get_current_user),
     service: BookingService = Depends(_get_booking_service),
 ) -> list[BookingResponse]:
@@ -136,7 +144,11 @@ async def get_user_bookings(
             raise HTTPException(
                 status_code=403, detail="Cannot access another user's bookings"
             )
-        bookings = await service.get_user_bookings(user_id)
+        bookings = await service.get_user_bookings(
+            user_id,
+            limit=limit,
+            offset=offset,
+        )
         return bookings
     except HTTPException:
         raise

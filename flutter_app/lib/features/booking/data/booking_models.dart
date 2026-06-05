@@ -76,6 +76,7 @@ class Booking {
   final String startTime;
   final String endTime;
   final BookingStatus status;
+  final String paymentStatus;
   final double? totalPrice;
   final String? notes;
   final DateTime createdAt;
@@ -93,6 +94,7 @@ class Booking {
     required this.startTime,
     required this.endTime,
     required this.status,
+    this.paymentStatus = 'unpaid',
     this.totalPrice,
     this.notes,
     required this.createdAt,
@@ -103,6 +105,8 @@ class Booking {
       _$BookingFromJson(json);
 
   Map<String, dynamic> toJson() => _$BookingToJson(this);
+
+  bool get isPaid => paymentStatus.startsWith('paid');
 
   Booking copyWith({
     String? id,
@@ -116,6 +120,7 @@ class Booking {
     String? startTime,
     String? endTime,
     BookingStatus? status,
+    String? paymentStatus,
     double? totalPrice,
     String? notes,
     DateTime? createdAt,
@@ -133,6 +138,7 @@ class Booking {
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       status: status ?? this.status,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
       totalPrice: totalPrice ?? this.totalPrice,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,

@@ -60,6 +60,7 @@ class BookingResponse(BaseModel):
     start_time: str
     end_time: str
     status: str
+    payment_status: str = "unpaid"
     total_price: float | None = None
     notes: str | None = None
     created_at: datetime | None = None

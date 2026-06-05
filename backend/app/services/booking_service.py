@@ -139,9 +139,19 @@ class BookingService:
             return None
         return self._to_response(booking)
 
-    async def get_user_bookings(self, user_id: str) -> list[BookingResponse]:
+    async def get_user_bookings(
+        self,
+        user_id: str,
+        *,
+        limit: int = 10,
+        offset: int = 0,
+    ) -> list[BookingResponse]:
         """Get all bookings for a user."""
-        bookings = await self._repo.get_by_user_id(user_id)
+        bookings = await self._repo.get_by_user_id(
+            user_id,
+            limit=limit,
+            offset=offset,
+        )
         return [self._to_response(b) for b in bookings]
 
     async def get_active_user_booking(self, user_id: str) -> BookingResponse | None:
@@ -162,6 +172,10 @@ class BookingService:
 
         if booking.status == "completed":
             raise ValueError("Cannot cancel a completed booking")
+
+        ps = getattr(booking, "payment_status", None) or ""
+        if ps.startswith("paid"):
+            raise ValueError("Paid bookings cannot be cancelled without a refund flow")
 
         cancelled = await self._repo.cancel(booking_id)
         if not cancelled:
@@ -274,6 +288,7 @@ class BookingService:
             start_time=start_local.strftime("%H:%M"),
             end_time=end_local.strftime("%H:%M"),
             status=booking.status,
+            payment_status=getattr(booking, "payment_status", None) or "unpaid",
             total_price=float(booking.total_price) if booking.total_price is not None else None,
             notes=booking.notes,
             created_at=booking.created_at if hasattr(booking, "created_at") else None,

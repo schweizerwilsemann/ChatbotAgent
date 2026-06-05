@@ -9,6 +9,8 @@ class BookingState {
   final List<Booking> bookings;
   final AvailabilityResponse? availability;
   final bool isLoading;
+  final bool isLoadingMore;
+  final bool hasMore;
   final bool isCreating;
   final String? error;
   final String? successMessage;
@@ -18,6 +20,8 @@ class BookingState {
     this.bookings = const [],
     this.availability,
     this.isLoading = false,
+    this.isLoadingMore = false,
+    this.hasMore = true,
     this.isCreating = false,
     this.error,
     this.successMessage,
@@ -28,6 +32,8 @@ class BookingState {
     List<Booking>? bookings,
     AvailabilityResponse? availability,
     bool? isLoading,
+    bool? isLoadingMore,
+    bool? hasMore,
     bool? isCreating,
     String? error,
     String? successMessage,
@@ -39,47 +45,80 @@ class BookingState {
   }) {
     return BookingState(
       bookings: bookings ?? this.bookings,
-      availability: clearAvailability
-          ? null
-          : (availability ?? this.availability),
+      availability:
+          clearAvailability ? null : (availability ?? this.availability),
       isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasMore: hasMore ?? this.hasMore,
       isCreating: isCreating ?? this.isCreating,
       error: clearError ? null : (error ?? this.error),
-      successMessage: clearSuccess
+      successMessage:
+          clearSuccess ? null : (successMessage ?? this.successMessage),
+      lastCreatedBooking: clearLastCreated
           ? null
-          : (successMessage ?? this.successMessage),
-      lastCreatedBooking:
-          clearLastCreated ? null : (lastCreatedBooking ?? this.lastCreatedBooking),
+          : (lastCreatedBooking ?? this.lastCreatedBooking),
     );
   }
 }
 
 /// Booking StateNotifier managing the booking state
 class BookingNotifier extends StateNotifier<BookingState> {
+  static const int _pageSize = 10;
+
   final BookingRepository _repository;
 
   BookingNotifier(this._repository) : super(const BookingState());
 
   /// Load user's bookings
-  Future<void> loadBookings(String userId) async {
-    state = state.copyWith(isLoading: true, clearError: true);
+  Future<void> loadBookings(String userId, {bool reset = true}) async {
+    if (!reset) {
+      if (state.isLoading || state.isLoadingMore || !state.hasMore) return;
+      state = state.copyWith(isLoadingMore: true, clearError: true);
+    } else {
+      state = state.copyWith(
+        isLoading: true,
+        isLoadingMore: false,
+        hasMore: true,
+        clearError: true,
+      );
+    }
+
     try {
-      final bookings = await _repository.getBookingsByUser(userId);
-      state = state.copyWith(bookings: bookings, isLoading: false);
+      final bookings = await _repository.getBookingsByUser(
+        userId,
+        limit: _pageSize,
+        offset: reset ? 0 : state.bookings.length,
+      );
+      state = state.copyWith(
+        bookings: reset ? bookings : [...state.bookings, ...bookings],
+        isLoading: false,
+        isLoadingMore: false,
+        hasMore: bookings.length == _pageSize,
+      );
     } on ApiException catch (e) {
-      state = state.copyWith(isLoading: false, error: e.message);
+      state = state.copyWith(
+        isLoading: false,
+        isLoadingMore: false,
+        error: e.message,
+      );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
+        isLoadingMore: false,
         error: 'Không thể tải danh sách đặt sân.',
       );
     }
+  }
+
+  Future<void> loadMoreBookings(String userId) {
+    return loadBookings(userId, reset: false);
   }
 
   /// Check availability for a court type and date
   Future<void> checkAvailability({
     required CourtType courtType,
     required DateTime date,
+    String? venueId,
   }) async {
     state = state.copyWith(
       isLoading: true,
@@ -90,6 +129,7 @@ class BookingNotifier extends StateNotifier<BookingState> {
       final availability = await _repository.checkAvailability(
         courtType: courtType,
         date: date,
+        venueId: venueId,
       );
       state = state.copyWith(availability: availability, isLoading: false);
     } on ApiException catch (e) {

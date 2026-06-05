@@ -39,6 +39,11 @@ class Booking(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         nullable=False,
         server_default="confirmed",
     )
+    payment_status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        server_default="unpaid",
+    )
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     total_price: Mapped[float | None] = mapped_column(
         Numeric(precision=12, scale=2), nullable=True, default=None
