@@ -11,6 +11,7 @@ class ChatMessage {
   final List<String>? toolsUsed;
   final String? sessionId;
   final bool isStreaming;
+  final Map<String, dynamic>? metadata;
 
   const ChatMessage({
     required this.id,
@@ -20,6 +21,7 @@ class ChatMessage {
     this.toolsUsed,
     this.sessionId,
     this.isStreaming = false,
+    this.metadata,
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) =>
@@ -35,6 +37,7 @@ class ChatMessage {
     List<String>? toolsUsed,
     String? sessionId,
     bool? isStreaming,
+    Map<String, dynamic>? metadata,
   }) {
     return ChatMessage(
       id: id ?? this.id,
@@ -44,6 +47,7 @@ class ChatMessage {
       toolsUsed: toolsUsed ?? this.toolsUsed,
       sessionId: sessionId ?? this.sessionId,
       isStreaming: isStreaming ?? this.isStreaming,
+      metadata: metadata ?? this.metadata,
     );
   }
 
@@ -65,6 +69,7 @@ class ChatMessage {
     required String content,
     List<String>? toolsUsed,
     String? sessionId,
+    Map<String, dynamic>? metadata,
   }) {
     return ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -73,6 +78,7 @@ class ChatMessage {
       timestamp: DateTime.now(),
       toolsUsed: toolsUsed,
       sessionId: sessionId,
+      metadata: metadata,
     );
   }
 }

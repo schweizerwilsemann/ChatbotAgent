@@ -193,6 +193,29 @@ async def order_menu_items(items: str, notes: str = "") -> str:
                 f"📍 Vị trí: {order.resource_label}\n" if order.resource_label else ""
             )
 
+            # Set structured metadata for the chat UI
+            chat_context["order_metadata"] = {
+                "type": "order",
+                "id": str(order.id),
+                "items": [
+                    {
+                        "name": item.item_name,
+                        "quantity": item.quantity,
+                        "unit_price": item.unit_price,
+                        "total_price": item.unit_price * item.quantity,
+                    }
+                    for item in order.items
+                ],
+                "total_price": order.total_price,
+                "payment_status": order.payment_status or "unpaid",
+                "venue_name": selected_venue_name or "",
+                "resource_label": order.resource_label or "",
+                "table_number": order.table_number,
+                "notes": notes or "",
+                "customer_name": chat_context.get("user_name", ""),
+                "customer_phone": chat_context.get("user_phone", ""),
+            }
+
             return (
                 f"✅ Đặt hàng thành công!\n"
                 f"{venue_text}"

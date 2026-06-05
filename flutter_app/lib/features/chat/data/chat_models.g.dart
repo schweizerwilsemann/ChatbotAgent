@@ -16,6 +16,7 @@ ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) => ChatMessage(
           .toList(),
       sessionId: json['session_id'] as String?,
       isStreaming: json['is_streaming'] as bool? ?? false,
+      metadata: json['metadata'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$ChatMessageToJson(ChatMessage instance) =>
@@ -27,6 +28,7 @@ Map<String, dynamic> _$ChatMessageToJson(ChatMessage instance) =>
       'tools_used': instance.toolsUsed,
       'session_id': instance.sessionId,
       'is_streaming': instance.isStreaming,
+      'metadata': instance.metadata,
     };
 
 ChatResponse _$ChatResponseFromJson(Map<String, dynamic> json) => ChatResponse(

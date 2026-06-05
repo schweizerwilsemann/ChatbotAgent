@@ -59,6 +59,7 @@ class ChatService:
             response=agent_response.output,
             session_id=session_id,
             tools_used=agent_response.tools_used,
+            metadata=agent_response.metadata,
         )
 
     @classmethod

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/features/chat/data/chat_models.dart';
+import 'package:sports_venue_chatbot/features/chat/presentation/widgets/order_card.dart';
 import 'package:sports_venue_chatbot/shared/utils/date_utils.dart';
 
 class ChatBubble extends StatelessWidget {
@@ -128,6 +129,9 @@ class ChatBubble extends StatelessWidget {
                           message.toolsUsed!.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         _buildToolBadges(),
+                      ],
+                      if (!isUser && message.metadata != null) ...[
+                        OrderCard(metadata: message.metadata!),
                       ],
                     ],
                   ),
@@ -262,7 +266,7 @@ class ChatBubble extends StatelessWidget {
       case 'menu':
       case 'get_menu':
       case 'search_menu':
-        return 'Thực đơn';
+        return 'Dịch vụ';
       case 'order':
       case 'create_order':
       case 'order_menu_items':

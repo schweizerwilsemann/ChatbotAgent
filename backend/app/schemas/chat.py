@@ -17,3 +17,6 @@ class ChatResponse(BaseModel):
     tools_used: list[str] = Field(
         default_factory=list, description="List of tools invoked"
     )
+    metadata: dict | None = Field(
+        None, description="Structured data from tools (booking/order info)"
+    )

@@ -221,6 +221,25 @@ async def book_court(
                 f"{_resource_kind(normalized_court_type)} số {booking.court_number}"
             )
             venue_text = f"\n📍 Quán: {selected_venue_name}" if selected_venue_name else ""
+
+            # Set structured metadata for the chat UI
+            chat_context["order_metadata"] = {
+                "type": "booking",
+                "id": str(booking.id),
+                "label": display_label,
+                "court_type": normalized_court_type,
+                "court_number": booking.court_number,
+                "time": (
+                    f"{start_dt.strftime('%H:%M')} - "
+                    f"{end_dt.strftime('%H:%M')} {start_dt.strftime('%d/%m/%Y')}"
+                ),
+                "total_price": booking.total_price or 0,
+                "payment_status": booking.payment_status or "unpaid",
+                "venue_name": selected_venue_name or "",
+                "customer_name": chat_context.get("user_name", ""),
+                "customer_phone": chat_context.get("user_phone", ""),
+            }
+
             return (
                 f"✅ Đặt sân thành công!{venue_text}\n"
                 f"📍 Sân/Bàn: {display_label}\n"

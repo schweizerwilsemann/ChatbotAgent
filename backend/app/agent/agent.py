@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 class AgentResponse:
     output: str
     tools_used: list[str] = field(default_factory=list)
+    metadata: dict | None = None
 
 
 class VenueAgent:
@@ -186,7 +187,8 @@ class VenueAgent:
             if repaired:
                 return repaired
             output = self._clean_tool_leak_text(output)
-            return AgentResponse(output=output, tools_used=tools_used)
+            metadata = self._extract_metadata()
+            return AgentResponse(output=output, tools_used=tools_used, metadata=metadata)
 
         except Exception as exc:
             if self._should_fallback_to_ollama(exc) and self._fallback_agent_executor:
@@ -208,7 +210,8 @@ class VenueAgent:
                     if repaired:
                         return repaired
                     output = self._clean_tool_leak_text(output)
-                    return AgentResponse(output=output, tools_used=tools_used)
+                    metadata = self._extract_metadata()
+                    return AgentResponse(output=output, tools_used=tools_used, metadata=metadata)
                 except Exception:
                     logger.exception(
                         "%s fallback execution failed", self._fallback_provider
@@ -293,6 +296,12 @@ class VenueAgent:
                     return cleaned
 
         return output
+
+    @staticmethod
+    def _extract_metadata() -> dict | None:
+        """Extract order/booking metadata set by tools in the chat context."""
+        ctx = current_chat_context.get() or {}
+        return ctx.get("order_metadata")
 
     @staticmethod
     def _extract_argument(output: str, argument_name: str) -> str | None:

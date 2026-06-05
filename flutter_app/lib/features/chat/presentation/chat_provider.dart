@@ -91,6 +91,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
         content: response.response,
         toolsUsed: response.toolsUsed,
         sessionId: response.sessionId,
+        metadata: response.metadata,
       );
 
       state = state.copyWith(
@@ -139,6 +140,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
         content: response.response,
         toolsUsed: response.toolsUsed,
         sessionId: response.sessionId,
+        metadata: response.metadata,
       );
 
       state = state.copyWith(
