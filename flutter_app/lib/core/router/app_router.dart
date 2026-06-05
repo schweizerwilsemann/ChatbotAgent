@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/analytics_screen.dart';
+import 'package:sports_venue_chatbot/features/payment/presentation/payment_webview_screen.dart';
+import 'package:sports_venue_chatbot/features/payment/presentation/payment_result_screen.dart';
+import 'package:sports_venue_chatbot/features/payment/presentation/stripe_checkout_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/admin_profile_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/dashboard_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/booking_management_screen.dart';
@@ -10,6 +13,7 @@ import 'package:sports_venue_chatbot/features/admin/presentation/billing_screen.
 import 'package:sports_venue_chatbot/features/admin/presentation/admin_notifications_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/resource_pricing_screen.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
+import 'package:sports_venue_chatbot/features/billing/presentation/customer_billing_screen.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/login_screen.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_screen.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/voice_agent_call_screen.dart';
@@ -20,23 +24,34 @@ import 'package:sports_venue_chatbot/features/profile/presentation/profile_scree
 import 'package:sports_venue_chatbot/features/shared/presentation/role_based_shell.dart';
 import 'package:sports_venue_chatbot/features/staff/presentation/staff_notifications_screen.dart';
 import 'package:sports_venue_chatbot/features/staff/presentation/staff_profile_screen.dart';
+import 'package:sports_venue_chatbot/shared/widgets/loading_widget.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
 
   return GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/splash',
     debugLogDiagnostics: true,
     redirect: (context, state) {
-      if (authState.isLoading) return null;
-
       final isLoggedIn = authState.valueOrNull != null;
       final userRole = authState.valueOrNull?.role.toUpperCase();
       final location = state.matchedLocation;
+      final isSplashRoute = location == '/splash';
       final isLoginRoute = location == '/login';
       final isAdminRoute = location.startsWith('/admin');
       final isStaffRoute = location.startsWith('/staff');
       final isManagementRoute = isAdminRoute || isStaffRoute;
+
+      if (authState.isLoading) {
+        return isSplashRoute ? null : '/splash';
+      }
+
+      if (isSplashRoute) {
+        if (!isLoggedIn) return '/login';
+        if (userRole == 'ADMIN') return '/admin/dashboard';
+        if (userRole == 'STAFF') return '/staff/notifications';
+        return '/home';
+      }
 
       // Not logged in → login
       if (!isLoggedIn && !isLoginRoute) return '/login';
@@ -75,6 +90,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const Scaffold(
+            body: LoadingWidget(message: 'Đang kiểm tra phiên đăng nhập...')),
+      ),
+
       // Login
       GoRoute(
         path: '/login',
@@ -109,6 +131,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'menu',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: MenuScreen()),
+          ),
+          GoRoute(
+            path: '/billing',
+            name: 'customer_billing',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: CustomerBillingScreen()),
           ),
           GoRoute(
             path: '/profile',
@@ -196,6 +224,43 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/staff/profile',
         name: 'staff_profile',
         builder: (context, state) => const StaffProfileScreen(),
+      ),
+      GoRoute(
+        path: '/payment',
+        name: 'payment',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return PaymentWebviewScreen(
+            paymentUrl: extra['paymentUrl'] as String,
+            orderId: extra['orderId'] as String,
+            orderType: extra['orderType'] as String? ?? 'booking',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/payment/result',
+        name: 'payment_result',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return PaymentResultScreen(
+            success: extra['success'] as bool? ?? false,
+            orderId: extra['orderId'] as String? ?? '',
+            orderType: extra['orderType'] as String? ?? 'booking',
+            code: extra['code'] as String?,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/stripe-checkout',
+        name: 'stripe_checkout',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return StripeCheckoutScreen(
+            checkoutUrl: extra['checkoutUrl'] as String,
+            orderId: extra['orderId'] as String,
+            orderType: extra['orderType'] as String? ?? 'booking',
+          );
+        },
       ),
       GoRoute(
         path: '/voice-agent',

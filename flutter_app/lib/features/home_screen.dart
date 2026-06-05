@@ -32,10 +32,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       route: '/booking',
     ),
     _NavigationItem(
-      icon: Icons.menu_book_outlined,
-      selectedIcon: Icons.menu_book,
-      label: 'Thực đơn',
+      icon: Icons.shopping_bag_outlined,
+      selectedIcon: Icons.shopping_bag,
+      label: 'Dịch vụ',
       route: '/menu',
+    ),
+    _NavigationItem(
+      icon: Icons.receipt_long_outlined,
+      selectedIcon: Icons.receipt_long,
+      label: 'Đơn đặt',
+      route: '/billing',
     ),
     _NavigationItem(
       icon: Icons.person_outline,
