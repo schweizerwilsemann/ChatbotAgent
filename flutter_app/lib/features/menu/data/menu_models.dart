@@ -200,6 +200,7 @@ class Order {
   final List<OrderItem> items;
   final double totalPrice;
   final OrderStatus status;
+  final String paymentStatus;
   final String? notes;
   final DateTime createdAt;
 
@@ -211,6 +212,7 @@ class Order {
     required this.items,
     required this.totalPrice,
     required this.status,
+    this.paymentStatus = 'unpaid',
     this.notes,
     required this.createdAt,
   });
@@ -226,10 +228,13 @@ class Order {
           .toList(),
       totalPrice: _toDouble(json['total_price']),
       status: $enumDecode(_$OrderStatusEnumMap, json['status']),
+      paymentStatus: json['payment_status'] as String? ?? 'unpaid',
       notes: json['notes'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
   }
 
   Map<String, dynamic> toJson() => _$OrderToJson(this);
+
+  bool get isPaid => paymentStatus.startsWith('paid');
 }

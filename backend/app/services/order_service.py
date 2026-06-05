@@ -119,9 +119,19 @@ class OrderService:
             return None
         return self._to_response(order)
 
-    async def get_user_orders(self, user_id: str) -> list[OrderResponse]:
+    async def get_user_orders(
+        self,
+        user_id: str,
+        *,
+        limit: int = 10,
+        offset: int = 0,
+    ) -> list[OrderResponse]:
         """Get all orders for a user."""
-        orders = await self._repo.get_by_user_id(user_id)
+        orders = await self._repo.get_by_user_id(
+            user_id,
+            limit=limit,
+            offset=offset,
+        )
         return [self._to_response(order) for order in orders]
 
     async def update_status(self, order_id: str, status: str) -> OrderResponse | None:
@@ -144,6 +154,10 @@ class OrderService:
                 f"Cannot transition from '{order.status}' to '{status}'. "
                 f"Allowed transitions: {allowed or 'none (terminal state)'}"
             )
+
+        ps = getattr(order, "payment_status", None) or ""
+        if status == "cancelled" and ps.startswith("paid"):
+            raise ValueError("Paid orders cannot be cancelled without a refund flow")
 
         updated = await self._repo.update_status(order_id, status)
         if not updated:
@@ -176,6 +190,7 @@ class OrderService:
             resource_label=getattr(order, "resource_label", None),
             table_number=order.table_number,
             status=order.status,
+            payment_status=getattr(order, "payment_status", None) or "unpaid",
             total_price=order.total_price,
             notes=order.notes,
             items=items,

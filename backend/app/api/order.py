@@ -55,6 +55,8 @@ async def create_order(
 @router.get("", response_model=list[OrderResponse])
 async def get_orders(
     user_id: str | None = Query(None, description="User ID"),
+    limit: int = Query(10, ge=1, le=100, description="Maximum rows to return"),
+    offset: int = Query(0, ge=0, description="Rows to skip"),
     user: User = Depends(get_current_user),
     service: OrderService = Depends(_get_order_service),
 ) -> list[OrderResponse]:
@@ -64,7 +66,11 @@ async def get_orders(
         target_user_id = (
             user_id if role_value in {"STAFF", "ADMIN"} and user_id else str(user.id)
         )
-        return await service.get_user_orders(target_user_id)
+        return await service.get_user_orders(
+            target_user_id,
+            limit=limit,
+            offset=offset,
+        )
     except Exception as exc:
         logger.exception("Error fetching user orders")
         raise HTTPException(status_code=500, detail="Internal server error") from exc

@@ -12,7 +12,11 @@ abstract class IMenuRepository {
   Future<List<MenuCategory>> getMenu();
   Future<Order> createOrder(OrderCreate order);
   Future<Order> getOrderById(String orderId);
-  Future<List<Order>> getOrdersByUser(String userId);
+  Future<List<Order>> getOrdersByUser(
+    String userId, {
+    int limit,
+    int offset,
+  });
 }
 
 /// Concrete implementation of the menu repository
@@ -75,9 +79,17 @@ class MenuRepository implements IMenuRepository {
   }
 
   @override
-  Future<List<Order>> getOrdersByUser(String userId) async {
+  Future<List<Order>> getOrdersByUser(
+    String userId, {
+    int limit = 10,
+    int offset = 0,
+  }) async {
     try {
-      return await _menuApi.getOrdersByUser(userId);
+      return await _menuApi.getOrdersByUser(
+        userId,
+        limit: limit,
+        offset: offset,
+      );
     } on ApiException {
       rethrow;
     } catch (e) {

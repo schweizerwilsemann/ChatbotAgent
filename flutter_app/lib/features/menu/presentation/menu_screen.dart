@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_spacing.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/menu/data/menu_models.dart';
 import 'package:sports_venue_chatbot/features/menu/presentation/menu_provider.dart';
+import 'package:sports_venue_chatbot/features/payment/presentation/payment_provider.dart';
+import 'package:sports_venue_chatbot/features/payment/presentation/stripe_provider.dart';
 import 'package:sports_venue_chatbot/features/venue/data/venue_models.dart';
 import 'package:sports_venue_chatbot/features/venue/presentation/venue_provider.dart';
+import 'package:sports_venue_chatbot/shared/widgets/app_confirm_dialog.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
 
 /// Vietnamese currency formatter
@@ -52,7 +57,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Thực đơn'),
+        title: const Text('Dịch vụ & sản phẩm'),
         bottom: TabBar(
           controller: _tabController,
           tabs: _categoryTabs.entries
@@ -423,8 +428,9 @@ class _CartSummaryBar extends ConsumerWidget {
     );
   }
 
-  void _showOrderConfirmation(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
+  Future<void> _showOrderConfirmation(
+      BuildContext context, WidgetRef ref) async {
+    final order = await showModalBottomSheet<Order>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -433,6 +439,130 @@ class _CartSummaryBar extends ConsumerWidget {
       ),
       builder: (_) => _OrderConfirmationSheet(cart: cart),
     );
+    if (order == null || !context.mounted) return;
+
+    AppSnackBar.showSuccess(context, 'Đặt hàng thành công!');
+    await _showPaymentDialog(context, ref, order);
+    ref.read(cartProvider.notifier).clear();
+  }
+
+  Future<void> _showPaymentDialog(
+    BuildContext context,
+    WidgetRef ref,
+    Order order,
+  ) async {
+    if (order.totalPrice <= 0) return;
+
+    final amount = order.totalPrice.round();
+    final label = order.resourceLabel != null
+        ? 'đơn hàng tại ${order.resourceLabel}'
+        : 'đơn hàng ${order.items.length} sản phẩm';
+
+    final confirmed = await AppConfirmDialog.show(
+      context: context,
+      title: 'Thanh toán đơn hàng',
+      content:
+          'Bạn có muốn thanh toán $label?\nTổng: ${_vndFormat.format(amount)}',
+      confirmLabel: 'Thanh toán',
+      cancelLabel: 'Để sau',
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final paymentMethod = await _showPaymentMethodDialog(context);
+    if (paymentMethod == null || !context.mounted) return;
+
+    if (paymentMethod == 'stripe') {
+      await _processStripePayment(context, ref, order.id, amount, label);
+    } else {
+      await _processVnpayPayment(context, ref, order.id, amount, label);
+    }
+  }
+
+  Future<String?> _showPaymentMethodDialog(BuildContext context) async {
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Chọn phương thức thanh toán'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.credit_card, color: AppColors.primary),
+              title: const Text('Stripe (Thẻ quốc tế)'),
+              subtitle: const Text('Visa, Mastercard, JCB'),
+              onTap: () => Navigator.pop(context, 'stripe'),
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.account_balance, color: AppColors.success),
+              title: const Text('VNPay (Ngân hàng VN)'),
+              subtitle: const Text('ATM, Internet Banking, QR'),
+              onTap: () => Navigator.pop(context, 'vnpay'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _processStripePayment(
+    BuildContext context,
+    WidgetRef ref,
+    String orderId,
+    int amount,
+    String label,
+  ) async {
+    final stripeNotifier = ref.read(stripeProvider.notifier);
+    final success = await stripeNotifier.createCheckout(
+      orderId: orderId,
+      amount: amount,
+      description: 'Thanh toan $label',
+      orderType: 'order',
+    );
+
+    if (success && context.mounted) {
+      final stripeState = ref.read(stripeProvider);
+      if (stripeState.checkoutUrl != null) {
+        context.push('/stripe-checkout', extra: {
+          'checkoutUrl': stripeState.checkoutUrl!,
+          'orderId': orderId,
+          'orderType': 'order',
+        });
+      }
+    } else if (context.mounted) {
+      final error = ref.read(stripeProvider).error;
+      if (error != null) AppSnackBar.showError(context, error);
+    }
+  }
+
+  Future<void> _processVnpayPayment(
+    BuildContext context,
+    WidgetRef ref,
+    String orderId,
+    int amount,
+    String label,
+  ) async {
+    final notifier = ref.read(paymentProvider.notifier);
+    final paymentSuccess = await notifier.createPayment(
+      orderId: orderId,
+      amount: amount,
+      description: 'Thanh toan $label',
+      orderType: 'order',
+    );
+
+    if (paymentSuccess && context.mounted) {
+      final paymentState = ref.read(paymentProvider);
+      if (paymentState.paymentUrl != null) {
+        context.push('/payment', extra: {
+          'paymentUrl': paymentState.paymentUrl!,
+          'orderId': orderId,
+          'orderType': 'order',
+        });
+      }
+    } else if (context.mounted) {
+      final error = ref.read(paymentProvider).error;
+      if (error != null) AppSnackBar.showError(context, error);
+    }
   }
 }
 
@@ -636,13 +766,9 @@ class _OrderConfirmationSheetState
         await ref.read(createOrderProvider.notifier).createOrder(orderCreate);
 
     if (success && mounted) {
-      ref.read(cartProvider.notifier).clear();
-      Navigator.of(context).pop(); // dismiss bottom sheet
-
-      AppSnackBar.showSuccess(context, 'Đặt hàng thành công! 🎉');
-
-      // Reset order state after showing success
+      final createdOrder = ref.read(createOrderProvider).order;
       ref.read(createOrderProvider.notifier).reset();
+      Navigator.of(context).pop(createdOrder);
     }
   }
 }

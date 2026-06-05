@@ -92,11 +92,19 @@ class MenuApi {
   }
 
   /// Get all orders for a user
-  Future<List<Order>> getOrdersByUser(String userId) async {
+  Future<List<Order>> getOrdersByUser(
+    String userId, {
+    int limit = 10,
+    int offset = 0,
+  }) async {
     try {
       final response = await _dioClient.get<List<dynamic>>(
         ApiConstants.orderEndpoint,
-        queryParameters: {'user_id': userId},
+        queryParameters: {
+          'user_id': userId,
+          'limit': limit,
+          'offset': offset,
+        },
       );
       if (response.data == null) return [];
       return response.data!

@@ -31,6 +31,7 @@ class OrderRepository:
             resource_label=resource_label,
             table_number=table_number,
             status="pending",
+            payment_status="unpaid",
             total_price=Decimal("0"),
             notes=notes or None,
         )
@@ -75,12 +76,20 @@ class OrderRepository:
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_by_user_id(self, user_id: str) -> list[Order]:
+    async def get_by_user_id(
+        self,
+        user_id: str,
+        *,
+        limit: int = 10,
+        offset: int = 0,
+    ) -> list[Order]:
         stmt = (
             select(Order)
             .options(selectinload(Order.items))
             .where(Order.user_id == user_id)
-            .order_by(Order.created_at.desc())
+            .order_by(Order.updated_at.desc(), Order.created_at.desc())
+            .offset(offset)
+            .limit(limit)
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
@@ -90,6 +99,18 @@ class OrderRepository:
         if not order:
             return None
         order.status = status
+        await self._session.flush()
+        return order
+
+    async def update_payment_status(
+        self,
+        order_id: str,
+        payment_status: str,
+    ) -> Order | None:
+        order = await self.get_by_id(order_id)
+        if not order:
+            return None
+        order.payment_status = payment_status
         await self._session.flush()
         return order
 

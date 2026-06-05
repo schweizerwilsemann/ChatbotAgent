@@ -1,5 +1,4 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element
 
 part of 'menu_models.dart';
 
@@ -99,6 +98,7 @@ Order _$OrderFromJson(Map<String, dynamic> json) => Order(
           .toList(),
       totalPrice: (json['total_price'] as num).toDouble(),
       status: $enumDecode(_$OrderStatusEnumMap, json['status']),
+      paymentStatus: json['payment_status'] as String? ?? 'unpaid',
       notes: json['notes'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
@@ -111,6 +111,7 @@ Map<String, dynamic> _$OrderToJson(Order instance) => <String, dynamic>{
       'items': instance.items,
       'total_price': instance.totalPrice,
       'status': _$OrderStatusEnumMap[instance.status]!,
+      'payment_status': instance.paymentStatus,
       'notes': instance.notes,
       'created_at': instance.createdAt.toIso8601String(),
     };

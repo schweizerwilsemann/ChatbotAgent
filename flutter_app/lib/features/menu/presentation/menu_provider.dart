@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/network/api_exception.dart';
+import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/menu/data/menu_models.dart';
 import 'package:sports_venue_chatbot/features/menu/domain/menu_repository.dart';
 import 'package:sports_venue_chatbot/features/venue/presentation/selected_venue_provider.dart';
@@ -13,6 +14,103 @@ final menuProvider = FutureProvider<List<MenuCategory>>((ref) async {
   final repository = ref.watch(menuRepositoryProvider);
   final selectedVenue = ref.watch(selectedVenueProvider);
   return repository.getMenu(venueId: selectedVenue?.id);
+});
+
+final userOrdersProvider = FutureProvider.autoDispose<List<Order>>((ref) async {
+  final user = ref.watch(authStateProvider).valueOrNull;
+  if (user == null) return const [];
+  final repository = ref.watch(menuRepositoryProvider);
+  return repository.getOrdersByUser(user.id);
+});
+
+class OrderHistoryState {
+  final List<Order> orders;
+  final bool isLoading;
+  final bool isLoadingMore;
+  final bool hasMore;
+  final String? error;
+
+  const OrderHistoryState({
+    this.orders = const [],
+    this.isLoading = false,
+    this.isLoadingMore = false,
+    this.hasMore = true,
+    this.error,
+  });
+
+  OrderHistoryState copyWith({
+    List<Order>? orders,
+    bool? isLoading,
+    bool? isLoadingMore,
+    bool? hasMore,
+    String? error,
+    bool clearError = false,
+  }) {
+    return OrderHistoryState(
+      orders: orders ?? this.orders,
+      isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasMore: hasMore ?? this.hasMore,
+      error: clearError ? null : (error ?? this.error),
+    );
+  }
+}
+
+class OrderHistoryNotifier extends StateNotifier<OrderHistoryState> {
+  static const int _pageSize = 10;
+
+  final MenuRepository _repository;
+
+  OrderHistoryNotifier(this._repository) : super(const OrderHistoryState());
+
+  Future<void> loadOrders(String userId, {bool reset = true}) async {
+    if (!reset) {
+      if (state.isLoading || state.isLoadingMore || !state.hasMore) return;
+      state = state.copyWith(isLoadingMore: true, clearError: true);
+    } else {
+      state = state.copyWith(
+        isLoading: true,
+        isLoadingMore: false,
+        hasMore: true,
+        clearError: true,
+      );
+    }
+
+    try {
+      final orders = await _repository.getOrdersByUser(
+        userId,
+        limit: _pageSize,
+        offset: reset ? 0 : state.orders.length,
+      );
+      state = state.copyWith(
+        orders: reset ? orders : [...state.orders, ...orders],
+        isLoading: false,
+        isLoadingMore: false,
+        hasMore: orders.length == _pageSize,
+      );
+    } on ApiException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        isLoadingMore: false,
+        error: e.message,
+      );
+    } catch (_) {
+      state = state.copyWith(
+        isLoading: false,
+        isLoadingMore: false,
+        error: 'Không thể tải danh sách đơn hàng.',
+      );
+    }
+  }
+
+  Future<void> loadMoreOrders(String userId) {
+    return loadOrders(userId, reset: false);
+  }
+}
+
+final orderHistoryProvider =
+    StateNotifierProvider<OrderHistoryNotifier, OrderHistoryState>((ref) {
+  return OrderHistoryNotifier(ref.watch(menuRepositoryProvider));
 });
 
 // ---------------------------------------------------------------------------

@@ -41,6 +41,11 @@ class Order(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         nullable=False,
         server_default="pending",
     )
+    payment_status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        server_default="unpaid",
+    )
     total_price: Mapped[Decimal] = mapped_column(
         Numeric(precision=12, scale=2), nullable=False, server_default="0"
     )
