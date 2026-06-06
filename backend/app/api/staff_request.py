@@ -93,6 +93,19 @@ async def get_pending_requests(
     return await service.get_pending_requests()
 
 
+@router.get("/active", response_model=list[StaffRequestResponse])
+async def get_active_requests(
+    user: User = Depends(require_roles("STAFF", "ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> list[StaffRequestResponse]:
+    """Get pending and accepted staff requests for handling."""
+    service = _get_service(session)
+    role_value = user.role.value if hasattr(user.role, "value") else str(user.role)
+    if role_value == "STAFF":
+        return await service.get_active_requests_for_staff(str(user.id))
+    return await service.get_active_requests()
+
+
 @router.patch("/{request_id}/accept", response_model=StaffRequestResponse)
 async def accept_staff_request(
     request_id: str,

@@ -7,6 +7,7 @@ from app.repositories.venue_repository import VenueRepository
 from app.schemas.notification import NotificationResponse
 from app.schemas.staff_request import StaffRequestResponse
 from app.services.notification_service import NotificationService
+from app.services.staff_chat_service import staff_chat_service
 
 logger = logging.getLogger(__name__)
 
@@ -132,7 +133,29 @@ class StaffRequestService:
         )
         return [self.to_response(r) for r in requests]
 
+    async def get_active_requests(self) -> list[StaffRequestResponse]:
+        requests = await self._repo.get_active()
+        return [self.to_response(r) for r in requests]
+
+    async def get_active_requests_for_staff(
+        self,
+        staff_id: str,
+    ) -> list[StaffRequestResponse]:
+        if not self._venue_repo:
+            return await self.get_active_requests()
+        access = await self._venue_repo.get_staff_access(staff_id)
+        if not access.has_assignments:
+            return await self.get_active_requests()
+        resource_ids = await self._venue_repo.expand_accessible_resource_ids(access)
+        requests = await self._repo.get_active_for_assignment(
+            staff_id=staff_id,
+            venue_scope_ids=access.venue_scope_ids,
+            resource_ids=resource_ids,
+        )
+        return [self.to_response(r) for r in requests]
+
     async def get_user_requests(self, user_id: str) -> list[StaffRequestResponse]:
+        await self._repo._expire_stale()
         requests = await self._repo.get_by_user(user_id)
         return [self.to_response(r) for r in requests]
 
@@ -166,18 +189,35 @@ class StaffRequestService:
             },
         )
 
+        await self._notification_service.update_request_status(
+            str(request.id), "accepted"
+        )
+
+        # Create ephemeral chat room in Redis
+        await staff_chat_service.create_room(
+            request_id=str(request.id),
+            user_id=request.user_id,
+            user_name=request.user_name,
+            staff_id=staff_id,
+            staff_name=staff_name,
+            venue_id=str(request.venue_id) if request.venue_id else None,
+            resource_label=request.resource_label,
+        )
+
         return self.to_response(request)
 
     async def complete_request(self, request_id: str) -> StaffRequestResponse:
         request = await self._repo.complete(request_id)
         if not request:
             raise ValueError("Request not found or not in accepted status")
+        await staff_chat_service.close_room(request_id)
         return self.to_response(request)
 
     async def cancel_request(self, request_id: str) -> StaffRequestResponse:
         request = await self._repo.cancel(request_id)
         if not request:
             raise ValueError("Request not found or cannot be cancelled")
+        await staff_chat_service.close_room(request_id)
         return self.to_response(request)
 
     @staticmethod

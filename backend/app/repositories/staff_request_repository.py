@@ -1,7 +1,7 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import and_, or_, select
+from sqlalchemy import and_, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.staff_request import StaffRequest
@@ -54,6 +54,16 @@ class StaffRequestRepository:
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
+    async def get_active(self, limit: int = 100) -> list[StaffRequest]:
+        stmt = (
+            select(StaffRequest)
+            .where(StaffRequest.status.in_(["pending", "accepted"]))
+            .order_by(StaffRequest.created_at.asc())
+            .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
     async def get_pending_for_assignment(
         self,
         *,
@@ -81,6 +91,49 @@ class StaffRequestRepository:
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
+    async def get_active_for_assignment(
+        self,
+        *,
+        staff_id: str,
+        venue_scope_ids: set[uuid.UUID],
+        resource_ids: set[uuid.UUID],
+        limit: int = 100,
+    ) -> list[StaffRequest]:
+        pending_scope_conditions = []
+        if venue_scope_ids:
+            pending_scope_conditions.append(
+                StaffRequest.venue_id.in_(list(venue_scope_ids))
+            )
+        if resource_ids:
+            pending_scope_conditions.append(
+                StaffRequest.resource_id.in_(list(resource_ids))
+            )
+
+        if pending_scope_conditions:
+            pending_condition = and_(
+                StaffRequest.status == "pending",
+                or_(*pending_scope_conditions),
+            )
+        else:
+            pending_condition = and_(
+                StaffRequest.status == "pending",
+                StaffRequest.resource_id.is_(None),
+            )
+
+        accepted_condition = and_(
+            StaffRequest.status == "accepted",
+            StaffRequest.accepted_by == staff_id,
+        )
+
+        stmt = (
+            select(StaffRequest)
+            .where(or_(pending_condition, accepted_condition))
+            .order_by(StaffRequest.created_at.asc())
+            .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
     async def get_by_user(self, user_id: str, limit: int = 20) -> list[StaffRequest]:
         stmt = (
             select(StaffRequest)
@@ -92,6 +145,9 @@ class StaffRequestRepository:
         return list(result.scalars().all())
 
     async def get_active_by_user(self, user_id: str) -> StaffRequest | None:
+        # Auto-expire stale accepted requests (>2 hours old)
+        await self._expire_stale()
+
         stmt = (
             select(StaffRequest)
             .where(
@@ -103,6 +159,30 @@ class StaffRequestRepository:
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def _expire_stale(self, max_age_hours: int = 2) -> None:
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=max_age_hours)
+        now = datetime.now(timezone.utc)
+        # Expire accepted requests older than max_age_hours
+        stmt = (
+            update(StaffRequest)
+            .where(
+                StaffRequest.status == "accepted",
+                StaffRequest.created_at < cutoff,
+            )
+            .values(status="completed", completed_at=now)
+        )
+        await self._session.execute(stmt)
+        # Expire pending requests older than max_age_hours
+        stmt2 = (
+            update(StaffRequest)
+            .where(
+                StaffRequest.status == "pending",
+                StaffRequest.created_at < cutoff,
+            )
+            .values(status="cancelled")
+        )
+        await self._session.execute(stmt2)
 
     async def accept(
         self, request_id: str, staff_id: str, staff_name: str | None

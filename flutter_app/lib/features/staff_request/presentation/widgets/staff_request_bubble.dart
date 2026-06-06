@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/features/booking/data/booking_api.dart';
+import 'package:sports_venue_chatbot/features/staff_chat/presentation/customer_staff_chat_screen.dart';
 import 'package:sports_venue_chatbot/features/staff_request/data/staff_request_models.dart';
 import 'package:sports_venue_chatbot/features/staff_request/presentation/staff_request_provider.dart';
 import 'package:sports_venue_chatbot/features/staff_request/presentation/widgets/call_staff_dialog.dart';
@@ -30,10 +32,24 @@ class StaffRequestBubble extends ConsumerWidget {
     });
 
     if (state.hasActiveRequest) {
+      final request = state.activeRequest!;
+      final isAccepted = request.status == StaffRequestStatus.accepted;
       return _ActiveRequestChip(
         state: state,
         onCancel: () => _handleCancelRequest(context, ref),
         onShowInfo: () => _showActiveRequestInfo(context, ref, state),
+        onTap: isAccepted
+            ? () {
+                Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(
+                    builder: (_) => CustomerStaffChatScreen(
+                      requestId: request.id,
+                      staffName: request.acceptedByName,
+                    ),
+                  ),
+                );
+              }
+            : null,
       );
     }
 
@@ -190,11 +206,13 @@ class _ActiveRequestChip extends StatelessWidget {
   final StaffRequestState state;
   final VoidCallback onCancel;
   final VoidCallback onShowInfo;
+  final VoidCallback? onTap;
 
   const _ActiveRequestChip({
     required this.state,
     required this.onCancel,
     required this.onShowInfo,
+    this.onTap,
   });
 
   @override
@@ -205,10 +223,10 @@ class _ActiveRequestChip extends StatelessWidget {
     return Material(
       elevation: 4,
       borderRadius: BorderRadius.circular(26),
-      color: isAccepted ? AppColors.success : AppColors.warning,
+      color: isAccepted ? AppColors.primary : AppColors.warning,
       child: InkWell(
         borderRadius: BorderRadius.circular(26),
-        onTap: onShowInfo,
+        onTap: onTap ?? onShowInfo,
         onLongPress: state.isLoading ? null : onCancel,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -226,14 +244,14 @@ class _ActiveRequestChip extends StatelessWidget {
                 )
               else
                 Icon(
-                  isAccepted ? Icons.person : Icons.hourglass_top,
+                  isAccepted ? Icons.chat_bubble : Icons.hourglass_top,
                   color: Colors.white,
                   size: 18,
                 ),
               const SizedBox(width: 8),
               Text(
                 isAccepted
-                    ? '${request.acceptedByName ?? "Nhân viên"} đang đến'
+                    ? 'Chat với ${request.acceptedByName ?? "Nhân viên"}'
                     : 'Đang chờ nhân viên...',
                 style: const TextStyle(
                   color: Colors.white,

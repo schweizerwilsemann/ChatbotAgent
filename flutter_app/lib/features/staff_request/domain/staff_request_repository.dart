@@ -59,6 +59,19 @@ class StaffRequestRepository {
     }
   }
 
+  Future<List<StaffRequest>> getActiveRequests() async {
+    try {
+      return await _api.getActiveRequests();
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(
+        message: 'Không thể tải danh sách yêu cầu đang xử lý.',
+        statusCode: 500,
+      );
+    }
+  }
+
   Future<StaffRequest> acceptRequest(String requestId) async {
     try {
       return await _api.acceptRequest(requestId);

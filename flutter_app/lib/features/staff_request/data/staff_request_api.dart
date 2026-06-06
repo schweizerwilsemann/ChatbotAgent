@@ -58,4 +58,13 @@ class StaffRequestApi {
         .map((item) => StaffRequest.fromJson(item as Map<String, dynamic>))
         .toList();
   }
+
+  Future<List<StaffRequest>> getActiveRequests() async {
+    final response = await _dioClient.get<List<dynamic>>(
+      '${ApiConstants.staffRequestEndpoint}/active',
+    );
+    return (response.data ?? const [])
+        .map((item) => StaffRequest.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
 }
