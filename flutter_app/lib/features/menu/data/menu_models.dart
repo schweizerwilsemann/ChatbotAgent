@@ -76,10 +76,7 @@ class OrderItemCreate {
   /// Only send item_name and quantity — the backend calculates unit_price
   /// from the menu automatically.
   Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'item_name': itemName,
-      'quantity': quantity,
-    };
+    return <String, dynamic>{'item_name': itemName, 'quantity': quantity};
   }
 }
 
@@ -154,6 +151,7 @@ class OrderCreate {
       'resource_label': resourceLabel,
       'table_number': tableNumber,
       'items': items.map((e) => e.toJson()).toList(),
+      'booking_id': bookingId,
       'notes': notes ?? '',
     };
   }
@@ -194,6 +192,7 @@ extension OrderStatusExtension on OrderStatus {
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Order {
   final String id;
+  final String? bookingId;
   final String? venueId;
   final String? resourceId;
   final String? resourceLabel;
@@ -206,6 +205,7 @@ class Order {
 
   const Order({
     required this.id,
+    this.bookingId,
     this.venueId,
     this.resourceId,
     this.resourceLabel,
@@ -220,6 +220,7 @@ class Order {
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
       id: json['id'] as String,
+      bookingId: json['booking_id'] as String?,
       venueId: json['venue_id'] as String?,
       resourceId: json['resource_id'] as String?,
       resourceLabel: json['resource_label'] as String?,

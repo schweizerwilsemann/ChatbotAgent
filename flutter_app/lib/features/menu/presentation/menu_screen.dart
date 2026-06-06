@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
+import 'package:sports_venue_chatbot/features/booking/data/booking_api.dart';
 import 'package:sports_venue_chatbot/features/menu/data/menu_models.dart';
 import 'package:sports_venue_chatbot/features/menu/presentation/menu_provider.dart';
 import 'package:sports_venue_chatbot/features/payment/presentation/payment_provider.dart';
@@ -429,13 +430,16 @@ class _CartSummaryBar extends ConsumerWidget {
   }
 
   Future<void> _showOrderConfirmation(
-      BuildContext context, WidgetRef ref) async {
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final order = await showModalBottomSheet<Order>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(AppSpacing.xl)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.xl),
+        ),
       ),
       builder: (_) => _OrderConfirmationSheet(cart: cart),
     );
@@ -493,8 +497,10 @@ class _CartSummaryBar extends ConsumerWidget {
               onTap: () => Navigator.pop(context, 'stripe'),
             ),
             ListTile(
-              leading:
-                  const Icon(Icons.account_balance, color: AppColors.success),
+              leading: const Icon(
+                Icons.account_balance,
+                color: AppColors.success,
+              ),
               title: const Text('VNPay (Ngân hàng VN)'),
               subtitle: const Text('ATM, Internet Banking, QR'),
               onTap: () => Navigator.pop(context, 'vnpay'),
@@ -513,7 +519,7 @@ class _CartSummaryBar extends ConsumerWidget {
     String label,
   ) async {
     final stripeNotifier = ref.read(stripeProvider.notifier);
-    final success = await stripeNotifier.createCheckout(
+    final success = await stripeNotifier.pay(
       orderId: orderId,
       amount: amount,
       description: 'Thanh toan $label',
@@ -521,14 +527,10 @@ class _CartSummaryBar extends ConsumerWidget {
     );
 
     if (success && context.mounted) {
-      final stripeState = ref.read(stripeProvider);
-      if (stripeState.checkoutUrl != null) {
-        context.push('/stripe-checkout', extra: {
-          'checkoutUrl': stripeState.checkoutUrl!,
-          'orderId': orderId,
-          'orderType': 'order',
-        });
-      }
+      context.go(
+        '/payment/result',
+        extra: {'success': true, 'orderId': orderId, 'orderType': 'order'},
+      );
     } else if (context.mounted) {
       final error = ref.read(stripeProvider).error;
       if (error != null) AppSnackBar.showError(context, error);
@@ -553,11 +555,14 @@ class _CartSummaryBar extends ConsumerWidget {
     if (paymentSuccess && context.mounted) {
       final paymentState = ref.read(paymentProvider);
       if (paymentState.paymentUrl != null) {
-        context.push('/payment', extra: {
-          'paymentUrl': paymentState.paymentUrl!,
-          'orderId': orderId,
-          'orderType': 'order',
-        });
+        context.push(
+          '/payment',
+          extra: {
+            'paymentUrl': paymentState.paymentUrl!,
+            'orderId': orderId,
+            'orderType': 'order',
+          },
+        );
       }
     } else if (context.mounted) {
       final error = ref.read(paymentProvider).error;
@@ -743,7 +748,11 @@ class _OrderConfirmationSheetState
 
   Future<void> _submitOrder() async {
     final resources = ref.read(venueResourcesProvider).valueOrNull ?? const [];
-    if (resources.isNotEmpty && _selectedResource == null) {
+    final activeBooking = await ref.read(bookingApiProvider).getActiveBooking();
+    if (!mounted) return;
+    if (resources.isNotEmpty &&
+        _selectedResource == null &&
+        activeBooking == null) {
       AppSnackBar.showWarning(context, 'Vui lòng chọn bàn / sân giao hàng.');
       return;
     }
@@ -752,10 +761,12 @@ class _OrderConfirmationSheetState
         ref.read(authStateProvider).valueOrNull?.id ?? 'current_user';
     final orderCreate = OrderCreate(
       userId: userId,
-      venueId: _selectedResource?.venueId,
-      resourceId: _selectedResource?.id,
-      resourceLabel: _selectedResource?.displayLabel,
-      tableNumber: _selectedResource?.number ?? 0,
+      bookingId: activeBooking?.id,
+      venueId: activeBooking?.venueId ?? _selectedResource?.venueId,
+      resourceId: activeBooking?.resourceId ?? _selectedResource?.id,
+      resourceLabel:
+          activeBooking?.resourceLabel ?? _selectedResource?.displayLabel,
+      tableNumber: activeBooking?.courtNumber ?? _selectedResource?.number ?? 0,
       items: widget.cart.toOrderItems(),
       notes: _notesController.text.trim().isEmpty
           ? null

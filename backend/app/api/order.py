@@ -7,6 +7,7 @@ from app.api.auth import get_current_user, require_roles
 from app.core.database import get_db
 from app.core.rate_limit import rate_limit
 from app.models.user import User
+from app.repositories.booking_repository import BookingRepository
 from app.repositories.menu_repository import MenuRepository
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.order_repository import OrderRepository
@@ -30,7 +31,14 @@ async def _get_order_service(
         NotificationRepository(session),
         venue_repo,
     )
-    return OrderService(repo, menu_repo, notification_service, venue_repo)
+    booking_repo = BookingRepository(session)
+    return OrderService(
+        repo,
+        menu_repo,
+        notification_service,
+        venue_repo,
+        booking_repo,
+    )
 
 
 @router.post("", response_model=OrderResponse, status_code=201)

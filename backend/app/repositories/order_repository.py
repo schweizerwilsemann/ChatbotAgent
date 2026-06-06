@@ -1,7 +1,7 @@
 import uuid
 from decimal import Decimal
 
-from sqlalchemy import select
+from sqlalchemy import and_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -19,6 +19,7 @@ class OrderRepository:
         items_data: list[dict],
         menu_prices: dict[str, Decimal],
         notes: str = "",
+        booking_id: str | uuid.UUID | None = None,
         venue_id: str | uuid.UUID | None = None,
         resource_id: str | uuid.UUID | None = None,
         resource_label: str | None = None,
@@ -26,6 +27,7 @@ class OrderRepository:
         order = Order(
             id=uuid.uuid4(),
             user_id=user_id,
+            booking_id=_to_uuid_or_none(booking_id),
             venue_id=_to_uuid_or_none(venue_id),
             resource_id=_to_uuid_or_none(resource_id),
             resource_label=resource_label,
@@ -90,6 +92,36 @@ class OrderRepository:
             .order_by(Order.updated_at.desc(), Order.created_at.desc())
             .offset(offset)
             .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_for_booking(self, booking) -> list[Order]:
+        fallback_conditions = [
+            Order.booking_id.is_(None),
+            Order.user_id == booking.user_id,
+            Order.created_at >= booking.start_time,
+            Order.created_at <= booking.end_time,
+        ]
+        scope_conditions = []
+        if booking.resource_id:
+            scope_conditions.append(Order.resource_id == booking.resource_id)
+        if booking.venue_id:
+            scope_conditions.append(Order.venue_id == booking.venue_id)
+        if scope_conditions:
+            fallback_conditions.append(or_(*scope_conditions))
+
+        stmt = (
+            select(Order)
+            .options(selectinload(Order.items))
+            .where(
+                Order.status != "cancelled",
+                or_(
+                    Order.booking_id == booking.id,
+                    and_(*fallback_conditions),
+                ),
+            )
+            .order_by(Order.created_at.asc())
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())

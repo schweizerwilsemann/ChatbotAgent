@@ -13,6 +13,12 @@ class Order(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "orders"
 
     user_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    booking_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("bookings.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
     venue_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("venues.id", ondelete="SET NULL"),

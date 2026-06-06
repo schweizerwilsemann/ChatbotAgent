@@ -11,8 +11,14 @@ import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
 /// with "Thanh toán" (Pay) and "Để sau" (Later) action buttons.
 class OrderCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> metadata;
+  final void Function(String orderId, String paymentStatus)?
+      onPaymentStatusChanged;
 
-  const OrderCard({super.key, required this.metadata});
+  const OrderCard({
+    super.key,
+    required this.metadata,
+    this.onPaymentStatusChanged,
+  });
 
   @override
   ConsumerState<OrderCard> createState() => _OrderCardState();
@@ -31,7 +37,7 @@ class _OrderCardState extends ConsumerState<OrderCard> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isPaid) return const SizedBox.shrink();
+    if (_isPaid) return _buildPaidCard();
 
     return AnimatedOpacity(
       opacity: _dismissed ? 0.5 : 1.0,
@@ -116,18 +122,34 @@ class _OrderCardState extends ConsumerState<OrderCard> {
   }
 
   Widget _buildStatusBadge() {
+    final isPaid = _isPaid;
+    final isFailed = _paymentStatus == 'failed';
+    final color = isPaid
+        ? AppColors.success
+        : isFailed
+            ? AppColors.error
+            : AppColors.warning;
+    final method = isPaid && _paymentStatus.contains('_')
+        ? _paymentStatus.split('_').last.toUpperCase()
+        : '';
+    final label = isPaid
+        ? (method.isNotEmpty ? 'Đã thanh toán ($method)' : 'Đã thanh toán')
+        : isFailed
+            ? 'Thanh toán lỗi'
+            : 'Chờ thanh toán';
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: const Text(
-        'Chờ thanh toán',
+      child: Text(
+        label,
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: AppColors.warning,
+          color: color,
         ),
       ),
     );
@@ -137,6 +159,66 @@ class _OrderCardState extends ConsumerState<OrderCard> {
     if (_type == 'booking') return _buildBookingBody();
     if (_type == 'order') return _buildOrderBody();
     return const SizedBox.shrink();
+  }
+
+  Widget _buildPaidCard() {
+    final isBooking = _type == 'booking';
+    final method = _paymentStatus.contains('_')
+        ? _paymentStatus.split('_').last.toUpperCase()
+        : '';
+    final methodLabel = method.isNotEmpty ? ' qua $method' : '';
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.success.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.check_circle,
+              size: 18,
+              color: AppColors.success,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${isBooking ? "Đặt sân" : "Đặt hàng"} đã thanh toán$methodLabel',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.success,
+                  ),
+                ),
+                if (_totalPrice > 0)
+                  Text(
+                    '${NumberFormat('#,###', 'vi_VN').format(_totalPrice.round())}đ',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          _buildStatusBadge(),
+        ],
+      ),
+    );
   }
 
   Widget _buildBookingBody() {
@@ -425,7 +507,7 @@ class _OrderCardState extends ConsumerState<OrderCard> {
       String orderId, int amount, String label) async {
     final stripeNotifier = ref.read(stripeProvider.notifier);
     final orderType = _type == 'booking' ? 'booking' : 'order';
-    final success = await stripeNotifier.createCheckout(
+    final success = await stripeNotifier.pay(
       orderId: orderId,
       amount: amount,
       description: label,
@@ -433,14 +515,10 @@ class _OrderCardState extends ConsumerState<OrderCard> {
     );
 
     if (success && mounted) {
-      final stripeState = ref.read(stripeProvider);
-      if (stripeState.checkoutUrl != null) {
-        context.push('/stripe-checkout', extra: {
-          'checkoutUrl': stripeState.checkoutUrl!,
-          'orderId': orderId,
-          'orderType': orderType,
-        });
-      }
+      setState(() {
+        widget.metadata['payment_status'] = 'paid_stripe';
+      });
+      widget.onPaymentStatusChanged?.call(orderId, 'paid_stripe');
     } else if (mounted) {
       final error = ref.read(stripeProvider).error;
       if (error != null) {
@@ -463,11 +541,18 @@ class _OrderCardState extends ConsumerState<OrderCard> {
     if (paymentSuccess && mounted) {
       final paymentState = ref.read(paymentProvider);
       if (paymentState.paymentUrl != null) {
-        context.push('/payment', extra: {
+        await context.push('/payment', extra: {
           'paymentUrl': paymentState.paymentUrl!,
           'orderId': orderId,
           'orderType': orderType,
         });
+        // Refresh payment status after returning from payment
+        if (mounted) {
+          setState(() {
+            widget.metadata['payment_status'] = 'paid_vnpay';
+          });
+          widget.onPaymentStatusChanged?.call(orderId, 'paid_vnpay');
+        }
       }
     } else if (mounted) {
       final error = ref.read(paymentProvider).error;

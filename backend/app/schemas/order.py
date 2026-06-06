@@ -11,6 +11,7 @@ class OrderItemCreate(BaseModel):
 
 class OrderCreate(BaseModel):
     user_id: str = Field("current_user", min_length=1, max_length=128)
+    booking_id: str | None = Field(None, description="Booking/session identifier")
     venue_id: str | None = Field(None, description="Venue/branch identifier")
     resource_id: str | None = Field(None, description="Selected table/court resource")
     resource_label: str | None = Field(
@@ -39,6 +40,7 @@ class OrderResponse(BaseModel):
     user_id: str
     user_name: str | None = None
     user_phone: str | None = None
+    booking_id: str | None = None
     venue_id: str | None = None
     resource_id: str | None = None
     resource_label: str | None = None
@@ -80,6 +82,7 @@ class StaffOrderResponse(BaseModel):
     user_id: str
     user_name: str | None = None
     user_phone: str | None = None
+    booking_id: str | None = None
     venue_id: str | None = None
     resource_id: str | None = None
     resource_label: str | None = None

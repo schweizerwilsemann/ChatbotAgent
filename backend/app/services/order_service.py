@@ -1,5 +1,6 @@
 import logging
 
+from app.repositories.booking_repository import BookingRepository
 from app.repositories.menu_repository import MenuRepository
 from app.repositories.order_repository import OrderRepository
 from app.repositories.venue_repository import VenueRepository
@@ -16,11 +17,13 @@ class OrderService:
         menu_repo: MenuRepository,
         notification_service: NotificationService | None = None,
         venue_repo: VenueRepository | None = None,
+        booking_repo: BookingRepository | None = None,
     ) -> None:
         self._repo = repo
         self._menu_repo = menu_repo
         self._notification_service = notification_service
         self._venue_repo = venue_repo
+        self._booking_repo = booking_repo
 
     async def create_order(self, data: OrderCreate, user=None) -> OrderResponse:
         """Create a new order, calculating total price from the menu."""
@@ -31,6 +34,29 @@ class OrderService:
         resource_id = data.resource_id
         resource_label = data.resource_label
         table_number = data.table_number
+        booking_id = data.booking_id
+        if self._booking_repo:
+            booking = None
+            if booking_id:
+                booking = await self._booking_repo.get_by_id(booking_id)
+                if not booking:
+                    raise ValueError("Booking not found")
+                if str(booking.user_id) != str(data.user_id):
+                    raise ValueError("Cannot attach order to another user's booking")
+                if booking.status == "cancelled":
+                    raise ValueError("Cannot order for a cancelled booking")
+            elif user is not None:
+                booking = await self._booking_repo.get_active_booking(str(user.id))
+
+            if booking:
+                booking_id = str(booking.id)
+                venue_id = str(booking.venue_id) if booking.venue_id else venue_id
+                resource_id = (
+                    str(booking.resource_id) if booking.resource_id else resource_id
+                )
+                resource_label = booking.resource_label or resource_label
+                table_number = booking.court_number
+
         if self._venue_repo:
             resolved_venue_id = await self._venue_repo.resolve_user_venue_id(
                 user,
@@ -81,6 +107,7 @@ class OrderService:
 
         order = await self._repo.create(
             user_id=data.user_id,
+            booking_id=booking_id,
             venue_id=venue_id,
             resource_id=resource_id,
             resource_label=resource_label,
@@ -183,6 +210,9 @@ class OrderService:
         return OrderResponse(
             id=str(order.id),
             user_id=order.user_id,
+            booking_id=str(order.booking_id)
+            if getattr(order, "booking_id", None)
+            else None,
             venue_id=str(order.venue_id) if getattr(order, "venue_id", None) else None,
             resource_id=str(order.resource_id)
             if getattr(order, "resource_id", None)
