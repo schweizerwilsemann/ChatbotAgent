@@ -142,25 +142,28 @@ class _CallStaffDialogContentState
                       child: const Text('Hủy'),
                     ),
                     const SizedBox(width: 8),
-                    ElevatedButton.icon(
-                      onPressed: _selectedType == null
-                          ? null
-                          : () {
-                              Navigator.of(context, rootNavigator: true)
-                                  .pop(CallStaffResult(
-                                requestType: _selectedType!,
-                                description: _descController.text.trim().isEmpty
-                                    ? null
-                                    : _descController.text.trim(),
-                              ));
-                            },
-                      icon: const Icon(Icons.send, size: 18),
-                      label: const Text('Gửi yêu cầu'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    Flexible(
+                      child: ElevatedButton.icon(
+                        onPressed: _selectedType == null
+                            ? null
+                            : () {
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop(CallStaffResult(
+                                  requestType: _selectedType!,
+                                  description:
+                                      _descController.text.trim().isEmpty
+                                          ? null
+                                          : _descController.text.trim(),
+                                ));
+                              },
+                        icon: const Icon(Icons.send, size: 18),
+                        label: const Text('Gửi yêu cầu'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                     ),
