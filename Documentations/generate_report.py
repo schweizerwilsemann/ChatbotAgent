@@ -104,6 +104,39 @@ def add_page_break(doc):
     doc.add_page_break()
 
 
+def add_mermaid_block(doc, title, mermaid_code):
+    """Add a Mermaid diagram code block with title."""
+    doc.add_paragraph()
+    p = doc.add_paragraph()
+    run = p.add_run(title)
+    run.bold = True
+    run.font.name = "Times New Roman"
+    run.font.size = Pt(13)
+    set_paragraph_format(p, space_before=6, space_after=4)
+
+    p2 = doc.add_paragraph()
+    run_label = p2.add_run("Mermaid code (copy để generate hình):")
+    run_label.font.name = "Times New Roman"
+    run_label.font.size = Pt(11)
+    run_label.italic = True
+
+    # Code block
+    code_p = doc.add_paragraph()
+    code_run = code_p.add_run(mermaid_code)
+    code_run.font.name = "Consolas"
+    code_run.font.size = Pt(9)
+    pf = code_p.paragraph_format
+    pf.space_before = Pt(2)
+    pf.space_after = Pt(6)
+    pf.line_spacing = 1.15
+
+    # Add shading to code block
+    from docx.oxml.ns import qn as _qn
+    from docx.oxml import parse_xml as _parse_xml
+    shading = _parse_xml(f'<w:shd {nsdecls("w")} w:fill="F5F5F5" w:val="clear"/>')
+    code_p.paragraph_format.element.get_or_add_pPr().append(shading)
+
+
 def create_report():
     doc = Document()
 
@@ -472,6 +505,7 @@ def create_report():
         ("NHIỆM VỤ THIẾT KẾ", "ii"),
         ("MỤC LỤC", "iii"),
         ("DANH MỤC CÁC BẢNG BIỂU", "iv"),
+        ("BẢNG TỪ VIẾT TẮT", "v"),
         ("CHƯƠNG 1. TỔNG QUAN", "1"),
         ("1.1. Đặt vấn đề", "1"),
         ("1.2. Nhiệm vụ của đồ án", "2"),
@@ -510,35 +544,39 @@ def create_report():
         ("3.4.1. Xác thực", "41"),
         ("3.4.2. Chat APIs", "41"),
         ("3.4.3. Booking APIs", "42"),
-        ("3.4.4. Order APIs", "42"),
-        ("3.4.5. Menu APIs", "43"),
-        ("3.4.6. Staff APIs", "43"),
-        ("3.4.7. Payment APIs", "43"),
-        ("3.4.8. Mô hình bảo mật API", "44"),
-        ("CHƯƠNG 4. HIỆN THỰC CHƯƠNG TRÌNH", "45"),
-        ("4.1. Cấu trúc thư mục dự án", "45"),
-        ("4.2. Hiện thực Backend", "46"),
-        ("4.2.1. AI Agent Implementation", "46"),
-        ("4.2.2. Knowledge Graph Pipeline", "48"),
-        ("4.2.3. Database Models", "50"),
-        ("4.2.4. API Endpoints", "51"),
-        ("4.2.5. Payment Implementation", "52"),
-        ("4.2.6. Docker Deployment", "54"),
-        ("4.3. Hiện thực Frontend (Flutter App)", "55"),
-        ("4.3.1. Cấu trúc Feature-based", "55"),
-        ("4.3.2. State Management với Riverpod", "56"),
-        ("4.3.3. Navigation với GoRouter", "56"),
-        ("4.3.4. Chat UI với flutter_chat_ui", "57"),
-        ("4.4. Môi trường triển khai", "58"),
-        ("4.5. Kết quả đạt được", "59"),
-        ("4.6. Hướng phát triển", "60"),
-        ("TÀI LIỆU THAM KHẢO", "61"),
-        ("PHỤ LỤC", "62"),
+        ("3.4.4. Booking Bill APIs", "42"),
+        ("3.4.5. Order APIs", "43"),
+        ("3.4.6. Menu APIs", "43"),
+        ("3.4.7. Staff Request APIs", "43"),
+        ("3.4.8. Staff Chat APIs", "44"),
+        ("3.4.9. Realtime Notification APIs", "44"),
+        ("3.4.10. Payment APIs", "45"),
+        ("3.4.11. Mô hình bảo mật API", "46"),
+        ("CHƯƠNG 4. HIỆN THỰC CHƯƠNG TRÌNH", "47"),
+        ("4.1. Cấu trúc thư mục dự án", "47"),
+        ("4.2. Hiện thực Backend", "48"),
+        ("4.2.1. AI Agent Implementation", "48"),
+        ("4.2.2. Knowledge Graph Pipeline", "50"),
+        ("4.2.3. Database Models", "52"),
+        ("4.2.4. API Endpoints", "53"),
+        ("4.2.5. Payment Implementation", "54"),
+        ("4.2.6. Docker Deployment", "56"),
+        ("4.3. Hiện thực Frontend (Flutter App)", "57"),
+        ("4.3.1. Cấu trúc Feature-based", "57"),
+        ("4.3.2. State Management với Riverpod", "58"),
+        ("4.3.3. Navigation với GoRouter", "58"),
+        ("4.3.4. Chat UI với flutter_chat_ui", "59"),
+        ("4.3.5. Giới thiệu giao diện ứng dụng", "59"),
+        ("4.4. Môi trường triển khai", "65"),
+        ("4.5. Kết quả đạt được", "66"),
+        ("4.6. Hướng phát triển", "67"),
+        ("TÀI LIỆU THAM KHẢO", "68"),
+        ("PHỤ LỤC", "69"),
     ]
 
     for entry, page in toc_entries:
         p = doc.add_paragraph()
-        if entry.startswith("CHƯƠNG") or entry in ["LỜI MỞ ĐẦU", "NHIỆM VỤ THIẾT KẾ", "MỤC LỤC", "DANH MỤC CÁC BẢNG BIỂU", "TÀI LIỆU THAM KHẢO", "PHỤ LỤC"]:
+        if entry.startswith("CHƯƠNG") or entry in ["LỜI MỞ ĐẦU", "NHIỆM VỤ THIẾT KẾ", "MỤC LỤC", "DANH MỤC CÁC BẢNG BIỂU", "BẢNG TỪ VIẾT TẮT", "TÀI LIỆU THAM KHẢO", "PHỤ LỤC"]:
             run = p.add_run(entry)
             run.bold = True
         else:
@@ -576,16 +614,22 @@ def create_report():
         ("Bảng 3.4", "Bảng venues"),
         ("Bảng 3.5", "Bảng menu_items"),
         ("Bảng 3.6", "Bảng payments"),
-        ("Bảng 3.7", "Authentication APIs"),
-        ("Bảng 3.8", "Chat APIs"),
-        ("Bảng 3.9", "Booking APIs"),
-        ("Bảng 3.10", "Order APIs"),
-        ("Bảng 3.11", "Menu APIs"),
-        ("Bảng 3.12", "Staff APIs"),
-        ("Bảng 3.13", "VNPay Payment APIs"),
-        ("Bảng 3.14", "Stripe Payment APIs"),
+        ("Bảng 3.7", "Bảng staff_requests"),
+        ("Bảng 3.8", "Bảng notifications"),
+        ("Bảng 3.9", "Authentication APIs"),
+        ("Bảng 3.10", "Chat APIs"),
+        ("Bảng 3.11", "Booking APIs"),
+        ("Bảng 3.12", "Booking Bill APIs"),
+        ("Bảng 3.13", "Order APIs"),
+        ("Bảng 3.14", "Menu APIs"),
+        ("Bảng 3.15", "Staff Request APIs"),
+        ("Bảng 3.16", "Staff Chat APIs"),
+        ("Bảng 3.17", "Realtime Notification APIs"),
+        ("Bảng 3.18", "VNPay Payment APIs"),
+        ("Bảng 3.19", "Stripe Payment APIs"),
         ("Bảng 4.1", "Môi trường triển khai"),
         ("Bảng 4.2", "Docker Services"),
+        ("Bảng 4.3", "Flutter Dependencies"),
     ]
 
     table = doc.add_table(rows=len(bang_muc) + 1, cols=2)
@@ -636,6 +680,30 @@ def create_report():
         ("Hình 4.4", "Luồng thanh toán Stripe"),
         ("Hình 4.5", "Luồng thanh toán VNPay"),
         ("Hình 4.6", "Kiến trúc Docker Deployment"),
+        ("Hình 4.7", "Màn hình đăng nhập"),
+        ("Hình 4.8", "Màn hình chính (Home Screen)"),
+        ("Hình 4.9", "Giao diện Chat với AI Agent"),
+        ("Hình 4.10", "Màn hình đặt sân (Booking)"),
+        ("Hình 4.11", "Màn hình chọn thời gian đặt sân"),
+        ("Hình 4.12", "Màn hình Menu đồ uống"),
+        ("Hình 4.13", "Màn hình giỏ hàng (Cart)"),
+        ("Hình 4.14", "Dialog chọn phương thức thanh toán"),
+        ("Hình 4.15", "Màn hình thanh toán Stripe (Payment Sheet)"),
+        ("Hình 4.16", "Màn hình thanh toán VNPay"),
+        ("Hình 4.17", "Kết quả thanh toán thành công"),
+        ("Hình 4.18", "Màn hình gọi nhân viên (Call Staff Dialog)"),
+        ("Hình 4.19", "Màn hình danh sách yêu cầu (Staff Requests)"),
+        ("Hình 4.20", "Màn hình quản lý yêu cầu (Staff Request Management)"),
+        ("Hình 4.21", "Màn hình chat với nhân viên (Staff Chat)"),
+        ("Hình 4.22", "Màn hình hộp thư nhân viên (Staff Inbox)"),
+        ("Hình 4.23", "Màn hình thông báo vận hành (Notifications)"),
+        ("Hình 4.24", "Màn hình hóa đơn đặt sân (Booking Bill)"),
+        ("Hình 4.25", "Màn hình lịch sử đơn hàng (Order History)"),
+        ("Hình 4.26", "Màn hình quản lý đặt sân (Admin Booking)"),
+        ("Hình 4.27", "Màn hình quản lý menu (Admin Menu)"),
+        ("Hình 4.28", "Màn hình Dashboard Admin"),
+        ("Hình 4.29", "Màn hình hồ sơ cá nhân (Profile)"),
+        ("Hình 4.30", "Thanh điều hướng nhân viên (Staff Shell)"),
     ]
 
     table2 = doc.add_table(rows=len(hinh_muc) + 1, cols=2)
@@ -657,6 +725,66 @@ def create_report():
         table2.rows[i + 1].cells[0].text = ma
         table2.rows[i + 1].cells[1].text = ten
         for cell in table2.rows[i + 1].cells:
+            for paragraph in cell.paragraphs:
+                for run in paragraph.runs:
+                    run.font.name = "Times New Roman"
+                    run.font.size = Pt(12)
+
+    doc.add_paragraph()
+
+    # ===== BẢNG TỪ VIẾT TẮT =====
+    add_body_text(doc, "Bảng từ viết tắt:", bold=True)
+
+    abbrev_data = [
+        ("AI", "Artificial Intelligence - Trí tuệ nhân tạo"),
+        ("API", "Application Programming Interface - Giao diện lập trình ứng dụng"),
+        ("BWF", "Badminton World Federation - Liên đoàn Cầu lông Thế giới"),
+        ("CRUD", "Create, Read, Update, Delete - Tạo, Đọc, Sửa, Xóa"),
+        ("CSS", "Cascading Style Sheets"),
+        ("DIO", "Dart HTTP client library"),
+        ("ERD", "Entity-Relationship Diagram - Sơ đồ thực thể quan hệ"),
+        ("FK", "Foreign Key - Khóa ngoại"),
+        ("gRPC", "Google Remote Procedure Call"),
+        ("HTTP", "Hypertext Transfer Protocol"),
+        ("IDE", "Integrated Development Environment - Môi trường phát triển tích hợp"),
+        ("JSON", "JavaScript Object Notation"),
+        ("JWT", "JSON Web Token - Mã xác thực người dùng"),
+        ("KG", "Knowledge Graph - Đồ thị tri thức"),
+        ("LLM", "Large Language Model - Mô hình ngôn ngữ lớn"),
+        ("ORM", "Object-Relational Mapping - Ánh xạ đối tượng-quan hệ"),
+        ("PK", "Primary Key - Khóa chính"),
+        ("RAG", "Retrieval Augmented Generation - Truy xuất tăng cường"),
+        ("REST", "Representational State Transfer"),
+        ("SDK", "Software Development Kit - Bộ phát triển phần mềm"),
+        ("SQL", "Structured Query Language - Ngôn ngữ truy vấn có cấu trúc"),
+        ("SQLAlchemy", "Python ORM library cho PostgreSQL"),
+        ("UUID", "Universally Unique Identifier - Định danh duy nhất toàn cầu"),
+        ("USAPA", "USA Pickleball Association - Hiệp hội Pickleball Hoa Kỳ"),
+        ("VND", "Vietnamese Dong - Đồng Việt Nam"),
+        ("VNPay", "Cổng thanh toán trực tuyến Việt Nam"),
+        ("WebSocket", "Giao thức truyền thông hai chiều thời gian thực"),
+        ("WPA", "World Pool-Billiard Association - Hiệp hội Bida Thế giới"),
+    ]
+
+    table_abbr = doc.add_table(rows=len(abbrev_data) + 1, cols=2)
+    table_abbr.style = "Table Grid"
+    table_abbr.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+    for i, h in enumerate(["Viết tắt", "Giải thích"]):
+        cell = table_abbr.rows[0].cells[i]
+        cell.text = h
+        for paragraph in cell.paragraphs:
+            for run in paragraph.runs:
+                run.bold = True
+                run.font.name = "Times New Roman"
+                run.font.size = Pt(12)
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        set_cell_shading(cell, "D9E2F3")
+
+    for i, (abbr, desc) in enumerate(abbrev_data):
+        table_abbr.rows[i + 1].cells[0].text = abbr
+        table_abbr.rows[i + 1].cells[1].text = desc
+        for cell in table_abbr.rows[i + 1].cells:
             for paragraph in cell.paragraphs:
                 for run in paragraph.runs:
                     run.font.name = "Times New Roman"
@@ -1042,6 +1170,104 @@ def create_report():
     doc.add_paragraph()
     add_body_text(doc, "[Chèn hình Use Case Diagram tại đây]", bold=True)
 
+    # ── Use Case Mermaid diagrams (per feature) ──
+
+    add_mermaid_block(doc, "Use Case - Chat AI:", """graph LR
+    Customer((Customer))
+    AI((AI Agent))
+
+    Customer -->|Gửi tin nhắn| UC01[UC01: Chat với AI]
+    Customer -->|Hỏi luật/ky thuật| UC02[UC02: Tra cứu kiến thức]
+    UC01 --> AI
+    UC02 --> AI
+    AI -->|Trả lời tự động| Customer
+    AI -->|Dùng tool| KG[(Neo4j KG)]
+""")
+
+    add_mermaid_block(doc, "Use Case - Đặt sân:", """graph LR
+    Customer((Customer))
+    System((Hệ thống))
+
+    Customer -->|Chọn loại sân| UC03[UC03: Đặt sân]
+    Customer -->|Xem sân trống| UC03a[UC03a: Kiểm tra availability]
+    Customer -->|Chọn thời gian| UC03b[UC03b: Chọn time slot]
+    UC03 --> System
+    UC03a --> System
+    System -->|Xác nhận| Customer
+    System -->|Tạo booking| DB[(PostgreSQL)]
+""")
+
+    add_mermaid_block(doc, "Use Case - Đặt đồ uống:", """graph LR
+    Customer((Customer))
+    System((Hệ thống))
+
+    Customer -->|Xem menu| UC04[UC04: Đặt đồ uống]
+    Customer -->|Chọn món| UC04a[UC04a: Thêm vào giỏ]
+    Customer -->|Xác nhận đơn| UC04b[UC04b: Đặt hàng]
+    UC04 --> System
+    UC04b --> System
+    System -->|Tạo order| DB[(PostgreSQL)]
+    System -->|Thông báo| Staff((Staff))
+""")
+
+    add_mermaid_block(doc, "Use Case - Gọi nhân viên:", """graph LR
+    Customer((Customer))
+    Staff((Staff))
+    System((Hệ thống))
+
+    Customer -->|Chọn loại yêu cầu| UC05[UC05: Gọi nhân viên]
+    Customer -->|Nhập mô tả| UC05a[UC05a: Tạo yêu cầu]
+    UC05 --> System
+    UC05a --> System
+    System -->|Thông báo real-time| Staff
+    Staff -->|Chấp nhận| UC08[UC08: Xử lý yêu cầu]
+    Staff -->|Hoàn thành| UC08a[UC08a: Đóng yêu cầu]
+""")
+
+    add_mermaid_block(doc, "Use Case - Thanh toán:", """graph LR
+    Customer((Customer))
+    System((Hệ thống))
+    Stripe((Stripe))
+    VNPay((VNPay))
+
+    Customer -->|Chọn thanh toán| UC11[UC11: Thanh toán]
+    Customer -->|Chọn Stripe| UC11a[UC11a: Stripe Payment]
+    Customer -->|Chọn VNPay| UC11b[UC11b: VNPay Payment]
+    UC11a --> System
+    UC11b --> System
+    System -->|PaymentIntent| Stripe
+    System -->|Payment URL| VNPay
+    Stripe -->|Webhook xác nhận| System
+    VNPay -->|Callback| System
+    System -->|Cập nhật trạng thái| Customer
+""")
+
+    add_mermaid_block(doc, "Use Case - Staff Chat:", """graph LR
+    Customer((Customer))
+    Staff((Staff))
+    System((Hệ thống))
+
+    Customer -->|Gửi tin nhắn| UC_C1[Chat với nhân viên]
+    Staff -->|Gửi tin nhắn| UC_S1[Chat với khách hàng]
+    UC_C1 --> System
+    UC_S1 --> System
+    System -->|WebSocket| Customer
+    System -->|WebSocket| Staff
+    Staff -->|Xem inbox| UC_S2[UC: Staff Inbox]
+    Staff -->|Đóng phòng chat| UC_S3[UC: Đóng room]
+""")
+
+    add_mermaid_block(doc, "Use Case - Admin:", """graph LR
+    Admin((Admin))
+
+    Admin -->|Quản lý| UC09[UC09: Quản lý sân & menu]
+    Admin -->|Xem thống kê| UC10[UC10: Dashboard]
+    Admin -->|Quản lý đặt sân| UC12[UC12: Quản lý booking]
+    Admin -->|Xem hóa đơn| UC13[UC13: Xem bill]
+    Admin -->|Quản lý đơn hàng| UC14[UC14: Quản lý order]
+    Admin -->|CRUD menu| UC15[UC15: Quản lý menu]
+""")
+
     doc.add_paragraph()
     add_body_text(doc, "Mô tả chi tiết Use Case UC11 - Thanh toán trực tuyến:", bold=True)
 
@@ -1112,6 +1338,207 @@ def create_report():
     doc.add_paragraph()
     add_body_text(doc, "[Chèn hình Sequence Diagram tại đây]", bold=True)
 
+    # ── Sequence Mermaid diagrams (per feature) ──
+
+    add_mermaid_block(doc, "Sequence - Chat với AI Agent:", """sequenceDiagram
+    participant C as Customer
+    participant F as Flutter App
+    participant B as FastAPI Backend
+    participant A as AI Agent
+    participant KG as Neo4j KG
+    participant R as Redis
+
+    C->>F: Nhập tin nhắn
+    F->>B: POST /api/chat {message, session_id}
+    B->>R: Lấy session history
+    R-->>B: History
+    B->>A: process(message, history)
+    A->>A: IntentRouter phân tích intent
+    alt Intent đơn giản (greeting)
+        A-->>B: Trả lời trực tiếp
+    else Intent phức tạp
+        A->>KG: query_knowledge (Cypher)
+        KG-->>A: Kết quả
+        A->>A: LLM tổng hợp phản hồi
+        A-->>B: Response
+    end
+    B-->>F: ChatResponse {reply, tools_used}
+    F-->>C: Hiển thị tin nhắn
+    B->>R: Lưu session
+""")
+
+    add_mermaid_block(doc, "Sequence - Đặt sân (Booking):", """sequenceDiagram
+    participant C as Customer
+    participant F as Flutter App
+    participant B as FastAPI Backend
+    participant DB as PostgreSQL
+
+    C->>F: Chọn loại sân + thời gian
+    F->>B: GET /api/booking/availability
+    B->>DB: Query sân trống
+    DB-->>B: Danh sách sân
+    B-->>F: AvailabilityResponse
+    F-->>C: Hiển thị sân trống
+
+    C->>F: Xác nhận đặt sân
+    F->>B: POST /api/booking/
+    B->>DB: Tạo booking (status=confirmed)
+    DB-->>B: Booking created
+    B-->>F: BookingResponse
+    F-->>C: Đặt sân thành công
+    F->>F: Hiển thị dialog thanh toán
+""")
+
+    add_mermaid_block(doc, "Sequence - Đặt đồ uống (Order):", """sequenceDiagram
+    participant C as Customer
+    participant F as Flutter App
+    participant B as FastAPI Backend
+    participant DB as PostgreSQL
+    participant S as Staff
+
+    C->>F: Chọn món từ menu
+    F->>F: Thêm vào giỏ hàng
+    C->>F: Xác nhận đặt hàng
+    F->>B: POST /api/order/ {items, booking_id}
+    B->>DB: Tạo order + order_items
+    B->>DB: Link order với booking (nếu có)
+    DB-->>B: Order created
+    B-->>F: OrderResponse
+    F-->>C: Đặt hàng thành công
+    B->>S: Thông báo đơn hàng mới (WebSocket)
+""")
+
+    add_mermaid_block(doc, "Sequence - Thanh toán Stripe (PaymentIntent):", """sequenceDiagram
+    participant C as Customer
+    participant F as Flutter App
+    participant FS as flutter_stripe SDK
+    participant B as FastAPI Backend
+    participant S as Stripe API
+    participant DB as PostgreSQL
+
+    C->>F: Chọn thanh toán Stripe
+    F->>B: POST /api/stripe/create-payment-intent {order_type, order_id, amount}
+    B->>S: stripe.PaymentIntent.create(amount, currency)
+    S-->>B: PaymentIntent {client_secret}
+    B-->>F: {client_secret, payment_intent_id}
+    F->>FS: initPaymentSheet(clientSecret)
+    FS->>C: Hiển thị Payment Sheet (native)
+    C->>FS: Nhập thông tin thẻ, xác nhận
+    FS->>S: Xác nhận thanh toán
+    S-->>FS: Payment thành công
+    FS-->>F: PaymentSheetResponse
+    F->>B: POST /api/stripe/webhook (payment_intent.succeeded)
+    B->>DB: Cập nhật payment_status = 'paid'
+    B-->>F: Redirect /success
+    F-->>C: Thanh toán thành công
+""")
+
+    add_mermaid_block(doc, "Sequence - Thanh toán VNPay:", """sequenceDiagram
+    participant C as Customer
+    participant F as Flutter App
+    participant B as FastAPI Backend
+    participant JV as Java Payment Service
+    participant V as VNPay API
+
+    C->>F: Chọn thanh toán VNPay
+    F->>B: POST /api/payment/create {order_type, order_id, amount}
+    B->>JV: gRPC: createPayment
+    JV->>V: Tạo VNPay payment URL
+    V-->>JV: payment_url
+    JV-->>B: payment_url
+    B-->>F: {payment_url}
+    F->>F: Mở VNPay Native SDK (MethodChannel)
+    C->>V: Chọn ngân hàng, hoàn tất
+    V-->>B: Callback URL
+    B->>B: Xác thực chữ ký VNPay
+    B->>DB: Cập nhật payment_status = 'paid'
+    B-->>F: Kết quả thanh toán
+    F-->>C: Thanh toán thành công
+""")
+
+    add_mermaid_block(doc, "Sequence - Gọi nhân viên (Staff Request):", """sequenceDiagram
+    participant C as Customer
+    participant F as Flutter App
+    participant B as FastAPI Backend
+    participant DB as PostgreSQL
+    participant WS as WebSocket
+    participant S as Staff
+
+    C->>F: Mở dialog gọi nhân viên
+    C->>F: Chọn loại yêu cầu + mô tả
+    F->>B: POST /api/staff/requests
+    B->>DB: Tạo staff_request
+    B->>WS: broadcast_to_roles [STAFF]
+    WS-->>S: Thông báo yêu cầu mới
+    S->>F: Xem danh sách yêu cầu
+    S->>B: PATCH /requests/{id}/accept
+    B->>DB: Cập nhật status=accepted
+    B->>WS: Thông báo cho customer
+    WS-->>C: Yêu cầu đã được chấp nhận
+    S->>B: PATCH /requests/{id}/complete
+    B->>DB: Cập nhật status=completed
+    B->>WS: Thông báo hoàn thành
+    WS-->>C: Yêu cầu đã hoàn thành
+""")
+
+    add_mermaid_block(doc, "Sequence - Staff Chat (Real-time):", """sequenceDiagram
+    participant C as Customer
+    participant CW as Customer WebSocket
+    participant B as FastAPI Backend
+    participant R as Redis
+    participant SW as Staff WebSocket
+    participant S as Staff
+
+    Note over C,S: Staff request accepted -> Chat room created
+
+    C->>CW: Kết nối /api/staff/chat/{room_id}/ws
+    S->>SW: Kết nối /api/staff/chat/{room_id}/ws
+    B->>R: Lưu room info
+
+    C->>CW: {type: "message", content: "Xin chào"}
+    CW->>B: WebSocket message
+    B->>R: Lưu message (rpush)
+    B->>SW: broadcast_to_room
+    SW-->>S: Hiển thị tin nhắn
+
+    S->>SW: {type: "message", content: "Chào bạn"}
+    SW->>B: WebSocket message
+    B->>R: Lưu message (rpush)
+    B->>CW: broadcast_to_room
+    CW-->>C: Hiển thị tin nhắn
+
+    Note over C,S: Presence tracking qua Redis (TTL 60s)
+    C->>CW: {type: "ping"}
+    CW->>B: refresh_presence
+    B->>R: SET online:{room}:{user} TTL=60s
+""")
+
+    add_mermaid_block(doc, "Sequence - Realtime Notification:", """sequenceDiagram
+    participant F as Flutter App
+    participant WS as WebSocket Client
+    participant B as FastAPI Backend
+    participant R as Redis
+    participant N as NotificationService
+    participant DB as PostgreSQL
+
+    Note over F,DB: App khởi động -> Kết nối WebSocket
+
+    F->>WS: Kết nối /api/realtime/notifications?token=xxx
+    B->>B: Xác thực JWT token
+    B->>B: connect(websocket, role, user_id)
+
+    Note over F,DB: Khi có sự kiện mới (booking/order/request)
+
+    B->>N: notify_operations(event_type, title, message)
+    N->>DB: Lưu notification
+    N->>R: SET + PUBLISH
+    N->>B: broadcast_to_roles(target_roles)
+    B->>WS: Gửi notification qua WebSocket
+    WS-->>F: Nhận message
+    F->>F: showOperationNotification (native)
+    F->>F: Cập nhật danh sách in-app
+""")
+
     add_page_break(doc)
 
     # ====================================================================
@@ -1153,6 +1580,200 @@ def create_report():
 
     doc.add_paragraph()
     add_body_text(doc, "[Chèn hình ERD Diagram tại đây]", bold=True)
+
+    # ── Class Diagram (Mermaid) ──
+    add_mermaid_block(doc, "Sơ đồ Class - Backend Models:", """classDiagram
+    class User {
+        +UUID id
+        +String phone
+        +String name
+        +String email
+        +String password_hash
+        +UserRole role
+        +String stripe_customer_id
+        +DateTime created_at
+    }
+
+    class Booking {
+        +UUID id
+        +String user_id
+        +UUID venue_id
+        +CourtType court_type
+        +Int court_number
+        +DateTime start_time
+        +DateTime end_time
+        +BookingStatus status
+        +Numeric total_price
+        +String payment_status
+    }
+
+    class Order {
+        +UUID id
+        +String user_id
+        +UUID venue_id
+        +UUID booking_id
+        +Numeric total_price
+        +OrderStatus status
+        +String payment_status
+        +DateTime created_at
+    }
+
+    class OrderItem {
+        +UUID id
+        +UUID order_id
+        +UUID menu_item_id
+        +String name
+        +Int price
+        +Int quantity
+    }
+
+    class MenuItem {
+        +UUID id
+        +UUID venue_id
+        +String name
+        +Int price
+        +String category
+        +Boolean available
+    }
+
+    class Venue {
+        +UUID id
+        +String name
+        +String address
+        +String phone
+        +UUID business_id
+    }
+
+    class ServiceResource {
+        +UUID id
+        +UUID venue_id
+        +String name
+        +CourtType resource_type
+        +Numeric hourly_rate
+        +Boolean active
+    }
+
+    class Payment {
+        +UUID id
+        +String order_type
+        +UUID order_id
+        +Numeric amount
+        +String bank_code
+        +String vnp_transaction_no
+        +String stripe_payment_intent_id
+        +String status
+        +DateTime paid_at
+    }
+
+    class StaffRequest {
+        +UUID id
+        +String user_id
+        +UUID venue_id
+        +UUID resource_id
+        +RequestType request_type
+        +String description
+        +RequestStatus status
+        +String accepted_by
+        +DateTime created_at
+        +DateTime accepted_at
+        +DateTime completed_at
+    }
+
+    class Notification {
+        +UUID id
+        +String event_type
+        +String title
+        +String message
+        +JSON target_roles
+        +String source
+        +JSON payload
+        +DateTime read_at
+        +DateTime created_at
+    }
+
+    User "1" -- "*" Booking
+    User "1" -- "*" Order
+    User "1" -- "*" StaffRequest
+    Venue "1" -- "*" Booking
+    Venue "1" -- "*" Order
+    Venue "1" -- "*" MenuItem
+    Venue "1" -- "*" ServiceResource
+    Venue "1" -- "*" StaffRequest
+    Order "1" -- "*" OrderItem
+    Booking "1" -- "*" Payment
+    Order "1" -- "*" Payment
+""")
+
+    # ── Class Diagram - Flutter Architecture ──
+    add_mermaid_block(doc, "Sơ đồ Class - Flutter Feature Architecture:", """classDiagram
+    class AuthProvider {
+        +AsyncValue~User?~ state
+        +login(phone, password)
+        +logout()
+        +refreshProfile()
+    }
+
+    class ChatProvider {
+        +List~ChatMessage~ messages
+        +sendMessage(text)
+        +streamResponse()
+    }
+
+    class BookingProvider {
+        +List~Booking~ bookings
+        +createBooking()
+        +checkAvailability()
+        +getActiveBooking()
+    }
+
+    class CartNotifier {
+        +List~CartItem~ items
+        +addItem(item)
+        +removeItem(id)
+        +clear()
+        +placeOrder()
+    }
+
+    class StripeNotifier {
+        +initPaymentSheet()
+        +pay(orderType, orderId, amount)
+    }
+
+    class StaffNotificationsNotifier {
+        +List~StaffNotification~ notifications
+        +WebSocketChannel channel
+        +start()
+        +stop()
+        +markAsRead()
+        +markAllAsRead()
+    }
+
+    class StaffRequestNotifier {
+        +List~StaffRequest~ requests
+        +createRequest()
+        +acceptRequest()
+        +completeRequest()
+        +cancelRequest()
+    }
+
+    class CustomerChatNotificationsNotifier {
+        +WebSocketChannel channel
+        +start()
+        +stop()
+    }
+
+    class LocalNotificationService {
+        +MethodChannel channel
+        +showOperationNotification(title, body)
+    }
+
+    AuthProvider --> ChatProvider : provides user
+    AuthProvider --> BookingProvider : provides user
+    BookingProvider --> CartNotifier : active booking
+    CartNotifier --> StripeNotifier : triggers payment
+    StaffNotificationsNotifier --> LocalNotificationService : shows native notif
+    CustomerChatNotificationsNotifier --> LocalNotificationService : shows native notif
+""")
 
     # 3.2. Chi tiết các bảng
     add_heading_custom(doc, "3.2. Chi tiết các bảng", level=2)
@@ -1291,13 +1912,15 @@ def create_report():
         "┌─────────────────────────────────────┐\n"
         "│           Flutter App               │  Presentation Layer\n"
         "│  (Chat UI, Booking, Menu, Auth)     │\n"
+        "│  (Staff Chat, Staff Requests)       │\n"
         "│  (Payment: Stripe/VNPay SDK)        │\n"
         "└──────────────┬──────────────────────┘\n"
         "               │ HTTP / WebSocket\n"
         "┌──────────────▼──────────────────────┐\n"
         "│          FastAPI Backend            │  Application Layer\n"
         "│  /chat /booking /order /staff       │\n"
-        "│  /payment /stripe                   │\n"
+        "│  /payment /stripe /realtime         │\n"
+        "│  /staff/chat /staff/requests        │\n"
         "└──────┬───────────────────┬──────────┘\n"
         "       │                   │\n"
         "┌──────▼──────┐    ┌───────▼─────────┐\n"
@@ -1314,6 +1937,61 @@ def create_report():
 
     doc.add_paragraph()
     add_body_text(doc, "[Chèn hình Architecture Diagram tại đây]", bold=True)
+
+    # ── System Architecture Flow (Mermaid) ──
+    add_mermaid_block(doc, "Sơ đồ luồng tổng thể hệ thống:", """flowchart TB
+    subgraph Mobile["Flutter App"]
+        Chat[Chat UI]
+        Booking[Booking Screen]
+        Menu[Menu Screen]
+        Payment[Payment Screen]
+        StaffReq[Staff Request]
+        StaffChat[Staff Chat]
+        Notif[Notifications]
+    end
+
+    subgraph Backend["FastAPI Backend"]
+        Auth[Auth API]
+        ChatAPI[Chat API]
+        BookAPI[Booking API]
+        OrderAPI[Order API]
+        MenuAPI[Menu API]
+        StaffAPI[Staff Request API]
+        ChatWS[Staff Chat WS]
+        RealtimeWS[Realtime WS]
+        PayAPI[Payment API]
+        StripeAPI[Stripe API]
+        AdminAPI[Admin API]
+    end
+
+    subgraph Domain["Domain Layer"]
+        Agent[AI Agent\nLangChain + Tools]
+        NotifSvc[Notification Service]
+        StaffChatSvc[Staff Chat Service]
+    end
+
+    subgraph Infra["Infrastructure"]
+        PG[(PostgreSQL)]
+        Neo[(Neo4j KG)]
+        Redis[(Redis)]
+        Stripe[Stripe API]
+        VNPay[VNPay API]
+    end
+
+    Mobile -->|HTTP/WS| Backend
+    Backend --> Domain
+    Domain --> Infra
+    ChatAPI --> Agent
+    Agent --> Neo
+    BookAPI --> PG
+    OrderAPI --> PG
+    RealtimeWS --> NotifSvc
+    ChatWS --> StaffChatSvc
+    StaffChatSvc --> Redis
+    NotifSvc --> PG
+    StripeAPI --> Stripe
+    PayAPI --> VNPay
+""")
 
     # 3.3.3. Mô tả thành phần trong kiến trúc
     add_heading_custom(doc, "3.3.3. Mô tả thành phần trong kiến trúc", level=3)
@@ -1605,6 +2283,117 @@ def create_report():
     doc.add_paragraph()
     add_body_text(doc, "[Chèn hình Agent Flow Diagram tại đây]", bold=True)
 
+    # ── AI Agent Flow (Mermaid) ──
+    add_mermaid_block(doc, "Luồng xử lý AI Agent:", """flowchart TD
+    A[Nhận message từ user] --> B{IntentRouter\nphân tích intent}
+    B -->|Greeting/Goodbye| C[Trả lời trực tiếp\nkhông gọi LLM]
+    B -->|Hỏi luật/kỹ thuật| D[Gọi LLM AgentExecutor]
+    B -->|Đặt sân| D
+    B -->|Gọi món| D
+    B -->|Gọi nhân viên| D
+
+    D --> E[LLM phân tích\nvà chọn tool]
+
+    E -->|query_knowledge| F[Truy vấn Neo4j\nCypher + Fulltext]
+    E -->|book_court| G[Kiểm tra availability\nInsert PostgreSQL]
+    E -->|order_food| H[Tạo order\nLink booking]
+    E -->|call_staff| I[Tạo staff request\nNotify WebSocket]
+    E -->|check_schedule| J[Query bookings\ntheo ngày]
+    E -->|Không cần tool| K[LLM trả lời trực tiếp]
+
+    F --> L[Kết quả tool\ntrả về LLM]
+    G --> L
+    H --> L
+    I --> L
+    J --> L
+
+    L --> M[LLM tổng hợp\nphản hồi cuối cùng]
+    K --> M
+    C --> M
+
+    M --> N[Trả response\nvề Flutter App]
+""")
+
+    # ── Payment Decision Flow (Mermaid) ──
+    add_mermaid_block(doc, "Luồng quyết định thanh toán:", """flowchart TD
+    A[Đặt sân / Đặt hàng thành công] --> B{Chọn phương thức\nthanh toán?}
+
+    B -->|Stripe| C[POST /stripe/create-payment-intent]
+    B -->|VNPay| D[POST /payment/create]
+    B -->|Để sau| E[Lưu trạng thái unpaid]
+
+    C --> F[Stripe PaymentIntent\ntrả client_secret]
+    F --> G[Flutter: initPaymentSheet]
+    G --> H[User nhập thông tin thẻ]
+    H --> I{Thanh toán?}
+    I -->|Thành công| J[Webhook: payment_intent.succeeded]
+    I -->|Thất bại| K[Hiển thị lỗi]
+    I -->|Hủy| E
+
+    D --> L[Java Service tạo\nVNPay payment URL]
+    L --> M[Flutter: mở VNPay SDK]
+    M --> N[User chọn ngân hàng]
+    N --> O{Thanh toán?}
+    O -->|Thành công| P[Callback: xác thực chữ ký]
+    O -->|Thất bại| K
+    O -->|Hủy| E
+
+    J --> Q[Cập nhật payment_status = paid]
+    P --> Q
+    Q --> R[Cập nhật booking/order]
+    R --> S[Hiển kết quả thành công]
+""")
+
+    # ── User Journey Activity (Mermaid) ──
+    add_mermaid_block(doc, "Hoạt động - Journey người dùng (Customer):", """flowchart TD
+    START([Mở app]) --> LOGIN{Đăng nhập?}
+    LOGIN -->|Chưa có TK| REGISTER[Đăng ký]
+    LOGIN -->|Đã có TK| INPUT[Nhập SĐT + MK]
+    REGISTER --> INPUT
+    INPUT --> HOME[Màn hình chính]
+
+    HOME --> CHAT[Chat AI]
+    HOME --> BOOK[Đặt sân]
+    HOME --> ORDER[Đặt đồ uống]
+    HOME --> STAFF[0 Gọi nhân viên]
+    HOME --> PROFILE[Hồ sơ]
+
+    CHAT --> ASK[Nhập tin nhắn]
+    ASK --> REPLY[Nhận phản hồi AI]
+    REPLY --> CHAT
+
+    BOOK --> SELECT[Chọn loại sân + thời gian]
+    SELECT --> CHECK{Sân trống?}
+    CHECK -->|Có| CONFIRM[Xác nhận đặt]
+    CHECK -->|Không| SELECT
+    CONFIRM --> PAY1{Thanh toán?}
+
+    ORDER --> MENU[Xem menu]
+    MENU --> CART[Thêm vào giỏ]
+    CART --> PLACE[Đặt hàng]
+    PLACE --> PAY2{Thanh toán?}
+
+    PAY1 -->|Stripe| STRIPE[Stripe Payment Sheet]
+    PAY1 -->|VNPay| VNPAY[VNPay SDK]
+    PAY1 -->|Để sau| HOME
+
+    PAY2 -->|Stripe| STRIPE
+    PAY2 -->|VNPay| VNPAY
+    PAY2 -->|Để sau| HOME
+
+    STRIPE --> RESULT{Kết quả}
+    VNPAY --> RESULT
+    RESULT -->|OK| SUCCESS[Thành công]
+    RESULT -->|Fail| RETRY[Thử lại]
+    SUCCESS --> HOME
+    RETRY --> HOME
+
+    STAFF --> REQ[Chọn loại yêu cầu]
+    REQ --> SEND[Gửi yêu cầu]
+    SEND --> WAIT[Chờ nhân viên xử lý]
+    WAIT --> HOME
+""")
+
     # 4.2.2. Knowledge Graph Pipeline
     add_heading_custom(doc, "4.2.2. Knowledge Graph Pipeline", level=3)
 
@@ -1781,10 +2570,13 @@ def create_report():
         "Booking Feature: Chọn loại sân, thời gian, xem sân trống, xác nhận đặt, thanh toán.",
         "Menu Feature: Hiển thị danh sách đồ uống, đặt hàng.",
         "Auth Feature: Đăng nhập/đăng ký với số điện thoại.",
-        "Payment Feature: Thanh toán qua Stripe (WebView) và VNPay (Native SDK).",
+        "Payment Feature: Thanh toán qua Stripe (Native Payment Sheet) và VNPay (Native SDK).",
+        "Billing Feature: Xem hóa đơn đặt sân tổng hợp (phí sân + đơn hàng).",
         "Profile Feature: Quản lý thông tin cá nhân, đổi mật khẩu, đăng xuất.",
         "Admin Feature: Quản lý booking, billing, resource pricing, dashboard analytics.",
-        "Staff Request Feature: Gửi yêu cầu hỗ trợ nhân viên.",
+        "Staff Request Feature: Gửi và quản lý yêu cầu hỗ trợ nhân viên.",
+        "Staff Chat Feature: Chat thời gian thực giữa nhân viên và khách hàng.",
+        "Notification Feature: Thông báo real-time qua WebSocket cho tất cả role.",
     ]
     for item in features:
         add_bullet_point(doc, item)
@@ -1814,6 +2606,197 @@ def create_report():
         "hiển thị tin nhắn văn bản, markdown rendering (flutter_markdown), "
         "typing indicator, message bubbles, và scroll-to-bottom."
     )
+
+    # 4.3.5. Giới thiệu giao diện ứng dụng
+    add_heading_custom(doc, "4.3.5. Giới thiệu giao diện ứng dụng", level=3)
+
+    add_body_text(doc,
+        "Phần này giới thiệu các màn hình chính của ứng dụng Sports Venue Chatbot. "
+        "Mỗi màn hình được mô tả chức năng và cách sử dụng. "
+        "Ảnh chụp màn hình tương ứng được đính kèm bên dưới mỗi mục."
+    )
+
+    doc.add_paragraph()
+    add_body_text(doc, "A. Màn hình xác thực (Authentication)", bold=True)
+
+    auth_screens = [
+        ("Hình 4.7 - Màn hình đăng nhập:", "Người dùng nhập số điện thoại và mật khẩu để đăng nhập. "
+         "Hỗ trợ chuyển sang màn hình đăng ký cho người dùng mới. "
+         "Giao diện đơn giản, tập trung vào trải nghiệm người dùng."),
+    ]
+    for title, desc in auth_screens:
+        add_body_text(doc, title, bold=True)
+        add_body_text(doc, desc)
+        add_body_text(doc, "[Chèn ảnh chụp màn hình tại đây]", bold=True)
+        doc.add_paragraph()
+
+    add_body_text(doc, "B. Màn hình chính và điều hướng", bold=True)
+
+    home_screens = [
+        ("Hình 4.8 - Màn hình chính (Home Screen):", "Màn hình chính sau khi đăng nhập, hiển thị "
+         "các chức năng chính: Chat AI, Đặt sân, Menu, Gọi nhân viên. "
+         "Thanh điều hướng dưới cùng cho phép chuyển đổi giữa các tab."),
+    ]
+    for title, desc in home_screens:
+        add_body_text(doc, title, bold=True)
+        add_body_text(doc, desc)
+        add_body_text(doc, "[Chèn ảnh chụp màn hình tại đây]", bold=True)
+        doc.add_paragraph()
+
+    add_body_text(doc, "C. Chat với AI Agent", bold=True)
+
+    chat_screens = [
+        ("Hình 4.9 - Giao diện Chat với AI Agent:", "Màn hình chat chính, người dùng nhập tin nhắn "
+         "và nhận phản hồi từ AI. Hỗ trợ markdown rendering cho định dạng văn bản, "
+         "hiển thị typing indicator khi AI đang xử lý. "
+         "Có thể hỏi về luật chơi, kỹ thuật, đặt sân, gọi đồ uống trực tiếp qua chat."),
+    ]
+    for title, desc in chat_screens:
+        add_body_text(doc, title, bold=True)
+        add_body_text(doc, desc)
+        add_body_text(doc, "[Chèn ảnh chụp màn hình tại đây]", bold=True)
+        doc.add_paragraph()
+
+    add_body_text(doc, "D. Đặt sân (Booking)", bold=True)
+
+    booking_screens = [
+        ("Hình 4.10 - Màn hình đặt sân (Booking):", "Chọn loại sân (bida, pickleball, cầu lông), "
+         "xem danh sách sân trống theo thời gian. Hiển thị giá sân và trạng thái availability."),
+        ("Hình 4.11 - Màn hình chọn thời gian đặt sân:", "Chọn ngày và giờ bắt đầu, kết thúc. "
+         "Hệ thống kiểm tra tự động sân trống và hiển thị kết quả real-time."),
+    ]
+    for title, desc in booking_screens:
+        add_body_text(doc, title, bold=True)
+        add_body_text(doc, desc)
+        add_body_text(doc, "[Chèn ảnh chụp màn hình tại đây]", bold=True)
+        doc.add_paragraph()
+
+    add_body_text(doc, "E. Menu và đặt đồ uống", bold=True)
+
+    menu_screens = [
+        ("Hình 4.12 - Màn hình Menu đồ uống:", "Hiển thị danh sách đồ uống/đồ ăn theo danh mục, "
+         "có hình ảnh, giá tiền (VND). Hỗ trợ tìm kiếm và lọc theo loại."),
+        ("Hình 4.13 - Màn hình giỏ hàng (Cart):", "Xem các món đã chọn, điều chỉnh số lượng, "
+         "xem tổng tiền. Nút 'Đặt hàng' để xác nhận đơn."),
+    ]
+    for title, desc in menu_screens:
+        add_body_text(doc, title, bold=True)
+        add_body_text(doc, desc)
+        add_body_text(doc, "[Chèn ảnh chụp màn hình tại đây]", bold=True)
+        doc.add_paragraph()
+
+    add_body_text(doc, "F. Thanh toán", bold=True)
+
+    payment_screens = [
+        ("Hình 4.14 - Dialog chọn phương thức thanh toán:", "Sau khi đặt sân hoặc đặt đồ uống, "
+         "hệ thống hiển thị dialog cho phép chọn phương thức: Stripe (quốc tế) hoặc VNPay (trong nước). "
+         "Có nút 'Để sau' nếu người dùng chưa muốn thanh toán ngay."),
+        ("Hình 4.15 - Màn hình thanh toán Stripe (Payment Sheet):", "Stripe Native Payment Sheet "
+         "hiển thị trực tiếp trong app (không qua WebView). Người dùng nhập thông tin thẻ "
+         "và xác nhận thanh toán. Hỗ trợ Visa, Mastercard, JCB."),
+        ("Hình 4.16 - Màn hình thanh toán VNPay:", "VNPay Native SDK mở trang thanh toán "
+         "trên thiết bị. Người dùng chọn ngân hàng và hoàn tất giao dịch."),
+        ("Hình 4.17 - Kết quả thanh toán thành công:", "Hiển thị kết quả thanh toán "
+         "với mã giao dịch, số tiền, và trạng thái. Có nút quay về trang chính."),
+    ]
+    for title, desc in payment_screens:
+        add_body_text(doc, title, bold=True)
+        add_body_text(doc, desc)
+        add_body_text(doc, "[Chèn ảnh chụp màn hình tại đây]", bold=True)
+        doc.add_paragraph()
+
+    add_body_text(doc, "G. Gọi nhân viên và quản lý yêu cầu", bold=True)
+
+    staff_screens = [
+        ("Hình 4.18 - Màn hình gọi nhân viên (Call Staff Dialog):", "Dialog cho phép khách hàng "
+         "chọn loại yêu cầu (bảo trì, dọn dẹp, gọi đồ uống, hỗ trợ khác) "
+         "và nhập mô tả chi tiết. Gửi yêu cầu đến nhân viên phụ trách."),
+        ("Hình 4.19 - Màn hình danh sách yêu cầu (Staff Requests):", "Danh sách các yêu cầu "
+         "đã gửi, hiển thị trạng thái: chờ xử lý, đã chấp nhận, đã hoàn thành."),
+        ("Hình 4.20 - Màn hình quản lý yêu cầu (Staff Request Management):", "Giao diện cho nhân viên "
+         "xem và xử lý yêu cầu từ khách hàng. Chia thành 2 nhóm: 'Chờ xử lý' và 'Đang xử lý'. "
+         "Nhân viên có thể chấp nhận, hoàn thành, hoặc hủy yêu cầu."),
+    ]
+    for title, desc in staff_screens:
+        add_body_text(doc, title, bold=True)
+        add_body_text(doc, desc)
+        add_body_text(doc, "[Chèn ảnh chụp màn hình tại đây]", bold=True)
+        doc.add_paragraph()
+
+    add_body_text(doc, "H. Chat với nhân viên (Staff Chat)", bold=True)
+
+    staff_chat_screens = [
+        ("Hình 4.21 - Màn hình chat với nhân viên (Staff Chat):", "Giao diện chat thời gian thực "
+         "giữa khách hàng và nhân viên. Sử dụng WebSocket để truyền tin nhắn tức thì. "
+         "Hỗ trợ hiển thị tin nhắn, thời gian gửi, và trạng thái đối phương online."),
+        ("Hình 4.22 - Màn hình hộp thư nhân viên (Staff Inbox):", "Danh sách các cuộc trò chuyện "
+         "của nhân viên với khách hàng. Hiển thị tin nhắn cuối cùng, thời gian, "
+         "và số tin nhắn chưa đọc."),
+    ]
+    for title, desc in staff_chat_screens:
+        add_body_text(doc, title, bold=True)
+        add_body_text(doc, desc)
+        add_body_text(doc, "[Chèn ảnh chụp màn hình tại đây]", bold=True)
+        doc.add_paragraph()
+
+    add_body_text(doc, "I. Thông báo vận hành", bold=True)
+
+    notif_screens = [
+        ("Hình 4.23 - Màn hình thông báo vận hành (Notifications):", "Danh sách thông báo "
+         "cho nhân viên/admin: đặt sân mới, đặt đồ uống mới, yêu cầu hỗ trợ. "
+         "Hiển thị kết nối realtime, đánh dấu đã đọc, phân trang vô hạn."),
+    ]
+    for title, desc in notif_screens:
+        add_body_text(doc, title, bold=True)
+        add_body_text(doc, desc)
+        add_body_text(doc, "[Chèn ảnh chụp màn hình tại đây]", bold=True)
+        doc.add_paragraph()
+
+    add_body_text(doc, "J. Hóa đơn và lịch sử", bold=True)
+
+    billing_screens = [
+        ("Hình 4.24 - Màn hình hóa đơn đặt sân (Booking Bill):", "Hiển thị hóa đơn tổng hợp "
+         "cho một lần đặt sân: phí sân theo giờ, danh sách đồ uống đã đặt, "
+         "và tổng tiền thanh toán. Hỗ trợ xem chi tiết từng đơn hàng."),
+        ("Hình 4.25 - Màn hình lịch sử đơn hàng (Order History):", "Danh sách tất cả đơn hàng "
+         "của khách hàng, hiển thị trạng thái, tổng tiền, và nút thanh toán nếu chưa trả."),
+    ]
+    for title, desc in billing_screens:
+        add_body_text(doc, title, bold=True)
+        add_body_text(doc, desc)
+        add_body_text(doc, "[Chèn ảnh chụp màn hình tại đây]", bold=True)
+        doc.add_paragraph()
+
+    add_body_text(doc, "K. Quản trị (Admin)", bold=True)
+
+    admin_screens = [
+        ("Hình 4.26 - Màn hình quản lý đặt sân (Admin Booking):", "Admin xem tất cả đặt sân, "
+         "lọc theo trạng thái, xem hóa đơn chi tiết, cập nhật trạng thái."),
+        ("Hình 4.27 - Màn hình quản lý menu (Admin Menu):", "Admin thêm/sửa/xóa món trong menu, "
+         "cập nhật giá, bật/tắt tình trạng còn phục vụ."),
+        ("Hình 4.28 - Màn hình Dashboard Admin:", "Tổng quan doanh thu, số lượng đặt sân, "
+         "đơn hàng theo ngày. Biểu đồ và thống kê."),
+    ]
+    for title, desc in admin_screens:
+        add_body_text(doc, title, bold=True)
+        add_body_text(doc, desc)
+        add_body_text(doc, "[Chèn ảnh chụp màn hình tại đây]", bold=True)
+        doc.add_paragraph()
+
+    add_body_text(doc, "L. Hồ sơ cá nhân và điều hướng nhân viên", bold=True)
+
+    profile_screens = [
+        ("Hình 4.29 - Màn hình hồ sơ cá nhân (Profile):", "Xem thông tin cá nhân, "
+         "đổi mật khẩu, đăng xuất. Hiển thị tên, số điện thoại, email."),
+        ("Hình 4.30 - Thanh điều hướng nhân viên (Staff Shell):", "Thanh navigation "
+         "dành cho nhân viên với 3 tab: Thông báo, Tin nhắn (Inbox), Yêu cầu. "
+         "Hiển thị badge số thông báo chưa đọc."),
+    ]
+    for title, desc in profile_screens:
+        add_body_text(doc, title, bold=True)
+        add_body_text(doc, desc)
+        add_body_text(doc, "[Chèn ảnh chụp màn hình tại đây]", bold=True)
+        doc.add_paragraph()
 
     # 4.4. Môi trường triển khai
     add_heading_custom(doc, "4.4. Môi trường triển khai", level=2)
