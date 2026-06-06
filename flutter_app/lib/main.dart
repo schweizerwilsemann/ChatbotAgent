@@ -8,6 +8,9 @@ import 'package:sports_venue_chatbot/core/config/flavor_config.dart';
 import 'package:sports_venue_chatbot/core/router/app_router.dart';
 import 'package:sports_venue_chatbot/core/theme/app_scroll_behavior.dart';
 import 'package:sports_venue_chatbot/core/theme/app_theme.dart';
+import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
+import 'package:sports_venue_chatbot/features/staff/presentation/staff_notifications_provider.dart';
+import 'package:sports_venue_chatbot/features/staff_chat/presentation/customer_chat_notifications_provider.dart';
 
 Future<void> main() async => _runApp(FlavorConfig.resolveFlavor(appFlavor));
 
@@ -28,6 +31,14 @@ class SportsVenueChatbotApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(authStateProvider, (_, next) {
+      _syncRealtimeNotifications(ref, next.valueOrNull?.role);
+    });
+    final authState = ref.watch(authStateProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _syncRealtimeNotifications(ref, authState.valueOrNull?.role);
+    });
+
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
@@ -49,4 +60,31 @@ class SportsVenueChatbotApp extends ConsumerWidget {
       ],
     );
   }
+}
+
+void _syncRealtimeNotifications(WidgetRef ref, String? role) {
+  _syncCustomerChatNotifications(ref, role);
+  _syncStaffNotifications(ref, role);
+}
+
+void _syncCustomerChatNotifications(WidgetRef ref, String? role) {
+  final customerNotifier = ref.read(customerChatNotificationsProvider.notifier);
+  final normalizedRole = role?.toUpperCase();
+  if (normalizedRole == null ||
+      normalizedRole == 'STAFF' ||
+      normalizedRole == 'ADMIN') {
+    customerNotifier.stop();
+    return;
+  }
+  customerNotifier.start();
+}
+
+void _syncStaffNotifications(WidgetRef ref, String? role) {
+  final staffNotifier = ref.read(staffNotificationsProvider.notifier);
+  final normalizedRole = role?.toUpperCase();
+  if (normalizedRole == 'STAFF' || normalizedRole == 'ADMIN') {
+    staffNotifier.start();
+    return;
+  }
+  staffNotifier.stop();
 }

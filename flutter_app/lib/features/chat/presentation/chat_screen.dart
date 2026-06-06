@@ -109,27 +109,33 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   color: AppColors.primary, size: 20),
             ),
             const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Sports Venue AI',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Sports Venue AI',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                Text(
-                  chatState.isLoading || chatState.isStreaming
-                      ? 'Đang trả lời...'
-                      : 'Trực tuyến',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
+                  Text(
+                    chatState.isLoading || chatState.isStreaming
+                        ? 'Đang trả lời...'
+                        : 'Trực tuyến',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -305,6 +311,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               return ChatBubble(
                 message: chatState.messages[index],
                 key: ValueKey(chatState.messages[index].id),
+                onPaymentStatusChanged: (orderId, status) {
+                  ref
+                      .read(chatProvider.notifier)
+                      .updatePaymentStatus(orderId, status);
+                },
               );
             }
 

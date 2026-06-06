@@ -8,11 +8,14 @@ import 'package:sports_venue_chatbot/shared/utils/date_utils.dart';
 class ChatBubble extends StatelessWidget {
   final ChatMessage message;
   final bool showTimestamp;
+  final void Function(String orderId, String paymentStatus)?
+      onPaymentStatusChanged;
 
   const ChatBubble({
     super.key,
     required this.message,
     this.showTimestamp = true,
+    this.onPaymentStatusChanged,
   });
 
   @override
@@ -131,7 +134,10 @@ class ChatBubble extends StatelessWidget {
                         _buildToolBadges(),
                       ],
                       if (!isUser && message.metadata != null) ...[
-                        OrderCard(metadata: message.metadata!),
+                        OrderCard(
+                          metadata: message.metadata!,
+                          onPaymentStatusChanged: onPaymentStatusChanged,
+                        ),
                       ],
                     ],
                   ),

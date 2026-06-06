@@ -24,6 +24,7 @@ from app.api.order import router as order_router
 from app.api.payment import router as payment_router
 from app.api.realtime import router as realtime_router
 from app.api.staff import router as staff_router
+from app.api.staff_chat import router as staff_chat_router
 from app.api.staff_request import router as staff_request_router
 from app.api.stripe import router as stripe_router
 from app.api.venue import router as venue_router
@@ -169,6 +170,7 @@ app.include_router(order_router)
 app.include_router(menu_router)
 app.include_router(staff_router)
 app.include_router(staff_request_router)
+app.include_router(staff_chat_router)
 app.include_router(venue_router)
 app.include_router(realtime_router)
 app.include_router(admin_router)

@@ -1,5 +1,6 @@
 from app.schemas.booking import (
     AvailabilityQuery,
+    BookingBillResponse,
     BookingCancelResponse,
     BookingCreate,
     BookingResponse,
@@ -17,6 +18,7 @@ __all__ = [
     "ChatResponse",
     "BookingCreate",
     "BookingResponse",
+    "BookingBillResponse",
     "BookingCancelResponse",
     "AvailabilityQuery",
     "OrderCreate",

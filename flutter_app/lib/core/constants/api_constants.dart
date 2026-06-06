@@ -17,6 +17,20 @@ class ApiConstants {
   static const String venueResourcesEndpoint = '/api/venues/resources';
   static const String staffNotifyEndpoint = '/api/staff/notify';
   static const String staffRequestEndpoint = '/api/staff/requests';
+  static const String staffChatEndpoint = '/api/staff/chat';
+
+  static String staffChatWsEndpoint(String requestId) {
+    final uri = Uri.parse(baseUrl);
+    final scheme = uri.scheme == 'https' ? 'wss' : 'ws';
+    return uri
+        .replace(
+          scheme: scheme,
+          path: '/api/staff/chat/$requestId/ws',
+          query: '',
+        )
+        .toString();
+  }
+
   static const String realtimeNotificationsEndpoint =
       '/api/realtime/notifications';
   static const String realtimeNotificationsReadAllEndpoint =

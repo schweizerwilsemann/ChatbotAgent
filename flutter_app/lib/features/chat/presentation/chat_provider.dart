@@ -274,6 +274,18 @@ class ChatNotifier extends StateNotifier<ChatState> {
     state = state.copyWith(clearError: true);
   }
 
+  /// Update payment_status in metadata for messages matching [orderId].
+  void updatePaymentStatus(String orderId, String paymentStatus) {
+    final updated = state.messages.map((msg) {
+      if (msg.metadata == null) return msg;
+      if (msg.metadata!['id'] != orderId) return msg;
+      return msg.copyWith(
+        metadata: {...msg.metadata!, 'payment_status': paymentStatus},
+      );
+    }).toList();
+    state = state.copyWith(messages: updated);
+  }
+
   /// Retry the last message
   Future<void> retryLastMessage() async {
     if (state.messages.isEmpty) return;

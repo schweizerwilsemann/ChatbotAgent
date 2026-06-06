@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/analytics_screen.dart';
 import 'package:sports_venue_chatbot/features/payment/presentation/payment_webview_screen.dart';
 import 'package:sports_venue_chatbot/features/payment/presentation/payment_result_screen.dart';
-import 'package:sports_venue_chatbot/features/payment/presentation/stripe_checkout_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/admin_profile_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/dashboard_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/booking_management_screen.dart';
@@ -18,6 +17,10 @@ import 'package:sports_venue_chatbot/features/auth/presentation/login_screen.dar
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_screen.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/voice_agent_call_screen.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_screen.dart';
+import 'package:sports_venue_chatbot/features/staff_chat/presentation/customer_staff_chat_screen.dart';
+import 'package:sports_venue_chatbot/features/staff_chat/presentation/staff_chat_screen.dart';
+import 'package:sports_venue_chatbot/features/staff_chat/presentation/staff_inbox_screen.dart';
+import 'package:sports_venue_chatbot/features/staff_request/presentation/staff_request_management_screen.dart';
 import 'package:sports_venue_chatbot/features/home_screen.dart';
 import 'package:sports_venue_chatbot/features/menu/presentation/menu_screen.dart';
 import 'package:sports_venue_chatbot/features/profile/presentation/profile_screen.dart';
@@ -38,8 +41,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
       final isSplashRoute = location == '/splash';
       final isLoginRoute = location == '/login';
-      final isAdminRoute = location.startsWith('/admin');
-      final isStaffRoute = location.startsWith('/staff');
+      final isAdminRoute =
+          location == '/admin' || location.startsWith('/admin/');
+      final isStaffRoute = location == '/staff' ||
+          location.startsWith('/staff/') ||
+          location.startsWith('/staff-operator-chat/');
       final isManagementRoute = isAdminRoute || isStaffRoute;
 
       if (authState.isLoading) {
@@ -49,7 +55,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (isSplashRoute) {
         if (!isLoggedIn) return '/login';
         if (userRole == 'ADMIN') return '/admin/dashboard';
-        if (userRole == 'STAFF') return '/staff/notifications';
+        if (userRole == 'STAFF') return '/staff/requests';
         return '/home';
       }
 
@@ -59,13 +65,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // Logged in on login page → redirect by role
       if (isLoggedIn && isLoginRoute) {
         if (userRole == 'ADMIN') return '/admin/dashboard';
-        if (userRole == 'STAFF') return '/staff/notifications';
+        if (userRole == 'STAFF') return '/staff/requests';
         return '/home';
       }
 
       // Staff trying admin routes → staff area
       if (isLoggedIn && userRole == 'STAFF' && isAdminRoute) {
-        return '/staff/notifications';
+        return '/staff/requests';
       }
 
       // Admin trying staff routes → admin area
@@ -76,7 +82,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // Logged-in staff/admin on customer routes → their area
       if (isLoggedIn && !isManagementRoute) {
         if (userRole == 'ADMIN') return '/admin/dashboard';
-        if (userRole == 'STAFF') return '/staff/notifications';
+        if (userRole == 'STAFF') return '/staff/requests';
       }
 
       // Customer on management routes → home
@@ -191,10 +197,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 const NoTransitionPage(child: MenuManagementScreen()),
           ),
           GoRoute(
+            path: '/staff/requests',
+            name: 'staff_requests',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: StaffRequestManagementScreen()),
+          ),
+          GoRoute(
             path: '/staff/notifications',
             name: 'staff_notifications',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: StaffNotificationsScreen()),
+          ),
+          GoRoute(
+            path: '/staff/inbox',
+            name: 'staff_inbox',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: StaffInboxScreen()),
           ),
         ],
       ),
@@ -251,21 +269,36 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/stripe-checkout',
-        name: 'stripe_checkout',
+        path: '/voice-agent',
+        name: 'voice_agent',
+        builder: (context, state) => const VoiceAgentCallScreen(),
+      ),
+      GoRoute(
+        path: '/staff-chat/:requestId',
+        name: 'staff_chat',
         builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>;
-          return StripeCheckoutScreen(
-            checkoutUrl: extra['checkoutUrl'] as String,
-            orderId: extra['orderId'] as String,
-            orderType: extra['orderType'] as String? ?? 'booking',
+          final requestId = state.pathParameters['requestId']!;
+          final extra = state.extra as Map<String, dynamic>?;
+          // Customer uses this route
+          return CustomerStaffChatScreen(
+            requestId: requestId,
+            staffName: extra?['staffName'] as String?,
           );
         },
       ),
       GoRoute(
-        path: '/voice-agent',
-        name: 'voice_agent',
-        builder: (context, state) => const VoiceAgentCallScreen(),
+        path: '/staff-operator-chat/:requestId',
+        name: 'staff_operator_chat',
+        builder: (context, state) {
+          final requestId = state.pathParameters['requestId']!;
+          final extra = state.extra as Map<String, dynamic>?;
+          // Staff uses this route
+          return StaffChatScreen(
+            requestId: requestId,
+            customerName: extra?['customerName'] as String?,
+            resourceLabel: extra?['resourceLabel'] as String?,
+          );
+        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

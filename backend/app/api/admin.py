@@ -608,7 +608,7 @@ async def get_all_menu_items(
 @router.post("/menu", response_model=MenuItemResponse, status_code=201)
 async def create_menu_item(
     data: MenuItemCreate,
-    user: User = Depends(require_roles("STAFF", "ADMIN")),
+    user: User = Depends(require_roles("ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> MenuItemResponse:
     """Create a new menu item."""
@@ -635,7 +635,7 @@ async def create_menu_item(
 async def update_menu_item(
     item_id: str,
     data: MenuItemUpdate,
-    user: User = Depends(require_roles("STAFF", "ADMIN")),
+    user: User = Depends(require_roles("ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> MenuItemResponse:
     """Update a menu item. Only provided fields are updated."""

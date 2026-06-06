@@ -256,24 +256,32 @@ class AdminRepository:
 
     async def get_orders_during_booking(self, booking: Booking) -> list[Order]:
         """Return non-cancelled orders created by this customer during a booking."""
-        stmt = (
-            select(Order)
-            .options(selectinload(Order.items))
-            .where(
-                Order.user_id == booking.user_id,
-                Order.status != "cancelled",
-                Order.created_at >= booking.start_time,
-                Order.created_at <= booking.end_time,
-            )
-            .order_by(Order.created_at.asc())
-        )
+        fallback_conditions = [
+            Order.booking_id.is_(None),
+            Order.user_id == booking.user_id,
+            Order.created_at >= booking.start_time,
+            Order.created_at <= booking.end_time,
+        ]
         scope_conditions = []
         if booking.resource_id:
             scope_conditions.append(Order.resource_id == booking.resource_id)
         if booking.venue_id:
             scope_conditions.append(Order.venue_id == booking.venue_id)
         if scope_conditions:
-            stmt = stmt.where(or_(*scope_conditions))
+            fallback_conditions.append(or_(*scope_conditions))
+
+        stmt = (
+            select(Order)
+            .options(selectinload(Order.items))
+            .where(
+                Order.status != "cancelled",
+                or_(
+                    Order.booking_id == booking.id,
+                    and_(*fallback_conditions),
+                ),
+            )
+            .order_by(Order.created_at.asc())
+        )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

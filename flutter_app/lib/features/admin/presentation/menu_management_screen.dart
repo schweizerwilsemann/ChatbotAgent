@@ -8,6 +8,7 @@ import 'package:sports_venue_chatbot/core/constants/app_spacing.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/admin/data/admin_models.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/menu_management_provider.dart';
+import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/pagination_footer.dart';
 
 // ─── Category helpers ───────────────────────────────────────────────────────
@@ -357,6 +358,8 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(menuManagementProvider);
+    final user = ref.watch(authStateProvider).valueOrNull;
+    final canManageMenu = user?.role.toUpperCase() == 'ADMIN';
 
     // Listen for success / error messages
     ref.listen<MenuManagementState>(menuManagementProvider, (prev, next) {
@@ -381,11 +384,12 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
         foregroundColor: AppColors.textPrimary,
         elevation: 0.5,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline),
-            tooltip: 'Thêm món',
-            onPressed: _handleCreate,
-          ),
+          if (canManageMenu)
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline),
+              tooltip: 'Thêm món',
+              onPressed: _handleCreate,
+            ),
         ],
         bottom: TabBar(
           controller: _tabController,
@@ -461,6 +465,7 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
                                   return _MenuItemManagementCard(
                                     item: items[i],
                                     formatPrice: _formatPrice,
+                                    canManageMenu: canManageMenu,
                                     onEdit: () => _handleEdit(items[i]),
                                     onDelete: () => _handleDelete(items[i]),
                                     onToggleAvailability: () =>
@@ -513,6 +518,7 @@ class _MenuManagementScreenState extends ConsumerState<MenuManagementScreen>
 class _MenuItemManagementCard extends StatelessWidget {
   final AdminMenuItem item;
   final String Function(double) formatPrice;
+  final bool canManageMenu;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final VoidCallback onToggleAvailability;
@@ -520,6 +526,7 @@ class _MenuItemManagementCard extends StatelessWidget {
   const _MenuItemManagementCard({
     required this.item,
     required this.formatPrice,
+    required this.canManageMenu,
     required this.onEdit,
     required this.onDelete,
     required this.onToggleAvailability,
@@ -661,16 +668,17 @@ class _MenuItemManagementCard extends StatelessWidget {
                 }
               },
               itemBuilder: (_) => [
-                const PopupMenuItem(
-                  value: 'edit',
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit, size: 18, color: AppColors.info),
-                      SizedBox(width: 10),
-                      Text('Sửa'),
-                    ],
+                if (canManageMenu)
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit, size: 18, color: AppColors.info),
+                        SizedBox(width: 10),
+                        Text('Sửa'),
+                      ],
+                    ),
                   ),
-                ),
                 PopupMenuItem(
                   value: 'toggle',
                   child: Row(
@@ -687,16 +695,17 @@ class _MenuItemManagementCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete, size: 18, color: AppColors.error),
-                      SizedBox(width: 10),
-                      Text('Xoá', style: TextStyle(color: AppColors.error)),
-                    ],
+                if (canManageMenu)
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, size: 18, color: AppColors.error),
+                        SizedBox(width: 10),
+                        Text('Xoá', style: TextStyle(color: AppColors.error)),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           ],
