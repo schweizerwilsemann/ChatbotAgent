@@ -21,11 +21,11 @@ def set_neo4j_client(client: Neo4jClient) -> None:
 
 
 @tool
-async def query_knowledge(question: str) -> str:
+async def query_knowledge(query: str) -> str:
     """Truy cập knowledge graph để trả lời câu hỏi về luật chơi, kỹ thuật thể thao (bida, pickleball, cầu lông).
 
     Args:
-        question: Câu hỏi của người dùng về luật chơi hoặc kỹ thuật thể thao
+        query: Câu hỏi của người dùng về luật chơi hoặc kỹ thuật thể thao
 
     Returns:
         Thông tin liên quan từ knowledge graph
@@ -33,6 +33,7 @@ async def query_knowledge(question: str) -> str:
     if not _neo4j_client:
         return "Knowledge graph chưa được kết nối. Vui lòng thử lại sau."
 
+    question = query
     cache_key = _cache_key(question)
     try:
         cached = await redis_client.get(cache_key)

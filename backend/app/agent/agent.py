@@ -9,6 +9,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_google_genai import ChatGoogleGenerativeAI
 
+from app.agent.context import current_chat_context
 from app.agent.intent_router import IntentRouter
 from app.agent.prompts import SYSTEM_PROMPT
 from app.core.config import settings
@@ -252,7 +253,7 @@ class VenueAgent:
             if question:
                 for tool in self._tools:
                     if getattr(tool, "name", "") == "query_knowledge":
-                        result = await tool.ainvoke({"question": question})
+                        result = await tool.ainvoke({"query": question})
                         return AgentResponse(
                             output=str(result), tools_used=["query_knowledge"]
                         )

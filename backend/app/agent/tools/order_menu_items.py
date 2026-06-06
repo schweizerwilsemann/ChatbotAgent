@@ -145,13 +145,20 @@ async def order_menu_items(items: str, notes: str = "") -> str:
                 NotificationRepository(session),
                 venue_repo,
             )
-            service = OrderService(repo, menu_repo, notification_service, venue_repo)
+            booking_repo = BookingRepository(session)
+            service = OrderService(
+                repo,
+                menu_repo,
+                notification_service,
+                venue_repo,
+                booking_repo,
+            )
 
             venue_id = selected_venue_id
             resource_id = None
             resource_label = None
             table_number = 0
-            active_booking = await BookingRepository(session).get_active_booking(
+            active_booking = await booking_repo.get_active_booking(
                 str(current_user_id.get())
             )
             if active_booking and (
@@ -169,6 +176,7 @@ async def order_menu_items(items: str, notes: str = "") -> str:
 
             order_data = OrderCreate(
                 user_id=current_user_id.get(),
+                booking_id=str(active_booking.id) if active_booking else None,
                 venue_id=venue_id,
                 resource_id=resource_id,
                 resource_label=resource_label,
