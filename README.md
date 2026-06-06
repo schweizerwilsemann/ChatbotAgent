@@ -1,7 +1,7 @@
-# 🎱 Sports Venue AI Chatbot
+# Sports Venue AI Chatbot
 
-AI Agent chatbot cho quán bida / pickleball / cầu lông.  
-Tích hợp Knowledge Graph (Neo4j) + Tool Calling + Mobile App (Flutter).
+AI Agent chatbot cho quán bida / pickleball / cau long.
+Tich hop Knowledge Graph (Neo4j) + Tool Calling + Mobile App (Flutter).
 
 ---
 
@@ -19,11 +19,10 @@ Tích hợp Knowledge Graph (Neo4j) + Tool Calling + Mobile App (Flutter).
   - [Redis Setup](#redis-setup)
   - [Flutter Setup](#flutter-setup)
 - [Knowledge Base](#knowledge-base)
-  - [Raw Data Sources](#raw-data-sources)
-  - [Data Pipeline](#data-pipeline)
-  - [Knowledge Graph Schema](#knowledge-graph-schema)
 - [API Reference](#api-reference)
+- [Features](#features)
 - [Running the Application](#running-the-application)
+- [Demo Accounts](#demo-accounts)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -31,28 +30,30 @@ Tích hợp Knowledge Graph (Neo4j) + Tool Calling + Mobile App (Flutter).
 ## Architecture Overview
 
 ```
-┌─────────────────────────────────────┐
-│           Flutter App               │  Presentation Layer
-│  (Chat UI, Booking, Menu, Auth)     │
-└──────────────┬──────────────────────┘
-               │ HTTP / WebSocket
-┌──────────────▼──────────────────────┐
-│          FastAPI Backend            │  Application Layer
-│  /chat  /booking  /order  /staff    │
-└──────────────┬──────────────────────┘
-               │
-┌──────────────▼──────────────────────┐
-│           AI Agent Layer            │  Domain Layer
-│  Intent → Tool Selection → Execute  │
-│  Graph RAG (Neo4j) + Tool Calling   │
-│  LLM: Ollama (qwen2.5-coder:7b)    │
-└──────┬───────────────────┬──────────┘
-       │                   │
-┌──────▼──────┐    ┌───────▼─────────┐
-│   Neo4j     │    │   PostgreSQL    │  Infrastructure Layer
-│  Knowledge  │    │  booking/order  │
-│   Graph     │    │   /user data    │
-└─────────────┘    └─────────────────┘
++-------------------------------------+
+|           Flutter App               |  Presentation Layer
+|  (Chat UI, Booking, Menu, Auth)     |
+|  (Staff Chat, Staff Requests)       |
+|  (Payment: Stripe/VNPay SDK)        |
++--------------+----------------------+
+               | HTTP / WebSocket
++--------------v----------------------+
+|          FastAPI Backend            |  Application Layer
+|  /chat /booking /order /staff       |
+|  /payment /stripe /realtime         |
+|  /staff/chat /staff/requests        |
++---+---------------------------+-----+
+    |                           |
++---v-----------+   +-----------v---------+
+|  AI Agent     |   | Payment Service     |  Domain Layer
+|  LangChain    |   |  (Java/VNPay)       |
+|  Tool Call    |   |  Stripe SDK         |
++---+-----------+   +-----------+---------+
+    |                           |
++---v---------------------------v---------+
+|         Infrastructure Layer            |
+|  PostgreSQL | Neo4j | Redis | Docker    |
++-----------------------------------------+
 ```
 
 ---
@@ -62,14 +63,17 @@ Tích hợp Knowledge Graph (Neo4j) + Tool Calling + Mobile App (Flutter).
 | Layer | Technology | Version |
 |---|---|---|
 | Mobile App | Flutter (iOS + Android) | Dart 3.1+ |
-| Backend API | Python — FastAPI | 0.115+ |
+| Backend API | Python - FastAPI | 0.115+ |
 | AI Agent | LangChain + Ollama | langchain 0.3.1 |
-| LLM (Local) | Ollama — qwen2.5-coder:7b | 7B params |
+| LLM (Local) | Ollama - qwen2.5-coder:7b | 7B params |
 | LLM (Cloud) | Google Gemini / Anthropic Claude | Optional fallback |
 | Knowledge Graph | Neo4j AuraDB (free cloud) | 5.x |
 | Database | PostgreSQL | 14+ |
-| Cache | Redis | 7+ |
-| Data Scraping | BeautifulSoup, yt-dlp, pdfplumber | — |
+| Cache & Pub/Sub | Redis | 7+ |
+| Payment (International) | Stripe + flutter_stripe | ^11.0.0 |
+| Payment (Domestic) | VNPay Native SDK | Java gateway |
+| Real-time | WebSocket (web_socket_channel) | 3.0.3 |
+| Data Scraping | BeautifulSoup, yt-dlp, pdfplumber | - |
 
 ---
 
@@ -77,86 +81,77 @@ Tích hợp Knowledge Graph (Neo4j) + Tool Calling + Mobile App (Flutter).
 
 ```
 ChatbotAgent/
-│
-├── README.md                          ← You are here
-├── backend/
-│   ├── main.py                        # FastAPI entry point
-│   ├── requirements.txt               # Python dependencies
-│   ├── .env                           # Environment variables (gitignored)
-│   ├── .env.example                   # Environment template
-│   │
-│   ├── app/
-│   │   ├── api/                       # FastAPI routers
-│   │   │   ├── chat.py                # POST /api/chat
-│   │   │   ├── booking.py             # CRUD booking
-│   │   │   ├── order.py               # CRUD F&B order
-│   │   │   ├── menu.py                # GET /api/menu
-│   │   │   └── staff.py               # POST /api/staff/notify
-│   │   │
-│   │   ├── agent/                     # AI Agent core
-│   │   │   ├── agent.py               # Main agent loop (VenueAgent)
-│   │   │   ├── prompts.py             # System prompts
-│   │   │   └── tools/
-│   │   │       ├── book_court.py      # Tool: đặt sân
-│   │   │       ├── order_food.py      # Tool: gọi món
-│   │   │       ├── call_staff.py      # Tool: gọi nhân viên
-│   │   │       ├── query_faq.py       # Tool: tra cứu KG
-│   │   │       └── check_schedule.py  # Tool: xem lịch
-│   │   │
-│   │   ├── kg/                        # Knowledge Graph
-│   │   │   ├── builder.py             # LLM extract → Neo4j insert
-│   │   │   ├── query.py               # Graph traversal / RAG
-│   │   │   ├── embeddings.py          # Node embeddings
-│   │   │   └── scraper/
-│   │   │       ├── base_scraper.py    # Abstract base scraper
-│   │   │       ├── wpa_scraper.py     # WPA billiards rules
-│   │   │       ├── youtube_scraper.py # yt-dlp transcript
-│   │   │       ├── pickleball_scraper.py
-│   │   │       └── bwf_scraper.py     # BWF badminton
-│   │   │
-│   │   ├── models/                    # SQLAlchemy models
-│   │   │   ├── base.py                # UUID + timestamp mixins
-│   │   │   ├── booking.py             # Booking, CourtType, BookingStatus
-│   │   │   ├── order.py               # Order, OrderItem, OrderStatus
-│   │   │   └── user.py                # User, UserRole
-│   │   │
-│   │   ├── schemas/                   # Pydantic request/response
-│   │   ├── services/                  # Business logic
-│   │   ├── repositories/              # DB access layer
-│   │   └── core/
-│   │       ├── config.py              # Pydantic BaseSettings
-│   │       ├── database.py            # Async SQLAlchemy
-│   │       ├── neo4j_client.py        # Neo4j async driver
-│   │       └── redis_client.py        # Redis async client
-│   │
-│   ├── data_pipeline/                 # Knowledge graph build pipeline
-│   │   ├── 01_scrape.py               # Scrape data from web
-│   │   ├── 02_extract_entities.py     # LLM entity extraction
-│   │   ├── 03_build_graph.py          # Insert into Neo4j
-│   │   ├── 04_embed_nodes.py          # Generate embeddings
-│   │   ├── run_pipeline.py            # Master orchestrator
-│   │   │
-│   │   ├── raw_data/                  # Source knowledge files
-│   │   │   ├── billiards/             # Pool & carom knowledge
-│   │   │   ├── pickleball/            # Pickleball knowledge
-│   │   │   ├── badminton/             # Badminton knowledge
-│   │   │   └── venue/                 # Venue-specific (manual input)
-│   │   │
-│   │   └── extracted/                 # LLM-extracted entities (JSON)
-│   │
-│   └── tests/
-│
-└── flutter_app/
-    ├── pubspec.yaml
-    └── lib/
-        ├── main.dart
-        ├── core/                      # Constants, theme, network, router
-        ├── features/
-        │   ├── chat/                  # Chat with AI
-        │   ├── booking/               # Court booking
-        │   ├── menu/                  # Food & drink ordering
-        │   └── auth/                  # Login
-        └── shared/                    # Widgets, utils
+|
++-- README.md
++-- backend/
+|   +-- main.py                        # FastAPI entry point
+|   +-- requirements.txt
+|   +-- .env / .env.example
+|   +-- app/
+|   |   +-- api/                       # FastAPI routers (13 modules)
+|   |   |   +-- auth.py                # Authentication
+|   |   |   +-- chat.py                # AI Chat
+|   |   |   +-- booking.py             # Booking + Bill
+|   |   |   +-- order.py               # F&B Order
+|   |   |   +-- menu.py                # Menu
+|   |   |   +-- staff.py               # Staff notify
+|   |   |   +-- staff_request.py       # Staff request management
+|   |   |   +-- staff_chat.py          # Staff-customer real-time chat
+|   |   |   +-- realtime.py            # WebSocket notifications
+|   |   |   +-- payment.py             # VNPay payment
+|   |   |   +-- stripe.py              # Stripe payment
+|   |   |   +-- admin.py               # Admin management
+|   |   |   +-- venue.py               # Venue/resource
+|   |   |
+|   |   +-- agent/                     # AI Agent core
+|   |   |   +-- agent.py               # VenueAgent (LangChain)
+|   |   |   +-- prompts.py             # System prompts (Vietnamese)
+|   |   |   +-- tools/
+|   |   |       +-- book_court.py
+|   |   |       +-- order_food.py
+|   |   |       +-- call_staff.py
+|   |   |       +-- query_faq.py
+|   |   |       +-- check_schedule.py
+|   |   |       +-- order_menu_items.py
+|   |   |
+|   |   +-- models/                    # SQLAlchemy models
+|   |   |   +-- user.py, booking.py, order.py
+|   |   |   +-- menu.py, venue.py, payment.py
+|   |   |   +-- staff_request.py, notification.py
+|   |   |
+|   |   +-- schemas/                   # Pydantic schemas (59 classes)
+|   |   +-- services/                  # Business logic
+|   |   +-- repositories/              # DB access layer
+|   |   +-- core/
+|   |       +-- config.py, database.py
+|   |       +-- neo4j_client.py, redis_client.py
+|   |
+|   +-- data_pipeline/                 # KG build pipeline
+|   +-- Dockerfile
+|
++-- flutter_app/
+|   +-- pubspec.yaml
+|   +-- lib/
+|       +-- main.dart
+|       +-- core/                      # Constants, theme, network, router
+|       +-- features/                  # 13 feature modules
+|       |   +-- chat/                  # Chat with AI
+|       |   +-- booking/               # Court booking + billing
+|       |   +-- menu/                  # Food & drink ordering
+|       |   +-- auth/                  # Login/register
+|       |   +-- payment/               # Stripe/VNPay payment
+|       |   +-- staff/                 # Staff notifications
+|       |   +-- staff_chat/            # Staff-customer chat
+|       |   +-- staff_request/         # Staff request management
+|       |   +-- admin/                 # Admin panel
+|       |   +-- billing/               # Customer billing
+|       |   +-- profile/               # User profile
+|       |   +-- venue/                 # Venue selection
+|       |   +-- shared/                # Shared widgets
+|       +-- shared/
+|
++-- docker-compose.yml
++-- proto/                             # gRPC definitions
 ```
 
 ---
@@ -175,72 +170,29 @@ ChatbotAgent/
 ### Backend Setup
 
 ```bash
-# 1. Navigate to backend
 cd ChatbotAgent/backend
-
-# 2. Create virtual environment
 python -m venv venv
 source venv/bin/activate        # Linux/Mac
 # venv\Scripts\activate         # Windows
-
-# 3. Install dependencies
 pip install -r requirements.txt
-
-# 4. Copy and edit environment file
 cp .env.example .env
-# Edit .env with your actual values (see below)
-
-# 5. Start the server
+# Edit .env with your actual values
 python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### Ollama Setup (Local LLM)
 
-Ollama runs LLMs locally on your machine — no API key needed, no rate limits, fully private.
-
 ```bash
-# 1. Install Ollama
-# Windows: Download from https://ollama.ai
-# Linux:   curl -fsSL https://ollama.ai/install.sh | sh
-
-# 2. Pull the model used by this project
+# Install Ollama from https://ollama.ai
 ollama pull qwen2.5-coder:7b
-
-# 3. Verify it's running
 ollama list
-# Should show: qwen2.5-coder:7b
-
-# 4. Test it
-curl http://localhost:11434/api/tags
 ```
-
-**Model used:** `qwen2.5-coder:7b` (4.7 GB)  
-- Good at structured JSON output for entity extraction
-- Runs on CPU (no GPU required, but slower)
-- Each extraction chunk takes ~60 seconds on CPU
-
-**Alternative models** (if you want faster/higher quality):
-```bash
-ollama pull qwen2.5:14b        # Better quality, needs 16GB+ RAM
-ollama pull llama3.1:8b        # Good alternative
-ollama pull mistral:7b         # Fast
-```
-
-Update `OLLAMA_MODEL` in `.env` if you switch models.
 
 ### Neo4j AuraDB Setup
 
-Neo4j AuraDB is the cloud-hosted knowledge graph database.
-
-```
-# 1. Go to https://neo4j.com/cloud/aura-free/
-# 2. Create a free instance
-# 3. Note down the connection details:
-#    - URI:      neo4j+s://xxxxxxxx.databases.neo4j.io
-#    - Username: neo4j (or instance ID)
-#    - Password: (set during creation)
-# 4. Add to .env:
-```
+1. Go to https://neo4j.com/cloud/aura-free/
+2. Create a free instance
+3. Add connection details to `.env`
 
 ```env
 NEO4J_URI=neo4j+s://your-instance.databases.neo4j.io
@@ -249,383 +201,277 @@ NEO4J_PASSWORD=your-password
 NEO4J_DATABASE=your-database-name
 ```
 
-**Current instance:**
-- Instance ID: `fe8ca00f`
-- URI: `neo4j+s://fe8ca00f.databases.neo4j.io`
-
-**What's in the graph:**
-- 418 entity nodes (Rule, Technique, Equipment, Sport, Concept, GameType)
-- 441 relationships (DUNG_DE, LIEN_QUAN, LA_LOAI, THUOC, SU_DUNG, QUY_DINH)
-- Full-text search index on entity names and descriptions
-
 ### PostgreSQL Setup
 
 ```bash
-# In WSL (Ubuntu/Debian):
+# In WSL:
 sudo apt update && sudo apt install postgresql postgresql-contrib
 sudo systemctl start postgresql
-
-# Create database
 sudo -u postgres psql
 CREATE DATABASE sports_venue;
 \q
-
-# Or if database already exists, just verify:
-sudo -u postgres psql -c "SELECT 1 FROM pg_database WHERE datname='sports_venue'"
 ```
 
 ```env
-# .env
 DATABASE_URL=postgresql+asyncpg://postgres:your_password@localhost:5432/sports_venue
 ```
 
 **Tables auto-created on startup:**
-- `bookings` — court bookings (user_id, court_type, start/end time, status)
-- `orders` — food/drink orders (user_id, items JSON, total_price, status)
-- `order_items` — individual items in an order
-- `users` — customer accounts (phone, name, email, role)
-
-**Enums:**
-- `court_type_enum`: billiards, pickleball, badminton
-- `booking_status_enum`: confirmed, cancelled, completed
-- `order_status_enum`: pending, preparing, ready, delivered, cancelled
-- `user_role_enum`: CUSTOMER, STAFF, ADMIN
+- `users` - customer/staff/admin accounts
+- `bookings` - court bookings with payment_status
+- `orders` - F&B orders with booking_id FK
+- `order_items` - individual items
+- `venues`, `service_resources` - venue & court management
+- `menu_items` - food/drink menu
+- `payments` - payment transactions (Stripe/VNPay)
+- `staff_requests` - customer support requests
+- `notifications` - real-time notification records
 
 ### Redis Setup
 
 ```bash
-# In WSL:
-sudo apt update && sudo apt install redis-server
+sudo apt install redis-server
 sudo systemctl start redis-server
-
-# Verify:
-redis-cli ping
-# Should return: PONG
+redis-cli ping  # Should return: PONG
 ```
 
 ```env
-# .env
 REDIS_URL=redis://localhost:6379
 ```
 
 **Used for:**
 - Chat session storage (conversation history with TTL)
-- Staff notifications (pub/sub)
+- Staff notifications pub/sub
+- Staff chat rooms (ephemeral, Redis-only)
+- Presence tracking for chat participants
 - Caching
 
 ### Flutter Setup
 
 ```bash
 cd ChatbotAgent/flutter_app
-
-# Generate platform directories (first time only)
-flutter create . --org com.sportsvenue
-
-# Install dependencies
 flutter pub get
-
-# Generate code (JSON serialization, etc.)
 flutter run build_runner build --delete-conflicting-outputs
-
-# Run on connected device/emulator
 flutter run
 ```
 
-**Dependencies:** Riverpod (state), GoRouter (navigation), Dio (HTTP), flutter_chat_ui (chat)
+**Key Dependencies:** Riverpod (state), GoRouter (navigation), Dio (HTTP), flutter_chat_ui (chat), flutter_stripe (payment), web_socket_channel (real-time)
 
 ---
 
 ## Knowledge Base
 
-### Raw Data Sources
+### Data Sources
 
-All knowledge files are in `backend/data_pipeline/raw_data/`:
+All knowledge files in `backend/data_pipeline/raw_data/`:
 
-| File | Sport | Content | Words |
-|------|-------|---------|-------|
-| `billiards/wpa_rules.txt` | Billiards | WPA 8-ball, 9-ball, 10-ball, 3-cushion rules | ~2,500 |
-| `billiards/diamond_system.txt` | Billiards | Diamond system deep-dive (plus 2, plus 3) | ~2,000 |
-| `billiards/three_cushion_techniques.txt` | Billiards | 3-cushion techniques, strategy, safety | ~1,800 |
-| `billiards/youtube_techniques.txt` | Billiards | Vietnamese technique summaries | ~1,500 |
-| `pickleball/usapa_rules.txt` | Pickleball | USA Pickleball official rules | ~2,500 |
-| `pickleball/USAP-Official-Rulebook.txt` | Pickleball | Full rulebook (96 pages, PDF extracted) | ~145K chars |
-| `pickleball/techniques.txt` | Pickleball | Dinking, third shot, Erne, stacking | ~2,400 |
-| `badminton/bwf_rules.txt` | Badminton | BWF laws of badminton | ~2,000 |
-| `badminton/techniques.txt` | Badminton | Grip, footwork, smash, net play, doubles | ~2,400 |
-| `venue/menu_placeholder.txt` | Venue | Menu template (needs manual input) | — |
-| `venue/court_schedule_placeholder.txt` | Venue | Schedule template (needs manual input) | — |
-| `venue/pricing_placeholder.txt` | Venue | Pricing template (needs manual input) | — |
-| `billiards/local_rules_billiard_lo.txt` | Venue | Local pool rules (needs manual input) | — |
-| `billiards/local_rules_billiard_phang.txt` | Venue | Local carom rules (needs manual input) | — |
-
-**Data format:** Files use `[SECTION: ...]` and `[TOPIC: ...]` headers with `---` separators, designed for LLM entity extraction.
-
-### Data Pipeline
-
-The pipeline transforms raw text files into a Neo4j knowledge graph:
-
-```
-Step 1: Scrape / Collect
-    Web scraping (BeautifulSoup), PDF extraction (pdfplumber),
-    YouTube transcripts (yt-dlp), manual input
-    → raw_data/*.txt
-
-Step 2: Extract Entities (LLM)
-    Each .txt file is parsed into chunks by [SECTION:]/[TOPIC:] headers.
-    Each chunk is sent to the LLM (Ollama qwen2.5-coder:7b) with a prompt
-    to extract entities and relationships as JSON.
-    → extracted/*.json
-
-Step 3: Build Graph
-    Deduplicate entities across all files.
-    Create constraints, indexes, and fulltext search in Neo4j.
-    Insert all entities as nodes and relationships as edges.
-    → Neo4j database
-
-Step 4: Embed Nodes (Optional)
-    Generate vector embeddings for entity names + descriptions.
-    Store as node properties for hybrid search.
-    → Neo4j node properties
-```
-
-**Running the pipeline:**
-
-```bash
-cd ChatbotAgent/backend
-
-# Full pipeline (all steps)
-python data_pipeline/02_extract_entities.py   # ~90 min with Ollama on CPU
-python data_pipeline/03_build_graph.py        # ~1 min
-python data_pipeline/04_embed_nodes.py        # Optional, needs embedding model
-```
-
-**Extraction results (completed):**
-
-| Metric | Value |
-|--------|-------|
-| Files processed | 10 |
-| Total chunks | 83 |
-| Entities extracted | 563 |
-| Relationships extracted | 464 |
-| Unique entities (after dedup) | 418 |
-| Unique relationships (after dedup) | 441 |
-| Processing time | ~91 minutes |
+| Sport | Content | Files |
+|-------|---------|-------|
+| Billiards | WPA rules, diamond system, techniques | 5 files |
+| Pickleball | USAPA rules, techniques, full rulebook | 3 files |
+| Badminton | BWF laws, techniques | 2 files |
 
 ### Knowledge Graph Schema
 
-**Node types (labels):**
+**Node types:** Rule, Technique, Equipment, Sport, Concept, GameType
+**Relationships:** DUNG_DE, LIEN_QUAN, LA_LOAI, THUOC, SU_DUNG, QUY_DINH
 
-| Label | Description | Example |
-|-------|-------------|---------|
-| `Rule` | A specific rule or regulation | "8-Ball Break Rules" |
-| `Technique` | A playing technique or skill | "Diamond System" |
-| `Equipment` | Physical equipment | "Cue Stick", "Shuttlecock" |
-| `Sport` | A sport name | "Billiards", "Pickleball" |
-| `Concept` | General concept or strategy | "Safety Play" |
-| `GameType` | A game variant | "8-Ball", "9-Ball", "Singles" |
-
-**Relationship types:**
-
-| Type | Meaning (Vietnamese) | Example |
-|------|---------------------|---------|
-| `DUNG_DE` | applies to / relevant for | Diamond System → DUNG_DE → 3-Cushion |
-| `LIEN_QUAN` | related to | Smash → LIEN_QUAN → Jump |
-| `LA_LOAI` | is a type of | 8-Ball → LA_LOAI → Pool |
-| `THUOC` | belongs to | Kitchen Rule → THUOC → Pickleball |
-| `SU_DUNG` | uses | Smash → SU_DUNG → Racket |
-| `QUY_DINH` | regulates | WPA → QUY_DINH → 9-Ball |
-
-**Querying the graph (Cypher examples):**
-
-```cypher
--- Find all rules for billiards
-MATCH (r:Rule)-[:THUOC]->(s:Sport {name: "Billiards"})
-RETURN r.name, r.description
-
--- Find techniques related to the diamond system
-MATCH (t:Technique {name: "Diamond System"})-[r]-(related)
-RETURN t.name, type(r), related.name, labels(related)
-
--- Full-text search across all entities
-CALL db.index.fulltext.queryNodes("entity_fulltext", "smash technique")
-YIELD node, score
-RETURN node.name, node.description, score
-ORDER BY score DESC LIMIT 10
-
--- Find everything related to pickleball
-MATCH (n)-[r]-(m)
-WHERE n.name = "Pickleball" OR m.name = "Pickleball"
-RETURN n.name, type(r), m.name
-```
+**Stats:** 418 entities, 441 relationships, full-text search index
 
 ---
 
 ## API Reference
 
-### Endpoints
+### Endpoints (65 REST + 2 WebSocket)
 
+| Group | Endpoints | Description |
+|-------|-----------|-------------|
+| Auth | 4 | Login, verify, change password, profile |
+| Chat | 1 | AI chat with tool calling |
+| Booking | 10 | CRUD, availability, active, bills |
+| Order | 4 | CRUD with booking linking |
+| Menu | 3 | List, top-selling, suggest |
+| Staff Notify | 1 | Send notification to staff |
+| Staff Request | 7 | Create, accept, complete, cancel, active |
+| Staff Chat | 4 | Rooms, history, close, WebSocket |
+| Realtime | 4 | WebSocket notifications, list, mark read |
+| VNPay Payment | 3 | Create, callback, query |
+| Stripe Payment | 6 | PaymentIntent, checkout, webhook, config |
+| Admin | 12 | Dashboard, bookings, orders, menu, analytics |
+| Venue | 6+ | CRUD venues, resources, staff assignments |
+
+### Key API Groups
+
+**Staff Request APIs:**
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/health` | Health check |
-| `POST` | `/api/chat` | Chat with AI agent |
-| `POST` | `/api/booking/` | Create booking |
-| `GET` | `/api/booking/{id}` | Get booking by ID |
-| `GET` | `/api/booking/user/{user_id}` | Get user's bookings |
-| `PUT` | `/api/booking/{id}/cancel` | Cancel booking |
-| `GET` | `/api/booking/available/` | Check availability |
-| `POST` | `/api/order/` | Create order |
-| `GET` | `/api/order/{id}` | Get order by ID |
-| `PUT` | `/api/order/{id}/status` | Update order status |
-| `GET` | `/api/menu/` | Get menu (VND prices) |
-| `POST` | `/api/staff/notify` | Notify staff |
+| POST | /api/staff/requests | Create support request |
+| GET | /api/staff/requests/mine | Get my requests |
+| GET | /api/staff/requests/pending | Get pending requests |
+| GET | /api/staff/requests/active | Get pending + accepted |
+| PATCH | /api/staff/requests/{id}/accept | Accept request |
+| PATCH | /api/staff/requests/{id}/complete | Complete request |
+| PATCH | /api/staff/requests/{id}/cancel | Cancel request |
 
-### Chat Request/Response
+**Staff Chat APIs:**
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/staff/chat/rooms | List chat rooms |
+| GET | /api/staff/chat/{id}/history | Chat message history |
+| POST | /api/staff/chat/{id}/close | Close chat room |
+| WS | /api/staff/chat/{id}/ws | Real-time chat WebSocket |
 
-```json
-// POST /api/chat
-{
-  "message": "Cho tôi biết kỹ thuật diamond system trong bida 3 băng",
-  "session_id": "optional-session-id"
-}
+**Realtime Notification APIs:**
+| Method | Path | Description |
+|--------|------|-------------|
+| WS | /api/realtime/notifications | WebSocket for push notifications |
+| GET | /api/realtime/notifications | List notifications (paginated) |
+| PATCH | /api/realtime/notifications/{id}/read | Mark as read |
+| PATCH | /api/realtime/notifications/read-all | Mark all as read |
 
-// Response
-{
-  "reply": "Diamond system là kỹ thuật tính góc...",
-  "session_id": "abc-123",
-  "tools_used": ["query_knowledge"]
-}
-```
+**Stripe Payment APIs:**
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | /api/stripe/create-payment-intent | Create PaymentIntent (native) |
+| POST | /api/stripe/create-checkout | Create Checkout Session (legacy) |
+| POST | /api/stripe/webhook | Stripe webhook handler |
+| GET | /api/stripe/config | Get publishable key |
+
+**Booking Bill APIs:**
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/booking/bills | List all booking bills |
+| GET | /api/booking/{id}/bill | Get bill for specific booking |
+| GET | /api/admin/bookings/{id}/bill | Admin view booking bill |
 
 ### Agent Tools
 
 | Tool | Trigger | Action |
 |------|---------|--------|
-| `query_knowledge` | Hỏi luật, kỹ thuật | Graph RAG → Neo4j fulltext search |
-| `book_court` | Đặt sân | Check availability → insert PostgreSQL |
-| `order_food` | Gọi đồ | Insert order → notify kitchen |
-| `call_staff` | Gọi nhân viên | Redis pub/sub notification |
-| `check_schedule` | Xem lịch | Query bookings by date |
+| query_knowledge | Hoi luat, ky thuat | Graph RAG - Neo4j fulltext search |
+| book_court | Dat san | Check availability, insert PostgreSQL |
+| order_food | Goi do | Insert order, link to active booking |
+| call_staff | Goi nhan vien | Create staff request, notify via WebSocket |
+| check_schedule | Xem lich | Query bookings by date |
+| order_menu_items | Dat mon | Order from menu with booking association |
 
-### Demo Scenario
+---
 
-```
-User: "Cho tôi biết kỹ thuật cule là gì rồi đặt sân bida lúc 7h tối mai"
+## Features
 
-Agent flow:
-1. Detects two intents: query + booking
-2. Calls query_knowledge → Neo4j search for "cule" → returns technique info
-3. Calls book_court → checks availability → creates booking
-4. Returns combined response with technique explanation + booking confirmation
-```
+### Core Features
+- AI Chat with Knowledge Graph (Graph RAG)
+- Court booking with real-time availability
+- F&B ordering with menu management
+- Staff request system (create, accept, complete, cancel)
+- Real-time WebSocket notifications for all roles
+
+### Payment Features
+- Stripe native PaymentIntent (flutter_stripe)
+- VNPay native SDK (Method Channel)
+- Booking bill aggregation (court fees + food orders)
+- Payment status tracking on orders and bookings
+
+### Staff Features
+- Staff-customer real-time chat (ephemeral, Redis-backed)
+- Staff request management screen
+- Notification inbox with unread badge
+- Room-scoped WebSocket for chat
+
+### Admin Features
+- Dashboard with analytics
+- Booking/order management
+- Menu CRUD (ADMIN only)
+- Revenue statistics
 
 ---
 
 ## Running the Application
 
-### Start all services
-
 ```bash
-# Terminal 1 — Redis (in WSL)
+# Terminal 1 - Redis (in WSL)
 sudo systemctl start redis-server
 
-# Terminal 2 — PostgreSQL (in WSL)
+# Terminal 2 - PostgreSQL (in WSL)
 sudo systemctl start postgresql
 
-# Terminal 3 — Ollama
+# Terminal 3 - Ollama
 ollama serve
 
-# Terminal 4 — Backend
+# Terminal 4 - Backend
 cd ChatbotAgent/backend
 python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
-# Terminal 5 — Flutter (optional)
+# Terminal 5 - Flutter
 cd ChatbotAgent/flutter_app
 flutter run
 ```
 
-### Verify everything is running
+### Verify
 
 ```bash
-# Backend health
 curl http://localhost:8000/health
-# → {"status": "ok", "env": "development"}
+# -> {"status": "ok", "env": "development"}
 
-# Swagger UI
-# Open: http://localhost:8000/docs
-
-# Test chat
-curl -X POST http://localhost:8000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Luật bida 8-ball là gì?"}'
-
-# Test menu
-curl http://localhost:8000/api/menu/
+# Swagger UI: http://localhost:8000/docs
 ```
+
+---
+
+## Demo Accounts
+
+Seed data tao san 3 venue theo loai san, moi venue co admin + staff rieng.
+
+| Vai tro | Ten | So dien thoai | Mat khau | Venue |
+|---------|-----|---------------|-----------|-------|
+| Admin Bida | Quan ly Bida | `0111111111` | `123456` | CLB Bida Sai Gon |
+| Staff Bida | NV Bida | `0111111112` | `123456` | CLB Bida Sai Gon |
+| Admin Pickleball | Quan ly Pickleball | `0222222222` | `123456` | San Pickleball Thu Duc |
+| Staff Pickleball | NV Pickleball | `0222222223` | `123456` | San Pickleball Thu Duc |
+| Admin Cau long | Quan ly Cau long | `0333333333` | `123456` | Nha thi dau Cau long Binh Thanh |
+| Staff Cau long | NV Cau long | `0333333334` | `123456` | Nha thi dau Cau long Binh Thanh |
+| Khach hang | Khach hang | `0900000000` | `123456` | (mac dinh: CLB Bida) |
+
+**Seed data:**
+- CLB Bida Sai Gon - 8 ban bida (B01-B08)
+- San Pickleball Thu Duc - 6 san pickleball (P01-P06)
+- Nha thi dau Cau long Binh Thanh - 6 san cau long (C01-C06)
+
+Staff chi thay request tu venue minh duoc assign. Khach goi nhan vien se tu dong detect tu booking dang active.
 
 ---
 
 ## Troubleshooting
 
 ### Gemini API 429 (Rate Limit)
-
-If you see `429 You exceeded your current quota`:
-- Your Gemini API key has no free-tier allocation
-- **Fix:** Use Ollama instead (set `LLM_PROVIDER=ollama` in `.env`)
-- Or get a new API key from [aistudio.google.com](https://aistudio.google.com)
+Use Ollama instead: set `LLM_PROVIDER=ollama` in `.env`
 
 ### LangChain Import Errors
-
-If you see `cannot import name 'AgentExecutor'`:
-- LangChain 1.x broke backward compatibility with 0.3.x
-- **Fix:** Pin to compatible versions:
-  ```bash
-  pip install langchain==0.3.1 langchain-core==0.3.63 langchain-ollama==0.2.3
-  ```
+```bash
+pip install langchain==0.3.1 langchain-core==0.3.63 langchain-ollama==0.2.3
+```
 
 ### Neo4j Connection Failed
-
-If you see `ServiceUnavailable`:
-- Check `NEO4J_URI` uses `neo4j+s://` scheme (not `bolt://`)
-- Verify credentials in Neo4j AuraDB console
-- Free tier instances pause after 3 days of inactivity — resume in console
+Check `NEO4J_URI` uses `neo4j+s://` scheme. Free tier pauses after 3 days inactivity.
 
 ### PostgreSQL Connection Refused
-
-If you see `Connection refused`:
-- Ensure PostgreSQL is running: `sudo systemctl status postgresql`
-- Check `DATABASE_URL` in `.env` matches your setup
-- WSL PostgreSQL listens on `localhost:5432` by default
+Ensure PostgreSQL is running: `sudo systemctl status postgresql`
 
 ### Redis Connection Refused
-
-If you see `Error 10061 connecting to localhost:6379`:
-- Ensure Redis is running: `sudo systemctl status redis-server`
-- Start it: `sudo systemctl start redis-server`
-
-### Entity Extraction is Slow
-
-Each chunk takes ~60 seconds with `qwen2.5-coder:7b` on CPU. To speed up:
-- Use a GPU: Install CUDA-enabled Ollama
-- Use a smaller model: `ollama pull qwen2.5:3b`
-- Use a faster model: `ollama pull mistral:7b`
-- Use cloud LLM: Set `GEMINI_API_KEY` in `.env` (requires billing)
+Ensure Redis is running: `sudo systemctl status redis-server`
 
 ---
 
 ## .env.example
 
 ```env
-# AI — Ollama (local, free, recommended)
+# AI - Ollama (local, free, recommended)
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=qwen2.5-coder:7b
 LLM_PROVIDER=ollama
-LLM_MODEL=qwen2.5-coder:7b
 
-# AI — Gemini (cloud fallback, requires API key)
+# AI - Gemini (cloud fallback)
 GEMINI_API_KEY=your_key_here
-
-# AI — Anthropic (cloud fallback, requires API key)
-ANTHROPIC_API_KEY=your_key_here
 
 # Neo4j AuraDB
 NEO4J_URI=neo4j+s://xxxxxxxx.databases.neo4j.io
@@ -639,6 +485,17 @@ DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/sports_venue
 # Redis
 REDIS_URL=redis://localhost:6379
 
+# Stripe
+STRIPE_SECRET_KEY=sk_test_xxx
+STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+
+# VNPay
+VNPAY_TMN_CODE=your_tmn_code
+VNPAY_HASH_SECRET=your_hash_secret
+VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+VNPAY_RETURN_URL=http://localhost:8000/api/payment/callback
+
 # App
 APP_ENV=development
 SECRET_KEY=your_secret_key
@@ -646,29 +503,6 @@ SECRET_KEY=your_secret_key
 
 ---
 
-## Demo Accounts
-
-Seed data tạo sẵn 3 venue theo loại sân, mỗi venue có admin + staff riêng.
-
-| Vai trò | Tên | Số điện thoại | Mật khẩu | Venue |
-|---------|-----|---------------|-----------|-------|
-| **Admin Bida** | Quản lý Bida | `0111111111` | `123456` | CLB Bida Sài Gòn |
-| **Staff Bida** | NV Bida | `0111111112` | `123456` | CLB Bida Sài Gòn |
-| **Admin Pickleball** | Quản lý Pickleball | `0222222222` | `123456` | Sân Pickleball Thủ Đức |
-| **Staff Pickleball** | NV Pickleball | `0222222223` | `123456` | Sân Pickleball Thủ Đức |
-| **Admin Cầu lông** | Quản lý Cầu lông | `0333333333` | `123456` | Nhà thi đấu Cầu lông Bình Thạnh |
-| **Staff Cầu lông** | NV Cầu lông | `0333333334` | `123456` | Nhà thi đấu Cầu lông Bình Thạnh |
-| **Khách hàng** | Khách hàng | `0900000000` | `123456` | (mặc định: CLB Bida) |
-
-**Seed data:**
-- **CLB Bida Sài Gòn** — 8 bàn bida (B01–B08)
-- **Sân Pickleball Thủ Đức** — 6 sân pickleball (P01–P06)
-- **Nhà thi đấu Cầu lông Bình Thạnh** — 6 sân cầu lông (C01–C06)
-
-Staff chỉ thấy request từ venue mình được assign. Khách gọi nhân viên sẽ tự động detect từ booking đang active.
-
----
-
 ## License
 
-Academic project — Sports Venue AI Chatbot.
+Academic project - Sports Venue AI Chatbot.
