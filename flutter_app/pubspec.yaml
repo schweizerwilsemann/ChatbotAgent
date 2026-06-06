@@ -49,6 +49,9 @@ dependencies:
   # WebView (VNPay payment)
   webview_flutter: ^4.7.0
 
+  # Stripe native payment
+  flutter_stripe: ^11.0.0
+
   # Voice / Speech-to-Text
   speech_to_text: ^7.0.0
   permission_handler: ^11.3.0

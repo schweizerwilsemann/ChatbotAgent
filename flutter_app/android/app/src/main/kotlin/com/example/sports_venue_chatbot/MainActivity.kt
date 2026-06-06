@@ -12,10 +12,10 @@ import android.graphics.Color
 import android.os.Build
 import android.util.Log
 import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.plugin.common.MethodChannel
 
-class MainActivity : FlutterActivity() {
+class MainActivity : FlutterFragmentActivity() {
     private val channelName = "sports_venue_chatbot/notifications"
     private val vnpayChannelName = "sports_venue_chatbot/vnpay"
     private val notificationChannelId = "operations_notifications"
