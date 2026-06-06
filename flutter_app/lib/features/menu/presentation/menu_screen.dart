@@ -13,7 +13,6 @@ import 'package:sports_venue_chatbot/features/payment/presentation/payment_provi
 import 'package:sports_venue_chatbot/features/payment/presentation/stripe_provider.dart';
 import 'package:sports_venue_chatbot/features/venue/data/venue_models.dart';
 import 'package:sports_venue_chatbot/features/venue/presentation/venue_provider.dart';
-import 'package:sports_venue_chatbot/shared/widgets/app_confirm_dialog.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
 
 /// Vietnamese currency formatter
@@ -445,9 +444,11 @@ class _CartSummaryBar extends ConsumerWidget {
     );
     if (order == null || !context.mounted) return;
 
-    AppSnackBar.showSuccess(context, 'Đặt hàng thành công!');
-    await _showPaymentDialog(context, ref, order);
     ref.read(cartProvider.notifier).clear();
+    AppSnackBar.showSuccess(context, 'Đặt hàng thành công!');
+    await Future<void>.delayed(Duration.zero);
+    if (!context.mounted) return;
+    await _showPaymentDialog(context, ref, order);
   }
 
   Future<void> _showPaymentDialog(
@@ -461,16 +462,6 @@ class _CartSummaryBar extends ConsumerWidget {
     final label = order.resourceLabel != null
         ? 'đơn hàng tại ${order.resourceLabel}'
         : 'đơn hàng ${order.items.length} sản phẩm';
-
-    final confirmed = await AppConfirmDialog.show(
-      context: context,
-      title: 'Thanh toán đơn hàng',
-      content:
-          'Bạn có muốn thanh toán $label?\nTổng: ${_vndFormat.format(amount)}',
-      confirmLabel: 'Thanh toán',
-      cancelLabel: 'Để sau',
-    );
-    if (confirmed != true || !context.mounted) return;
 
     final paymentMethod = await _showPaymentMethodDialog(context);
     if (paymentMethod == null || !context.mounted) return;
@@ -487,6 +478,7 @@ class _CartSummaryBar extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Chọn phương thức thanh toán'),
+        contentPadding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -507,6 +499,12 @@ class _CartSummaryBar extends ConsumerWidget {
             ),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Để sau'),
+          ),
+        ],
       ),
     );
   }
