@@ -6,9 +6,7 @@ import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/staff/data/staff_notification.dart';
 import 'package:sports_venue_chatbot/features/auth/data/auth_api.dart';
 import 'package:sports_venue_chatbot/features/staff/presentation/staff_notifications_provider.dart';
-import 'package:sports_venue_chatbot/features/staff_request/domain/staff_request_repository.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_section_title.dart';
-import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
 import 'package:sports_venue_chatbot/shared/widgets/pagination_footer.dart';
 
 class StaffNotificationsScreen extends ConsumerStatefulWidget {
@@ -163,11 +161,9 @@ class _NotificationTile extends ConsumerWidget {
     final timeText = DateFormat('HH:mm dd/MM', 'vi_VN')
         .format(notification.createdAt.toLocal());
     final isStaffRequest = notification.eventType == 'staff.requested' ||
-        notification.eventType == 'staff_request';
+        notification.eventType == 'staff_request' ||
+        notification.eventType == 'staff_request_accepted';
     final isOrder = notification.eventType.startsWith('order');
-    final notifState = ref.watch(staffNotificationsProvider);
-    final effectiveStatus =
-        isStaffRequest ? notifState.getEffectiveStatus(notification) : null;
 
     return InkWell(
       borderRadius: BorderRadius.circular(8),
@@ -281,6 +277,18 @@ class _NotificationTile extends ConsumerWidget {
                         _OrderNotificationSummary(
                           payload: notification.payload,
                         ),
+                      if (isStaffRequest)
+                        const Padding(
+                          padding: EdgeInsets.only(top: 8),
+                          child: Text(
+                            'Xử lý yêu cầu tại tab Yêu cầu.',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -302,152 +310,10 @@ class _NotificationTile extends ConsumerWidget {
                   ),
               ],
             ),
-            // Accept/Reject buttons for staff requests
-            if (isStaffRequest && effectiveStatus == 'pending')
-              Padding(
-                padding: const EdgeInsets.only(top: 10, left: 52),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _acceptRequest(context, ref),
-                        icon: const Icon(Icons.check, size: 16),
-                        label: const Text('Tiếp nhận'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.success,
-                          side: const BorderSide(color: AppColors.success),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            if (isStaffRequest && effectiveStatus == 'accepted')
-              Padding(
-                padding: const EdgeInsets.only(top: 10, left: 52),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.success.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                            color: AppColors.success.withValues(alpha: 0.3)),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.check_circle,
-                              size: 14, color: AppColors.success),
-                          SizedBox(width: 4),
-                          Text(
-                            'Đã tiếp nhận',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.success,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _completeRequest(context, ref),
-                        icon: const Icon(Icons.done_all, size: 16),
-                        label: const Text('Hoàn thành'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primary,
-                          side: const BorderSide(color: AppColors.primary),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _acceptRequest(BuildContext context, WidgetRef ref) async {
-    final requestId = notification.payload['request_id']?.toString();
-    if (requestId == null || requestId.isEmpty) {
-      if (context.mounted) {
-        AppSnackBar.showError(context, 'Không tìm thấy mã yêu cầu.');
-      }
-      return;
-    }
-
-    try {
-      final repo = ref.read(staffRequestRepositoryProvider);
-      final updated = await repo.acceptRequest(requestId);
-      final newStatus = updated.status.toString().split('.').last;
-      // Update both local notification payload and resolved status map
-      final newPayload = Map<String, dynamic>.from(notification.payload)
-        ..['status'] = newStatus
-        ..['accepted_by_name'] = updated.acceptedByName;
-      ref
-          .read(staffNotificationsProvider.notifier)
-          .updateNotificationPayload(notification.id, newPayload);
-      ref
-          .read(staffNotificationsProvider.notifier)
-          .markRequestStatus(requestId, newStatus);
-      if (context.mounted) {
-        AppSnackBar.showSuccess(context, 'Đã tiếp nhận yêu cầu.');
-        onMarkRead?.call();
-      }
-    } catch (e) {
-      if (context.mounted) {
-        AppSnackBar.showError(
-            context, 'Không thể tiếp nhận yêu cầu. Vui lòng thử lại.');
-      }
-    }
-  }
-
-  Future<void> _completeRequest(BuildContext context, WidgetRef ref) async {
-    final requestId = notification.payload['request_id']?.toString();
-    if (requestId == null || requestId.isEmpty) {
-      if (context.mounted) {
-        AppSnackBar.showError(context, 'Không tìm thấy mã yêu cầu.');
-      }
-      return;
-    }
-
-    try {
-      final repo = ref.read(staffRequestRepositoryProvider);
-      final updated = await repo.completeRequest(requestId);
-      final newStatus = updated.status.toString().split('.').last;
-      final newPayload = Map<String, dynamic>.from(notification.payload)
-        ..['status'] = newStatus;
-      ref
-          .read(staffNotificationsProvider.notifier)
-          .updateNotificationPayload(notification.id, newPayload);
-      ref
-          .read(staffNotificationsProvider.notifier)
-          .markRequestStatus(requestId, newStatus);
-      if (context.mounted) {
-        AppSnackBar.showSuccess(context, 'Đã hoàn thành yêu cầu.');
-        onMarkRead?.call();
-      }
-    } catch (e) {
-      if (context.mounted) {
-        AppSnackBar.showError(
-            context, 'Không thể hoàn thành yêu cầu. Vui lòng thử lại.');
-      }
-    }
   }
 
   Future<void> _showCustomerInfo(BuildContext context, WidgetRef ref) async {
@@ -676,14 +542,13 @@ class _OrderNotificationSummary extends StatelessWidget {
   }
 
   static String _paymentLabel(String status) {
-    switch (status) {
-      case 'paid':
-        return 'Đã thanh toán';
-      case 'failed':
-        return 'Thanh toán lỗi';
-      default:
-        return 'Chưa thanh toán';
+    if (status.startsWith('paid')) {
+      final method =
+          status.contains('_') ? status.split('_').last.toUpperCase() : '';
+      return method.isNotEmpty ? 'Đã thanh toán ($method)' : 'Đã thanh toán';
     }
+    if (status == 'failed') return 'Thanh toán lỗi';
+    return 'Chưa thanh toán';
   }
 }
 

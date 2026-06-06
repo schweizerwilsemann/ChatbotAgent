@@ -88,6 +88,7 @@ class StaffNotificationsNotifier
   StreamSubscription<dynamic>? _subscription;
   bool _started = false;
   static const int _pageSize = 30;
+  static const String _resolvedStatusesKey = 'staff_resolved_statuses';
 
   StaffNotificationsNotifier({
     required DioClient dioClient,
@@ -96,7 +97,31 @@ class StaffNotificationsNotifier
   })  : _dioClient = dioClient,
         _storage = storage,
         _localNotifications = localNotifications,
-        super(const StaffNotificationsState());
+        super(const StaffNotificationsState()) {
+    _loadResolvedStatuses();
+  }
+
+  Future<void> _loadResolvedStatuses() async {
+    try {
+      final raw = await _storage.read(key: _resolvedStatusesKey);
+      if (raw != null && raw.isNotEmpty) {
+        final Map<String, dynamic> decoded = jsonDecode(raw);
+        final statuses = decoded.map(
+          (k, v) => MapEntry(k, v.toString()),
+        );
+        state = state.copyWith(resolvedStatuses: statuses);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _saveResolvedStatuses() async {
+    try {
+      await _storage.write(
+        key: _resolvedStatusesKey,
+        value: jsonEncode(state.resolvedStatuses),
+      );
+    } catch (_) {}
+  }
 
   Future<void> start() async {
     if (_started) return;
@@ -263,11 +288,12 @@ class StaffNotificationsNotifier
   }
 
   /// Mark a request ID as having a resolved status (accepted/completed).
-  /// This persists across refreshes since it's stored in provider state.
+  /// This persists across rebuilds since it's stored in secure storage.
   void markRequestStatus(String requestId, String status) {
     final updated = Map<String, String>.from(state.resolvedStatuses)
       ..[requestId] = status;
     state = state.copyWith(resolvedStatuses: updated);
+    _saveResolvedStatuses();
   }
 
   /// Mark all notifications as read.

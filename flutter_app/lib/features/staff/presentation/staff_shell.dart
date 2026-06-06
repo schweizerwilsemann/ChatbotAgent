@@ -12,6 +12,7 @@ import 'package:sports_venue_chatbot/shared/widgets/glass_app_bar.dart';
 ///
 /// Provides a limited navigation for staff members:
 /// - Đặt sân (Bookings management)
+/// - Yêu cầu (Customer support requests)
 /// - Thực đơn (Menu management)
 /// - Thông báo (Notifications/Requests)
 ///
@@ -37,10 +38,22 @@ class _StaffShellState extends ConsumerState<StaffShell> {
       route: '/staff/bookings',
     ),
     _StaffNavItem(
+      icon: Icons.assignment_turned_in_outlined,
+      selectedIcon: Icons.assignment_turned_in,
+      label: 'Yêu cầu',
+      route: '/staff/requests',
+    ),
+    _StaffNavItem(
       icon: Icons.restaurant_menu_outlined,
       selectedIcon: Icons.restaurant_menu,
       label: 'Thực đơn',
       route: '/staff/menu',
+    ),
+    _StaffNavItem(
+      icon: Icons.chat_bubble_outline,
+      selectedIcon: Icons.chat_bubble,
+      label: 'Tin nhắn',
+      route: '/staff/inbox',
     ),
     _StaffNavItem(
       icon: Icons.notifications_outlined,

@@ -87,3 +87,16 @@ class NotificationRepository:
                 count += 1
         await self._session.flush()
         return count
+
+    async def update_payload_by_request_id(
+        self, event_type: str, request_id: str, status: str
+    ) -> None:
+        """Update payload.status for notifications matching event_type and request_id."""
+        stmt = select(Notification).where(Notification.event_type == event_type)
+        result = await self._session.execute(stmt)
+        for notification in result.scalars().all():
+            payload = notification.payload or {}
+            if payload.get("request_id") == request_id:
+                payload["status"] = status
+                notification.payload = payload
+        await self._session.flush()

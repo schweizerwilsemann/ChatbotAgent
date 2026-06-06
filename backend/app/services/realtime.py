@@ -38,6 +38,38 @@ class RealtimeConnectionManager:
         for role, websocket in stale:
             self.disconnect(websocket, role)
 
+    # ── Room-scoped methods for staff chat ────────────────────────────
+
+    async def connect_to_room(
+        self, websocket: WebSocket, room_id: str, user_id: str
+    ) -> None:
+        await websocket.accept()
+        room_key = f"room:{room_id}"
+        self._connections.setdefault(room_key, {})[websocket] = user_id
+
+    def disconnect_from_room(self, websocket: WebSocket, room_id: str) -> None:
+        room_key = f"room:{room_id}"
+        sockets = self._connections.get(room_key, {})
+        sockets.pop(websocket, None)
+        if not sockets:
+            self._connections.pop(room_key, None)
+
+    async def broadcast_to_room(
+        self, room_id: str, payload: dict, exclude: WebSocket | None = None
+    ) -> None:
+        room_key = f"room:{room_id}"
+        encoded = json.dumps(payload, ensure_ascii=False)
+        stale: list[WebSocket] = []
+        for ws, uid in list(self._connections.get(room_key, {}).items()):
+            if ws is exclude:
+                continue
+            try:
+                await ws.send_text(encoded)
+            except Exception:
+                stale.append(ws)
+        for ws in stale:
+            self.disconnect_from_room(ws, room_id)
+
 
 realtime_manager = RealtimeConnectionManager()
 

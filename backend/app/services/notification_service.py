@@ -53,6 +53,32 @@ class NotificationService:
         await self.publish(response)
         return response
 
+    async def notify_user(
+        self,
+        *,
+        event_type: str,
+        title: str,
+        message: str,
+        target_roles: list[str],
+        source: str,
+        target_user_id: str,
+        payload: dict[str, Any],
+    ) -> NotificationResponse:
+        targeted_payload = dict(payload)
+        targeted_payload["target_user_ids"] = [target_user_id]
+
+        notification = await self._repo.create(
+            event_type=event_type,
+            title=title,
+            message=message,
+            target_roles=target_roles,
+            source=source,
+            payload=targeted_payload,
+        )
+        response = self.to_response(notification)
+        await self.publish(response)
+        return response
+
     async def list_for_operations(
         self,
         limit: int = 50,
@@ -103,6 +129,13 @@ class NotificationService:
                 break
             scan_offset += len(batch)
         return visible[offset:target_count]
+
+    async def update_request_status(
+        self, request_id: str, status: str
+    ) -> None:
+        await self._repo.update_payload_by_request_id(
+            "staff_request", request_id, status
+        )
 
     async def publish(self, notification: NotificationResponse) -> None:
         payload = notification.model_dump(mode="json")

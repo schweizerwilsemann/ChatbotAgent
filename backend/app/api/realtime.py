@@ -24,11 +24,6 @@ router = APIRouter(prefix="/api/realtime", tags=["realtime"])
 logger = logging.getLogger(__name__)
 
 
-def _is_operations_role(role: UserRole | str) -> bool:
-    value = role.value if isinstance(role, UserRole) else str(role)
-    return value in {"STAFF", "ADMIN"}
-
-
 @router.websocket("/notifications")
 async def staff_notifications_socket(
     websocket: WebSocket,
@@ -37,7 +32,7 @@ async def staff_notifications_socket(
     try:
         async with async_session_factory() as session:
             user = await get_current_user_from_token(token, session)
-            if user is None or not _is_operations_role(user.role):
+            if user is None:
                 await websocket.close(code=1008)
                 return
             role = (
