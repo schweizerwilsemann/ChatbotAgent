@@ -207,17 +207,6 @@ class PaymentService:
             is_success=result["is_success"],
             paid_at=datetime.utcnow(),
         )
-            result["already_processed"] = True
-            return result
-
-        await self.confirm_external_payment(
-            order_id=order_id,
-            transaction_no=transaction_no or None,
-            response_code=result["response_code"],
-            bank_code=result["bank_code"],
-            is_success=result["is_success"],
-            paid_at=datetime.utcnow(),
-        )
 
         logger.info(
             "Payment callback recorded: order=%s txn=%s code=%s success=%s",

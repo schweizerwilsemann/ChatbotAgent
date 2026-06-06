@@ -31,6 +31,74 @@ async def _get_payment_service(
     return PaymentService(repo, booking_repo, order_repo)
 
 
+@router.post("/create-payment-intent")
+async def create_payment_intent(
+    body: dict,
+    _: None = Depends(rate_limit(limit=10, window_seconds=60, scope="stripe")),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+    service: PaymentService = Depends(_get_payment_service),
+) -> dict:
+    order_id = body.get("order_id")
+    amount = body.get("amount")
+    description = body.get("description", "Payment")
+    order_type = body.get("order_type", "booking")
+
+    if not order_id or not amount:
+        raise HTTPException(status_code=400, detail="order_id and amount are required")
+
+    try:
+        amount_int = int(amount)
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=400, detail="amount must be an integer")
+
+    ok, error = await service.create_checkout_record(
+        order_id=order_id,
+        amount=amount_int,
+        order_type=order_type,
+    )
+    if not ok:
+        raise HTTPException(status_code=400, detail=error or "Cannot create payment")
+
+    stripe_customer_id = user.stripe_customer_id
+    if not stripe_customer_id:
+        try:
+            customer = stripe.Customer.create(
+                name=user.name,
+                email=user.email,
+                phone=user.phone,
+                metadata={"user_id": str(user.id)},
+            )
+            stripe_customer_id = customer.id
+            user_repo = UserRepository(session)
+            await user_repo.update_stripe_customer_id(str(user.id), stripe_customer_id)
+        except stripe.error.StripeError as e:
+            logger.exception("Stripe customer creation error")
+            raise HTTPException(status_code=500, detail=str(e))
+
+    try:
+        intent = stripe.PaymentIntent.create(
+            amount=amount_int,
+            currency="vnd",
+            customer=stripe_customer_id,
+            payment_method_types=["card"],
+            metadata={
+                "order_id": order_id,
+                "order_type": order_type,
+                "user_id": str(user.id),
+            },
+            description=description,
+        )
+
+        return {
+            "client_secret": intent.client_secret,
+            "payment_intent_id": intent.id,
+        }
+    except stripe.error.StripeError as e:
+        logger.exception("Stripe PaymentIntent error")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/create-checkout")
 async def create_stripe_checkout(
     body: dict,
@@ -170,6 +238,33 @@ async def stripe_webhook(
                 order_type=order_type,
             )
             logger.info("Stripe payment confirmed: order=%s", order_id)
+        elif txn and txn.status == "completed":
+            await service.mark_entity_payment_status(
+                order_id=order_id,
+                order_type=order_type or txn.order_type,
+                payment_status="paid_stripe",
+            )
+
+    elif event["type"] == "payment_intent.succeeded":
+        intent = event["data"]["object"]
+        metadata = intent.get("metadata") or {}
+        order_id = metadata.get("order_id")
+        order_type = metadata.get("order_type")
+        if not order_id:
+            logger.warning("Stripe PaymentIntent succeeded without order_id metadata")
+            return {"status": "ok"}
+
+        txn = await service._repo.get_by_order_id(order_id)
+        if txn and txn.status != "completed":
+            await service.confirm_external_payment(
+                order_id=order_id,
+                transaction_no=intent.get("id"),
+                response_code="00",
+                bank_code="stripe",
+                is_success=True,
+                order_type=order_type,
+            )
+            logger.info("Stripe PaymentIntent confirmed: order=%s", order_id)
         elif txn and txn.status == "completed":
             await service.mark_entity_payment_status(
                 order_id=order_id,

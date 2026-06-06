@@ -5,14 +5,14 @@ class StripeApi {
 
   final DioClient _dioClient;
 
-  Future<Map<String, dynamic>> createCheckout({
+  Future<Map<String, dynamic>> createPaymentIntent({
     required String orderId,
     required int amount,
     required String description,
     String orderType = 'booking',
   }) async {
     final response = await _dioClient.post<Map<String, dynamic>>(
-      '/api/stripe/create-checkout',
+      '/api/stripe/create-payment-intent',
       data: {
         'order_id': orderId,
         'amount': amount,
