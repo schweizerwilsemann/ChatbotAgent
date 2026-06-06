@@ -8,6 +8,7 @@ import 'package:sports_venue_chatbot/core/config/flavor_config.dart';
 import 'package:sports_venue_chatbot/core/router/app_router.dart';
 import 'package:sports_venue_chatbot/core/theme/app_scroll_behavior.dart';
 import 'package:sports_venue_chatbot/core/theme/app_theme.dart';
+import 'package:sports_venue_chatbot/features/auth/data/auth_models.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/staff/presentation/staff_notifications_provider.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/customer_chat_notifications_provider.dart';
@@ -26,18 +27,35 @@ Future<void> _runApp(Flavor flavor) async {
   );
 }
 
-class SportsVenueChatbotApp extends ConsumerWidget {
+class SportsVenueChatbotApp extends ConsumerStatefulWidget {
   const SportsVenueChatbotApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen(authStateProvider, (_, next) {
+  ConsumerState<SportsVenueChatbotApp> createState() =>
+      _SportsVenueChatbotAppState();
+}
+
+class _SportsVenueChatbotAppState extends ConsumerState<SportsVenueChatbotApp> {
+  bool _initialSyncDone = false;
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen<AsyncValue<User?>>(authStateProvider, (_, next) {
+      debugPrint('[Main] authState changed: ${next.valueOrNull?.role}');
       _syncRealtimeNotifications(ref, next.valueOrNull?.role);
     });
-    final authState = ref.watch(authStateProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _syncRealtimeNotifications(ref, authState.valueOrNull?.role);
-    });
+
+    if (!_initialSyncDone) {
+      final authState = ref.read(authStateProvider);
+      final role = authState.valueOrNull?.role;
+      if (authState.hasValue) {
+        _initialSyncDone = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          debugPrint('[Main] Initial sync with role: $role');
+          _syncRealtimeNotifications(ref, role);
+        });
+      }
+    }
 
     final router = ref.watch(appRouterProvider);
 
@@ -63,6 +81,7 @@ class SportsVenueChatbotApp extends ConsumerWidget {
 }
 
 void _syncRealtimeNotifications(WidgetRef ref, String? role) {
+  debugPrint('[Main] _syncRealtimeNotifications called with role: $role');
   _syncCustomerChatNotifications(ref, role);
   _syncStaffNotifications(ref, role);
 }
@@ -70,21 +89,28 @@ void _syncRealtimeNotifications(WidgetRef ref, String? role) {
 void _syncCustomerChatNotifications(WidgetRef ref, String? role) {
   final customerNotifier = ref.read(customerChatNotificationsProvider.notifier);
   final normalizedRole = role?.toUpperCase();
+  debugPrint(
+      '[Main] _syncCustomerChatNotifications: normalizedRole=$normalizedRole');
   if (normalizedRole == null ||
       normalizedRole == 'STAFF' ||
       normalizedRole == 'ADMIN') {
+    debugPrint('[Main] Stopping customer chat notifications');
     customerNotifier.stop();
     return;
   }
+  debugPrint('[Main] Starting customer chat notifications');
   customerNotifier.start();
 }
 
 void _syncStaffNotifications(WidgetRef ref, String? role) {
   final staffNotifier = ref.read(staffNotificationsProvider.notifier);
   final normalizedRole = role?.toUpperCase();
+  debugPrint('[Main] _syncStaffNotifications: normalizedRole=$normalizedRole');
   if (normalizedRole == 'STAFF' || normalizedRole == 'ADMIN') {
+    debugPrint('[Main] Starting staff notifications');
     staffNotifier.start();
     return;
   }
+  debugPrint('[Main] Stopping staff notifications');
   staffNotifier.stop();
 }

@@ -34,6 +34,7 @@ class MainActivity : FlutterFragmentActivity() {
                     "showOperationNotification" -> {
                         val title = call.argument<String>("title") ?: "Thông báo mới"
                         val body = call.argument<String>("body") ?: ""
+                        Log.d("MainActivity", "showOperationNotification called: title=$title, body=$body")
                         showOperationNotification(title, body)
                         result.success(null)
                     }
@@ -141,9 +142,11 @@ class MainActivity : FlutterFragmentActivity() {
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
             PackageManager.PERMISSION_GRANTED
         ) {
+            Log.w("MainActivity", "POST_NOTIFICATIONS permission not granted")
             return
         }
 
+        Log.d("MainActivity", "Building notification: title=$title")
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
@@ -172,6 +175,8 @@ class MainActivity : FlutterFragmentActivity() {
             .build()
 
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        manager.notify(System.currentTimeMillis().toInt(), notification)
+        val notifId = System.currentTimeMillis().toInt()
+        manager.notify(notifId, notification)
+        Log.d("MainActivity", "Notification shown with id=$notifId")
     }
 }

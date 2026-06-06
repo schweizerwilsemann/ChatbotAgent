@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class LocalNotificationService {
@@ -9,13 +10,18 @@ class LocalNotificationService {
     required String body,
   }) async {
     try {
+      debugPrint('[LocalNoti] Calling showOperationNotification: $title');
       await _channel.invokeMethod<void>('showOperationNotification', {
         'title': title,
         'body': body,
       });
+      debugPrint('[LocalNoti] showOperationNotification success');
     } on MissingPluginException {
+      debugPrint(
+          '[LocalNoti] MissingPluginException - native handler not registered');
       return;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[LocalNoti] Error: $e');
       return;
     }
   }

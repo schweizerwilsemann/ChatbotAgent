@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sports_venue_chatbot/core/constants/api_constants.dart';
@@ -124,7 +125,11 @@ class StaffNotificationsNotifier
   }
 
   Future<void> start() async {
-    if (_started) return;
+    if (_started) {
+      debugPrint('[StaffNoti] Already started, skipping');
+      return;
+    }
+    debugPrint('[StaffNoti] Starting...');
     _started = true;
     await refresh();
     await _connect();
@@ -194,16 +199,21 @@ class StaffNotificationsNotifier
 
   Future<void> _connect() async {
     final token = await _storage.read(key: 'auth_token');
-    if (token == null || token.isEmpty) return;
+    if (token == null || token.isEmpty) {
+      debugPrint('[StaffNoti] No auth token, cannot connect');
+      return;
+    }
 
     final uri = Uri.parse(ApiConstants.realtimeNotificationsWsEndpoint)
         .replace(queryParameters: {'token': token});
+    debugPrint('[StaffNoti] Connecting to WS: $uri');
     try {
       _channel = WebSocketChannel.connect(uri);
       // Don't set isConnected until we actually receive data
       _subscription = _channel!.stream.listen(
         _handleSocketMessage,
         onError: (error) {
+          debugPrint('[StaffNoti] WS error: $error');
           state = state.copyWith(
             isConnected: false,
             error: 'Mất kết nối realtime.',
@@ -211,6 +221,7 @@ class StaffNotificationsNotifier
           _scheduleReconnect();
         },
         onDone: () {
+          debugPrint('[StaffNoti] WS closed');
           state = state.copyWith(isConnected: false);
           _scheduleReconnect();
         },
@@ -218,10 +229,12 @@ class StaffNotificationsNotifier
       // Set connected after a short delay to confirm the connection is stable
       Future.delayed(const Duration(milliseconds: 500), () {
         if (_channel != null) {
+          debugPrint('[StaffNoti] WS connected');
           state = state.copyWith(isConnected: true, clearError: true);
         }
       });
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[StaffNoti] WS connect error: $e');
       state = state.copyWith(
         isConnected: false,
         error: 'Không thể kết nối realtime.',
@@ -232,6 +245,8 @@ class StaffNotificationsNotifier
 
   void _handleSocketMessage(dynamic raw) {
     try {
+      debugPrint(
+          '[StaffNoti] Received WS message: ${raw.toString().substring(0, raw.toString().length.clamp(0, 200))}');
       final decoded = jsonDecode(raw.toString()) as Map<String, dynamic>;
       final notification = StaffNotification.fromJson(decoded);
       final exists =
@@ -239,11 +254,14 @@ class StaffNotificationsNotifier
       final updated =
           exists ? state.notifications : [notification, ...state.notifications];
       state = state.copyWith(notifications: updated);
+      debugPrint(
+          '[StaffNoti] Showing native notification: ${notification.title}');
       _localNotifications.showOperationNotification(
         title: notification.title,
         body: notification.message,
       );
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[StaffNoti] Error handling WS message: $e');
       return;
     }
   }

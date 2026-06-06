@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sports_venue_chatbot/core/constants/api_constants.dart';
@@ -54,7 +55,11 @@ class CustomerChatNotificationsNotifier
         super(const CustomerChatNotificationsState());
 
   void start() {
-    if (_started) return;
+    if (_started) {
+      debugPrint('[CustomerNoti] Already started, skipping');
+      return;
+    }
+    debugPrint('[CustomerNoti] Starting...');
     _started = true;
     _connect();
   }
@@ -70,16 +75,21 @@ class CustomerChatNotificationsNotifier
 
   Future<void> _connect() async {
     final token = await _storage.read(key: 'auth_token');
-    if (!_started || token == null || token.isEmpty) return;
+    if (!_started || token == null || token.isEmpty) {
+      debugPrint('[CustomerNoti] No auth token or not started, cannot connect');
+      return;
+    }
 
     final uri = Uri.parse(ApiConstants.realtimeNotificationsWsEndpoint)
         .replace(queryParameters: {'token': token});
+    debugPrint('[CustomerNoti] Connecting to WS: $uri');
     try {
       _channel = WebSocketChannel.connect(uri);
       _subscription = _channel!.stream.listen(
         _handleSocketMessage,
         onError: (_) {
           if (!mounted) return;
+          debugPrint('[CustomerNoti] WS error');
           state = state.copyWith(
             isConnected: false,
             error: 'Mất kết nối thông báo tin nhắn.',
@@ -88,6 +98,7 @@ class CustomerChatNotificationsNotifier
         },
         onDone: () {
           if (!mounted) return;
+          debugPrint('[CustomerNoti] WS closed');
           state = state.copyWith(isConnected: false);
           _scheduleReconnect();
         },
@@ -95,11 +106,13 @@ class CustomerChatNotificationsNotifier
 
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted && _started && _channel != null) {
+          debugPrint('[CustomerNoti] WS connected');
           state = state.copyWith(isConnected: true, clearError: true);
         }
       });
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
+      debugPrint('[CustomerNoti] WS connect error: $e');
       state = state.copyWith(
         isConnected: false,
         error: 'Không thể kết nối thông báo tin nhắn.',
@@ -110,22 +123,30 @@ class CustomerChatNotificationsNotifier
 
   void _handleSocketMessage(dynamic raw) {
     try {
+      debugPrint(
+          '[CustomerNoti] Received WS message: ${raw.toString().substring(0, raw.toString().length.clamp(0, 200))}');
       final decoded = jsonDecode(raw.toString()) as Map<String, dynamic>;
       if (decoded['event_type']?.toString() != 'staff_chat_message') {
+        debugPrint(
+            '[CustomerNoti] Ignoring non-chat event: ${decoded['event_type']}');
         return;
       }
 
       final payload = decoded['payload'];
       if (payload is Map<String, dynamic> &&
           payload['sender_role']?.toString() != 'staff') {
+        debugPrint('[CustomerNoti] Ignoring non-staff message');
         return;
       }
 
+      debugPrint(
+          '[CustomerNoti] Showing native notification: ${decoded['title']}');
       _localNotifications.showOperationNotification(
         title: decoded['title']?.toString() ?? 'Tin nhắn mới',
         body: decoded['message']?.toString() ?? '',
       );
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[CustomerNoti] Error handling WS message: $e');
       return;
     }
   }
