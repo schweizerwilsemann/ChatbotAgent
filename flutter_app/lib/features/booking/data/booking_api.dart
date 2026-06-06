@@ -46,11 +46,7 @@ class BookingApi {
     try {
       final response = await _dioClient.get<List<dynamic>>(
         ApiConstants.bookingEndpoint,
-        queryParameters: {
-          'user_id': userId,
-          'limit': limit,
-          'offset': offset,
-        },
+        queryParameters: {'user_id': userId, 'limit': limit, 'offset': offset},
       );
       if (response.data == null) return [];
       return response.data!
@@ -72,6 +68,27 @@ class BookingApi {
     } catch (e) {
       return null;
     }
+  }
+
+  Future<List<BookingBill>> getBookingBills({
+    int limit = 10,
+    int offset = 0,
+  }) async {
+    final response = await _dioClient.get<List<dynamic>>(
+      '${ApiConstants.bookingEndpoint}/bills',
+      queryParameters: {'limit': limit, 'offset': offset},
+    );
+    if (response.data == null) return [];
+    return response.data!
+        .map((json) => BookingBill.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<BookingBill> getBookingBill(String bookingId) async {
+    final response = await _dioClient.get<Map<String, dynamic>>(
+      '${ApiConstants.bookingEndpoint}/$bookingId/bill',
+    );
+    return BookingBill.fromJson(response.data!);
   }
 
   /// Cancel a booking

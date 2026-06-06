@@ -290,7 +290,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   Future<void> _processStripePayment(
       String orderId, int amount, String label) async {
     final stripeNotifier = ref.read(stripeProvider.notifier);
-    final success = await stripeNotifier.createCheckout(
+    final success = await stripeNotifier.pay(
       orderId: orderId,
       amount: amount,
       description: 'Dat san $label',
@@ -298,14 +298,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     );
 
     if (success && mounted) {
-      final stripeState = ref.read(stripeProvider);
-      if (stripeState.checkoutUrl != null) {
-        context.push('/stripe-checkout', extra: {
-          'checkoutUrl': stripeState.checkoutUrl!,
-          'orderId': orderId,
-          'orderType': 'booking',
-        });
-      }
+      context.go('/payment/result', extra: {
+        'success': true,
+        'orderId': orderId,
+        'orderType': 'booking',
+      });
     } else if (mounted) {
       final error = ref.read(stripeProvider).error;
       if (error != null) {

@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sports_venue_chatbot/features/menu/data/menu_models.dart';
 
 part 'booking_models.g.dart';
 
@@ -147,6 +148,36 @@ class Booking {
   }
 }
 
+class BookingBill {
+  final Booking booking;
+  final List<Order> orders;
+  final double orderTotal;
+  final double? bookingTotal;
+  final double grandTotal;
+
+  const BookingBill({
+    required this.booking,
+    required this.orders,
+    required this.orderTotal,
+    this.bookingTotal,
+    required this.grandTotal,
+  });
+
+  factory BookingBill.fromJson(Map<String, dynamic> json) {
+    return BookingBill(
+      booking: Booking.fromJson(json['booking'] as Map<String, dynamic>),
+      orders: (json['orders'] as List<dynamic>? ?? const [])
+          .map((item) => Order.fromJson(item as Map<String, dynamic>))
+          .toList(),
+      orderTotal: _billToDouble(json['order_total']),
+      bookingTotal: json['booking_total'] == null
+          ? null
+          : _billToDouble(json['booking_total']),
+      grandTotal: _billToDouble(json['grand_total']),
+    );
+  }
+}
+
 @JsonSerializable()
 class BookingCreate {
   final String? venueId;
@@ -195,6 +226,13 @@ class BookingCreate {
       'user_id': userId,
     };
   }
+}
+
+double _billToDouble(dynamic value) {
+  if (value == null) return 0;
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value) ?? 0;
+  return 0;
 }
 
 @JsonSerializable()

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/constants/app_spacing.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
+import 'package:sports_venue_chatbot/features/booking/data/booking_api.dart';
 import 'package:sports_venue_chatbot/features/booking/data/booking_models.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_provider.dart';
 import 'package:sports_venue_chatbot/features/menu/data/menu_models.dart';
@@ -14,6 +15,13 @@ final _vndFormat = NumberFormat.currency(
   symbol: '₫',
   decimalDigits: 0,
 );
+
+final _bookingBillProvider = FutureProvider.family<BookingBill, String>((
+  ref,
+  bookingId,
+) {
+  return ref.watch(bookingApiProvider).getBookingBill(bookingId);
+});
 
 class CustomerBillingScreen extends ConsumerStatefulWidget {
   const CustomerBillingScreen({super.key});
@@ -82,9 +90,7 @@ class _CustomerBillingScreenState extends ConsumerState<CustomerBillingScreen> {
     final orderHistory = ref.watch(orderHistoryProvider);
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Bạn chưa đăng nhập')),
-      );
+      return const Scaffold(body: Center(child: Text('Bạn chưa đăng nhập')));
     }
 
     return DefaultTabController(
@@ -94,8 +100,8 @@ class _CustomerBillingScreenState extends ConsumerState<CustomerBillingScreen> {
           title: const Text('Đơn đã đặt'),
           bottom: const TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.sports_tennis_outlined), text: 'Đặt sân'),
-              Tab(icon: Icon(Icons.receipt_long_outlined), text: 'Đơn hàng'),
+              Tab(icon: Icon(Icons.receipt_long_outlined), text: 'Hóa đơn'),
+              Tab(icon: Icon(Icons.shopping_bag_outlined), text: 'Đơn lẻ'),
             ],
           ),
         ),
@@ -123,10 +129,7 @@ class _BookingBillingList extends StatelessWidget {
   final BookingState state;
   final ScrollController controller;
 
-  const _BookingBillingList({
-    required this.state,
-    required this.controller,
-  });
+  const _BookingBillingList({required this.state, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -159,17 +162,185 @@ class _BookingBillingList extends StatelessWidget {
           return const _BottomLoader();
         }
         final booking = state.bookings[index];
-        return _BillingCard(
-          title: booking.resourceLabel ??
-              '${booking.courtType.displayName} - Sân ${booking.courtNumber}',
-          subtitle:
-              '${DateFormat('dd/MM/yyyy').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
-          statusLabel: booking.status.displayName,
-          paymentStatus: booking.paymentStatus,
-          amount: booking.totalPrice,
-          icon: Icons.sports_tennis_outlined,
-        );
+        return _BookingBillCard(booking: booking);
       },
+    );
+  }
+}
+
+class _BookingBillCard extends ConsumerWidget {
+  final Booking booking;
+
+  const _BookingBillCard({required this.booking});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bill = ref.watch(_bookingBillProvider(booking.id));
+    return bill.when(
+      data: (bill) => _BillCard(bill: bill),
+      loading: () => _BillingCard(
+        title:
+            booking.resourceLabel ??
+            '${booking.courtType.displayName} - Sân ${booking.courtNumber}',
+        subtitle:
+            '${DateFormat('dd/MM/yyyy').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
+        statusLabel: booking.status.displayName,
+        paymentStatus: booking.paymentStatus,
+        amount: booking.totalPrice,
+        icon: Icons.receipt_long_outlined,
+      ),
+      error: (_, __) => _BillingCard(
+        title:
+            booking.resourceLabel ??
+            '${booking.courtType.displayName} - Sân ${booking.courtNumber}',
+        subtitle:
+            '${DateFormat('dd/MM/yyyy').format(booking.date)} • Không thể tải chi tiết bill',
+        statusLabel: booking.status.displayName,
+        paymentStatus: booking.paymentStatus,
+        amount: booking.totalPrice,
+        icon: Icons.error_outline,
+      ),
+    );
+  }
+}
+
+class _BillCard extends StatelessWidget {
+  final BookingBill bill;
+
+  const _BillCard({required this.bill});
+
+  @override
+  Widget build(BuildContext context) {
+    final booking = bill.booking;
+    final title =
+        booking.resourceLabel ??
+        '${booking.courtType.displayName} - Sân ${booking.courtNumber}';
+    final subtitle =
+        '${DateFormat('dd/MM/yyyy').format(booking.date)} • ${booking.startTime} - ${booking.endTime}';
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.receipt_long_outlined,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                _StatusChip(label: booking.status.displayName),
+                _PaymentChip(paymentStatus: booking.paymentStatus),
+              ],
+            ),
+            const Divider(height: AppSpacing.xl),
+            _TotalRow(
+              label: 'Tiền sân',
+              amount: bill.bookingTotal ?? booking.totalPrice ?? 0,
+            ),
+            if (bill.orders.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text('Đồ đã gọi', style: Theme.of(context).textTheme.labelLarge),
+              const SizedBox(height: 6),
+              ...bill.orders.map((order) {
+                final itemSummary = order.items
+                    .map((item) => '${item.itemName} x${item.quantity}')
+                    .join(', ');
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          itemSummary,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        _vndFormat.format(order.totalPrice),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+              _TotalRow(label: 'Tiền đồ', amount: bill.orderTotal),
+            ],
+            const Divider(height: AppSpacing.xl),
+            _TotalRow(
+              label: 'Tổng bill',
+              amount: bill.grandTotal,
+              isGrandTotal: true,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TotalRow extends StatelessWidget {
+  final String label;
+  final double amount;
+  final bool isGrandTotal;
+
+  const _TotalRow({
+    required this.label,
+    required this.amount,
+    this.isGrandTotal = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontWeight: isGrandTotal ? FontWeight.w800 : FontWeight.w600,
+            ),
+          ),
+        ),
+        Text(
+          _vndFormat.format(amount),
+          style: TextStyle(
+            color: isGrandTotal ? AppColors.primary : AppColors.textPrimary,
+            fontWeight: isGrandTotal ? FontWeight.w800 : FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -178,42 +349,44 @@ class _OrderBillingList extends StatelessWidget {
   final OrderHistoryState state;
   final ScrollController controller;
 
-  const _OrderBillingList({
-    required this.state,
-    required this.controller,
-  });
+  const _OrderBillingList({required this.state, required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    if (state.isLoading && state.orders.isEmpty) {
+    final standaloneOrders = state.orders
+        .where((order) => order.bookingId == null)
+        .toList();
+
+    if (state.isLoading && standaloneOrders.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(color: AppColors.primary),
       );
     }
-    if (state.error != null && state.orders.isEmpty) {
+    if (state.error != null && standaloneOrders.isEmpty) {
       return _EmptyState(
         icon: Icons.error_outline,
-        title: 'Không thể tải đơn hàng',
+        title: 'Không thể tải đơn lẻ',
         message: state.error!,
       );
     }
-    if (state.orders.isEmpty) {
+    if (standaloneOrders.isEmpty) {
       return const _EmptyState(
-        icon: Icons.receipt_long_outlined,
-        title: 'Chưa có đơn hàng',
-        message: 'Các sản phẩm và dịch vụ bạn đã đặt sẽ hiển thị ở đây.',
+        icon: Icons.shopping_bag_outlined,
+        title: 'Không có đơn lẻ',
+        message:
+            'Đơn gọi trong lúc chơi sẽ nằm trong hóa đơn của lượt đặt sân.',
       );
     }
 
     return ListView.builder(
       controller: controller,
       padding: const EdgeInsets.all(AppSpacing.md),
-      itemCount: state.orders.length + (state.isLoadingMore ? 1 : 0),
+      itemCount: standaloneOrders.length + (state.isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
-        if (index >= state.orders.length) {
+        if (index >= standaloneOrders.length) {
           return const _BottomLoader();
         }
-        final order = state.orders[index];
+        final order = standaloneOrders[index];
         final itemSummary = order.items
             .take(3)
             .map((item) => '${item.itemName} x${item.quantity}')
@@ -303,8 +476,8 @@ class _BillingCard extends StatelessWidget {
                       Text(
                         subtitle,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
+                          color: AppColors.textSecondary,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -366,16 +539,16 @@ class _PaymentChip extends StatelessWidget {
     final color = isPaid
         ? AppColors.success
         : isFailed
-            ? AppColors.error
-            : AppColors.textHint;
+        ? AppColors.error
+        : AppColors.textHint;
     final method = isPaid && paymentStatus.contains('_')
         ? paymentStatus.split('_').last.toUpperCase()
         : '';
     final label = isPaid
         ? (method.isNotEmpty ? 'Đã thanh toán ($method)' : 'Đã thanh toán')
         : isFailed
-            ? 'Thanh toán lỗi'
-            : 'Chưa thanh toán';
+        ? 'Thanh toán lỗi'
+        : 'Chưa thanh toán';
 
     return Chip(
       avatar: Icon(
@@ -420,9 +593,9 @@ class _EmptyState extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         Text(
           message,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
           textAlign: TextAlign.center,
         ),
       ],

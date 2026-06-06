@@ -1,10 +1,12 @@
 from datetime import date as DateType
 from datetime import datetime, time
+from decimal import Decimal
 from zoneinfo import ZoneInfo
 
 from pydantic import BaseModel, Field, field_validator
 
 from app.core.config import settings
+from app.schemas.order import OrderResponse
 
 
 class BookingCreate(BaseModel):
@@ -68,6 +70,14 @@ class BookingResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class BookingBillResponse(BaseModel):
+    booking: BookingResponse
+    orders: list[OrderResponse]
+    order_total: Decimal
+    booking_total: Decimal | None = None
+    grand_total: Decimal
 
 
 class BookingCancelResponse(BaseModel):
