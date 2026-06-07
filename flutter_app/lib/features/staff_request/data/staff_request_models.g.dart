@@ -52,6 +52,9 @@ const _$StaffRequestTypeEnumMap = {
   StaffRequestType.payment: 'payment',
   StaffRequestType.help: 'help',
   StaffRequestType.maintenance: 'maintenance',
+  StaffRequestType.earlyArrival: 'early_arrival',
+  StaffRequestType.lateArrival: 'late_arrival',
+  StaffRequestType.scheduleChange: 'schedule_change',
   StaffRequestType.other: 'other',
 };
 

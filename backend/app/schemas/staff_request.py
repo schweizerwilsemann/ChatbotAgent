@@ -13,7 +13,10 @@ class StaffRequestCreate(BaseModel):
     )
     request_type: str = Field(
         ...,
-        description="Type of request: order, payment, help, maintenance, other",
+        description=(
+            "Type of request: order, payment, help, maintenance, "
+            "early_arrival, late_arrival, schedule_change, other"
+        ),
     )
     description: str | None = Field(
         None, max_length=1000, description="Additional description"

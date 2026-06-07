@@ -16,6 +16,9 @@ REQUEST_TYPE_LABELS = {
     "payment": "Thanh toán",
     "help": "Hỗ trợ chung",
     "maintenance": "Sự cố kỹ thuật",
+    "early_arrival": "Khách đến sớm",
+    "late_arrival": "Khách đến trễ",
+    "schedule_change": "Đổi giờ đặt sân",
     "other": "Yêu cầu khác",
 }
 

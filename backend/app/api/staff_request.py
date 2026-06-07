@@ -48,7 +48,16 @@ async def create_staff_request(
             detail="Bạn đang có yêu cầu chưa hoàn thành. Vui lòng chờ hoặc hủy yêu cầu trước.",
         )
 
-    allowed_types = {"order", "payment", "help", "maintenance", "other"}
+    allowed_types = {
+        "order",
+        "payment",
+        "help",
+        "maintenance",
+        "early_arrival",
+        "late_arrival",
+        "schedule_change",
+        "other",
+    }
     if data.request_type not in allowed_types:
         raise HTTPException(
             status_code=422,

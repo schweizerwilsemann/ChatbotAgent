@@ -11,6 +11,12 @@ enum StaffRequestType {
   help,
   @JsonValue('maintenance')
   maintenance,
+  @JsonValue('early_arrival')
+  earlyArrival,
+  @JsonValue('late_arrival')
+  lateArrival,
+  @JsonValue('schedule_change')
+  scheduleChange,
   @JsonValue('other')
   other,
 }
@@ -26,6 +32,12 @@ extension StaffRequestTypeExtension on StaffRequestType {
         return 'Hỗ trợ chung';
       case StaffRequestType.maintenance:
         return 'Sự cố kỹ thuật';
+      case StaffRequestType.earlyArrival:
+        return 'Tôi đến sớm';
+      case StaffRequestType.lateArrival:
+        return 'Tôi đến trễ';
+      case StaffRequestType.scheduleChange:
+        return 'Đổi giờ đặt sân';
       case StaffRequestType.other:
         return 'Yêu cầu khác';
     }
@@ -41,6 +53,12 @@ extension StaffRequestTypeExtension on StaffRequestType {
         return '🙋';
       case StaffRequestType.maintenance:
         return '🔧';
+      case StaffRequestType.earlyArrival:
+        return '⏩';
+      case StaffRequestType.lateArrival:
+        return '⏰';
+      case StaffRequestType.scheduleChange:
+        return '🔁';
       case StaffRequestType.other:
         return '📋';
     }
