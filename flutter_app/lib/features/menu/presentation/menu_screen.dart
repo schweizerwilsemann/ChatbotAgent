@@ -416,7 +416,7 @@ class _CartSummaryBar extends ConsumerWidget {
                       height: 18,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: AppColors.textOnPrimary,
                       ),
                     )
                   : const Icon(Icons.send),
@@ -446,126 +446,6 @@ class _CartSummaryBar extends ConsumerWidget {
 
     ref.read(cartProvider.notifier).clear();
     AppSnackBar.showSuccess(context, 'Đặt hàng thành công!');
-    await Future<void>.delayed(Duration.zero);
-    if (!context.mounted) return;
-    await _showPaymentDialog(context, ref, order);
-  }
-
-  Future<void> _showPaymentDialog(
-    BuildContext context,
-    WidgetRef ref,
-    Order order,
-  ) async {
-    if (order.totalPrice <= 0) return;
-
-    final amount = order.totalPrice.round();
-    final label = order.resourceLabel != null
-        ? 'đơn hàng tại ${order.resourceLabel}'
-        : 'đơn hàng ${order.items.length} sản phẩm';
-
-    final paymentMethod = await _showPaymentMethodDialog(context);
-    if (paymentMethod == null || !context.mounted) return;
-
-    if (paymentMethod == 'stripe') {
-      await _processStripePayment(context, ref, order.id, amount, label);
-    } else {
-      await _processVnpayPayment(context, ref, order.id, amount, label);
-    }
-  }
-
-  Future<String?> _showPaymentMethodDialog(BuildContext context) async {
-    return showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Chọn phương thức thanh toán'),
-        contentPadding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.credit_card, color: AppColors.primary),
-              title: const Text('Stripe (Thẻ quốc tế)'),
-              subtitle: const Text('Visa, Mastercard, JCB'),
-              onTap: () => Navigator.pop(context, 'stripe'),
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.account_balance,
-                color: AppColors.success,
-              ),
-              title: const Text('VNPay (Ngân hàng VN)'),
-              subtitle: const Text('ATM, Internet Banking, QR'),
-              onTap: () => Navigator.pop(context, 'vnpay'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Để sau'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _processStripePayment(
-    BuildContext context,
-    WidgetRef ref,
-    String orderId,
-    int amount,
-    String label,
-  ) async {
-    final stripeNotifier = ref.read(stripeProvider.notifier);
-    final success = await stripeNotifier.pay(
-      orderId: orderId,
-      amount: amount,
-      description: 'Thanh toan $label',
-      orderType: 'order',
-    );
-
-    if (success && context.mounted) {
-      context.go(
-        '/payment/result',
-        extra: {'success': true, 'orderId': orderId, 'orderType': 'order'},
-      );
-    } else if (context.mounted) {
-      final error = ref.read(stripeProvider).error;
-      if (error != null) AppSnackBar.showError(context, error);
-    }
-  }
-
-  Future<void> _processVnpayPayment(
-    BuildContext context,
-    WidgetRef ref,
-    String orderId,
-    int amount,
-    String label,
-  ) async {
-    final notifier = ref.read(paymentProvider.notifier);
-    final paymentSuccess = await notifier.createPayment(
-      orderId: orderId,
-      amount: amount,
-      description: 'Thanh toan $label',
-      orderType: 'order',
-    );
-
-    if (paymentSuccess && context.mounted) {
-      final paymentState = ref.read(paymentProvider);
-      if (paymentState.paymentUrl != null) {
-        context.push(
-          '/payment',
-          extra: {
-            'paymentUrl': paymentState.paymentUrl!,
-            'orderId': orderId,
-            'orderType': 'order',
-          },
-        );
-      }
-    } else if (context.mounted) {
-      final error = ref.read(paymentProvider).error;
-      if (error != null) AppSnackBar.showError(context, error);
-    }
   }
 }
 
@@ -587,6 +467,30 @@ class _OrderConfirmationSheetState
     extends ConsumerState<_OrderConfirmationSheet> {
   final _notesController = TextEditingController();
   VenueResource? _selectedResource;
+  dynamic _activeBooking; // Active booking if customer is checked in
+  bool _detectingLocation = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _detectActiveBooking();
+  }
+
+  Future<void> _detectActiveBooking() async {
+    try {
+      final booking = await ref.read(bookingApiProvider).getActiveBooking();
+      if (mounted) {
+        setState(() {
+          _activeBooking = booking;
+          _detectingLocation = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _detectingLocation = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -607,146 +511,195 @@ class _OrderConfirmationSheetState
         top: 16,
         bottom: MediaQuery.of(context).viewInsets.bottom + 16,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Handle bar
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Handle bar
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          Text(
-            'Xác nhận đơn hàng',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 12),
-
-          // Items list
-          ...widget.cart.items.map(
-            (item) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '${item.name} x${item.quantity}',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-                  Text(
-                    _vndFormat.format(item.totalPrice),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                ],
-              ),
+            Text(
+              'Xác nhận đơn hàng',
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-          ),
-          const Divider(height: 24),
+            const SizedBox(height: 12),
 
-          // Total
-          Row(
-            children: [
-              Text(
-                'Tổng cộng',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const Spacer(),
-              Text(
-                _vndFormat.format(widget.cart.totalPrice),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.primary,
+            // Total
+            Row(
+              children: [
+                Text(
+                  'Tổng cộng',
+                  style: Theme.of(
+                    context,
+                  )
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const Spacer(),
+                Text(
+                  _vndFormat.format(widget.cart.totalPrice),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.primary,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Auto-detected location or manual selection
+            if (_detectingLocation)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
                     ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          resourcesAsync.when(
-            loading: () => const LinearProgressIndicator(minHeight: 2),
-            error: (_, __) => const SizedBox.shrink(),
-            data: (resources) => DropdownButtonFormField<VenueResource>(
-              initialValue: resources
-                  .where((resource) => resource.id == _selectedResource?.id)
-                  .firstOrNull,
-              isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'Bàn / sân giao hàng',
-                isDense: true,
-              ),
-              hint: const Text('Chọn vị trí của bạn'),
-              items: resources
-                  .map(
-                    (resource) => DropdownMenuItem(
-                      value: resource,
-                      child: Text(
-                        resource.displayLabel,
-                        overflow: TextOverflow.ellipsis,
+                    SizedBox(width: 12),
+                    Text('Đang xác định vị trí...'),
+                  ],
+                ),
+              )
+            else if (_activeBooking != null)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.success.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.success.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.location_on, color: AppColors.success, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Giao đến sân của bạn',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.success,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _activeBooking!.resourceLabel ??
+                                'Sân ${_activeBooking!.courtNumber}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Text(
+                            '${_activeBooking!.startTime} - ${_activeBooking!.endTime}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  )
-                  .toList(),
-              onChanged: (resource) {
-                setState(() => _selectedResource = resource);
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Notes field
-          TextField(
-            controller: _notesController,
-            decoration: const InputDecoration(
-              labelText: 'Ghi chú (tuỳ chọn)',
-              hintText: 'Ví dụ: không đá, ít đường...',
-              isDense: true,
-            ),
-            maxLines: 2,
-          ),
-          const SizedBox(height: 16),
-
-          // Error message
-          if (orderState.error != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(
-                orderState.error!,
-                style: TextStyle(color: colorScheme.error),
+                    Icon(Icons.check_circle,
+                        color: AppColors.success, size: 20),
+                  ],
+                ),
+              )
+            else
+              resourcesAsync.when(
+                loading: () => const LinearProgressIndicator(minHeight: 2),
+                error: (_, __) => const SizedBox.shrink(),
+                data: (resources) => DropdownButtonFormField<VenueResource>(
+                  initialValue: resources
+                      .where((resource) => resource.id == _selectedResource?.id)
+                      .firstOrNull,
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Bàn / sân giao hàng',
+                    isDense: true,
+                  ),
+                  hint: const Text('Chọn vị trí của bạn'),
+                  items: resources
+                      .map(
+                        (resource) => DropdownMenuItem(
+                          value: resource,
+                          child: Text(
+                            resource.displayLabel,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (resource) {
+                    setState(() => _selectedResource = resource);
+                  },
+                ),
               ),
-            ),
+            const SizedBox(height: 16),
 
-          // Submit button
-          FilledButton(
-            onPressed: orderState.isLoading ? null : _submitOrder,
-            child: orderState.isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Xác nhận đặt hàng'),
-          ),
-        ],
+            // Notes field
+            TextField(
+              controller: _notesController,
+              decoration: const InputDecoration(
+                labelText: 'Ghi chú (tuỳ chọn)',
+                hintText: 'Ví dụ: không đá, ít đường...',
+                isDense: true,
+              ),
+              maxLines: 2,
+            ),
+            const SizedBox(height: 16),
+
+            // Error message
+            if (orderState.error != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  orderState.error!,
+                  style: TextStyle(color: colorScheme.error),
+                ),
+              ),
+
+            // Submit button
+            FilledButton(
+              onPressed: orderState.isLoading ? null : _submitOrder,
+              child: orderState.isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Xác nhận đặt hàng'),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Future<void> _submitOrder() async {
     final resources = ref.read(venueResourcesProvider).valueOrNull ?? const [];
-    final activeBooking = await ref.read(bookingApiProvider).getActiveBooking();
+    // Use already detected active booking
+    final activeBooking = _activeBooking;
     if (!mounted) return;
     if (resources.isNotEmpty &&
         _selectedResource == null &&
@@ -777,7 +730,112 @@ class _OrderConfirmationSheetState
     if (success && mounted) {
       final createdOrder = ref.read(createOrderProvider).order;
       ref.read(createOrderProvider.notifier).reset();
-      Navigator.of(context).pop(createdOrder);
+
+      if (createdOrder != null && mounted) {
+        // Show payment method dialog BEFORE popping bottom sheet
+        final method = await _showPaymentMethodDialog();
+
+        if (method != null && mounted) {
+          final amount = createdOrder.totalPrice.round();
+          if (method == 'stripe') {
+            await _processStripePayment(createdOrder.id, amount);
+          } else {
+            await _processVnpayPayment(createdOrder.id, amount);
+          }
+        }
+
+        // Pop bottom sheet
+        if (mounted) {
+          Navigator.of(context).pop(createdOrder);
+        }
+        // Navigate to billing tab (use go to update bottom nav)
+        if (mounted) {
+          context.go('/billing');
+        }
+      }
     }
+  }
+
+  Future<String?> _showPaymentMethodDialog() async {
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Chọn phương thức thanh toán'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.credit_card, color: AppColors.primary),
+              title: const Text('Stripe (Thẻ quốc tế)'),
+              subtitle: const Text('Visa, Mastercard, JCB'),
+              onTap: () => Navigator.pop(context, 'stripe'),
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.account_balance, color: AppColors.success),
+              title: const Text('VNPay (Ngân hàng VN)'),
+              subtitle: const Text('ATM, Internet Banking, QR'),
+              onTap: () => Navigator.pop(context, 'vnpay'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, null),
+              child: const Text('Thanh toán sau'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _processStripePayment(String orderId, int amount) async {
+    final stripeNotifier = ref.read(stripeProvider.notifier);
+    final success = await stripeNotifier.pay(
+      orderId: orderId,
+      amount: amount,
+      description: 'Đặt hàng',
+      orderType: 'order',
+    );
+
+    if (success && mounted) {
+      AppSnackBar.showSuccess(context, 'Thanh toán thành công!');
+      return true;
+    } else if (mounted) {
+      final error = ref.read(stripeProvider).error;
+      if (error != null) {
+        AppSnackBar.showError(context, error);
+      }
+    }
+    return false;
+  }
+
+  Future<bool> _processVnpayPayment(String orderId, int amount) async {
+    final notifier = ref.read(paymentProvider.notifier);
+    final paymentSuccess = await notifier.createPayment(
+      orderId: orderId,
+      amount: amount,
+      description: 'Đặt hàng',
+      orderType: 'order',
+    );
+
+    if (paymentSuccess && mounted) {
+      final paymentState = ref.read(paymentProvider);
+      if (paymentState.paymentUrl != null) {
+        await context.push('/payment', extra: {
+          'paymentUrl': paymentState.paymentUrl!,
+          'orderId': orderId,
+          'orderType': 'order',
+        });
+        if (mounted) {
+          AppSnackBar.showSuccess(context, 'Thanh toán thành công!');
+          return true;
+        }
+      }
+    } else if (mounted) {
+      final error = ref.read(paymentProvider).error;
+      if (error != null) {
+        AppSnackBar.showError(context, error);
+      }
+    }
+    return false;
   }
 }

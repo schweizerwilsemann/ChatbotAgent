@@ -100,6 +100,11 @@ class StaffProfileScreen extends ConsumerWidget {
                         onTap: () => context.go('/staff/notifications'),
                       ),
                       _SettingsTile(
+                        icon: Icons.settings_outlined,
+                        label: 'Cài đặt chung',
+                        onTap: () => context.push('/staff/settings'),
+                      ),
+                      _SettingsTile(
                         icon: Icons.info_outline,
                         label: 'Thông tin ứng dụng',
                         onTap: () => _showAboutDialog(context),
@@ -142,7 +147,7 @@ class StaffProfileScreen extends ConsumerWidget {
             onPressed: () => Navigator.of(ctx).pop(true),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.textOnPrimary,
             ),
             child: const Text('Đăng xuất'),
           ),

@@ -50,16 +50,16 @@ class _StaffShellState extends ConsumerState<StaffShell> {
       route: '/staff/menu',
     ),
     _StaffNavItem(
+      icon: Icons.receipt_long_outlined,
+      selectedIcon: Icons.receipt_long,
+      label: 'Hoá đơn',
+      route: '/staff/billing',
+    ),
+    _StaffNavItem(
       icon: Icons.chat_bubble_outline,
       selectedIcon: Icons.chat_bubble,
       label: 'Tin nhắn',
       route: '/staff/inbox',
-    ),
-    _StaffNavItem(
-      icon: Icons.notifications_outlined,
-      selectedIcon: Icons.notifications,
-      label: 'Thông báo',
-      route: '/staff/notifications',
     ),
   ];
 
@@ -128,6 +128,9 @@ class _StaffShellState extends ConsumerState<StaffShell> {
                 case 'profile':
                   context.push('/staff/profile');
                   break;
+                case 'settings':
+                  context.push('/staff/settings');
+                  break;
                 case 'logout':
                   _confirmLogout(context, ref);
                   break;
@@ -163,6 +166,15 @@ class _StaffShellState extends ConsumerState<StaffShell> {
                 child: ListTile(
                   leading: Icon(Icons.person_outline),
                   title: Text('Hồ sơ'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'settings',
+                child: ListTile(
+                  leading: Icon(Icons.settings_outlined),
+                  title: Text('Cài đặt'),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -214,7 +226,7 @@ class _StaffShellState extends ConsumerState<StaffShell> {
             onPressed: () => Navigator.of(ctx).pop(true),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.textOnPrimary,
             ),
             child: const Text('Đăng xuất'),
           ),
@@ -248,7 +260,7 @@ class _NotificationBell extends ConsumerWidget {
         isLabelVisible: count > 0,
         label: Text(
           count > 99 ? '99+' : '$count',
-          style: const TextStyle(fontSize: 10, color: Colors.white),
+          style: const TextStyle(fontSize: 10, color: AppColors.textOnPrimary),
         ),
         child: const Icon(Icons.notifications_outlined),
       ),

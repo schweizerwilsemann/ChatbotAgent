@@ -28,7 +28,8 @@ class StaffChatBubble extends StatelessWidget {
             CircleAvatar(
               radius: 14,
               backgroundColor: AppColors.primary,
-              child: const Icon(Icons.person, size: 16, color: Colors.white),
+              child: const Icon(Icons.person,
+                  size: 16, color: AppColors.textOnPrimary),
             ),
             const SizedBox(width: 6),
           ],
@@ -105,7 +106,8 @@ class StaffChatBubble extends StatelessWidget {
             CircleAvatar(
               radius: 14,
               backgroundColor: AppColors.secondary,
-              child: const Icon(Icons.person, size: 16, color: Colors.white),
+              child: const Icon(Icons.person,
+                  size: 16, color: AppColors.textOnPrimary),
             ),
           ],
         ],

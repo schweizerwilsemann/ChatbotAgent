@@ -97,7 +97,8 @@ class _StaffChatInputState extends State<StaffChatInput> {
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                icon: const Icon(Icons.send, color: Colors.white, size: 18),
+                icon: const Icon(Icons.send,
+                    color: AppColors.textOnPrimary, size: 18),
                 onPressed: widget.enabled ? _handleSend : null,
               ),
             ),

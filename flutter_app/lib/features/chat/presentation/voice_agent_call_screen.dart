@@ -223,7 +223,7 @@ class _VoiceAgentCallScreenState extends ConsumerState<VoiceAgentCallScreen> {
                 style: FilledButton.styleFrom(
                   shape: const CircleBorder(),
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.textOnPrimary,
                   padding: EdgeInsets.zero,
                 ),
                 onPressed: controller.retryListening,
@@ -239,7 +239,7 @@ class _VoiceAgentCallScreenState extends ConsumerState<VoiceAgentCallScreen> {
               style: FilledButton.styleFrom(
                 shape: const CircleBorder(),
                 backgroundColor: AppColors.error,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.textOnPrimary,
                 padding: EdgeInsets.zero,
               ),
               onPressed: () async {

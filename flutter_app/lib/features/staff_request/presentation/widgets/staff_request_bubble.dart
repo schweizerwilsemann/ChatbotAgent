@@ -193,7 +193,7 @@ class _CallButton extends StatelessWidget {
           height: 52,
           child: Icon(
             Icons.support_agent,
-            color: Colors.white,
+            color: AppColors.textOnPrimary,
             size: 24,
           ),
         ),
@@ -239,13 +239,13 @@ class _ActiveRequestChip extends StatelessWidget {
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Colors.white,
+                    color: AppColors.textOnPrimary,
                   ),
                 )
               else
                 Icon(
                   isAccepted ? Icons.chat_bubble : Icons.hourglass_top,
-                  color: Colors.white,
+                  color: AppColors.textOnPrimary,
                   size: 18,
                 ),
               const SizedBox(width: 8),
@@ -254,7 +254,7 @@ class _ActiveRequestChip extends StatelessWidget {
                     ? 'Chat với ${request.acceptedByName ?? "Nhân viên"}'
                     : 'Đang chờ nhân viên...',
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textOnPrimary,
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
                 ),

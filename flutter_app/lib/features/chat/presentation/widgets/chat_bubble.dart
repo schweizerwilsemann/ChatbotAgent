@@ -181,7 +181,7 @@ class ChatBubble extends StatelessWidget {
       ),
       child: Icon(
         message.isUser ? Icons.person : Icons.smart_toy,
-        color: Colors.white,
+        color: AppColors.textOnPrimary,
         size: 18,
       ),
     );
@@ -355,7 +355,8 @@ class _TypingIndicatorState extends State<TypingIndicator>
                 ),
               ],
             ),
-            child: const Icon(Icons.smart_toy, color: Colors.white, size: 18),
+            child: const Icon(Icons.smart_toy,
+                color: AppColors.textOnPrimary, size: 18),
           ),
           const SizedBox(width: 8),
           Container(

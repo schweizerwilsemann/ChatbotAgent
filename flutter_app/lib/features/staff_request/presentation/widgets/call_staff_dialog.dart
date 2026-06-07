@@ -160,7 +160,7 @@ class _CallStaffDialogContentState
                         label: const Text('Gửi yêu cầu'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
+                          foregroundColor: AppColors.textOnPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -206,7 +206,7 @@ class CallStaffDialog {
           onPressed: () => Navigator.of(context, rootNavigator: true).pop(true),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.error,
-            foregroundColor: Colors.white,
+            foregroundColor: AppColors.textOnPrimary,
           ),
           child: const Text('Hủy yêu cầu'),
         ),

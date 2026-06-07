@@ -66,6 +66,8 @@ class ProfileScreen extends ConsumerWidget {
           return _ProfileBody(
             user: user,
             onChangePassword: () => _showChangePasswordDialog(context, ref),
+            onScanQr: () => context.push('/scan-qr'),
+            onOpenSettings: () => context.push('/settings'),
           );
         },
       ),
@@ -112,7 +114,7 @@ class ProfileScreen extends ConsumerWidget {
           onPressed: () => Navigator.of(context, rootNavigator: true).pop(true),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.error,
-            foregroundColor: Colors.white,
+            foregroundColor: AppColors.textOnPrimary,
           ),
           child: const Text('Đăng xuất'),
         ),
@@ -143,10 +145,14 @@ class ProfileScreen extends ConsumerWidget {
 class _ProfileBody extends StatelessWidget {
   final User user;
   final VoidCallback onChangePassword;
+  final VoidCallback onScanQr;
+  final VoidCallback onOpenSettings;
 
   const _ProfileBody({
     required this.user,
     required this.onChangePassword,
+    required this.onScanQr,
+    required this.onOpenSettings,
   });
 
   @override
@@ -207,6 +213,18 @@ class _ProfileBody extends StatelessWidget {
               icon: Icons.badge_outlined,
               label: 'Mã người dùng',
               value: user.id,
+            ),
+            _ProfileTile(
+              icon: Icons.qr_code_scanner,
+              label: 'Quét QR nhận sân',
+              value: 'Mở camera để xác nhận nhận sân với nhân viên',
+              onTap: onScanQr,
+            ),
+            _ProfileTile(
+              icon: Icons.settings_outlined,
+              label: 'Cài đặt',
+              value: 'Bảo mật thanh toán online và gói ngôn ngữ',
+              onTap: onOpenSettings,
             ),
             _ProfileTile(
               icon: Icons.lock_outline,

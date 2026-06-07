@@ -55,7 +55,7 @@ class _VoiceInputOverlayState extends ConsumerState<VoiceInputOverlay> {
             action: next.errorMessage!.contains('Cài đặt')
                 ? SnackBarAction(
                     label: 'Mở Cài đặt',
-                    textColor: Colors.white,
+                    textColor: AppColors.textOnPrimary,
                     onPressed: () => openAppSettings(),
                   )
                 : null,

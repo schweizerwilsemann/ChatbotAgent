@@ -125,6 +125,9 @@ class _AdminShellState extends ConsumerState<AdminShell> {
                 case 'profile':
                   context.push('/admin/profile');
                   break;
+                case 'settings':
+                  context.push('/admin/settings');
+                  break;
                 case 'logout':
                   _confirmLogout(context, ref);
                   break;
@@ -183,6 +186,15 @@ class _AdminShellState extends ConsumerState<AdminShell> {
                 ),
               ),
               const PopupMenuItem(
+                value: 'settings',
+                child: ListTile(
+                  leading: Icon(Icons.settings_outlined),
+                  title: Text('Cài đặt'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
                 value: 'logout',
                 child: ListTile(
                   leading: Icon(Icons.logout, color: AppColors.error),
@@ -229,7 +241,7 @@ class _AdminShellState extends ConsumerState<AdminShell> {
             onPressed: () => Navigator.of(ctx).pop(true),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.textOnPrimary,
             ),
             child: const Text('Đăng xuất'),
           ),
@@ -263,7 +275,7 @@ class _NotificationBell extends ConsumerWidget {
         isLabelVisible: count > 0,
         label: Text(
           count > 99 ? '99+' : '$count',
-          style: const TextStyle(fontSize: 10, color: Colors.white),
+          style: const TextStyle(fontSize: 10, color: AppColors.textOnPrimary),
         ),
         child: const Icon(Icons.notifications_outlined),
       ),
