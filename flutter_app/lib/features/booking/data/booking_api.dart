@@ -91,6 +91,17 @@ class BookingApi {
     return BookingBill.fromJson(response.data!);
   }
 
+  Future<Booking> confirmCheckIn({
+    required String bookingId,
+    required String token,
+  }) async {
+    final response = await _dioClient.post<Map<String, dynamic>>(
+      '${ApiConstants.bookingEndpoint}/$bookingId/confirm-checkin',
+      data: {'token': token},
+    );
+    return Booking.fromJson(response.data!);
+  }
+
   /// Cancel a booking
   Future<Booking> cancelBooking(String bookingId) async {
     try {

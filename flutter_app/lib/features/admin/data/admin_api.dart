@@ -84,6 +84,54 @@ class AdminApi {
     }
   }
 
+  Future<BookingCheckInToken> createBookingCheckInToken(
+    String bookingId,
+  ) async {
+    try {
+      final response = await _dioClient.post<Map<String, dynamic>>(
+        '${ApiConstants.adminBookingsEndpoint}/$bookingId/checkin-token',
+      );
+      return BookingCheckInToken.fromJson(response.data!);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<AdminBooking> checkInBooking(String bookingId) async {
+    try {
+      final response = await _dioClient.post<Map<String, dynamic>>(
+        '${ApiConstants.adminBookingsEndpoint}/$bookingId/check-in',
+      );
+      return AdminBooking.fromJson(response.data!);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<AdminBooking> rescheduleBooking({
+    required String bookingId,
+    required DateTime date,
+    required String startTime,
+    required String endTime,
+  }) async {
+    try {
+      final dateStr = '${date.year.toString().padLeft(4, '0')}-'
+          '${date.month.toString().padLeft(2, '0')}-'
+          '${date.day.toString().padLeft(2, '0')}';
+      final response = await _dioClient.patch<Map<String, dynamic>>(
+        '${ApiConstants.adminBookingsEndpoint}/$bookingId/reschedule',
+        data: {
+          'date': dateStr,
+          'start_time': startTime,
+          'end_time': endTime,
+        },
+      );
+      return AdminBooking.fromJson(response.data!);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // ─── Orders ─────────────────────────────────────────────────────────────
 
   /// Fetch orders with optional status filter.

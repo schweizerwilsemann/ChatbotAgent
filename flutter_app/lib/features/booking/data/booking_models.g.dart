@@ -1,4 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: unused_element
 
 part of 'booking_models.dart';
 
@@ -21,6 +22,10 @@ Booking _$BookingFromJson(Map<String, dynamic> json) => Booking(
       paymentStatus: json['payment_status'] as String? ?? 'unpaid',
       totalPrice: (json['total_price'] as num?)?.toDouble(),
       notes: json['notes'] as String?,
+      checkedInAt: json['checked_in_at'] == null
+          ? null
+          : DateTime.parse(json['checked_in_at'] as String),
+      checkedInBy: json['checked_in_by'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] == null
           ? null
@@ -42,6 +47,8 @@ Map<String, dynamic> _$BookingToJson(Booking instance) => <String, dynamic>{
       'payment_status': instance.paymentStatus,
       'total_price': instance.totalPrice,
       'notes': instance.notes,
+      'checked_in_at': instance.checkedInAt?.toIso8601String(),
+      'checked_in_by': instance.checkedInBy,
       'created_at': instance.createdAt.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };
@@ -55,6 +62,7 @@ const _$CourtTypeEnumMap = {
 const _$BookingStatusEnumMap = {
   BookingStatus.pending: 'pending',
   BookingStatus.confirmed: 'confirmed',
+  BookingStatus.checkedIn: 'checked_in',
   BookingStatus.cancelled: 'cancelled',
   BookingStatus.completed: 'completed',
 };

@@ -1,10 +1,12 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import and_, select, update
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.booking import Booking
+
+ACTIVE_BOOKING_STATUSES = ("confirmed", "checked_in")
 
 
 class BookingRepository:
@@ -74,6 +76,79 @@ class BookingRepository:
         await self._session.refresh(booking)  
         return booking
 
+    async def reschedule(
+        self,
+        booking_id: str,
+        *,
+        start_time: datetime,
+        end_time: datetime,
+        total_price: float | None = None,
+    ) -> Booking | None:
+        booking = await self.get_by_id(booking_id)
+        if not booking:
+            return None
+        booking.start_time = start_time
+        booking.end_time = end_time
+        booking.total_price = total_price
+        booking.checkin_token = None
+        await self._session.flush()
+        return booking
+
+    async def set_checkin_token(
+        self,
+        booking_id: str,
+        token: str,
+    ) -> Booking | None:
+        booking = await self.get_by_id(booking_id)
+        if not booking:
+            return None
+        booking.checkin_token = token
+        await self._session.flush()
+        return booking
+
+    async def confirm_checkin(
+        self,
+        booking_id: str,
+        *,
+        checked_in_by: str,
+    ) -> Booking | None:
+        booking = await self.get_by_id(booking_id)
+        if not booking:
+            return None
+
+        now = datetime.now(timezone.utc)
+        time_shifted = False
+
+        if now < booking.start_time:
+            duration = booking.end_time - booking.start_time
+            new_start = now
+            new_end = now + duration
+
+            has_conflict = await self.check_conflict(
+                court_type=booking.court_type,
+                court_number=booking.court_number,
+                start_time=new_start,
+                end_time=new_end,
+                exclude_id=booking_id,
+                resource_id=booking.resource_id,
+            )
+            if has_conflict:
+                raise ValueError(
+                    "Sân đang có lịch đặt trong khung giờ này, không thể check-in sớm"
+                )
+
+            booking.start_time = new_start
+            booking.end_time = new_end
+            time_shifted = True
+
+        booking.status = "checked_in"
+        booking.checked_in_at = now
+        booking.checked_in_by = checked_in_by
+        booking.checkin_token = None
+        await self._session.flush()
+        await self._session.refresh(booking)
+        return booking
+
     async def update_payment_status(
         self,
         booking_id: str,
@@ -97,7 +172,7 @@ class BookingRepository:
     ) -> bool:
         """Return True if a conflicting booking exists."""
         conditions = [
-            Booking.status == "confirmed",
+            Booking.status.in_(ACTIVE_BOOKING_STATUSES),
             Booking.start_time < end_time,
             Booking.end_time > start_time,
         ]
@@ -118,15 +193,26 @@ class BookingRepository:
         return result.scalar_one_or_none() is not None
 
     async def get_active_booking(self, user_id: str) -> Booking | None:
-        """Return the user's current active booking (now between start and end)."""
+        """Return the user's current active booking.
+
+        Returns booking if:
+        - Currently within start/end time (confirmed or checked_in), OR
+        - Already checked in today (regardless of exact time)
+        """
         now = datetime.now(timezone.utc)
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        today_end = today_start.replace(hour=23, minute=59, second=59, microsecond=999999)
         stmt = (
             select(Booking)
             .where(
                 Booking.user_id == user_id,
-                Booking.status == "confirmed",
-                Booking.start_time <= now,
-                Booking.end_time > now,
+                Booking.status.in_(ACTIVE_BOOKING_STATUSES),
+                Booking.start_time >= today_start,
+                Booking.start_time <= today_end,
+                # Either currently in time range OR already checked in
+                (
+                    (Booking.start_time <= now) & (Booking.end_time > now)
+                ) | (Booking.status == "checked_in"),
             )
             .order_by(Booking.start_time.desc())
             .limit(1)
@@ -145,7 +231,7 @@ class BookingRepository:
         day_end = day_start.replace(hour=23, minute=59, second=59, microsecond=999999)
 
         conditions = [
-            Booking.status == "confirmed",
+            Booking.status.in_(ACTIVE_BOOKING_STATUSES),
             Booking.start_time >= day_start,
             Booking.start_time <= day_end,
         ]

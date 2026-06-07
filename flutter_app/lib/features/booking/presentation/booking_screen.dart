@@ -892,7 +892,7 @@ class _PaymentBadge extends StatelessWidget {
         ? paymentStatus.split('_').last.toUpperCase()
         : '';
     final label = isPaid
-        ? (method.isNotEmpty ? 'Đã thanh toán ($method)' : 'Đã thanh toán')
+        ? (method.isNotEmpty ? 'Đã thanh toán bằng $method' : 'Đã thanh toán')
         : isFailed
             ? 'Thanh toán lỗi'
             : 'Chưa thanh toán';
@@ -1043,6 +1043,8 @@ class _BookingCard extends StatelessWidget {
         return AppColors.warning;
       case BookingStatus.confirmed:
         return AppColors.success;
+      case BookingStatus.checkedIn:
+        return AppColors.info;
       case BookingStatus.cancelled:
         return AppColors.error;
       case BookingStatus.completed:

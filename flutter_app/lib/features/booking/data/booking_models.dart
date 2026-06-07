@@ -43,6 +43,8 @@ enum BookingStatus {
   pending,
   @JsonValue('confirmed')
   confirmed,
+  @JsonValue('checked_in')
+  checkedIn,
   @JsonValue('cancelled')
   cancelled,
   @JsonValue('completed')
@@ -56,6 +58,8 @@ extension BookingStatusExtension on BookingStatus {
         return 'Chờ xác nhận';
       case BookingStatus.confirmed:
         return 'Đã xác nhận';
+      case BookingStatus.checkedIn:
+        return 'Đã nhận sân';
       case BookingStatus.cancelled:
         return 'Đã hủy';
       case BookingStatus.completed:
@@ -80,6 +84,8 @@ class Booking {
   final String paymentStatus;
   final double? totalPrice;
   final String? notes;
+  final DateTime? checkedInAt;
+  final String? checkedInBy;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -98,6 +104,8 @@ class Booking {
     this.paymentStatus = 'unpaid',
     this.totalPrice,
     this.notes,
+    this.checkedInAt,
+    this.checkedInBy,
     required this.createdAt,
     this.updatedAt,
   });
@@ -124,6 +132,8 @@ class Booking {
     String? paymentStatus,
     double? totalPrice,
     String? notes,
+    DateTime? checkedInAt,
+    String? checkedInBy,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -142,6 +152,8 @@ class Booking {
       paymentStatus: paymentStatus ?? this.paymentStatus,
       totalPrice: totalPrice ?? this.totalPrice,
       notes: notes ?? this.notes,
+      checkedInAt: checkedInAt ?? this.checkedInAt,
+      checkedInBy: checkedInBy ?? this.checkedInBy,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -154,6 +166,8 @@ class BookingBill {
   final double orderTotal;
   final double? bookingTotal;
   final double grandTotal;
+  final double paidTotal;
+  final double unpaidTotal;
 
   const BookingBill({
     required this.booking,
@@ -161,6 +175,8 @@ class BookingBill {
     required this.orderTotal,
     this.bookingTotal,
     required this.grandTotal,
+    required this.paidTotal,
+    required this.unpaidTotal,
   });
 
   factory BookingBill.fromJson(Map<String, dynamic> json) {
@@ -174,6 +190,8 @@ class BookingBill {
           ? null
           : _billToDouble(json['booking_total']),
       grandTotal: _billToDouble(json['grand_total']),
+      paidTotal: _billToDouble(json['paid_total']),
+      unpaidTotal: _billToDouble(json['unpaid_total']),
     );
   }
 }

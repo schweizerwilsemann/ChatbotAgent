@@ -65,6 +65,8 @@ class BookingResponse(BaseModel):
     payment_status: str = "unpaid"
     total_price: float | None = None
     notes: str | None = None
+    checked_in_at: datetime | None = None
+    checked_in_by: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
@@ -78,6 +80,12 @@ class BookingBillResponse(BaseModel):
     order_total: Decimal
     booking_total: Decimal | None = None
     grand_total: Decimal
+    paid_total: Decimal = Decimal("0")
+    unpaid_total: Decimal = Decimal("0")
+
+
+class BookingCheckInConfirm(BaseModel):
+    token: str = Field(..., min_length=8, max_length=256)
 
 
 class BookingCancelResponse(BaseModel):

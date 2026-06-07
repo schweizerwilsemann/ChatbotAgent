@@ -29,6 +29,7 @@ DateTime? _parseDateTime(dynamic v) {
 enum AdminBookingStatus {
   pending,
   confirmed,
+  checkedIn,
   cancelled,
   completed,
 }
@@ -39,6 +40,8 @@ AdminBookingStatus _parseBookingStatus(String value) {
       return AdminBookingStatus.pending;
     case 'confirmed':
       return AdminBookingStatus.confirmed;
+    case 'checked_in':
+      return AdminBookingStatus.checkedIn;
     case 'cancelled':
       return AdminBookingStatus.cancelled;
     case 'completed':
@@ -54,6 +57,8 @@ String _bookingStatusToString(AdminBookingStatus status) {
       return 'pending';
     case AdminBookingStatus.confirmed:
       return 'confirmed';
+    case AdminBookingStatus.checkedIn:
+      return 'checked_in';
     case AdminBookingStatus.cancelled:
       return 'cancelled';
     case AdminBookingStatus.completed:
@@ -68,6 +73,8 @@ extension AdminBookingStatusExtension on AdminBookingStatus {
         return 'Chờ xác nhận';
       case AdminBookingStatus.confirmed:
         return 'Đã xác nhận';
+      case AdminBookingStatus.checkedIn:
+        return 'Đã nhận sân';
       case AdminBookingStatus.cancelled:
         return 'Đã huỷ';
       case AdminBookingStatus.completed:
@@ -194,6 +201,8 @@ class AdminBooking {
   final String paymentStatus;
   final double? totalPrice;
   final String? notes;
+  final DateTime? checkedInAt;
+  final String? checkedInBy;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -214,6 +223,8 @@ class AdminBooking {
     this.paymentStatus = 'unpaid',
     this.totalPrice,
     this.notes,
+    this.checkedInAt,
+    this.checkedInBy,
     required this.createdAt,
     this.updatedAt,
   });
@@ -237,6 +248,8 @@ class AdminBooking {
       totalPrice:
           json['total_price'] != null ? _toDouble(json['total_price']) : null,
       notes: json['notes'] as String?,
+      checkedInAt: _parseDateTime(json['checked_in_at']),
+      checkedInBy: json['checked_in_by'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: _parseDateTime(json['updated_at']),
     );
@@ -261,6 +274,8 @@ class AdminBooking {
       'payment_status': paymentStatus,
       'total_price': totalPrice,
       'notes': notes,
+      'checked_in_at': checkedInAt?.toIso8601String(),
+      'checked_in_by': checkedInBy,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
@@ -283,6 +298,8 @@ class AdminBooking {
     String? paymentStatus,
     double? totalPrice,
     String? notes,
+    DateTime? checkedInAt,
+    String? checkedInBy,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -303,6 +320,8 @@ class AdminBooking {
       paymentStatus: paymentStatus ?? this.paymentStatus,
       totalPrice: totalPrice ?? this.totalPrice,
       notes: notes ?? this.notes,
+      checkedInAt: checkedInAt ?? this.checkedInAt,
+      checkedInBy: checkedInBy ?? this.checkedInBy,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -468,6 +487,8 @@ class BookingBill {
   final double orderTotal;
   final double? bookingTotal;
   final double grandTotal;
+  final double paidTotal;
+  final double unpaidTotal;
 
   const BookingBill({
     required this.booking,
@@ -475,6 +496,8 @@ class BookingBill {
     required this.orderTotal,
     required this.bookingTotal,
     required this.grandTotal,
+    required this.paidTotal,
+    required this.unpaidTotal,
   });
 
   factory BookingBill.fromJson(Map<String, dynamic> json) {
@@ -489,6 +512,28 @@ class BookingBill {
           ? _toDouble(json['booking_total'])
           : null,
       grandTotal: _toDouble(json['grand_total']),
+      paidTotal: _toDouble(json['paid_total']),
+      unpaidTotal: _toDouble(json['unpaid_total']),
+    );
+  }
+}
+
+class BookingCheckInToken {
+  final AdminBooking booking;
+  final String token;
+  final String qrPayload;
+
+  const BookingCheckInToken({
+    required this.booking,
+    required this.token,
+    required this.qrPayload,
+  });
+
+  factory BookingCheckInToken.fromJson(Map<String, dynamic> json) {
+    return BookingCheckInToken(
+      booking: AdminBooking.fromJson(json['booking'] as Map<String, dynamic>),
+      token: json['token'] as String,
+      qrPayload: json['qr_payload'] as String,
     );
   }
 }

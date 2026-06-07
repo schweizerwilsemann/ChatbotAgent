@@ -37,6 +37,8 @@ class AdminBookingResponse(BaseModel):
     payment_status: str = "unpaid"
     total_price: float | None = None
     notes: str | None = None
+    checked_in_at: datetime | None = None
+    checked_in_by: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
@@ -46,16 +48,29 @@ class AdminBookingResponse(BaseModel):
 
 class BookingStatusUpdate(BaseModel):
     status: str = Field(
-        ..., description="New booking status: confirmed, cancelled, completed"
+        ...,
+        description="New booking status: confirmed, checked_in, cancelled, completed",
     )
 
     @field_validator("status")
     @classmethod
     def validate_status(cls, v: str) -> str:
-        allowed = {"confirmed", "cancelled", "completed"}
+        allowed = {"confirmed", "checked_in", "cancelled", "completed"}
         if v.lower() not in allowed:
             raise ValueError(f"status must be one of {allowed}")
         return v.lower()
+
+
+class BookingRescheduleUpdate(BaseModel):
+    date: DateType | None = Field(None, description="New booking date")
+    start_time: datetime | str = Field(..., description="New booking start time")
+    end_time: datetime | str = Field(..., description="New booking end time")
+
+
+class BookingCheckInTokenResponse(BaseModel):
+    booking: AdminBookingResponse
+    token: str
+    qr_payload: str
 
 
 class BookingBillResponse(BaseModel):
@@ -64,6 +79,8 @@ class BookingBillResponse(BaseModel):
     order_total: Decimal
     booking_total: Decimal | None = None
     grand_total: Decimal
+    paid_total: Decimal = Decimal("0")
+    unpaid_total: Decimal = Decimal("0")
 
 
 # --- Menu ---

@@ -1,5 +1,5 @@
 import logging
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from app.core.config import settings
@@ -272,8 +272,15 @@ class BookingService:
     @staticmethod
     def _to_response(booking) -> BookingResponse:
         local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
-        start_local = booking.start_time.astimezone(local_tz) if booking.start_time.tzinfo else booking.start_time
-        end_local = booking.end_time.astimezone(local_tz) if booking.end_time.tzinfo else booking.end_time
+        # Always convert to local time - handle both aware and naive datetimes
+        start = booking.start_time
+        end = booking.end_time
+        if start.tzinfo is None:
+            start = start.replace(tzinfo=timezone.utc)
+        if end.tzinfo is None:
+            end = end.replace(tzinfo=timezone.utc)
+        start_local = start.astimezone(local_tz)
+        end_local = end.astimezone(local_tz)
         return BookingResponse(
             id=str(booking.id),
             user_id=booking.user_id,
@@ -291,8 +298,10 @@ class BookingService:
             payment_status=getattr(booking, "payment_status", None) or "unpaid",
             total_price=float(booking.total_price) if booking.total_price is not None else None,
             notes=booking.notes,
-            created_at=booking.created_at if hasattr(booking, "created_at") else None,
-            updated_at=booking.updated_at if hasattr(booking, "updated_at") else None,
+            checked_in_at=getattr(booking, "checked_in_at", None),
+            checked_in_by=getattr(booking, "checked_in_by", None),
+            created_at=getattr(booking, "created_at", None),
+            updated_at=getattr(booking, "updated_at", None),
         )
 
 

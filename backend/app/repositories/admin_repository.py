@@ -11,6 +11,7 @@ from app.core.config import settings
 from app.models.booking import Booking
 
 _local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
+ACTIVE_BOOKING_STATUSES = ("confirmed", "checked_in")
 from app.models.menu import MenuItem
 from app.models.order import Order
 from app.models.user import User
@@ -92,7 +93,7 @@ class AdminRepository:
         day_end = datetime.combine(today, datetime.max.time(), tzinfo=_local_tz)
         stmt = select(func.coalesce(func.sum(Booking.total_price), 0)).where(
             and_(
-                Booking.status.in_(["confirmed", "completed"]),
+                Booking.status.in_(["confirmed", "checked_in", "completed"]),
                 Booking.start_time >= day_start,
                 Booking.start_time <= day_end,
             )
@@ -110,7 +111,7 @@ class AdminRepository:
         """Count bookings that are currently active (confirmed and now between start/end)."""
         stmt = select(func.count(Booking.id)).where(
             and_(
-                Booking.status == "confirmed",
+                Booking.status.in_(ACTIVE_BOOKING_STATUSES),
                 Booking.start_time <= now,
                 Booking.end_time >= now,
             )

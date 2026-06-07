@@ -35,7 +35,13 @@ class Booking(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
     end_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     status: Mapped[str] = mapped_column(
-        Enum("confirmed", "cancelled", "completed", name="booking_status_enum"),
+        Enum(
+            "confirmed",
+            "checked_in",
+            "cancelled",
+            "completed",
+            name="booking_status_enum",
+        ),
         nullable=False,
         server_default="confirmed",
     )
@@ -48,3 +54,10 @@ class Booking(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     total_price: Mapped[float | None] = mapped_column(
         Numeric(precision=12, scale=2), nullable=True, default=None
     )
+    checkin_token: Mapped[str | None] = mapped_column(
+        String(128), nullable=True, unique=True, index=True
+    )
+    checked_in_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    checked_in_by: Mapped[str | None] = mapped_column(String(128), nullable=True)

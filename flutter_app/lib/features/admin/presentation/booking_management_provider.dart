@@ -135,6 +135,58 @@ class BookingManagementNotifier extends StateNotifier<BookingManagementState> {
     }
   }
 
+  Future<bool> checkInBooking(String id) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final updated = await _adminApi.checkInBooking(id);
+      final updatedBookings = state.bookings.map((b) {
+        return b.id == id ? updated : b;
+      }).toList();
+      state = state.copyWith(bookings: updatedBookings, isLoading: false);
+      return true;
+    } on ApiException catch (e) {
+      state = state.copyWith(isLoading: false, error: e.message);
+      return false;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Không thể xác nhận nhận sân.',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> rescheduleBooking({
+    required String id,
+    required DateTime date,
+    required String startTime,
+    required String endTime,
+  }) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final updated = await _adminApi.rescheduleBooking(
+        bookingId: id,
+        date: date,
+        startTime: startTime,
+        endTime: endTime,
+      );
+      final updatedBookings = state.bookings.map((b) {
+        return b.id == id ? updated : b;
+      }).toList();
+      state = state.copyWith(bookings: updatedBookings, isLoading: false);
+      return true;
+    } on ApiException catch (e) {
+      state = state.copyWith(isLoading: false, error: e.message);
+      return false;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Không thể đổi giờ đặt sân.',
+      );
+      return false;
+    }
+  }
+
   /// Set the selected date filter and reload.
   Future<void> setDate(DateTime date) async {
     state = state.copyWith(selectedDate: date);

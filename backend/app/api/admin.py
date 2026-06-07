@@ -1,6 +1,7 @@
 import logging
+import secrets
 import uuid
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
@@ -11,6 +12,7 @@ from app.api.auth import require_roles
 from app.core.config import settings
 from app.core.database import get_db
 from app.models.user import User
+from app.repositories.booking_repository import BookingRepository
 from app.repositories.admin_repository import AdminRepository
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.venue_repository import VenueRepository
@@ -18,6 +20,8 @@ from app.schemas.admin import (
     AdminBookingResponse,
     AnalyticsResponse,
     BookingBillResponse,
+    BookingCheckInTokenResponse,
+    BookingRescheduleUpdate,
     BookingStatusUpdate,
     CourtBookingCount,
     DashboardResponse,
@@ -31,13 +35,15 @@ from app.schemas.admin import (
 )
 from app.schemas.order import OrderItemResponse, OrderResponse, StaffOrderItemResponse, StaffOrderResponse
 from app.services.notification_service import NotificationService
+from app.services.realtime import realtime_manager
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 VALID_BOOKING_TRANSITIONS = {
-    "confirmed": {"cancelled", "completed"},
+    "confirmed": {"checked_in", "cancelled", "completed"},
+    "checked_in": {"completed"},
     "cancelled": set(),
     "completed": set(),
 }
@@ -75,8 +81,15 @@ def _booking_response(entry: dict) -> AdminBookingResponse:
     user_name = entry["user_name"]
     user_phone = entry.get("user_phone")
     local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
-    start_local = booking.start_time.astimezone(local_tz) if booking.start_time.tzinfo else booking.start_time
-    end_local = booking.end_time.astimezone(local_tz) if booking.end_time.tzinfo else booking.end_time
+    # Always convert to local time - handle both aware and naive datetimes
+    start = booking.start_time
+    end = booking.end_time
+    if start.tzinfo is None:
+        start = start.replace(tzinfo=timezone.utc)
+    if end.tzinfo is None:
+        end = end.replace(tzinfo=timezone.utc)
+    start_local = start.astimezone(local_tz)
+    end_local = end.astimezone(local_tz)
     return AdminBookingResponse(
         id=str(booking.id),
         user_id=booking.user_id,
@@ -96,6 +109,8 @@ def _booking_response(entry: dict) -> AdminBookingResponse:
         payment_status=getattr(booking, "payment_status", None) or "unpaid",
         total_price=float(booking.total_price) if booking.total_price is not None else None,
         notes=booking.notes,
+        checked_in_at=getattr(booking, "checked_in_at", None),
+        checked_in_by=getattr(booking, "checked_in_by", None),
         created_at=getattr(booking, "created_at", None),
         updated_at=getattr(booking, "updated_at", None),
     )
@@ -247,6 +262,93 @@ def _is_in_scope(
     return False
 
 
+def _is_paid_status(payment_status: str | None) -> bool:
+    return (payment_status or "").startswith("paid")
+
+
+def _booking_local_date(booking) -> date:
+    local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
+    if booking.start_time.tzinfo:
+        return booking.start_time.astimezone(local_tz).date()
+    return booking.start_time.date()
+
+
+async def _booking_entry(
+    repo: AdminRepository,
+    booking,
+    *,
+    venue_scope_ids: set[uuid.UUID] | None,
+    resource_ids: set[uuid.UUID] | None,
+) -> dict:
+    entries = await repo.get_all_bookings(
+        date_filter=_booking_local_date(booking),
+        venue_scope_ids=venue_scope_ids,
+        resource_ids=resource_ids,
+    )
+    return next(
+        (
+            entry
+            for entry in entries
+            if str(entry["booking"].id) == str(booking.id)
+        ),
+        {"booking": booking, "user_name": None, "user_phone": None},
+    )
+
+
+def _booking_bill_response(booking_entry: dict, orders) -> BookingBillResponse:
+    booking = booking_entry["booking"]
+    order_total = sum(
+        (order.total_price for order in orders),
+        start=Decimal("0"),
+    )
+    booking_total = (
+        Decimal(str(booking.total_price)) if booking.total_price is not None else None
+    )
+    grand_total = order_total + (booking_total or Decimal("0"))
+    paid_total = sum(
+        (
+            order.total_price
+            for order in orders
+            if _is_paid_status(getattr(order, "payment_status", None))
+        ),
+        start=Decimal("0"),
+    )
+    if booking_total is not None and _is_paid_status(
+        getattr(booking, "payment_status", None)
+    ):
+        paid_total += booking_total
+    unpaid_total = max(grand_total - paid_total, Decimal("0"))
+
+    bill_user_name = booking_entry.get("user_name")
+    bill_user_phone = booking_entry.get("user_phone")
+    order_entries = [
+        {"order": order, "user_name": bill_user_name, "user_phone": bill_user_phone}
+        for order in orders
+    ]
+    return BookingBillResponse(
+        booking=_booking_response(booking_entry),
+        orders=[_order_response(entry) for entry in order_entries],
+        order_total=order_total,
+        booking_total=booking_total,
+        grand_total=grand_total,
+        paid_total=paid_total,
+        unpaid_total=unpaid_total,
+    )
+
+
+def _checkin_qr_payload(booking_id: str, token: str) -> str:
+    return f"sportsvenue://booking-checkin?booking_id={booking_id}&token={token}"
+
+
+def _combine_booking_datetime(booking, value_date: date | None, value: datetime | str):
+    local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
+    if isinstance(value, datetime):
+        return value.replace(tzinfo=local_tz) if value.tzinfo is None else value
+    base_date = value_date or _booking_local_date(booking)
+    parsed_time = time.fromisoformat(value)
+    return datetime.combine(base_date, parsed_time, tzinfo=local_tz)
+
+
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
@@ -358,47 +460,274 @@ async def get_booking_bill(
                 detail="Booking is outside your assigned venue",
             )
 
-        entries = await repo.get_all_bookings(
-            date_filter=booking.start_time.astimezone(ZoneInfo(settings.DEFAULT_TIMEZONE)).date() if booking.start_time.tzinfo else booking.start_time.date(),
+        booking_entry = await _booking_entry(
+            repo,
+            booking,
             venue_scope_ids=venue_scope_ids,
             resource_ids=resource_ids,
         )
-        booking_entry = next(
-            (
-                entry
-                for entry in entries
-                if str(entry["booking"].id) == str(booking.id)
-            ),
-            {"booking": booking, "user_name": None, "user_phone": None},
-        )
         orders = await repo.get_orders_during_booking(booking)
-        order_total = sum(
-            (order.total_price for order in orders),
-            start=Decimal("0"),
-        )
-        booking_total = (
-            Decimal(str(booking.total_price))
-            if booking.total_price is not None
-            else None
-        )
-        # Reuse booking's user info for the order responses in this bill
-        bill_user_name = booking_entry.get("user_name")
-        bill_user_phone = booking_entry.get("user_phone")
-        order_entries = [
-            {"order": o, "user_name": bill_user_name, "user_phone": bill_user_phone}
-            for o in orders
-        ]
-        return BookingBillResponse(
-            booking=_booking_response(booking_entry),
-            orders=[_order_response(e) for e in order_entries],
-            order_total=order_total,
-            booking_total=booking_total,
-            grand_total=order_total + (booking_total or Decimal("0")),
-        )
+        return _booking_bill_response(booking_entry, orders)
     except HTTPException:
         raise
     except Exception as exc:
         logger.exception("Error fetching booking bill")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+@router.post(
+    "/bookings/{booking_id}/checkin-token",
+    response_model=BookingCheckInTokenResponse,
+)
+async def create_booking_checkin_token(
+    booking_id: str,
+    user: User = Depends(require_roles("STAFF", "ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> BookingCheckInTokenResponse:
+    """Create a one-time token that can be rendered as a QR for customer check-in."""
+    try:
+        repo = _admin_repo(session)
+        booking_repo = BookingRepository(session)
+        booking = await repo.get_booking_by_id(booking_id)
+        if not booking:
+            raise HTTPException(status_code=404, detail="Booking not found")
+
+        venue_scope_ids, resource_ids = await _operation_scope(user, session)
+        if not _is_in_scope(
+            venue_id=booking.venue_id,
+            resource_id=booking.resource_id,
+            venue_scope_ids=venue_scope_ids,
+            resource_ids=resource_ids,
+        ):
+            raise HTTPException(
+                status_code=403,
+                detail="Booking is outside your assigned venue",
+            )
+        if booking.status in {"cancelled", "completed"}:
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot create check-in QR for a terminal booking",
+            )
+
+        token = secrets.token_urlsafe(32)
+        updated = await booking_repo.set_checkin_token(booking_id, token)
+        if not updated:
+            raise HTTPException(status_code=404, detail="Booking not found")
+        booking_entry = await _booking_entry(
+            repo,
+            updated,
+            venue_scope_ids=venue_scope_ids,
+            resource_ids=resource_ids,
+        )
+        return BookingCheckInTokenResponse(
+            booking=_booking_response(booking_entry),
+            token=token,
+            qr_payload=_checkin_qr_payload(booking_id, token),
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Error creating booking check-in token")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+@router.post("/bookings/{booking_id}/check-in", response_model=AdminBookingResponse)
+async def staff_check_in_booking(
+    booking_id: str,
+    user: User = Depends(require_roles("STAFF", "ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> AdminBookingResponse:
+    """Staff/admin fallback to mark a customer as checked in without the QR scan."""
+    try:
+        repo = _admin_repo(session)
+        booking_repo = BookingRepository(session)
+        booking = await repo.get_booking_by_id(booking_id)
+        if not booking:
+            raise HTTPException(status_code=404, detail="Booking not found")
+
+        venue_scope_ids, resource_ids = await _operation_scope(user, session)
+        if not _is_in_scope(
+            venue_id=booking.venue_id,
+            resource_id=booking.resource_id,
+            venue_scope_ids=venue_scope_ids,
+            resource_ids=resource_ids,
+        ):
+            raise HTTPException(
+                status_code=403,
+                detail="Booking is outside your assigned venue",
+            )
+        if booking.status == "checked_in":
+            booking_entry = await _booking_entry(
+                repo,
+                booking,
+                venue_scope_ids=venue_scope_ids,
+                resource_ids=resource_ids,
+            )
+            return _booking_response(booking_entry)
+        if booking.status != "confirmed":
+            raise HTTPException(
+                status_code=400,
+                detail=f"Cannot check in booking with status '{booking.status}'",
+            )
+
+        updated = await booking_repo.confirm_checkin(
+            booking_id,
+            checked_in_by=str(user.id),
+        )
+        if not updated:
+            raise HTTPException(status_code=404, detail="Booking not found")
+
+        notification_service = NotificationService(
+            NotificationRepository(session),
+            VenueRepository(session),
+        )
+        await notification_service.notify_operations(
+            event_type="booking.checked_in",
+            title="Khách đã nhận sân",
+            message=(
+                f"{updated.resource_label or f'Sân {updated.court_number}'} "
+                "đã được xác nhận nhận sân"
+            ),
+            source="admin",
+            payload={
+                "booking_id": str(updated.id),
+                "status": "checked_in",
+                "checked_in_by": str(user.id),
+            },
+        )
+        await realtime_manager.broadcast_ui_event(
+            ["STAFF", "ADMIN"],
+            "court_status_changed",
+            {
+                "booking_id": str(updated.id),
+                "resource_id": str(updated.resource_id) if updated.resource_id else "",
+                "resource_label": updated.resource_label or "",
+                "status": "checked_in",
+                "start_time": updated.start_time.isoformat() if updated.start_time else None,
+                "end_time": updated.end_time.isoformat() if updated.end_time else None,
+            },
+        )
+
+        booking_entry = await _booking_entry(
+            repo,
+            updated,
+            venue_scope_ids=venue_scope_ids,
+            resource_ids=resource_ids,
+        )
+        return _booking_response(booking_entry)
+    except HTTPException:
+        raise
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Error checking in booking")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+@router.patch("/bookings/{booking_id}/reschedule", response_model=AdminBookingResponse)
+async def reschedule_booking(
+    booking_id: str,
+    data: BookingRescheduleUpdate,
+    user: User = Depends(require_roles("STAFF", "ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> AdminBookingResponse:
+    """Move a booking to another start/end time after checking court availability."""
+    try:
+        repo = _admin_repo(session)
+        booking_repo = BookingRepository(session)
+        venue_repo = VenueRepository(session)
+        booking = await repo.get_booking_by_id(booking_id)
+        if not booking:
+            raise HTTPException(status_code=404, detail="Booking not found")
+
+        venue_scope_ids, resource_ids = await _operation_scope(user, session)
+        if not _is_in_scope(
+            venue_id=booking.venue_id,
+            resource_id=booking.resource_id,
+            venue_scope_ids=venue_scope_ids,
+            resource_ids=resource_ids,
+        ):
+            raise HTTPException(
+                status_code=403,
+                detail="Booking is outside your assigned venue",
+            )
+        if booking.status in {"cancelled", "completed"}:
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot reschedule a terminal booking",
+            )
+
+        start_time = _combine_booking_datetime(booking, data.date, data.start_time)
+        end_time = _combine_booking_datetime(booking, data.date, data.end_time)
+        if end_time <= start_time:
+            raise HTTPException(status_code=400, detail="end_time must be after start_time")
+
+        has_conflict = await booking_repo.check_conflict(
+            court_type=booking.court_type,
+            court_number=booking.court_number,
+            start_time=start_time,
+            end_time=end_time,
+            exclude_id=booking_id,
+            resource_id=str(booking.resource_id) if booking.resource_id else None,
+        )
+        if has_conflict:
+            raise HTTPException(
+                status_code=409,
+                detail="Selected time slot is already occupied",
+            )
+
+        total_price = (
+            float(booking.total_price) if booking.total_price is not None else None
+        )
+        if booking.resource_id:
+            resource = await venue_repo.get_resource_by_id(str(booking.resource_id))
+            if resource and resource.hourly_rate is not None:
+                duration_hours = (end_time - start_time).total_seconds() / 3600
+                total_price = float(resource.hourly_rate) * duration_hours
+
+        updated = await booking_repo.reschedule(
+            booking_id,
+            start_time=start_time,
+            end_time=end_time,
+            total_price=total_price,
+        )
+        if not updated:
+            raise HTTPException(status_code=404, detail="Booking not found")
+
+        notification_service = NotificationService(
+            NotificationRepository(session),
+            VenueRepository(session),
+        )
+        local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
+        start_label = start_time.astimezone(local_tz).strftime("%H:%M")
+        end_label = end_time.astimezone(local_tz).strftime("%H:%M")
+        await notification_service.notify_operations(
+            event_type="booking.rescheduled",
+            title="Đổi giờ đặt sân",
+            message=(
+                f"{updated.resource_label or f'Sân {updated.court_number}'} "
+                f"đổi sang {start_label} - {end_label}"
+            ),
+            source="admin",
+            payload={
+                "booking_id": str(updated.id),
+                "start_time": start_time.isoformat(),
+                "end_time": end_time.isoformat(),
+                "changed_by": str(user.id),
+            },
+        )
+
+        booking_entry = await _booking_entry(
+            repo,
+            updated,
+            venue_scope_ids=venue_scope_ids,
+            resource_ids=resource_ids,
+        )
+        return _booking_response(booking_entry)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Error rescheduling booking")
         raise HTTPException(status_code=500, detail="Internal server error") from exc
 
 
@@ -446,7 +775,13 @@ async def update_booking_status(
                 ),
             )
 
-        updated = await repo.update_booking_status(booking_id, data.status)
+        if data.status == "checked_in":
+            updated = await BookingRepository(session).confirm_checkin(
+                booking_id,
+                checked_in_by=str(user.id),
+            )
+        else:
+            updated = await repo.update_booking_status(booking_id, data.status)
         if not updated:
             raise HTTPException(status_code=404, detail="Booking not found")
 
@@ -465,6 +800,7 @@ async def update_booking_status(
         )
         status_label = {
             "confirmed": "xác nhận",
+            "checked_in": "nhận sân",
             "cancelled": "hủy",
             "completed": "hoàn thành",
         }.get(data.status, data.status)
@@ -482,47 +818,30 @@ async def update_booking_status(
                 "changed_by": str(user.id),
             },
         )
+        await realtime_manager.broadcast_ui_event(
+            ["STAFF", "ADMIN"],
+            "court_status_changed",
+            {
+                "booking_id": str(updated.id),
+                "resource_id": str(updated.resource_id) if updated.resource_id else "",
+                "resource_label": updated.resource_label or "",
+                "status": data.status,
+                "start_time": updated.start_time.isoformat() if updated.start_time else None,
+                "end_time": updated.end_time.isoformat() if updated.end_time else None,
+            },
+        )
 
-        # Build response with user_name
-        user_repo_result = await repo.get_all_bookings(
-            date_filter=updated.start_time.astimezone(ZoneInfo(settings.DEFAULT_TIMEZONE)).date() if updated.start_time.tzinfo else updated.start_time.date(),
+        booking_entry = await _booking_entry(
+            repo,
+            updated,
             venue_scope_ids=venue_scope_ids,
             resource_ids=resource_ids,
         )
-        user_name = None
-        for entry in user_repo_result:
-            if str(entry["booking"].id) == str(updated.id):
-                user_name = entry["user_name"]
-                break
-
-        local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
-        start_local = updated.start_time.astimezone(local_tz) if updated.start_time.tzinfo else updated.start_time
-        end_local = updated.end_time.astimezone(local_tz) if updated.end_time.tzinfo else updated.end_time
-        return AdminBookingResponse(
-            id=str(updated.id),
-            user_id=updated.user_id,
-            user_name=user_name,
-            venue_id=str(updated.venue_id)
-            if getattr(updated, "venue_id", None)
-            else None,
-            resource_id=str(updated.resource_id)
-            if getattr(updated, "resource_id", None)
-            else None,
-            resource_label=getattr(updated, "resource_label", None),
-            court_type=updated.court_type,
-            court_number=updated.court_number,
-            date=start_local.date(),
-            start_time=start_local.strftime("%H:%M"),
-            end_time=end_local.strftime("%H:%M"),
-            status=updated.status,
-            payment_status=getattr(updated, "payment_status", None) or "unpaid",
-            total_price=float(updated.total_price) if updated.total_price is not None else None,
-            notes=updated.notes,
-            created_at=getattr(updated, "created_at", None),
-            updated_at=getattr(updated, "updated_at", None),
-        )
+        return _booking_response(booking_entry)
     except HTTPException:
         raise
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         logger.exception("Error updating booking status")
         raise HTTPException(status_code=500, detail="Internal server error") from exc
