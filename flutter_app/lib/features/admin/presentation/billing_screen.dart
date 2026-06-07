@@ -343,7 +343,7 @@ class _PaymentBadge extends StatelessWidget {
         ? paymentStatus.split('_').last.toUpperCase()
         : '';
     final label = isPaid
-        ? (method.isNotEmpty ? 'Đã thanh toán ($method)' : 'Đã thanh toán')
+        ? (method.isNotEmpty ? 'Đã thanh toán bằng $method' : 'Đã thanh toán')
         : isFailed
             ? 'Lỗi thanh toán'
             : 'Chưa thanh toán';
@@ -434,7 +434,8 @@ class _OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final timeText = DateFormat('HH:mm • dd/MM').format(order.createdAt);
+    final timeText =
+        DateFormat('HH:mm • dd/MM').format(order.createdAt.toLocal());
 
     final shortId = order.id.length > 8
         ? '#${order.id.substring(order.id.length - 8)}'

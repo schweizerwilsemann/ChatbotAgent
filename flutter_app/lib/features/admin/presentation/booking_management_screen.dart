@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/admin/data/admin_api.dart';
 import 'package:sports_venue_chatbot/features/admin/data/admin_models.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/booking_management_provider.dart';
+import 'package:sports_venue_chatbot/features/admin/presentation/realtime_event_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/pagination_footer.dart';
 
 // ─── Court type helpers ─────────────────────────────────────────────────────
@@ -45,6 +49,8 @@ Color _statusColor(AdminBookingStatus status) {
       return AppColors.warning;
     case AdminBookingStatus.confirmed:
       return AppColors.info;
+    case AdminBookingStatus.checkedIn:
+      return AppColors.success;
     case AdminBookingStatus.cancelled:
       return AppColors.error;
     case AdminBookingStatus.completed:
@@ -69,10 +75,37 @@ class _BookingManagementScreenState
     'Tất cả',
     'Chờ xác nhận',
     'Đã xác nhận',
-    'Đang chơi',
+    'Đã nhận sân',
     'Hoàn thành',
     'Đã huỷ',
   ];
+
+  StreamSubscription<RealtimeUiEvent>? _realtimeSub;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(bookingManagementProvider.notifier).loadBookings();
+      final realtimeNotifier = ref.read(realtimeEventProvider.notifier);
+      realtimeNotifier.start();
+      _realtimeSub = realtimeNotifier.eventStream.listen((event) {
+        if (event.type == 'court_status_changed' ||
+            event.type == 'order_changed' ||
+            event.type == 'payment_status_changed') {
+          debugPrint(
+              '[BookingMgmt] Realtime event: ${event.type}, refreshing...');
+          ref.read(bookingManagementProvider.notifier).loadBookings();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _realtimeSub?.cancel();
+    super.dispose();
+  }
 
   String? _filterTypeToApi(String display) {
     switch (display) {
@@ -92,8 +125,9 @@ class _BookingManagementScreenState
       case 'Chờ xác nhận':
         return 'pending';
       case 'Đã xác nhận':
-      case 'Đang chơi':
         return 'confirmed';
+      case 'Đã nhận sân':
+        return 'checked_in';
       case 'Hoàn thành':
         return 'completed';
       case 'Đã huỷ':
@@ -115,6 +149,8 @@ class _BookingManagementScreenState
         return 'Chờ xác nhận';
       case 'confirmed':
         return 'Đã xác nhận';
+      case 'checked_in':
+        return 'Đã nhận sân';
       case 'completed':
         return 'Hoàn thành';
       case 'cancelled':
@@ -122,14 +158,6 @@ class _BookingManagementScreenState
       default:
         return 'Tất cả';
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(bookingManagementProvider.notifier).loadBookings();
-    });
   }
 
   // ── Date picker ──────────────────────────────────────────────────────────
@@ -168,6 +196,87 @@ class _BookingManagementScreenState
               ? 'Cập nhật trạng thái thành công'
               : 'Không thể cập nhật trạng thái',
         ),
+        backgroundColor: success ? AppColors.success : AppColors.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  Future<void> _checkIn(AdminBooking booking) async {
+    final success = await ref
+        .read(bookingManagementProvider.notifier)
+        .checkInBooking(booking.id);
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? 'Đã xác nhận khách nhận sân'
+              : 'Không thể xác nhận nhận sân',
+        ),
+        backgroundColor: success ? AppColors.success : AppColors.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  Future<void> _showCheckInQr(AdminBooking booking) async {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final token = await ref
+          .read(adminApiProvider)
+          .createBookingCheckInToken(booking.id);
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      await showDialog<void>(
+        context: context,
+        builder: (_) => _CheckInQrDialog(token: token),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Không thể tạo mã QR nhận sân'),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+    }
+  }
+
+  Future<void> _showReschedule(AdminBooking booking) async {
+    final result = await showDialog<_RescheduleResult>(
+      context: context,
+      builder: (_) => _RescheduleDialog(booking: booking),
+    );
+    if (result == null) return;
+
+    final success =
+        await ref.read(bookingManagementProvider.notifier).rescheduleBooking(
+              id: booking.id,
+              date: result.date,
+              startTime: result.startTime,
+              endTime: result.endTime,
+            );
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(success ? 'Đã đổi giờ đặt sân' : 'Không thể đổi giờ'),
         backgroundColor: success ? AppColors.success : AppColors.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -442,6 +551,9 @@ class _BookingManagementScreenState
                     booking: state.bookings[index],
                     onAction: _updateStatus,
                     onShowBill: _showBookingBill,
+                    onCheckIn: _checkIn,
+                    onShowQr: _showCheckInQr,
+                    onReschedule: _showReschedule,
                   );
                 },
               ),
@@ -515,11 +627,17 @@ class _BookingCard extends StatelessWidget {
   final AdminBooking booking;
   final Future<void> Function(String id, String newStatus) onAction;
   final Future<void> Function(AdminBooking booking) onShowBill;
+  final Future<void> Function(AdminBooking booking) onCheckIn;
+  final Future<void> Function(AdminBooking booking) onShowQr;
+  final Future<void> Function(AdminBooking booking) onReschedule;
 
   const _BookingCard({
     required this.booking,
     required this.onAction,
     required this.onShowBill,
+    required this.onCheckIn,
+    required this.onShowQr,
+    required this.onReschedule,
   });
 
   @override
@@ -543,27 +661,31 @@ class _BookingCard extends StatelessWidget {
           // ── Header: type badge + status badge
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: _courtTypeColor(booking.courtType)
-                      .withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  booking.resourceLabel ??
-                      '${_courtTypeDisplay(booking.courtType)} · Sân ${booking.courtNumber}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: _courtTypeColor(booking.courtType),
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _courtTypeColor(booking.courtType)
+                        .withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    booking.resourceLabel ??
+                        '${_courtTypeDisplay(booking.courtType)} · Sân ${booking.courtNumber}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: _courtTypeColor(booking.courtType),
+                    ),
                   ),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -693,33 +815,73 @@ class _BookingCard extends StatelessWidget {
           ],
 
           const SizedBox(height: 14),
-          Align(
-            alignment: Alignment.centerRight,
-            child: OutlinedButton.icon(
-              onPressed: () => onShowBill(booking),
-              icon: const Icon(Icons.receipt_long, size: 18),
-              label: const Text('Tính tiền'),
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.end,
+            children: [
+              OutlinedButton.icon(
+                onPressed: () => onShowBill(booking),
+                icon: const Icon(Icons.receipt_long, size: 18),
+                label: const Text('Tính tiền'),
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
                 ),
               ),
-            ),
+              if (booking.status == AdminBookingStatus.confirmed)
+                OutlinedButton.icon(
+                  onPressed: () => onReschedule(booking),
+                  icon: const Icon(Icons.schedule, size: 18),
+                  label: const Text('Đổi giờ'),
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                  ),
+                ),
+              if (booking.status == AdminBookingStatus.confirmed)
+                OutlinedButton.icon(
+                  onPressed: () => onShowQr(booking),
+                  icon: const Icon(Icons.qr_code_2, size: 18),
+                  label: const Text('Mã QR'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: BorderSide(
+                      color: AppColors.primary.withValues(alpha: 0.45),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                  ),
+                ),
+            ],
           ),
 
           // ── Action buttons
           if (booking.status == AdminBookingStatus.pending ||
-              booking.status == AdminBookingStatus.confirmed) ...[
+              booking.status == AdminBookingStatus.confirmed ||
+              booking.status == AdminBookingStatus.checkedIn) ...[
             const SizedBox(height: 14),
             const Divider(height: 1),
             const SizedBox(height: 12),
             Row(
               children: [
-                if (!booking.isPaid) ...[
+                if (!booking.isPaid &&
+                    booking.status != AdminBookingStatus.checkedIn) ...[
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => onAction(
@@ -744,6 +906,10 @@ class _BookingCard extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
+                      if (booking.status == AdminBookingStatus.confirmed) {
+                        onCheckIn(booking);
+                        return;
+                      }
                       final newStatus =
                           booking.status == AdminBookingStatus.pending
                               ? AdminBookingStatus.confirmed.apiValue
@@ -753,13 +919,17 @@ class _BookingCard extends StatelessWidget {
                     icon: Icon(
                       booking.status == AdminBookingStatus.pending
                           ? Icons.check_circle_outline
-                          : Icons.task_alt,
+                          : booking.status == AdminBookingStatus.confirmed
+                              ? Icons.login
+                              : Icons.task_alt,
                       size: 18,
                     ),
                     label: Text(
                       booking.status == AdminBookingStatus.pending
                           ? 'Xác nhận'
-                          : 'Hoàn thành',
+                          : booking.status == AdminBookingStatus.confirmed
+                              ? 'Nhận sân'
+                              : 'Hoàn thành',
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
@@ -780,6 +950,244 @@ class _BookingCard extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _CheckInQrDialog extends StatelessWidget {
+  final BookingCheckInToken token;
+
+  const _CheckInQrDialog({required this.token});
+
+  @override
+  Widget build(BuildContext context) {
+    final booking = token.booking;
+    return AlertDialog(
+      title: const Text('Mã QR nhận sân'),
+      content: SizedBox(
+        width: 360,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              booking.resourceLabel ??
+                  '${_courtTypeDisplay(booking.courtType)} · Sân ${booking.courtNumber}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${booking.startTime} - ${booking.endTime}',
+              style: const TextStyle(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: QrImageView(
+                data: token.qrPayload,
+                version: QrVersions.auto,
+                size: 220,
+                backgroundColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 12),
+            SelectableText(
+              token.token,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Khách quét mã này bằng tài khoản đã đặt sân để xác nhận đã nhận sân.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.textHint, fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Đóng'),
+        ),
+      ],
+    );
+  }
+}
+
+class _RescheduleResult {
+  final DateTime date;
+  final String startTime;
+  final String endTime;
+
+  const _RescheduleResult({
+    required this.date,
+    required this.startTime,
+    required this.endTime,
+  });
+}
+
+class _RescheduleDialog extends StatefulWidget {
+  final AdminBooking booking;
+
+  const _RescheduleDialog({required this.booking});
+
+  @override
+  State<_RescheduleDialog> createState() => _RescheduleDialogState();
+}
+
+class _RescheduleDialogState extends State<_RescheduleDialog> {
+  late DateTime _date;
+  late final TextEditingController _startController;
+  late final TextEditingController _endController;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _date = widget.booking.date;
+    _startController = TextEditingController(text: widget.booking.startTime);
+    _endController = TextEditingController(text: widget.booking.endTime);
+  }
+
+  @override
+  void dispose() {
+    _startController.dispose();
+    _endController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _date,
+      firstDate: DateTime(2024),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      locale: const Locale('vi'),
+    );
+    if (picked != null) {
+      setState(() => _date = picked);
+    }
+  }
+
+  Future<void> _pickTime(TextEditingController controller) async {
+    final parts = controller.text.split(':');
+    final initial = parts.length == 2
+        ? TimeOfDay(
+            hour: int.tryParse(parts[0]) ?? 8,
+            minute: int.tryParse(parts[1]) ?? 0,
+          )
+        : const TimeOfDay(hour: 8, minute: 0);
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+      helpText: 'Chọn giờ',
+      cancelText: 'Huỷ',
+      confirmText: 'Chọn',
+    );
+    if (picked != null) {
+      controller.text =
+          '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+    }
+  }
+
+  void _submit() {
+    final start = _startController.text.trim();
+    final end = _endController.text.trim();
+    final pattern = RegExp(r'^\d{2}:\d{2}$');
+    if (!pattern.hasMatch(start) || !pattern.hasMatch(end)) {
+      setState(() => _error = 'Giờ phải có dạng HH:mm.');
+      return;
+    }
+    if (start.compareTo(end) >= 0) {
+      setState(() => _error = 'Giờ kết thúc phải sau giờ bắt đầu.');
+      return;
+    }
+    Navigator.of(context).pop(
+      _RescheduleResult(
+        date: _date,
+        startTime: start,
+        endTime: end,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Đổi giờ đặt sân'),
+      content: SizedBox(
+        width: 360,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.calendar_today),
+              title: Text(DateFormat('dd/MM/yyyy').format(_date)),
+              trailing: TextButton(
+                onPressed: _pickDate,
+                child: const Text('Đổi ngày'),
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _startController,
+                    readOnly: true,
+                    onTap: () => _pickTime(_startController),
+                    decoration: const InputDecoration(
+                      labelText: 'Bắt đầu',
+                      prefixIcon: Icon(Icons.access_time),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _endController,
+                    readOnly: true,
+                    onTap: () => _pickTime(_endController),
+                    decoration: const InputDecoration(
+                      labelText: 'Kết thúc',
+                      prefixIcon: Icon(Icons.access_time_filled),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 10),
+              Text(
+                _error!,
+                style: const TextStyle(color: AppColors.error, fontSize: 12),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Huỷ'),
+        ),
+        ElevatedButton(
+          onPressed: _submit,
+          child: const Text('Lưu đổi giờ'),
+        ),
+      ],
     );
   }
 }
@@ -859,7 +1267,8 @@ class _BookingBillDialog extends StatelessWidget {
                       child: Row(
                         children: [
                           Text(
-                            DateFormat('HH:mm dd/MM').format(order.createdAt),
+                            DateFormat('HH:mm dd/MM')
+                                .format(order.createdAt.toLocal()),
                             style: const TextStyle(
                               color: AppColors.textHint,
                               fontSize: 12,
@@ -888,6 +1297,17 @@ class _BookingBillDialog extends StatelessWidget {
               _BillLine(
                 label: bill.bookingTotal == null ? 'Tạm tính' : 'Tổng cần thu',
                 value: money.format(bill.grandTotal),
+                emphasized: true,
+              ),
+              const SizedBox(height: 6),
+              _BillLine(
+                label: 'Đã thanh toán online',
+                value: money.format(bill.paidTotal),
+              ),
+              const SizedBox(height: 6),
+              _BillLine(
+                label: 'Còn thu tại quầy',
+                value: money.format(bill.unpaidTotal),
                 emphasized: true,
               ),
               if (bill.bookingTotal == null) ...[
@@ -932,7 +1352,7 @@ class _PaymentBadge extends StatelessWidget {
         ? paymentStatus.split('_').last.toUpperCase()
         : '';
     final label = isPaid
-        ? (method.isNotEmpty ? 'Đã thanh toán ($method)' : 'Đã thanh toán')
+        ? (method.isNotEmpty ? 'Đã thanh toán bằng $method' : 'Đã thanh toán')
         : isFailed
             ? 'Thanh toán lỗi'
             : 'Chưa thanh toán';

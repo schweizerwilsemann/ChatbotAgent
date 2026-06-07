@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/constants/app_spacing.dart';
+import 'package:sports_venue_chatbot/features/admin/presentation/realtime_event_provider.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/booking/data/booking_api.dart';
 import 'package:sports_venue_chatbot/features/booking/data/booking_models.dart';
@@ -16,10 +19,11 @@ final _vndFormat = NumberFormat.currency(
   decimalDigits: 0,
 );
 
-final _bookingBillProvider = FutureProvider.family<BookingBill, String>((
-  ref,
-  bookingId,
-) {
+final _billRefreshKeyProvider = StateProvider<int>((ref) => 0);
+
+final _bookingBillProvider =
+    FutureProvider.family<BookingBill, String>((ref, bookingId) {
+  ref.watch(_billRefreshKeyProvider);
   return ref.watch(bookingApiProvider).getBookingBill(bookingId);
 });
 
@@ -34,17 +38,32 @@ class CustomerBillingScreen extends ConsumerStatefulWidget {
 class _CustomerBillingScreenState extends ConsumerState<CustomerBillingScreen> {
   final _bookingScrollController = ScrollController();
   final _orderScrollController = ScrollController();
+  StreamSubscription<RealtimeUiEvent>? _realtimeSub;
 
   @override
   void initState() {
     super.initState();
     _bookingScrollController.addListener(_handleBookingScroll);
     _orderScrollController.addListener(_handleOrderScroll);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refresh();
+      final realtimeNotifier = ref.read(realtimeEventProvider.notifier);
+      realtimeNotifier.start();
+      _realtimeSub = realtimeNotifier.eventStream.listen((event) {
+        if (event.type == 'payment_status_changed' ||
+            event.type == 'order_changed') {
+          debugPrint(
+              '[CustomerBilling] Realtime event: ${event.type}, refreshing...');
+          ref.read(_billRefreshKeyProvider.notifier).state++;
+          _refresh();
+        }
+      });
+    });
   }
 
   @override
   void dispose() {
+    _realtimeSub?.cancel();
     _bookingScrollController
       ..removeListener(_handleBookingScroll)
       ..dispose();
@@ -77,6 +96,8 @@ class _CustomerBillingScreenState extends ConsumerState<CustomerBillingScreen> {
   Future<void> _refresh() async {
     final user = ref.read(authStateProvider).valueOrNull;
     if (user == null) return;
+    // Bump refresh key so _bookingBillProvider re-fetches all bills
+    ref.read(_billRefreshKeyProvider.notifier).state++;
     await Future.wait([
       ref.read(bookingProvider.notifier).loadBookings(user.id),
       ref.read(orderHistoryProvider.notifier).loadOrders(user.id),
@@ -179,8 +200,7 @@ class _BookingBillCard extends ConsumerWidget {
     return bill.when(
       data: (bill) => _BillCard(bill: bill),
       loading: () => _BillingCard(
-        title:
-            booking.resourceLabel ??
+        title: booking.resourceLabel ??
             '${booking.courtType.displayName} - Sân ${booking.courtNumber}',
         subtitle:
             '${DateFormat('dd/MM/yyyy').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
@@ -190,8 +210,7 @@ class _BookingBillCard extends ConsumerWidget {
         icon: Icons.receipt_long_outlined,
       ),
       error: (_, __) => _BillingCard(
-        title:
-            booking.resourceLabel ??
+        title: booking.resourceLabel ??
             '${booking.courtType.displayName} - Sân ${booking.courtNumber}',
         subtitle:
             '${DateFormat('dd/MM/yyyy').format(booking.date)} • Không thể tải chi tiết bill',
@@ -212,8 +231,7 @@ class _BillCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final booking = bill.booking;
-    final title =
-        booking.resourceLabel ??
+    final title = booking.resourceLabel ??
         '${booking.courtType.displayName} - Sân ${booking.courtNumber}';
     final subtitle =
         '${DateFormat('dd/MM/yyyy').format(booking.date)} • ${booking.startTime} - ${booking.endTime}';
@@ -245,8 +263,8 @@ class _BillCard extends StatelessWidget {
                       Text(
                         subtitle,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                              color: AppColors.textSecondary,
+                            ),
                       ),
                     ],
                   ),
@@ -281,9 +299,21 @@ class _BillCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Text(
-                          itemSummary,
-                          style: Theme.of(context).textTheme.bodySmall,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              itemSummary,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            if (order.isPaid)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: _PaidBadge(
+                                    method: order.paymentStatus
+                                        .replaceFirst('paid_', '')),
+                              ),
+                          ],
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
@@ -301,6 +331,13 @@ class _BillCard extends StatelessWidget {
             _TotalRow(
               label: 'Tổng bill',
               amount: bill.grandTotal,
+              isGrandTotal: true,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            _TotalRow(label: 'Đã thanh toán online', amount: bill.paidTotal),
+            _TotalRow(
+              label: 'Còn cần thanh toán',
+              amount: bill.unpaidTotal,
               isGrandTotal: true,
             ),
           ],
@@ -353,9 +390,8 @@ class _OrderBillingList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final standaloneOrders = state.orders
-        .where((order) => order.bookingId == null)
-        .toList();
+    final standaloneOrders =
+        state.orders.where((order) => order.bookingId == null).toList();
 
     if (state.isLoading && standaloneOrders.isEmpty) {
       return const Center(
@@ -399,7 +435,7 @@ class _OrderBillingList extends StatelessWidget {
               ? 'Đơn tại ${order.resourceLabel}'
               : 'Đơn hàng ${order.items.length} sản phẩm',
           subtitle:
-              '${DateFormat('dd/MM/yyyy HH:mm').format(order.createdAt)} • $itemSummary$extraCount',
+              '${DateFormat('dd/MM/yyyy HH:mm').format(order.createdAt.toLocal())} • $itemSummary$extraCount',
           statusLabel: order.status.displayName,
           paymentStatus: order.paymentStatus,
           amount: order.totalPrice,
@@ -476,8 +512,8 @@ class _BillingCard extends StatelessWidget {
                       Text(
                         subtitle,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                              color: AppColors.textSecondary,
+                            ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -539,16 +575,16 @@ class _PaymentChip extends StatelessWidget {
     final color = isPaid
         ? AppColors.success
         : isFailed
-        ? AppColors.error
-        : AppColors.textHint;
+            ? AppColors.error
+            : AppColors.textHint;
     final method = isPaid && paymentStatus.contains('_')
         ? paymentStatus.split('_').last.toUpperCase()
         : '';
     final label = isPaid
-        ? (method.isNotEmpty ? 'Đã thanh toán ($method)' : 'Đã thanh toán')
+        ? (method.isNotEmpty ? 'Đã thanh toán bằng $method' : 'Đã thanh toán')
         : isFailed
-        ? 'Thanh toán lỗi'
-        : 'Chưa thanh toán';
+            ? 'Thanh toán lỗi'
+            : 'Chưa thanh toán';
 
     return Chip(
       avatar: Icon(
@@ -561,6 +597,40 @@ class _PaymentChip extends StatelessWidget {
       backgroundColor: color.withValues(alpha: 0.1),
       labelStyle: TextStyle(color: color, fontWeight: FontWeight.w700),
       side: BorderSide(color: color.withValues(alpha: 0.25)),
+    );
+  }
+}
+
+class _PaidBadge extends StatelessWidget {
+  final String method;
+
+  const _PaidBadge({required this.method});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = method.isNotEmpty ? 'Đã TT $method' : 'Đã TT online';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(
+        color: AppColors.success.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.verified_outlined, size: 11, color: AppColors.success),
+          const SizedBox(width: 3),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: AppColors.success,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
