@@ -3,8 +3,10 @@ from datetime import datetime
 
 from app.clients.payment_client import create_payment, verify_callback
 from app.repositories.booking_repository import BookingRepository
+from app.repositories.notification_repository import NotificationRepository
 from app.repositories.order_repository import OrderRepository
 from app.repositories.payment_repository import PaymentRepository
+from app.services.realtime import realtime_manager
 
 logger = logging.getLogger(__name__)
 
@@ -17,10 +19,12 @@ class PaymentService:
         repo: PaymentRepository,
         booking_repo: BookingRepository | None = None,
         order_repo: OrderRepository | None = None,
+        notification_repo: NotificationRepository | None = None,
     ) -> None:
         self._repo = repo
         self._booking_repo = booking_repo
         self._order_repo = order_repo
+        self._notification_repo = notification_repo
 
     async def create_payment(
         self,
@@ -130,6 +134,39 @@ class PaymentService:
             order_type=order_type,
             payment_status=payment_status,
         )
+        # Update notification payload with new payment status
+        # Use a savepoint so a failure here does NOT abort the outer transaction
+        if self._notification_repo and order_type == "order":
+            try:
+                logger.info(
+                    "Updating notification payment_status for order=%s to %s",
+                    order_id,
+                    payment_status,
+                )
+                async with self._repo._session.begin_nested():
+                    await self._notification_repo.update_order_payment_status(
+                        order_id, payment_status
+                    )
+                logger.info(
+                    "Successfully updated notification payment_status for order=%s",
+                    order_id,
+                )
+            except Exception as e:
+                logger.error(
+                    "Failed to update notification payment_status for order=%s: %s",
+                    order_id,
+                    e,
+                    exc_info=True,
+                )
+        await realtime_manager.broadcast_ui_event(
+            ["STAFF", "ADMIN", "CUSTOMER"],
+            "payment_status_changed",
+            {
+                "order_id": order_id,
+                "order_type": order_type,
+                "payment_status": payment_status,
+            },
+        )
 
     async def handle_callback(self, vnpay_params: dict[str, str]) -> dict:
         result = verify_callback(vnpay_params)
@@ -186,17 +223,6 @@ class PaymentService:
             )
             result["is_valid"] = False
             result["error"] = "duplicate_transaction_no"
-            return result
-
-        if txn.status in {"completed", "failed"}:
-            if resolved_type:
-                status = "paid_vnpay" if txn.status == "completed" else "failed"
-                await self.mark_entity_payment_status(
-                    order_id=order_id,
-                    order_type=resolved_type,
-                    payment_status=status,
-                )
-            result["already_processed"] = True
             return result
 
         await self.confirm_external_payment(

@@ -1,10 +1,13 @@
+import logging
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import select, update, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.notification import Notification
+
+logger = logging.getLogger(__name__)
 
 
 class NotificationRepository:
@@ -99,4 +102,33 @@ class NotificationRepository:
             if payload.get("request_id") == request_id:
                 payload["status"] = status
                 notification.payload = payload
+        await self._session.flush()
+
+    async def update_order_payment_status(
+        self, order_id: str, payment_status: str
+    ) -> None:
+        """Update payment_status in notification payloads for a given order_id."""
+        # Use raw SQL to bypass ORM cache
+        raw_sql = text("""
+            UPDATE notifications 
+            SET payload = jsonb_set(payload, '{payment_status}', CAST(:status AS jsonb))
+            WHERE event_type IN ('order.created', 'order.status_changed')
+            AND payload->>'id' = :order_id
+        """)
+        result = await self._session.execute(
+            raw_sql,
+            {"order_id": order_id, "status": f'"{payment_status}"'},
+        )
+        rowcount = result.rowcount
+        if rowcount > 0:
+            logger.info(
+                "Updated %d notifications for order_id=%s to payment_status=%s",
+                rowcount,
+                order_id,
+                payment_status,
+            )
+        else:
+            logger.warning(
+                "No notification found for order_id=%s", order_id
+            )
         await self._session.flush()
