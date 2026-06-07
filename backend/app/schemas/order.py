@@ -72,6 +72,7 @@ class StaffOrderItemResponse(BaseModel):
     id: str
     item_name: str
     quantity: int
+    unit_price: Decimal = Decimal("0")
 
     class Config:
         from_attributes = True
@@ -89,6 +90,7 @@ class StaffOrderResponse(BaseModel):
     table_number: int
     status: str
     payment_status: str = "unpaid"
+    total_price: Decimal = Decimal("0")
     notes: str | None = None
     items: list[StaffOrderItemResponse] = []
     created_at: datetime | None = None

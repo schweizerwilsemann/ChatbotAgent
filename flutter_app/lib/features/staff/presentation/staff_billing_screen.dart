@@ -13,33 +13,57 @@ import 'package:sports_venue_chatbot/features/admin/presentation/realtime_event_
 class StaffBillingState {
   final List<AdminBooking> bookings;
   final Map<String, List<AdminOrder>> ordersByBooking;
+  final List<AdminOrder> standaloneOrders;
   final bool isLoading;
   final String? error;
   final DateTime selectedDate;
+  final String? filterStatus;
 
   const StaffBillingState({
     this.bookings = const [],
     this.ordersByBooking = const {},
+    this.standaloneOrders = const [],
     this.isLoading = false,
     this.error,
     required this.selectedDate,
+    this.filterStatus,
   });
 
   StaffBillingState copyWith({
     List<AdminBooking>? bookings,
     Map<String, List<AdminOrder>>? ordersByBooking,
+    List<AdminOrder>? standaloneOrders,
     bool? isLoading,
     String? error,
     DateTime? selectedDate,
+    String? filterStatus,
     bool clearError = false,
+    bool clearFilter = false,
   }) {
     return StaffBillingState(
       bookings: bookings ?? this.bookings,
       ordersByBooking: ordersByBooking ?? this.ordersByBooking,
+      standaloneOrders: standaloneOrders ?? this.standaloneOrders,
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : (error ?? this.error),
       selectedDate: selectedDate ?? this.selectedDate,
+      filterStatus: clearFilter ? null : (filterStatus ?? this.filterStatus),
     );
+  }
+
+  List<AdminBooking> get filteredBookings {
+    if (filterStatus == null) return bookings;
+    return bookings.where((booking) {
+      final orders = ordersByBooking[booking.id] ?? [];
+      return orders.any((o) => o.status.apiValue == filterStatus);
+    }).toList();
+  }
+
+  List<AdminOrder> get filteredStandaloneOrders {
+    if (filterStatus == null) return standaloneOrders;
+    return standaloneOrders
+        .where((o) => o.status.apiValue == filterStatus)
+        .toList();
   }
 }
 
@@ -76,9 +100,25 @@ class StaffBillingNotifier extends StateNotifier<StaffBillingState> {
         }
       }
 
+      // Load standalone orders (not linked to any booking)
+      List<AdminOrder> standaloneOrders = [];
+      try {
+        standaloneOrders = await _adminApi.getStaffOrders(
+          status: state.filterStatus,
+          limit: 100,
+          offset: 0,
+        );
+        // Filter to only show orders without a booking_id
+        standaloneOrders =
+            standaloneOrders.where((o) => o.bookingId == null).toList();
+      } catch (_) {
+        // Skip if standalone orders fetch fails
+      }
+
       state = state.copyWith(
         bookings: bookings,
         ordersByBooking: ordersByBooking,
+        standaloneOrders: standaloneOrders,
         isLoading: false,
       );
     } catch (e) {
@@ -96,12 +136,36 @@ class StaffBillingNotifier extends StateNotifier<StaffBillingState> {
 
   Future<bool> updateOrderStatus(String orderId, String newStatus) async {
     try {
-      await _adminApi.updateOrderStatus(orderId, newStatus);
-      await loadBillingData();
+      final updated = await _adminApi.updateOrderStatus(orderId, newStatus);
+
+      // Update in ordersByBooking
+      final newOrdersByBooking = <String, List<AdminOrder>>{};
+      for (final entry in state.ordersByBooking.entries) {
+        newOrdersByBooking[entry.key] = entry.value.map((o) {
+          return o.id == orderId ? updated : o;
+        }).toList();
+      }
+
+      // Update in standaloneOrders
+      final newStandaloneOrders = state.standaloneOrders.map((o) {
+        return o.id == orderId ? updated : o;
+      }).toList();
+
+      state = state.copyWith(
+        ordersByBooking: newOrdersByBooking,
+        standaloneOrders: newStandaloneOrders,
+      );
       return true;
     } catch (_) {
       return false;
     }
+  }
+
+  void setFilterStatus(String? status) {
+    state = state.copyWith(
+      filterStatus: status,
+      clearFilter: status == null,
+    );
   }
 
   void clearError() {
@@ -123,13 +187,16 @@ class StaffBillingScreen extends ConsumerStatefulWidget {
   ConsumerState<StaffBillingScreen> createState() => _StaffBillingScreenState();
 }
 
-class _StaffBillingScreenState extends ConsumerState<StaffBillingScreen> {
+class _StaffBillingScreenState extends ConsumerState<StaffBillingScreen>
+    with SingleTickerProviderStateMixin {
   final _currencyFormat = NumberFormat('#,###', 'vi_VN');
   StreamSubscription<RealtimeUiEvent>? _realtimeSub;
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(staffBillingProvider.notifier).loadBillingData();
       final realtimeNotifier = ref.read(realtimeEventProvider.notifier);
@@ -147,6 +214,7 @@ class _StaffBillingScreenState extends ConsumerState<StaffBillingScreen> {
 
   @override
   void dispose() {
+    _tabController.dispose();
     _realtimeSub?.cancel();
     super.dispose();
   }
@@ -261,63 +329,251 @@ class _StaffBillingScreenState extends ConsumerState<StaffBillingScreen> {
             ),
           ),
 
+        // ── Tab bar + Filter ────────────────────────────────────
+        Container(
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            border: Border(bottom: BorderSide(color: AppColors.border)),
+          ),
+          child: Column(
+            children: [
+              TabBar(
+                controller: _tabController,
+                labelColor: AppColors.primary,
+                unselectedLabelColor: AppColors.textSecondary,
+                indicatorColor: AppColors.primary,
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelStyle: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+                tabs: [
+                  Tab(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.calendar_month, size: 16),
+                        const SizedBox(width: 6),
+                        Text('Đơn đặt sân (${state.filteredBookings.length})'),
+                      ],
+                    ),
+                  ),
+                  Tab(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.shopping_bag_outlined, size: 16),
+                        const SizedBox(width: 6),
+                        Text(
+                            'Đơn lẻ (${state.filteredStandaloneOrders.length})'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              // Filter row
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    const Text(
+                      'Lọc trạng thái:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _buildFilterChip(null, 'Tất cả', state),
+                            _buildFilterChip('pending', 'Chờ xử lý', state),
+                            _buildFilterChip(
+                                'preparing', 'Đang chuẩn bị', state),
+                            _buildFilterChip('ready', 'Sẵn sàng', state),
+                            _buildFilterChip('delivered', 'Đã giao', state),
+                            _buildFilterChip('cancelled', 'Đã hủy', state),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
         // ── Content ─────────────────────────────────────────────
         Expanded(
           child: state.isLoading
               ? const Center(child: CircularProgressIndicator())
-              : state.bookings.isEmpty
-                  ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.receipt_long,
-                              size: 48, color: AppColors.textHint),
-                          SizedBox(height: 12),
-                          Text(
-                            'Không có đặt sân nào trong ngày',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: () => ref
-                          .read(staffBillingProvider.notifier)
-                          .loadBillingData(),
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(12),
-                        itemCount: state.bookings.length,
-                        itemBuilder: (context, index) {
-                          final booking = state.bookings[index];
-                          final orders =
-                              state.ordersByBooking[booking.id] ?? [];
-                          return _BookingBillCard(
-                            booking: booking,
-                            orders: orders,
-                            currencyFormat: _currencyFormat,
-                            onOrderStatusUpdate: (orderId, newStatus) async {
-                              final success = await ref
-                                  .read(staffBillingProvider.notifier)
-                                  .updateOrderStatus(orderId, newStatus);
-                              if (context.mounted && success) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content:
-                                        Text('Đã cập nhật trạng thái đơn hàng'),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
-                                );
-                              }
-                            },
-                          );
-                        },
-                      ),
-                    ),
+              : TabBarView(
+                  controller: _tabController,
+                  children: [
+                    // Tab 1: Booking orders
+                    _buildBookingOrdersTab(state),
+                    // Tab 2: Standalone orders
+                    _buildStandaloneOrdersTab(state),
+                  ],
+                ),
         ),
       ],
+    );
+  }
+
+  Widget _buildFilterChip(
+      String? status, String label, StaffBillingState state) {
+    final isSelected = state.filterStatus == status;
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: FilterChip(
+        label: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: isSelected ? AppColors.textOnPrimary : AppColors.textPrimary,
+          ),
+        ),
+        selected: isSelected,
+        onSelected: (_) {
+          ref.read(staffBillingProvider.notifier).setFilterStatus(status);
+        },
+        selectedColor: AppColors.primary,
+        backgroundColor: AppColors.surface,
+        checkmarkColor: AppColors.textOnPrimary,
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+    );
+  }
+
+  Widget _buildBookingOrdersTab(StaffBillingState state) {
+    final filteredBookings = state.filteredBookings;
+
+    if (filteredBookings.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              state.filterStatus != null
+                  ? Icons.filter_list_off
+                  : Icons.calendar_month_outlined,
+              size: 48,
+              color: AppColors.textHint,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              state.filterStatus != null
+                  ? 'Không có đơn nào ở trạng thái này'
+                  : 'Không có đặt sân nào trong ngày',
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () =>
+          ref.read(staffBillingProvider.notifier).loadBillingData(),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: filteredBookings.length,
+        itemBuilder: (context, index) {
+          final booking = filteredBookings[index];
+          final orders = state.ordersByBooking[booking.id] ?? [];
+          return _BookingBillCard(
+            booking: booking,
+            orders: orders,
+            currencyFormat: _currencyFormat,
+            onOrderStatusUpdate: (orderId, newStatus) async {
+              final success = await ref
+                  .read(staffBillingProvider.notifier)
+                  .updateOrderStatus(orderId, newStatus);
+              if (context.mounted && success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Đã cập nhật trạng thái'),
+                    behavior: SnackBarBehavior.floating,
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+              }
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildStandaloneOrdersTab(StaffBillingState state) {
+    final filteredOrders = state.filteredStandaloneOrders;
+
+    if (filteredOrders.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              state.filterStatus != null
+                  ? Icons.filter_list_off
+                  : Icons.shopping_bag_outlined,
+              size: 48,
+              color: AppColors.textHint,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              state.filterStatus != null
+                  ? 'Không có đơn nào ở trạng thái này'
+                  : 'Không có đơn lẻ nào',
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () =>
+          ref.read(staffBillingProvider.notifier).loadBillingData(),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: filteredOrders.length,
+        itemBuilder: (context, index) {
+          final order = filteredOrders[index];
+          return _StandaloneOrderCard(
+            order: order,
+            currencyFormat: _currencyFormat,
+            onOrderStatusUpdate: (orderId, newStatus) async {
+              final success = await ref
+                  .read(staffBillingProvider.notifier)
+                  .updateOrderStatus(orderId, newStatus);
+              if (context.mounted && success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Đã cập nhật trạng thái'),
+                    behavior: SnackBarBehavior.floating,
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+              }
+            },
+          );
+        },
+      ),
     );
   }
 }
@@ -826,6 +1082,218 @@ class _BookingBillCard extends StatelessWidget {
       case AdminBookingStatus.cancelled:
         return Icons.cancel_outlined;
     }
+  }
+
+  String _paymentLabel(String status) {
+    switch (status) {
+      case 'paid_stripe':
+        return 'Stripe';
+      case 'paid_vnpay':
+        return 'VNPay';
+      case 'unpaid':
+        return 'Chưa TT';
+      default:
+        return status;
+    }
+  }
+
+  Color _paymentColor(String status) {
+    switch (status) {
+      case 'paid_stripe':
+      case 'paid_vnpay':
+        return AppColors.success;
+      case 'unpaid':
+        return AppColors.warning;
+      default:
+        return AppColors.textSecondary;
+    }
+  }
+
+  String _orderStatusLabel(AdminOrderStatus status) {
+    switch (status) {
+      case AdminOrderStatus.pending:
+        return 'Chờ xử lý';
+      case AdminOrderStatus.preparing:
+        return 'Đang chuẩn bị';
+      case AdminOrderStatus.ready:
+        return 'Sẵn sàng';
+      case AdminOrderStatus.delivered:
+        return 'Đã giao';
+      case AdminOrderStatus.cancelled:
+        return 'Đã huỷ';
+    }
+  }
+
+  Color _orderStatusColor(AdminOrderStatus status) {
+    switch (status) {
+      case AdminOrderStatus.pending:
+        return AppColors.warning;
+      case AdminOrderStatus.preparing:
+        return AppColors.info;
+      case AdminOrderStatus.ready:
+        return AppColors.success;
+      case AdminOrderStatus.delivered:
+        return AppColors.success;
+      case AdminOrderStatus.cancelled:
+        return AppColors.error;
+    }
+  }
+}
+
+// ─── Standalone Order Card ──────────────────────────────────────────────────
+
+class _StandaloneOrderCard extends StatelessWidget {
+  final AdminOrder order;
+  final NumberFormat currencyFormat;
+  final Function(String orderId, String newStatus) onOrderStatusUpdate;
+
+  const _StandaloneOrderCard({
+    required this.order,
+    required this.currencyFormat,
+    required this.onOrderStatusUpdate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isPaid = order.paymentStatus != 'unpaid';
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Đơn #${order.id.substring(0, 8)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+                _buildBadge(
+                  _orderStatusLabel(order.status),
+                  _orderStatusColor(order.status),
+                ),
+                const SizedBox(width: 4),
+                _buildBadge(
+                  _paymentLabel(order.paymentStatus),
+                  _paymentColor(order.paymentStatus),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            for (final item in order.items)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  children: [
+                    Text(
+                      '${item.quantity}x ',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        item.itemName,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                    Text(
+                      '${currencyFormat.format((item.unitPrice * item.quantity).round())}đ',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            const Divider(height: 8),
+            Row(
+              children: [
+                const Spacer(),
+                Text(
+                  '${currencyFormat.format(order.totalPrice.round())}đ',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: isPaid ? AppColors.success : AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+            if (order.status != AdminOrderStatus.delivered &&
+                order.status != AdminOrderStatus.cancelled)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (order.status == AdminOrderStatus.pending)
+                      _buildActionButton(
+                        'Chuẩn bị',
+                        Icons.restaurant,
+                        () => onOrderStatusUpdate(order.id, 'preparing'),
+                      ),
+                    if (order.status == AdminOrderStatus.preparing)
+                      _buildActionButton(
+                        'Sẵn sàng',
+                        Icons.check_circle_outline,
+                        () => onOrderStatusUpdate(order.id, 'ready'),
+                      ),
+                    if (order.status == AdminOrderStatus.ready)
+                      _buildActionButton(
+                        'Đã giao',
+                        Icons.delivery_dining,
+                        () => onOrderStatusUpdate(order.id, 'delivered'),
+                      ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBadge(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(String label, IconData icon, VoidCallback onTap) {
+    return TextButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 16),
+      label: Text(label),
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.primary,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+      ),
+    );
   }
 
   String _paymentLabel(String status) {

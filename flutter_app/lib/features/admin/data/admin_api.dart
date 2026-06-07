@@ -172,6 +172,31 @@ class AdminApi {
     }
   }
 
+  /// Fetch orders for staff view (no revenue details).
+  Future<List<AdminOrder>> getStaffOrders({
+    String? status,
+    int? limit,
+    int? offset,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (status != null) queryParams['status'] = status;
+      if (limit != null) queryParams['limit'] = limit;
+      if (offset != null) queryParams['offset'] = offset;
+
+      final response = await _dioClient.get<List<dynamic>>(
+        ApiConstants.adminStaffOrdersEndpoint,
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+      );
+      if (response.data == null) return [];
+      return response.data!
+          .map((json) => AdminOrder.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // ─── Menu ───────────────────────────────────────────────────────────────
 
   /// Fetch menu items with optional category filter.

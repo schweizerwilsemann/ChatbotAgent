@@ -48,6 +48,7 @@ class ApiConstants {
   static const String adminDashboardEndpoint = '/api/admin/dashboard';
   static const String adminBookingsEndpoint = '/api/admin/bookings';
   static const String adminOrdersEndpoint = '/api/admin/orders';
+  static const String adminStaffOrdersEndpoint = '/api/admin/orders/staff';
   static const String adminMenuEndpoint = '/api/admin/menu';
   static const String adminAnalyticsEndpoint = '/api/admin/analytics';
   static const String adminResourcesEndpoint = '/api/admin/resources';

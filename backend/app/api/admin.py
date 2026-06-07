@@ -159,6 +159,7 @@ def _staff_order_response(entry: dict) -> StaffOrderResponse:
             id=str(item.id),
             item_name=item.item_name,
             quantity=item.quantity,
+            unit_price=getattr(item, "unit_price", Decimal("0")),
         )
         for item in order.items
     ]
@@ -167,6 +168,7 @@ def _staff_order_response(entry: dict) -> StaffOrderResponse:
         user_id=order.user_id,
         user_name=user_name,
         user_phone=user_phone,
+        booking_id=str(order.booking_id) if getattr(order, "booking_id", None) else None,
         venue_id=str(order.venue_id) if getattr(order, "venue_id", None) else None,
         resource_id=str(order.resource_id)
         if getattr(order, "resource_id", None)
@@ -175,6 +177,7 @@ def _staff_order_response(entry: dict) -> StaffOrderResponse:
         table_number=order.table_number,
         status=order.status,
         payment_status=getattr(order, "payment_status", None) or "unpaid",
+        total_price=getattr(order, "total_price", Decimal("0")),
         notes=order.notes,
         items=items,
         created_at=getattr(order, "created_at", None),

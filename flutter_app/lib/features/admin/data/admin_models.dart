@@ -348,12 +348,17 @@ class AdminOrderItem {
   });
 
   factory AdminOrderItem.fromJson(Map<String, dynamic> json) {
+    final quantity = _toInt(json['quantity']);
+    final unitPrice = _toDouble(json['unit_price']);
+    final totalPrice = json['total_price'] != null
+        ? _toDouble(json['total_price'])
+        : unitPrice * quantity;
     return AdminOrderItem(
       id: json['id'] as String,
       itemName: json['item_name'] as String,
-      quantity: _toInt(json['quantity']),
-      unitPrice: _toDouble(json['unit_price']),
-      totalPrice: _toDouble(json['total_price']),
+      quantity: quantity,
+      unitPrice: unitPrice,
+      totalPrice: totalPrice,
     );
   }
 
@@ -375,6 +380,7 @@ class AdminOrder {
   final String userId;
   final String? userName;
   final String? userPhone;
+  final String? bookingId;
   final String? venueId;
   final String? resourceId;
   final String? resourceLabel;
@@ -391,6 +397,7 @@ class AdminOrder {
     required this.userId,
     this.userName,
     this.userPhone,
+    this.bookingId,
     this.venueId,
     this.resourceId,
     this.resourceLabel,
@@ -409,6 +416,7 @@ class AdminOrder {
       userId: json['user_id'] as String,
       userName: json['user_name'] as String?,
       userPhone: json['user_phone'] as String?,
+      bookingId: json['booking_id'] as String?,
       venueId: json['venue_id'] as String?,
       resourceId: json['resource_id'] as String?,
       resourceLabel: json['resource_label'] as String?,
@@ -431,6 +439,7 @@ class AdminOrder {
       'user_id': userId,
       'user_name': userName,
       'user_phone': userPhone,
+      'booking_id': bookingId,
       'venue_id': venueId,
       'resource_id': resourceId,
       'resource_label': resourceLabel,
