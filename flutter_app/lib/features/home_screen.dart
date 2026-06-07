@@ -108,6 +108,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
         ),
         centerTitle: false,
+        actions: [
+          IconButton(
+            tooltip: 'Cài đặt',
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.push('/settings'),
+          ),
+          IconButton(
+            tooltip: 'Quét QR nhận sân',
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: () => context.push('/scan-qr'),
+          ),
+        ],
       ),
       body: widget.child,
       bottomNavigationBar: FloatingBottomNav(
@@ -145,60 +157,64 @@ class _VenueDropdown extends StatelessWidget {
       return const Text('Không có sân nào');
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<Venue>(
-          value: selected,
-          isDense: true,
-          icon: const Icon(Icons.keyboard_arrow_down,
-              size: 20, color: AppColors.textPrimary),
-          dropdownColor: AppColors.surface,
-          hint: const Text(
-            'Chọn sân',
-            style: TextStyle(
+    return SizedBox(
+      width: double.infinity,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceVariant,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<Venue>(
+            value: selected,
+            isDense: true,
+            isExpanded: true,
+            icon: const Icon(Icons.keyboard_arrow_down,
+                size: 20, color: AppColors.textPrimary),
+            dropdownColor: AppColors.surface,
+            hint: const Text(
+              'Chọn sân',
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: AppColors.textPrimary,
             ),
-          ),
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-          items: venues.map((venue) {
-            return DropdownMenuItem<Venue>(
-              value: venue,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.location_on,
-                      size: 16, color: AppColors.primary),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      venue.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+            items: venues.map((venue) {
+              return DropdownMenuItem<Venue>(
+                value: venue,
+                child: Row(
+                  children: [
+                    const Icon(Icons.location_on,
+                        size: 16, color: AppColors.primary),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        venue.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
                     ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-          onChanged: (venue) {
-            if (venue != null) onChanged(venue);
-          },
+                  ],
+                ),
+              );
+            }).toList(),
+            onChanged: (venue) {
+              if (venue != null) onChanged(venue);
+            },
+          ),
         ),
       ),
     );

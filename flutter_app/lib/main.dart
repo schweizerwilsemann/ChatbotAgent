@@ -10,6 +10,7 @@ import 'package:sports_venue_chatbot/core/theme/app_scroll_behavior.dart';
 import 'package:sports_venue_chatbot/core/theme/app_theme.dart';
 import 'package:sports_venue_chatbot/features/auth/data/auth_models.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
+import 'package:sports_venue_chatbot/features/settings/presentation/app_settings_provider.dart';
 import 'package:sports_venue_chatbot/features/staff/presentation/staff_notifications_provider.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/customer_chat_notifications_provider.dart';
 
@@ -19,6 +20,7 @@ Future<void> _runApp(Flavor flavor) async {
   WidgetsFlutterBinding.ensureInitialized();
   Intl.defaultLocale = 'vi_VN';
   await initializeDateFormatting('vi_VN');
+  await initializeDateFormatting('en_US');
   await FlavorConfig.init(flavor);
   runApp(
     const ProviderScope(
@@ -58,6 +60,9 @@ class _SportsVenueChatbotAppState extends ConsumerState<SportsVenueChatbotApp> {
     }
 
     final router = ref.watch(appRouterProvider);
+    final settings = ref.watch(appSettingsProvider);
+    final selectedLocale = settings.language.locale ?? const Locale('vi', 'VN');
+    Intl.defaultLocale = settings.language.intlLocaleName ?? 'vi_VN';
 
     return MaterialApp.router(
       title: FlavorConfig.appName,
@@ -67,6 +72,7 @@ class _SportsVenueChatbotAppState extends ConsumerState<SportsVenueChatbotApp> {
       themeMode: ThemeMode.light,
       scrollBehavior: const AppScrollBehavior(),
       routerConfig: router,
+      locale: selectedLocale,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -74,7 +80,6 @@ class _SportsVenueChatbotAppState extends ConsumerState<SportsVenueChatbotApp> {
       ],
       supportedLocales: const [
         Locale('vi', 'VN'),
-        Locale('en', 'US'),
       ],
     );
   }

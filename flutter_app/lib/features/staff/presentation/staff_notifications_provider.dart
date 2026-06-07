@@ -248,6 +248,14 @@ class StaffNotificationsNotifier
       debugPrint(
           '[StaffNoti] Received WS message: ${raw.toString().substring(0, raw.toString().length.clamp(0, 200))}');
       final decoded = jsonDecode(raw.toString()) as Map<String, dynamic>;
+
+      // Handle UI events (payment_status_changed, order_changed, etc.)
+      if (decoded['type'] == 'ui_event') {
+        _handleUiEvent(decoded);
+        return;
+      }
+
+      // Handle regular notifications
       final notification = StaffNotification.fromJson(decoded);
       final exists =
           state.notifications.any((item) => item.id == notification.id);
@@ -264,6 +272,68 @@ class StaffNotificationsNotifier
       debugPrint('[StaffNoti] Error handling WS message: $e');
       return;
     }
+  }
+
+  void _handleUiEvent(Map<String, dynamic> decoded) {
+    final event = decoded['event']?.toString() ?? '';
+    final data = decoded['data'] as Map<String, dynamic>? ?? {};
+
+    debugPrint('[StaffNoti] UI event: $event, data: $data');
+
+    if (event == 'payment_status_changed') {
+      final orderId = data['order_id']?.toString();
+      final paymentStatus = data['payment_status']?.toString();
+      if (orderId != null && paymentStatus != null) {
+        debugPrint(
+            '[StaffNoti] Payment status changed: order=$orderId, status=$paymentStatus');
+        _updateNotificationPaymentStatus(orderId, paymentStatus);
+      }
+    } else if (event == 'order_changed') {
+      debugPrint('[StaffNoti] Order changed, refreshing...');
+      refresh();
+    }
+  }
+
+  void _updateNotificationPaymentStatus(String orderId, String paymentStatus) {
+    debugPrint('[StaffNoti] Looking for notification with order_id=$orderId');
+    debugPrint(
+        '[StaffNoti] Current notifications: ${state.notifications.length}');
+
+    bool found = false;
+    final updated = state.notifications.map((n) {
+      final payload = n.payload;
+      final payloadId = payload['id']?.toString();
+      final payloadOrderId = payload['order_id']?.toString();
+
+      debugPrint(
+          '[StaffNoti] Checking notification ${n.id}: payload.id=$payloadId, payload.order_id=$payloadOrderId');
+
+      if (payloadId == orderId || payloadOrderId == orderId) {
+        found = true;
+        debugPrint(
+            '[StaffNoti] Found matching notification! Updating payment_status to $paymentStatus');
+        final newPayload = Map<String, dynamic>.from(payload);
+        newPayload['payment_status'] = paymentStatus;
+        return StaffNotification(
+          id: n.id,
+          eventType: n.eventType,
+          title: n.title,
+          message: n.message,
+          source: n.source,
+          payload: newPayload,
+          createdAt: n.createdAt,
+          readAt: n.readAt,
+        );
+      }
+      return n;
+    }).toList();
+
+    if (!found) {
+      debugPrint(
+          '[StaffNoti] No matching notification found for order_id=$orderId');
+    }
+
+    state = state.copyWith(notifications: updated);
   }
 
   /// Mark a single notification as read.

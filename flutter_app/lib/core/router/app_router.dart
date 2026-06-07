@@ -15,6 +15,7 @@ import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.da
 import 'package:sports_venue_chatbot/features/billing/presentation/customer_billing_screen.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/login_screen.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_screen.dart';
+import 'package:sports_venue_chatbot/features/booking/presentation/booking_qr_scan_screen.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/voice_agent_call_screen.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_screen.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/customer_staff_chat_screen.dart';
@@ -24,8 +25,10 @@ import 'package:sports_venue_chatbot/features/staff_request/presentation/staff_r
 import 'package:sports_venue_chatbot/features/home_screen.dart';
 import 'package:sports_venue_chatbot/features/menu/presentation/menu_screen.dart';
 import 'package:sports_venue_chatbot/features/profile/presentation/profile_screen.dart';
+import 'package:sports_venue_chatbot/features/settings/presentation/settings_screen.dart';
 import 'package:sports_venue_chatbot/features/shared/presentation/role_based_shell.dart';
 import 'package:sports_venue_chatbot/features/staff/presentation/staff_notifications_screen.dart';
+import 'package:sports_venue_chatbot/features/staff/presentation/staff_billing_screen.dart';
 import 'package:sports_venue_chatbot/features/staff/presentation/staff_profile_screen.dart';
 import 'package:sports_venue_chatbot/shared/widgets/loading_widget.dart';
 
@@ -109,6 +112,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'login',
         builder: (context, state) => const LoginScreen(),
       ),
+      GoRoute(
+        path: '/scan-qr',
+        name: 'scan_qr',
+        builder: (context, state) => const BookingQrScanScreen(),
+      ),
 
       // Customer shell
       ShellRoute(
@@ -149,6 +157,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'profile',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: ProfileScreen()),
+          ),
+          GoRoute(
+            path: '/settings',
+            name: 'settings',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: SettingsScreen()),
           ),
         ],
       ),
@@ -197,6 +211,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 const NoTransitionPage(child: MenuManagementScreen()),
           ),
           GoRoute(
+            path: '/staff/billing',
+            name: 'staff_billing',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: StaffBillingScreen()),
+          ),
+          GoRoute(
             path: '/staff/requests',
             name: 'staff_requests',
             pageBuilder: (context, state) =>
@@ -213,6 +233,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'staff_inbox',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: StaffInboxScreen()),
+          ),
+          GoRoute(
+            path: '/admin/settings',
+            name: 'admin_settings',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: SettingsScreen()),
+          ),
+          GoRoute(
+            path: '/staff/settings',
+            name: 'staff_settings',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: SettingsScreen()),
           ),
         ],
       ),
