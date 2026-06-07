@@ -29,8 +29,13 @@ class _OrderCardState extends ConsumerState<OrderCard> {
 
   String get _type => widget.metadata['type'] as String? ?? '';
   String get _id => widget.metadata['id'] as String? ?? '';
-  double get _totalPrice =>
-      (widget.metadata['total_price'] as num?)?.toDouble() ?? 0;
+  double get _totalPrice {
+    final raw = widget.metadata['total_price'];
+    if (raw is num) return raw.toDouble();
+    if (raw is String) return double.tryParse(raw) ?? 0;
+    return 0;
+  }
+
   String get _paymentStatus =>
       widget.metadata['payment_status'] as String? ?? 'unpaid';
   bool get _isPaid => _paymentStatus.startsWith('paid');
@@ -45,7 +50,7 @@ class _OrderCardState extends ConsumerState<OrderCard> {
       child: Container(
         margin: const EdgeInsets.only(top: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.border),
           boxShadow: const [
@@ -122,6 +127,42 @@ class _OrderCardState extends ConsumerState<OrderCard> {
   }
 
   Widget _buildStatusBadge() {
+    final isBooking = _type == 'booking';
+    final bookingStatus = widget.metadata['status'] as String? ?? 'confirmed';
+
+    // For bookings, show booking status
+    if (isBooking) {
+      final isCheckedIn = bookingStatus == 'checked_in';
+      final isCancelled = bookingStatus == 'cancelled';
+      final color = isCheckedIn
+          ? AppColors.success
+          : isCancelled
+              ? AppColors.error
+              : AppColors.info;
+      final label = isCheckedIn
+          ? 'Đã nhận sân'
+          : isCancelled
+              ? 'Đã hủy'
+              : 'Đã xác nhận';
+
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
+      );
+    }
+
+    // For orders, show payment status
     final isPaid = _isPaid;
     final isFailed = _paymentStatus == 'failed';
     final color = isPaid
@@ -133,10 +174,10 @@ class _OrderCardState extends ConsumerState<OrderCard> {
         ? _paymentStatus.split('_').last.toUpperCase()
         : '';
     final label = isPaid
-        ? (method.isNotEmpty ? 'Đã thanh toán ($method)' : 'Đã thanh toán')
+        ? (method.isNotEmpty ? 'TT $method' : 'Đã TT')
         : isFailed
-            ? 'Thanh toán lỗi'
-            : 'Chờ thanh toán';
+            ? 'Lỗi'
+            : 'Chờ TT';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -166,7 +207,7 @@ class _OrderCardState extends ConsumerState<OrderCard> {
     final method = _paymentStatus.contains('_')
         ? _paymentStatus.split('_').last.toUpperCase()
         : '';
-    final methodLabel = method.isNotEmpty ? ' qua $method' : '';
+    final methodLabel = method.isNotEmpty ? ' ($method)' : '';
 
     return Container(
       margin: const EdgeInsets.only(top: 8),
@@ -197,7 +238,7 @@ class _OrderCardState extends ConsumerState<OrderCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${isBooking ? "Đặt sân" : "Đặt hàng"} đã thanh toán$methodLabel',
+                  'Đã thanh toán$methodLabel',
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -339,7 +380,15 @@ class _OrderCardState extends ConsumerState<OrderCard> {
   Widget _orderItemRow(dynamic item) {
     final name = item['name'] as String? ?? '';
     final qty = item['quantity'] as int? ?? 0;
-    final price = (item['total_price'] as num?)?.toDouble() ?? 0;
+    final rawPrice = item['total_price'];
+    final double price;
+    if (rawPrice is num) {
+      price = rawPrice.toDouble();
+    } else if (rawPrice is String) {
+      price = double.tryParse(rawPrice) ?? 0;
+    } else {
+      price = 0;
+    }
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(
@@ -435,7 +484,7 @@ class _OrderCardState extends ConsumerState<OrderCard> {
               onPressed: _handlePay,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.textOnPrimary,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
