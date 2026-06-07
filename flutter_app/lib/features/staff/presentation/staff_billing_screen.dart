@@ -676,14 +676,14 @@ class _BookingBillCard extends StatelessWidget {
                 ),
               )
             else
-              Row(
+              const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.check_circle, color: AppColors.success, size: 14),
-                  const SizedBox(width: 3),
+                  SizedBox(width: 3),
                   Text(
                     'Đã thanh toán',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       color: AppColors.success,
                       fontWeight: FontWeight.w600,
@@ -698,12 +698,12 @@ class _BookingBillCard extends StatelessWidget {
 
           // ── Unpaid items (cần thanh toán) ──────────────────────
           if (totalUnpaid > 0) ...[
-            Padding(
-              padding: const EdgeInsets.only(top: 8, bottom: 4),
+            const Padding(
+              padding: EdgeInsets.only(top: 8, bottom: 4),
               child: Row(
                 children: [
                   Icon(Icons.payment, size: 16, color: AppColors.error),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   Text(
                     'Cần thanh toán',
                     style: TextStyle(
@@ -735,7 +735,7 @@ class _BookingBillCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     'Tổng cần thu',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
@@ -745,7 +745,7 @@ class _BookingBillCard extends StatelessWidget {
                   ),
                   Text(
                     '${currencyFormat.format(totalUnpaid.round())}đ',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
                       color: AppColors.error,
@@ -758,12 +758,12 @@ class _BookingBillCard extends StatelessWidget {
 
           // ── Paid items (đã thanh toán online) ──────────────────
           if (totalPaid > 0) ...[
-            Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 4),
+            const Padding(
+              padding: EdgeInsets.only(top: 12, bottom: 4),
               child: Row(
                 children: [
                   Icon(Icons.check_circle, size: 16, color: AppColors.success),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   Text(
                     'Đã thanh toán online',
                     style: TextStyle(
@@ -803,7 +803,7 @@ class _BookingBillCard extends StatelessWidget {
                   '${currencyFormat.format(totalPaid.round())}đ',
                   color: AppColors.success,
                 ),
-                Divider(height: 8),
+                const Divider(height: 8),
                 _summaryRow(
                   'Cần thu tại quầy',
                   '${currencyFormat.format(totalUnpaid.round())}đ',
