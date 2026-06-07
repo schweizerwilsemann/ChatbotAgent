@@ -3,6 +3,7 @@ import 'package:sports_venue_chatbot/core/network/api_exception.dart';
 import 'package:sports_venue_chatbot/features/payment/data/payment_api.dart';
 import 'package:sports_venue_chatbot/features/payment/data/payment_models.dart';
 import 'package:sports_venue_chatbot/features/payment/domain/payment_repository.dart';
+import 'package:sports_venue_chatbot/features/settings/presentation/app_settings_provider.dart';
 
 class PaymentState {
   final bool isLoading;
@@ -32,8 +33,10 @@ class PaymentState {
 
 class PaymentNotifier extends StateNotifier<PaymentState> {
   final PaymentRepository _repository;
+  final AppSettingsNotifier _settings;
 
-  PaymentNotifier(this._repository) : super(const PaymentState());
+  PaymentNotifier(this._repository, this._settings)
+      : super(const PaymentState());
 
   Future<bool> createPayment({
     required String orderId,
@@ -41,8 +44,18 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
     required String description,
     String orderType = 'booking',
   }) async {
-    state = state.copyWith(isLoading: true, clearError: true, clearPaymentUrl: true);
+    state = state.copyWith(
+        isLoading: true, clearError: true, clearPaymentUrl: true);
     try {
+      final authenticated = await _settings.authenticateForOnlinePayment();
+      if (!authenticated) {
+        state = state.copyWith(
+          isLoading: false,
+          error: _settings.latestError ?? 'Cần xác thực để thanh toán online.',
+        );
+        return false;
+      }
+
       final body = CreatePaymentBody(
         orderId: orderId,
         amount: amount,
@@ -90,5 +103,8 @@ final paymentRepositoryProvider = Provider<PaymentRepository>((ref) {
 
 final paymentProvider =
     StateNotifierProvider<PaymentNotifier, PaymentState>((ref) {
-  return PaymentNotifier(ref.watch(paymentRepositoryProvider));
+  return PaymentNotifier(
+    ref.watch(paymentRepositoryProvider),
+    ref.watch(appSettingsProvider.notifier),
+  );
 });

@@ -23,6 +23,22 @@ class StripeApi {
     return response.data as Map<String, dynamic>;
   }
 
+  Future<Map<String, dynamic>> confirmPaymentIntent({
+    required String paymentIntentId,
+    required String orderId,
+    String orderType = 'booking',
+  }) async {
+    final response = await _dioClient.post<Map<String, dynamic>>(
+      '/api/stripe/confirm-payment-intent',
+      data: {
+        'payment_intent_id': paymentIntentId,
+        'order_id': orderId,
+        'order_type': orderType,
+      },
+    );
+    return response.data as Map<String, dynamic>;
+  }
+
   Future<Map<String, dynamic>> getConfig() async {
     final response = await _dioClient.get<Map<String, dynamic>>(
       '/api/stripe/config',
