@@ -38,6 +38,21 @@ class RealtimeConnectionManager:
         for role, websocket in stale:
             self.disconnect(websocket, role)
 
+    async def broadcast_ui_event(
+        self, roles: list[str], event_type: str, data: dict
+    ) -> None:
+        payload = {"type": "ui_event", "event": event_type, "data": data}
+        encoded = json.dumps(payload, ensure_ascii=False)
+        stale: list[tuple[str, WebSocket]] = []
+        for role in roles:
+            for websocket, _ in list(self._connections.get(role, {}).items()):
+                try:
+                    await websocket.send_text(encoded)
+                except Exception:
+                    stale.append((role, websocket))
+        for role, websocket in stale:
+            self.disconnect(websocket, role)
+
     # ── Room-scoped methods for staff chat ────────────────────────────
 
     async def connect_to_room(

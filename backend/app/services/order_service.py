@@ -6,6 +6,7 @@ from app.repositories.order_repository import OrderRepository
 from app.repositories.venue_repository import VenueRepository
 from app.schemas.order import OrderCreate, OrderItemResponse, OrderResponse
 from app.services.notification_service import NotificationService
+from app.services.realtime import realtime_manager
 
 logger = logging.getLogger(__name__)
 
@@ -137,6 +138,19 @@ class OrderService:
                 source="order",
                 payload=response.model_dump(mode="json"),
             )
+        await realtime_manager.broadcast_ui_event(
+            ["STAFF", "ADMIN"],
+            "order_changed",
+            {
+                "action": "created",
+                "order_id": response.id,
+                "booking_id": response.booking_id,
+                "resource_id": response.resource_id or "",
+                "status": response.status,
+                "payment_status": response.payment_status,
+                "total_price": float(response.total_price),
+            },
+        )
         return response
 
     async def get_order(self, order_id: str) -> OrderResponse | None:
@@ -191,7 +205,21 @@ class OrderService:
             return None
 
         logger.info("Order %s status updated to %s", order_id, status)
-        return self._to_response(updated)
+        response = self._to_response(updated)
+        await realtime_manager.broadcast_ui_event(
+            ["STAFF", "ADMIN"],
+            "order_changed",
+            {
+                "action": "status_updated",
+                "order_id": response.id,
+                "booking_id": response.booking_id,
+                "resource_id": response.resource_id or "",
+                "status": response.status,
+                "payment_status": response.payment_status,
+                "total_price": float(response.total_price),
+            },
+        )
+        return response
 
     @staticmethod
     def _to_response(order) -> OrderResponse:
