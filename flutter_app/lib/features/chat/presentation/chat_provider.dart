@@ -286,6 +286,25 @@ class ChatNotifier extends StateNotifier<ChatState> {
     state = state.copyWith(messages: updated);
   }
 
+  /// Update booking status and time in metadata for messages matching [bookingId].
+  void updateBookingStatus(
+    String bookingId,
+    String status, {
+    String? startTime,
+    String? endTime,
+  }) {
+    final updated = state.messages.map((msg) {
+      if (msg.metadata == null) return msg;
+      if (msg.metadata!['id'] != bookingId) return msg;
+      final newMeta = {...msg.metadata!, 'status': status};
+      if (startTime != null && endTime != null) {
+        newMeta['time'] = '$startTime - $endTime';
+      }
+      return msg.copyWith(metadata: newMeta);
+    }).toList();
+    state = state.copyWith(messages: updated);
+  }
+
   /// Retry the last message
   Future<void> retryLastMessage() async {
     if (state.messages.isEmpty) return;

@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
+import 'package:sports_venue_chatbot/features/admin/presentation/realtime_event_provider.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_provider.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/voice_input_provider.dart';
@@ -24,6 +27,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
   bool _showVoiceOverlay = false;
+  StreamSubscription<RealtimeUiEvent>? _realtimeSub;
 
   @override
   void initState() {
@@ -31,11 +35,46 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _textController.addListener(() => setState(() {}));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
+      _startListening();
+    });
+  }
+
+  void _startListening() {
+    final realtimeNotifier = ref.read(realtimeEventProvider.notifier);
+    realtimeNotifier.start();
+    _realtimeSub = realtimeNotifier.eventStream.listen((event) {
+      if (event.type == 'court_status_changed') {
+        final bookingId = event.data['booking_id']?.toString();
+        final status = event.data['status']?.toString();
+        final startTime = event.data['start_time']?.toString();
+        final endTime = event.data['end_time']?.toString();
+        if (bookingId != null && status != null) {
+          debugPrint(
+              '[Chat] court_status_changed: booking=$bookingId, status=$status');
+          ref.read(chatProvider.notifier).updateBookingStatus(
+                bookingId,
+                status,
+                startTime: startTime,
+                endTime: endTime,
+              );
+        }
+      } else if (event.type == 'payment_status_changed') {
+        final orderId = event.orderId;
+        final paymentStatus = event.data['payment_status']?.toString();
+        if (orderId != null && paymentStatus != null) {
+          debugPrint(
+              '[Chat] payment_status_changed: order=$orderId, status=$paymentStatus');
+          ref
+              .read(chatProvider.notifier)
+              .updatePaymentStatus(orderId, paymentStatus);
+        }
+      }
     });
   }
 
   @override
   void dispose() {
+    _realtimeSub?.cancel();
     _textController.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
@@ -437,7 +476,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       : (_textController.text.trim().isEmpty
                           ? Icons.mic
                           : Icons.send),
-                  color: Colors.white,
+                  color: AppColors.textOnPrimary,
                   size: 20,
                 ),
                 onPressed: isLoading

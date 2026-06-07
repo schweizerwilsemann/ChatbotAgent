@@ -17,12 +17,14 @@ from app.repositories.venue_repository import VenueRepository
 from app.schemas.booking import (
     AvailabilityResponse,
     BookingBillResponse,
+    BookingCheckInConfirm,
     BookingCreate,
     BookingResponse,
 )
 from app.services.order_service import OrderService
 from app.services.booking_service import BookingService
 from app.services.notification_service import NotificationService
+from app.services.realtime import realtime_manager
 
 logger = logging.getLogger(__name__)
 
@@ -188,6 +190,85 @@ async def get_day_availability(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
+@router.post("/{booking_id}/confirm-checkin", response_model=BookingResponse)
+async def confirm_booking_checkin(
+    booking_id: str,
+    data: BookingCheckInConfirm,
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> BookingResponse:
+    """Customer confirms that they received the court by scanning staff's QR token."""
+    try:
+        booking_repo = BookingRepository(session)
+        booking = await booking_repo.get_by_id(booking_id)
+        if not booking:
+            raise HTTPException(status_code=404, detail="Booking not found")
+        if booking.user_id != str(user.id):
+            raise HTTPException(
+                status_code=403,
+                detail="Cannot check in another user's booking",
+            )
+        if booking.status == "checked_in":
+            return BookingService._to_response(booking)
+        if booking.status != "confirmed":
+            raise HTTPException(
+                status_code=400,
+                detail=f"Cannot check in booking with status '{booking.status}'",
+            )
+        if not booking.checkin_token or booking.checkin_token != data.token:
+            raise HTTPException(status_code=400, detail="Invalid check-in token")
+
+        updated = await booking_repo.confirm_checkin(
+            booking_id,
+            checked_in_by=str(user.id),
+        )
+        if not updated:
+            raise HTTPException(status_code=404, detail="Booking not found")
+
+        notification_service = NotificationService(
+            NotificationRepository(session),
+            VenueRepository(session),
+        )
+        await notification_service.notify_operations(
+            event_type="booking.checked_in",
+            title="Khách đã nhận sân",
+            message=(
+                f"{updated.resource_label or f'Sân {updated.court_number}'} "
+                "đã được khách xác nhận nhận sân"
+            ),
+            source="customer",
+            payload={
+                "booking_id": str(updated.id),
+                "user_id": str(user.id),
+                "venue_id": str(updated.venue_id) if updated.venue_id else "",
+                "resource_id": str(updated.resource_id) if updated.resource_id else "",
+                "resource_label": updated.resource_label or "",
+                "status": "checked_in",
+            },
+        )
+        await realtime_manager.broadcast_ui_event(
+            ["STAFF", "ADMIN", "CUSTOMER"],
+            "court_status_changed",
+            {
+                "booking_id": str(updated.id),
+                "user_id": str(user.id),
+                "resource_id": str(updated.resource_id) if updated.resource_id else "",
+                "resource_label": updated.resource_label or "",
+                "status": "checked_in",
+                "start_time": updated.start_time.isoformat() if updated.start_time else None,
+                "end_time": updated.end_time.isoformat() if updated.end_time else None,
+            },
+        )
+        return BookingService._to_response(updated)
+    except HTTPException:
+        raise
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Error confirming booking check-in")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
 @router.get("/user/{user_id}", response_model=list[BookingResponse])
 async def get_user_bookings(
     user_id: str,
@@ -271,10 +352,29 @@ def _booking_bill_response(booking, orders) -> BookingBillResponse:
     booking_total = (
         Decimal(str(booking.total_price)) if booking.total_price is not None else None
     )
+    grand_total = order_total + (booking_total or Decimal("0"))
+    paid_total = sum(
+        (
+            order.total_price
+            for order in orders
+            if _is_paid_status(getattr(order, "payment_status", None))
+        ),
+        start=Decimal("0"),
+    )
+    if booking_total is not None and _is_paid_status(
+        getattr(booking, "payment_status", None)
+    ):
+        paid_total += booking_total
     return BookingBillResponse(
         booking=BookingService._to_response(booking),
         orders=[OrderService._to_response(order) for order in orders],
         order_total=order_total,
         booking_total=booking_total,
-        grand_total=order_total + (booking_total or Decimal("0")),
+        grand_total=grand_total,
+        paid_total=paid_total,
+        unpaid_total=max(grand_total - paid_total, Decimal("0")),
     )
+
+
+def _is_paid_status(payment_status: str | None) -> bool:
+    return (payment_status or "").startswith("paid")

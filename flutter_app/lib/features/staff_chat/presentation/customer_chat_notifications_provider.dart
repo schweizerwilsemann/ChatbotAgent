@@ -126,6 +126,19 @@ class CustomerChatNotificationsNotifier
       debugPrint(
           '[CustomerNoti] Received WS message: ${raw.toString().substring(0, raw.toString().length.clamp(0, 200))}');
       final decoded = jsonDecode(raw.toString()) as Map<String, dynamic>;
+
+      // Handle ui_event (court_status_changed, payment_status_changed, etc.)
+      if (decoded['type']?.toString() == 'ui_event') {
+        final eventType = decoded['event']?.toString() ?? '';
+        final data = decoded['data'] as Map<String, dynamic>? ?? {};
+        debugPrint('[CustomerNoti] UI event: $eventType');
+
+        if (eventType == 'court_status_changed') {
+          _handleCourtStatusChanged(data);
+        }
+        return;
+      }
+
       if (decoded['event_type']?.toString() != 'staff_chat_message') {
         debugPrint(
             '[CustomerNoti] Ignoring non-chat event: ${decoded['event_type']}');
@@ -149,6 +162,22 @@ class CustomerChatNotificationsNotifier
       debugPrint('[CustomerNoti] Error handling WS message: $e');
       return;
     }
+  }
+
+  void _handleCourtStatusChanged(Map<String, dynamic> data) {
+    final bookingId = data['booking_id']?.toString();
+    final status = data['status']?.toString();
+    if (bookingId == null || status == null) return;
+
+    debugPrint(
+        '[CustomerNoti] Court status changed: booking=$bookingId, status=$status');
+
+    _localNotifications.showOperationNotification(
+      title: 'Cập nhật đặt sân',
+      body: status == 'checked_in'
+          ? 'Bạn đã nhận sân thành công!'
+          : 'Trạng thái sân đã thay đổi',
+    );
   }
 
   void _scheduleReconnect() {
