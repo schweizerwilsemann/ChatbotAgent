@@ -10,6 +10,7 @@ from app.core.database import get_db
 from app.core.rate_limit import rate_limit
 from app.models.user import User
 from app.repositories.booking_repository import BookingRepository
+from app.repositories.notification_repository import NotificationRepository
 from app.repositories.order_repository import OrderRepository
 from app.repositories.payment_repository import PaymentRepository
 from app.repositories.user_repository import UserRepository
@@ -28,7 +29,8 @@ async def _get_payment_service(
     repo = PaymentRepository(session)
     booking_repo = BookingRepository(session)
     order_repo = OrderRepository(session)
-    return PaymentService(repo, booking_repo, order_repo)
+    notification_repo = NotificationRepository(session)
+    return PaymentService(repo, booking_repo, order_repo, notification_repo)
 
 
 @router.post("/create-payment-intent")
@@ -51,6 +53,14 @@ async def create_payment_intent(
         amount_int = int(amount)
     except (TypeError, ValueError):
         raise HTTPException(status_code=400, detail="amount must be an integer")
+
+    # Stripe minimum is 50 cents USD ≈ 13,000 VND
+    STRIPE_MIN_VND = 13_000
+    if amount_int < STRIPE_MIN_VND:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Số tiền tối thiểu để thanh toán online là {STRIPE_MIN_VND:,}đ",
+        )
 
     ok, error = await service.create_checkout_record(
         order_id=order_id,
@@ -99,6 +109,84 @@ async def create_payment_intent(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/confirm-payment-intent")
+async def confirm_payment_intent(
+    body: dict,
+    _: None = Depends(rate_limit(limit=20, window_seconds=60, scope="stripe")),
+    user: User = Depends(get_current_user),
+    service: PaymentService = Depends(_get_payment_service),
+) -> dict:
+    payment_intent_id = body.get("payment_intent_id")
+    requested_order_id = body.get("order_id")
+    requested_order_type = body.get("order_type")
+
+    if not payment_intent_id:
+        raise HTTPException(status_code=400, detail="payment_intent_id is required")
+
+    try:
+        intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+    except stripe.error.StripeError as e:
+        logger.exception("Stripe PaymentIntent retrieve error")
+        raise HTTPException(status_code=500, detail=str(e))
+
+    if intent.status != "succeeded":
+        raise HTTPException(
+            status_code=400,
+            detail=f"Stripe payment is not completed: {intent.status}",
+        )
+
+    metadata = intent.metadata.to_dict() if intent.metadata else {}
+    order_id = metadata.get("order_id") or requested_order_id
+    order_type = metadata.get("order_type") or requested_order_type
+    metadata_user_id = metadata.get("user_id")
+
+    if metadata_user_id and metadata_user_id != str(user.id):
+        raise HTTPException(status_code=403, detail="Payment does not belong to user")
+    if not order_id:
+        raise HTTPException(status_code=400, detail="order_id metadata is required")
+
+    txn = await service._repo.get_by_order_id(order_id)
+    if not txn:
+        raise HTTPException(status_code=404, detail="Payment record not found")
+
+    resolved_order_type = order_type or txn.order_type
+    if requested_order_type and txn.order_type != requested_order_type:
+        raise HTTPException(status_code=400, detail="Payment order type mismatch")
+    if requested_order_id and txn.order_id != requested_order_id:
+        raise HTTPException(status_code=400, detail="Payment order ID mismatch")
+
+    paid_amount = int(intent.amount_received or intent.amount or 0)
+    if txn.amount != paid_amount:
+        raise HTTPException(status_code=400, detail="Payment amount mismatch")
+
+    # Save amount before flush (txn will be expired after confirm)
+    txn_amount = txn.amount
+
+    if txn.status != "completed":
+        await service.confirm_external_payment(
+            order_id=order_id,
+            transaction_no=intent.id,
+            response_code="00",
+            bank_code="stripe",
+            is_success=True,
+            order_type=resolved_order_type,
+        )
+    else:
+        await service.mark_entity_payment_status(
+            order_id=order_id,
+            order_type=resolved_order_type,
+            payment_status="paid_stripe",
+        )
+
+    return {
+        "status": "confirmed",
+        "order_id": order_id,
+        "order_type": resolved_order_type,
+        "payment_status": "paid_stripe",
+        "amount": txn_amount,
+    }
+
+
 @router.post("/create-checkout")
 async def create_stripe_checkout(
     body: dict,
@@ -120,6 +208,14 @@ async def create_stripe_checkout(
         amount_int = int(amount)
     except (TypeError, ValueError):
         raise HTTPException(status_code=400, detail="amount must be an integer")
+
+    # Stripe minimum is 50 cents USD ≈ 13,000 VND
+    STRIPE_MIN_VND = 13_000
+    if amount_int < STRIPE_MIN_VND:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Số tiền tối thiểu để thanh toán online là {STRIPE_MIN_VND:,}đ",
+        )
 
     ok, error = await service.create_checkout_record(
         order_id=order_id,
@@ -258,7 +354,7 @@ async def stripe_webhook(
         if txn and txn.status != "completed":
             await service.confirm_external_payment(
                 order_id=order_id,
-                transaction_no=intent.get("id"),
+            transaction_no=intent.id,
                 response_code="00",
                 bank_code="stripe",
                 is_success=True,
