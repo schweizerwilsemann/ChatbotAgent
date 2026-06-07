@@ -181,3 +181,11 @@ app.include_router(stripe_router)
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "env": settings.APP_ENV}
+
+
+@app.post("/debug/clear-cache")
+async def clear_cache():
+    """Debug endpoint to clear all SQLAlchemy caches."""
+    from app.core.database import clear_all_caches
+    await clear_all_caches()
+    return {"status": "cache cleared"}

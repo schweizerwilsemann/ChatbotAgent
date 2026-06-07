@@ -526,6 +526,10 @@ async def ensure_user_password_column(engine: AsyncEngine) -> None:
 async def ensure_multi_tenant_columns(engine: AsyncEngine) -> None:
     async with engine.begin() as conn:
         statements = [
+            "ALTER TYPE booking_status_enum ADD VALUE IF NOT EXISTS 'checked_in'",
+            "ALTER TYPE staff_request_type_enum ADD VALUE IF NOT EXISTS 'early_arrival'",
+            "ALTER TYPE staff_request_type_enum ADD VALUE IF NOT EXISTS 'late_arrival'",
+            "ALTER TYPE staff_request_type_enum ADD VALUE IF NOT EXISTS 'schedule_change'",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS business_id UUID",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS default_venue_id UUID",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR(255)",
@@ -536,8 +540,12 @@ async def ensure_multi_tenant_columns(engine: AsyncEngine) -> None:
             "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS resource_id UUID",
             "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS resource_label VARCHAR(255)",
             "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) NOT NULL DEFAULT 'unpaid'",
+            "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS checkin_token VARCHAR(128)",
+            "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS checked_in_at TIMESTAMPTZ",
+            "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS checked_in_by VARCHAR(128)",
             "CREATE INDEX IF NOT EXISTS ix_bookings_venue_id ON bookings (venue_id)",
             "CREATE INDEX IF NOT EXISTS ix_bookings_resource_id ON bookings (resource_id)",
+            "CREATE UNIQUE INDEX IF NOT EXISTS ix_bookings_checkin_token ON bookings (checkin_token)",
             "ALTER TABLE orders ADD COLUMN IF NOT EXISTS venue_id UUID",
             "ALTER TABLE orders ADD COLUMN IF NOT EXISTS booking_id UUID",
             "ALTER TABLE orders ADD COLUMN IF NOT EXISTS resource_id UUID",

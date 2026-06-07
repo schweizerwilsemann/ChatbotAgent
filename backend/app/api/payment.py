@@ -10,6 +10,7 @@ from app.core.database import get_db
 from app.core.rate_limit import rate_limit
 from app.models.user import User
 from app.repositories.booking_repository import BookingRepository
+from app.repositories.notification_repository import NotificationRepository
 from app.repositories.order_repository import OrderRepository
 from app.repositories.payment_repository import PaymentRepository
 from app.schemas.payment import (
@@ -36,7 +37,8 @@ async def _get_payment_service(
     repo = PaymentRepository(session)
     booking_repo = BookingRepository(session)
     order_repo = OrderRepository(session)
-    return PaymentService(repo, booking_repo, order_repo)
+    notification_repo = NotificationRepository(session)
+    return PaymentService(repo, booking_repo, order_repo, notification_repo)
 
 
 @router.post("/create", response_model=CreatePaymentResponse)
