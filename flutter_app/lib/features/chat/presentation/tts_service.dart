@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -18,11 +19,33 @@ class TtsService {
   Future<void> _ensureConfigured() async {
     if (_initialized) return;
 
+    // Configure audio session for communication mode (enables AEC)
+    await _configureAudioSession();
+
     await _tts.awaitSpeakCompletion(true);
     await _tts.setVolume(1.0);
     await _tts.setPitch(1.0);
     await _tts.setSpeechRate(0.55);
     _initialized = true;
+  }
+
+  Future<void> _configureAudioSession() async {
+    try {
+      final session = await AudioSession.instance;
+      await session.configure(const AudioSessionConfiguration(
+        avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+        avAudioSessionMode: AVAudioSessionMode.voiceChat,
+        androidAudioAttributes: AndroidAudioAttributes(
+          usage: AndroidAudioUsage.voiceCommunication,
+          contentType: AndroidAudioContentType.speech,
+        ),
+        androidAudioFocusGainType:
+            AndroidAudioFocusGainType.gainTransientExclusive,
+        androidWillPauseWhenDucked: false,
+      ));
+    } catch (e) {
+      debugPrint('[TtsService] Audio session config failed: $e');
+    }
   }
 
   Future<void> speak(String text, {VoiceAgentLocale? locale}) async {

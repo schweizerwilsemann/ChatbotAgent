@@ -79,7 +79,13 @@ class VoiceAgentController extends StateNotifier<VoiceAgentCallData> {
   bool _disposed = false;
   List<String?> _localeIds = const [];
   Timer? _retryTimer;
+  Timer? _endOfTurnTimer;
   VoiceAgentLocale _lastSpokenLocale = VoiceAgentLocale.vietnamese;
+
+  // End-of-turn detection
+  double _lastConfidence = 0.0;
+  static const double _minConfidence = 0.5;
+  static const Duration _endOfTurnDelay = Duration(milliseconds: 800);
 
   static const int _maxLevels = 32;
 
@@ -147,6 +153,7 @@ class VoiceAgentController extends StateNotifier<VoiceAgentCallData> {
   Future<void> retryListening() async {
     if (!_active || _disposed || _startingListen) return;
     _retryTimer?.cancel();
+    _endOfTurnTimer?.cancel();
     _retryTimer = null;
     if (_initialized) {
       await _speech.cancel();
@@ -247,8 +254,10 @@ class VoiceAgentController extends StateNotifier<VoiceAgentCallData> {
     if (!_active || _disposed || _startingListen) return;
     _startingListen = true;
     _retryTimer?.cancel();
+    _endOfTurnTimer?.cancel();
     _retryTimer = null;
     _hasRecognizedText = false;
+    _lastConfidence = 0.0;
 
     final localeId = _nextLocaleId();
     state = state.copyWith(
@@ -305,6 +314,7 @@ class VoiceAgentController extends StateNotifier<VoiceAgentCallData> {
     final text = result.recognizedWords.trim();
     if (text.isNotEmpty) {
       _hasRecognizedText = true;
+      _lastConfidence = result.confidence;
       state = state.copyWith(transcript: text);
 
       // If user starts speaking while TTS is active, stop TTS immediately
@@ -319,7 +329,17 @@ class VoiceAgentController extends StateNotifier<VoiceAgentCallData> {
       return;
     }
 
-    unawaited(_handleUserTurn(text));
+    // End-of-turn detection: wait a bit to ensure user finished speaking
+    _endOfTurnTimer?.cancel();
+    _endOfTurnTimer = Timer(_endOfTurnDelay, () {
+      if (!_active || _disposed) return;
+      if (_lastConfidence >= _minConfidence) {
+        unawaited(_handleUserTurn(text));
+      } else {
+        // Low confidence - ask user to repeat
+        _showListenError('Mimo chưa nghe rõ. Chạm mic để nói lại.');
+      }
+    });
   }
 
   Future<void> _handleUserTurn(String text) async {
@@ -534,6 +554,7 @@ class VoiceAgentController extends StateNotifier<VoiceAgentCallData> {
     _disposed = true;
     _active = false;
     _retryTimer?.cancel();
+    _endOfTurnTimer?.cancel();
     unawaited(_speech.cancel());
     unawaited(_ttsService.stop());
     super.dispose();
