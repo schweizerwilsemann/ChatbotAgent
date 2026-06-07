@@ -6,6 +6,10 @@
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Cần truy cập microphone để ghi âm giọng nói của bạn</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Cần truy cập camera để quét mã QR nhận sân</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Cần dùng Face ID để xác thực thanh toán online</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Cần truy cập để nhận diện giọng nói của bạn thành văn bản</string>
 	<key>CFBundleDevelopmentRegion</key>
