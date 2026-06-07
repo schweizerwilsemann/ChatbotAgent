@@ -77,7 +77,6 @@ class VoiceAgentController extends StateNotifier<VoiceAgentCallData> {
   bool _startingListen = false;
   bool _hasRecognizedText = false;
   bool _disposed = false;
-  int _localeIndex = 0;
   List<String?> _localeIds = const [];
   Timer? _retryTimer;
   VoiceAgentLocale _lastSpokenLocale = VoiceAgentLocale.vietnamese;
@@ -283,9 +282,13 @@ class VoiceAgentController extends StateNotifier<VoiceAgentCallData> {
 
   String? _nextLocaleId() {
     if (_localeIds.isEmpty) return null;
-    final preferred = _localeIds[_localeIndex % _localeIds.length];
-    _localeIndex += 1;
-    return preferred;
+    // Always prefer Vietnamese locale for listening
+    final viIndex = _localeIds.indexWhere(
+      (id) => id != null && id.toLowerCase().startsWith('vi'),
+    );
+    if (viIndex >= 0) return _localeIds[viIndex];
+    // Fallback to first available locale
+    return _localeIds.first;
   }
 
   String _localeLabel(String? localeId) {
@@ -303,6 +306,11 @@ class VoiceAgentController extends StateNotifier<VoiceAgentCallData> {
     if (text.isNotEmpty) {
       _hasRecognizedText = true;
       state = state.copyWith(transcript: text);
+
+      // If user starts speaking while TTS is active, stop TTS immediately
+      if (state.status == VoiceAgentCallStatus.speaking) {
+        unawaited(_ttsService.stop());
+      }
     }
 
     if (!result.finalResult) return;
@@ -356,8 +364,76 @@ class VoiceAgentController extends StateNotifier<VoiceAgentCallData> {
       status: VoiceAgentCallStatus.speaking,
       lastAssistantText: response,
     );
-    await _speak(response, locale: responseLocale);
+
+    // Start listening immediately while speaking (barge-in support)
+    _startListeningWhileSpeaking();
+    // Use lower volume to reduce echo during barge-in
+    await _ttsService.speakWithBargeIn(response, locale: responseLocale);
+
+    // TTS finished - cancel barge-in listening and reset flag
+    if (!_active || _disposed) return;
+    if (_hasRecognizedText) {
+      // User already spoke during TTS, handled by _onResultWhileSpeaking
+      return;
+    }
+    _startingListen = false;
+    try {
+      await _speech.cancel();
+    } catch (_) {}
+    // Small delay to let audio settle before listening again
+    await Future<void>.delayed(const Duration(milliseconds: 300));
     await _ensureNextTurn();
+  }
+
+  void _startListeningWhileSpeaking() {
+    if (!_active || _disposed || _startingListen) return;
+    _startingListen = true;
+    _hasRecognizedText = false;
+
+    final localeId = _nextLocaleId();
+
+    try {
+      _speech.listen(
+        onResult: _onResultWhileSpeaking,
+        onSoundLevelChange: _onSoundLevelChange,
+        listenOptions: SpeechListenOptions(
+          localeId: localeId,
+          listenFor: const Duration(seconds: 60),
+          pauseFor: const Duration(seconds: 4),
+          partialResults: true,
+          cancelOnError: false,
+          listenMode: ListenMode.dictation,
+        ),
+      );
+    } catch (e, st) {
+      debugPrint('[VoiceAgent] barge-in listen exception: $e\n$st');
+      _startingListen = false;
+    }
+  }
+
+  void _onResultWhileSpeaking(SpeechRecognitionResult result) {
+    if (!_active || _disposed) return;
+
+    final text = result.recognizedWords.trim();
+    if (text.isEmpty) return;
+
+    // User is speaking while TTS is active - stop TTS immediately
+    _hasRecognizedText = true;
+    state = state.copyWith(transcript: text);
+
+    // Stop TTS but keep listening for final result
+    unawaited(_ttsService.stop());
+
+    if (!result.finalResult) return;
+
+    // Now we have the final result, cancel listening and process
+    _startingListen = false;
+    unawaited(_speech.cancel());
+
+    state = state.copyWith(
+      status: VoiceAgentCallStatus.thinking,
+    );
+    unawaited(_handleUserTurn(text));
   }
 
   Future<void> _speak(String text, {required VoiceAgentLocale locale}) async {
@@ -384,11 +460,15 @@ class VoiceAgentController extends StateNotifier<VoiceAgentCallData> {
   void _onStatus(String status) {
     if (!_active || _disposed) return;
 
-    if ((status == SpeechToText.doneStatus ||
-            status == SpeechToText.notListeningStatus) &&
-        state.status == VoiceAgentCallStatus.listening &&
-        !_hasRecognizedText) {
-      _showListenError('Mimo chưa nghe rõ. Chạm mic để nói lại.');
+    // Reset startingListen flag when speech recognition ends
+    if (status == SpeechToText.doneStatus ||
+        status == SpeechToText.notListeningStatus) {
+      _startingListen = false;
+
+      if (state.status == VoiceAgentCallStatus.listening &&
+          !_hasRecognizedText) {
+        _showListenError('Mimo chưa nghe rõ. Chạm mic để nói lại.');
+      }
     }
   }
 

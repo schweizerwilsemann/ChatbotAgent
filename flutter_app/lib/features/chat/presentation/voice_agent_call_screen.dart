@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
@@ -189,6 +190,7 @@ class _VoiceAgentCallScreenState extends ConsumerState<VoiceAgentCallScreen> {
             label: 'Mimo',
             text: callState.lastAssistantText,
             color: AppColors.info,
+            useMarkdown: true,
           ),
         ],
         if (error != null) ...[
@@ -280,12 +282,14 @@ class _SpeechLine extends StatelessWidget {
   final String label;
   final String text;
   final Color color;
+  final bool useMarkdown;
 
   const _SpeechLine({
     required this.icon,
     required this.label,
     required this.text,
     required this.color,
+    this.useMarkdown = false,
   });
 
   @override
@@ -316,14 +320,65 @@ class _SpeechLine extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  text,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 14,
-                    height: 1.35,
-                  ),
-                ),
+                useMarkdown
+                    ? MarkdownBody(
+                        data: text,
+                        styleSheet: MarkdownStyleSheet(
+                          p: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 14,
+                            height: 1.35,
+                          ),
+                          strong: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          em: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 14,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          listBullet: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 14,
+                          ),
+                          code: TextStyle(
+                            backgroundColor:
+                                AppColors.border.withValues(alpha: 0.3),
+                            color: AppColors.textPrimary,
+                            fontSize: 12,
+                            fontFamily: 'monospace',
+                          ),
+                          codeblockDecoration: BoxDecoration(
+                            color: AppColors.border.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          h1: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          h2: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          h3: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                    : Text(
+                        text,
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 14,
+                          height: 1.35,
+                        ),
+                      ),
               ],
             ),
           ),
