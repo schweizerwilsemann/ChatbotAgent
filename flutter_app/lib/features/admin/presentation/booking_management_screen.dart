@@ -1374,7 +1374,7 @@ class _PaymentBadge extends StatelessWidget {
         ? paymentStatus.split('_').last.toUpperCase()
         : '';
     final label = isPaid
-        ? (method.isNotEmpty ? 'Đã thanh toán bằng $method' : 'Đã thanh toán')
+        ? (method.isNotEmpty ? 'Đã TT bằng $method' : 'Đã thanh toán')
         : isFailed
             ? 'Thanh toán lỗi'
             : 'Chưa thanh toán';
