@@ -131,8 +131,9 @@ async def create_resource(
     if not venue:
         raise HTTPException(status_code=404, detail="Venue not found")
     resource = await repo.create_resource(**data.model_dump())
+    result = _resource_response({"resource": resource, "area_name": None})
     await session.commit()
-    return _resource_response({"resource": resource, "area_name": None})
+    return result
 
 
 @router.patch(
@@ -152,8 +153,9 @@ async def update_resource(
     resource = await repo.update_resource(resource_id, **update_data)
     if not resource:
         raise HTTPException(status_code=404, detail="Resource not found")
+    result = _resource_response({"resource": resource, "area_name": None})
     await session.commit()
-    return _resource_response({"resource": resource, "area_name": None})
+    return result
 
 
 @router.get(
@@ -162,11 +164,16 @@ async def update_resource(
 )
 async def list_staff_assignments(
     staff_id: str | None = Query(None),
-    _: User = Depends(require_roles("ADMIN")),
+    user: User = Depends(require_roles("ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> list[StaffAssignmentResponse]:
     repo = VenueRepository(session)
+    venue_scope_ids = None
+    if user.default_venue_id:
+        venue_scope_ids = {user.default_venue_id}
     assignments = await repo.list_staff_assignments(staff_id=staff_id)
+    if venue_scope_ids is not None:
+        assignments = [a for a in assignments if a.venue_id in venue_scope_ids]
     return [_assignment_response(assignment) for assignment in assignments]
 
 
@@ -177,15 +184,27 @@ async def list_staff_assignments(
 )
 async def create_staff_assignment(
     data: StaffAssignmentCreate,
-    _: User = Depends(require_roles("ADMIN")),
+    user: User = Depends(require_roles("ADMIN")),
     session: AsyncSession = Depends(get_db),
 ) -> StaffAssignmentResponse:
     repo = VenueRepository(session)
-    venue = await repo.get_venue_by_id(data.venue_id)
+    venue_id = data.venue_id
+    if user.default_venue_id:
+        venue_id = str(user.default_venue_id)
+    venue = await repo.get_venue_by_id(venue_id)
     if not venue:
         raise HTTPException(status_code=404, detail="Venue not found")
     if data.resource_id and not await repo.get_resource_by_id(data.resource_id):
         raise HTTPException(status_code=404, detail="Resource not found")
-    assignment = await repo.create_staff_assignment(**data.model_dump())
+    assignment = await repo.create_staff_assignment(
+        staff_id=data.staff_id,
+        venue_id=venue_id,
+        area_id=data.area_id,
+        resource_id=data.resource_id,
+        scope=data.scope,
+        starts_at=data.starts_at,
+        ends_at=data.ends_at,
+    )
+    result = _assignment_response(assignment)
     await session.commit()
-    return _assignment_response(assignment)
+    return result

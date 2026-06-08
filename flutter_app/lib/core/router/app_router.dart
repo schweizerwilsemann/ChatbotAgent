@@ -9,6 +9,7 @@ import 'package:sports_venue_chatbot/features/admin/presentation/dashboard_scree
 import 'package:sports_venue_chatbot/features/admin/presentation/booking_management_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/menu_management_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/billing_screen.dart';
+import 'package:sports_venue_chatbot/features/admin/presentation/staff_management_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/admin_notifications_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/resource_pricing_screen.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
@@ -203,6 +204,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'admin_billing',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: BillingScreen()),
+          ),
+          GoRoute(
+            path: '/admin/staff',
+            name: 'admin_staff',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: StaffManagementScreen()),
           ),
 
           // Staff routes

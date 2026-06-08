@@ -298,4 +298,20 @@ class AdminApi {
       rethrow;
     }
   }
+
+  // ─── Recent Activity ─────────────────────────────────────────────────
+
+  Future<List<ActivityItem>> getRecentActivity() async {
+    try {
+      final response = await _dioClient.get<Map<String, dynamic>>(
+        ApiConstants.adminRecentActivityEndpoint,
+      );
+      final list = response.data!['activities'] as List<dynamic>? ?? [];
+      return list
+          .map((json) => ActivityItem.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

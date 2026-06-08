@@ -81,8 +81,10 @@ async def mark_notification_read(
     notification = await repo.mark_as_read(notification_id)
     if not notification:
         raise HTTPException(status_code=404, detail="Notification not found")
+    notif_id = str(notification.id)
+    read_at = notification.read_at.isoformat()
     await session.commit()
-    return {"id": str(notification.id), "read_at": notification.read_at.isoformat()}
+    return {"id": notif_id, "read_at": read_at}
 
 
 @router.patch("/notifications/read-all")

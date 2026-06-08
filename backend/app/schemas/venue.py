@@ -129,3 +129,53 @@ class StaffAssignmentCreate(BaseModel):
         if normalized not in allowed:
             raise ValueError(f"scope must be one of {allowed}")
         return normalized
+
+
+# ─── Staff Management ────────────────────────────────────────────────────
+
+
+class StaffCreate(BaseModel):
+    phone: str = Field(..., min_length=7, max_length=20)
+    name: str = Field(..., min_length=1, max_length=100)
+    email: str | None = Field(None, max_length=255)
+    password: str = Field(..., min_length=8, max_length=128)
+
+
+class StaffUpdate(BaseModel):
+    name: str | None = Field(None, min_length=1, max_length=100)
+    email: str | None = Field(None, max_length=255)
+    default_venue_id: str | None = None
+    is_active: bool | None = None
+
+
+class StaffResponse(BaseModel):
+    id: str
+    phone: str
+    name: str
+    email: str | None = None
+    role: str
+    default_venue_id: str | None = None
+    is_active: bool = True
+    created_at: datetime
+    updated_at: datetime
+
+
+class StaffListResponse(BaseModel):
+    staff: list[StaffResponse]
+    total: int
+
+
+class AssignmentWithDetails(BaseModel):
+    id: str
+    staff_id: str
+    staff_name: str
+    venue_id: str
+    venue_name: str
+    area_id: str | None = None
+    area_name: str | None = None
+    resource_id: str | None = None
+    resource_label: str | None = None
+    scope: str
+    starts_at: datetime | None = None
+    ends_at: datetime | None = None
+    is_active: bool

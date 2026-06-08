@@ -17,6 +17,7 @@ from app.repositories.admin_repository import AdminRepository
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.venue_repository import VenueRepository
 from app.schemas.admin import (
+    ActivityItem,
     AdminBookingResponse,
     AnalyticsResponse,
     BookingBillResponse,
@@ -32,8 +33,18 @@ from app.schemas.admin import (
     MenuItemCreate,
     MenuItemResponse,
     MenuItemUpdate,
+    RecentActivityResponse,
 )
 from app.schemas.order import OrderItemResponse, OrderResponse, StaffOrderItemResponse, StaffOrderResponse
+from app.schemas.venue import (
+    AssignmentWithDetails,
+    StaffAssignmentResponse,
+    StaffCreate,
+    StaffListResponse,
+    StaffResponse,
+    StaffUpdate,
+)
+from app.repositories.user_repository import UserRepository
 from app.services.notification_service import NotificationService
 from app.services.realtime import realtime_manager
 
@@ -406,6 +417,146 @@ async def dashboard(
         )
     except Exception as exc:
         logger.exception("Error fetching dashboard")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+def _time_ago(dt: datetime | None) -> str:
+    if dt is None:
+        return ""
+    now = datetime.now(timezone.utc)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    diff = now - dt
+    seconds = int(diff.total_seconds())
+    if seconds < 60:
+        return "Vừa xong"
+    minutes = seconds // 60
+    if minutes < 60:
+        return f"{minutes} phút trước"
+    hours = minutes // 60
+    if hours < 24:
+        return f"{hours} giờ trước"
+    days = hours // 24
+    return f"{days} ngày trước"
+
+
+COURT_TYPE_VI = {
+    "billiards": "Billiards",
+    "pickleball": "Pickleball",
+    "badminton": "Cầu lông",
+}
+
+BOOKING_STATUS_VI = {
+    "confirmed": "đã xác nhận",
+    "checked_in": "đã nhận sân",
+    "cancelled": "đã huỷ",
+    "completed": "hoàn thành",
+}
+
+ORDER_STATUS_VI = {
+    "pending": "chờ xử lý",
+    "preparing": "đang chuẩn bị",
+    "ready": "sẵn sàng",
+    "delivered": "đã giao",
+    "cancelled": "đã huỷ",
+}
+
+
+@router.get("/recent-activity", response_model=RecentActivityResponse)
+async def recent_activity(
+    user: User = Depends(require_roles("ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> RecentActivityResponse:
+    """Return recent bookings and orders as activity feed."""
+    try:
+        repo = _admin_repo(session)
+        venue_scope_ids, resource_ids = await _operation_scope(user, session)
+
+        recent_bookings = await repo.get_all_bookings(
+            venue_scope_ids=venue_scope_ids,
+            resource_ids=resource_ids,
+            limit=10,
+        )
+        recent_orders = await repo.get_all_orders(
+            venue_scope_ids=venue_scope_ids,
+            resource_ids=resource_ids,
+            limit=10,
+        )
+
+        activities: list[ActivityItem] = []
+
+        for entry in recent_bookings:
+            booking = entry["booking"]
+            user_name = entry.get("user_name") or "Khách"
+            court_label = booking.resource_label or f"Sân {booking.court_number}"
+            ct = COURT_TYPE_VI.get(booking.court_type, booking.court_type)
+            status_vi = BOOKING_STATUS_VI.get(booking.status, booking.status)
+
+            local_tz = ZoneInfo(settings.DEFAULT_TIMEZONE)
+            start = booking.start_time
+            if start.tzinfo is None:
+                start = start.replace(tzinfo=timezone.utc)
+            start_local = start.astimezone(local_tz)
+            time_str = start_local.strftime("%H:%M")
+
+            icon = "sports_tennis"
+            color = "#2E7D32"
+            if booking.court_type == "pickleball":
+                color = "#1565C0"
+            elif booking.court_type == "badminton":
+                color = "#F57C00"
+            if booking.status == "cancelled":
+                icon = "cancel_outlined"
+                color = "#D32F2F"
+            elif booking.status == "completed":
+                icon = "check_circle_outline"
+                color = "#27AE60"
+
+            activities.append(ActivityItem(
+                type="booking",
+                title=f"Đặt {ct} {court_label}",
+                subtitle=f"{user_name} • {time_str} • {status_vi}",
+                time_ago=_time_ago(getattr(booking, "updated_at", None) or getattr(booking, "created_at", None)),
+                icon=icon,
+                color=color,
+                created_at=getattr(booking, "updated_at", None) or getattr(booking, "created_at", None) or datetime.now(timezone.utc),
+            ))
+
+        for entry in recent_orders:
+            order = entry["order"]
+            user_name = entry.get("user_name") or "Khách"
+            table = order.table_number
+            status_vi = ORDER_STATUS_VI.get(order.status, order.status)
+            items = order.items
+            item_summary = ", ".join(f"{it.quantity}x {it.item_name}" for it in items[:3])
+            if len(items) > 3:
+                item_summary += "..."
+
+            icon = "shopping_bag_outlined"
+            color = "#F39C12"
+            if order.status == "cancelled":
+                icon = "cancel_outlined"
+                color = "#D32F2F"
+            elif order.status == "delivered":
+                icon = "check_circle_outline"
+                color = "#27AE60"
+
+            activities.append(ActivityItem(
+                type="order",
+                title=f"Đơn hàng - Bàn #{table}",
+                subtitle=f"{item_summary} • {status_vi}",
+                time_ago=_time_ago(getattr(order, "created_at", None)),
+                icon=icon,
+                color=color,
+                created_at=getattr(order, "created_at", None) or datetime.now(timezone.utc),
+            ))
+
+        activities.sort(key=lambda a: a.created_at, reverse=True)
+        activities = activities[:15]
+
+        return RecentActivityResponse(activities=activities)
+    except Exception as exc:
+        logger.exception("Error fetching recent activity")
         raise HTTPException(status_code=500, detail="Internal server error") from exc
 
 
@@ -1092,4 +1243,283 @@ async def analytics(
         )
     except Exception as exc:
         logger.exception("Error fetching analytics")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+# ---------------------------------------------------------------------------
+# Staff Management
+# ---------------------------------------------------------------------------
+
+
+def _staff_response(user: User) -> StaffResponse:
+    return StaffResponse(
+        id=str(user.id),
+        phone=user.phone,
+        name=user.name,
+        email=user.email,
+        role=user.role.value if hasattr(user.role, "value") else str(user.role),
+        default_venue_id=str(user.default_venue_id) if user.default_venue_id else None,
+        is_active=True,
+        created_at=user.created_at,
+        updated_at=user.updated_at,
+    )
+
+
+@router.get("/staff", response_model=StaffListResponse)
+async def list_staff(
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+    user: User = Depends(require_roles("ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> StaffListResponse:
+    """List STAFF users scoped to the admin's venue."""
+    try:
+        from sqlalchemy import select, func as sa_func
+        from app.models.user import UserRole
+
+        venue_scope_ids, _ = await _operation_scope(user, session)
+
+        stmt = select(User).where(User.role == UserRole.STAFF)
+        if venue_scope_ids is not None:
+            stmt = stmt.where(User.default_venue_id.in_(list(venue_scope_ids)))
+        stmt = stmt.order_by(User.created_at.desc()).offset(offset).limit(limit)
+
+        result = await session.execute(stmt)
+        staff_users = list(result.scalars().all())
+
+        count_stmt = select(sa_func.count()).select_from(User).where(User.role == UserRole.STAFF)
+        if venue_scope_ids is not None:
+            count_stmt = count_stmt.where(User.default_venue_id.in_(list(venue_scope_ids)))
+        total_result = await session.execute(count_stmt)
+        total = total_result.scalar() or 0
+
+        return StaffListResponse(
+            staff=[_staff_response(u) for u in staff_users],
+            total=total,
+        )
+    except Exception as exc:
+        logger.exception("Error listing staff")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+@router.post("/staff", response_model=StaffResponse, status_code=201)
+async def create_staff(
+    data: StaffCreate,
+    user: User = Depends(require_roles("ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> StaffResponse:
+    """Create a new STAFF account under the admin's venue."""
+    try:
+        user_repo = UserRepository(session)
+
+        existing = await user_repo.get_by_phone(data.phone)
+        if existing:
+            raise HTTPException(status_code=409, detail="Phone number already registered")
+
+        from app.core.security import hash_password
+
+        venue_scope_ids, _ = await _operation_scope(user, session)
+        venue_id = None
+        if venue_scope_ids:
+            venue_id = next(iter(venue_scope_ids))
+
+        staff_user = await user_repo.create({
+            "phone": data.phone,
+            "name": data.name,
+            "email": data.email,
+            "password_hash": hash_password(data.password),
+            "role": "STAFF",
+            "default_venue_id": venue_id,
+        })
+        staff_id = staff_user.id
+        staff_phone = staff_user.phone
+        staff_created = staff_user.created_at
+        staff_updated = staff_user.updated_at
+        admin_id = user.id
+        await session.commit()
+
+        logger.info("Staff user created: %s (%s) by %s", staff_id, staff_phone, admin_id)
+        return StaffResponse(
+            id=str(staff_id),
+            phone=staff_phone,
+            name=data.name,
+            email=data.email,
+            role="STAFF",
+            default_venue_id=str(venue_id) if venue_id else None,
+            is_active=True,
+            created_at=staff_created,
+            updated_at=staff_updated,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Error creating staff")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+@router.put("/staff/{staff_id}", response_model=StaffResponse)
+async def update_staff(
+    staff_id: str,
+    data: StaffUpdate,
+    user: User = Depends(require_roles("ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> StaffResponse:
+    """Update a staff user's info (scoped to admin's venue)."""
+    try:
+        user_repo = UserRepository(session)
+        target = await user_repo.get_by_id(staff_id)
+        if not target:
+            raise HTTPException(status_code=404, detail="Staff not found")
+
+        role_value = target.role.value if hasattr(target.role, "value") else str(target.role)
+        if role_value != "STAFF":
+            raise HTTPException(status_code=400, detail="User is not a staff member")
+
+        venue_scope_ids, _ = await _operation_scope(user, session)
+        if venue_scope_ids is not None:
+            if target.default_venue_id not in venue_scope_ids:
+                raise HTTPException(status_code=403, detail="Staff is not in your venue")
+
+        update_fields = data.model_dump(exclude_unset=True)
+        if "default_venue_id" in update_fields:
+            update_fields.pop("default_venue_id")
+        if "is_active" in update_fields:
+            update_fields.pop("is_active")
+
+        for key, value in update_fields.items():
+            if hasattr(target, key):
+                setattr(target, key, value)
+
+        await session.flush()
+
+        result = _staff_response(target)
+        admin_id = user.id
+        await session.commit()
+
+        logger.info("Staff %s updated by %s", staff_id, admin_id)
+        return result
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Error updating staff")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+@router.delete("/staff/{staff_id}", status_code=204)
+async def delete_staff(
+    staff_id: str,
+    user: User = Depends(require_roles("ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> None:
+    """Deactivate a staff user (scoped to admin's venue)."""
+    try:
+        user_repo = UserRepository(session)
+        target = await user_repo.get_by_id(staff_id)
+        if not target:
+            raise HTTPException(status_code=404, detail="Staff not found")
+
+        role_value = target.role.value if hasattr(target.role, "value") else str(target.role)
+        if role_value != "STAFF":
+            raise HTTPException(status_code=400, detail="User is not a staff member")
+
+        venue_scope_ids, _ = await _operation_scope(user, session)
+        if venue_scope_ids is not None:
+            if target.default_venue_id not in venue_scope_ids:
+                raise HTTPException(status_code=403, detail="Staff is not in your venue")
+
+        from app.models.user import UserRole as UR
+        target.role = UR.CUSTOMER
+        admin_id = user.id
+        await session.flush()
+        await session.commit()
+
+        logger.info("Staff %s deactivated by %s", staff_id, admin_id)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Error deleting staff")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+@router.get("/staff-assignments/all", response_model=list[AssignmentWithDetails])
+async def list_all_assignments(
+    user: User = Depends(require_roles("ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> list[AssignmentWithDetails]:
+    """List staff assignments scoped to the admin's venue."""
+    try:
+        venue_repo = VenueRepository(session)
+        user_repo = UserRepository(session)
+
+        venue_scope_ids, _ = await _operation_scope(user, session)
+
+        assignments = await venue_repo.list_staff_assignments()
+        if venue_scope_ids is not None:
+            assignments = [a for a in assignments if a.venue_id in venue_scope_ids]
+
+        result = []
+        for a in assignments:
+            staff = await user_repo.get_by_id(a.staff_id)
+            venue = await venue_repo.get_venue_by_id(a.venue_id)
+            resource = await venue_repo.get_resource_by_id(a.resource_id) if a.resource_id else None
+
+            scope_val = a.scope.value if hasattr(a.scope, "value") else str(a.scope)
+            resource_label = None
+            if resource:
+                resource_label = f"{resource.code} - {resource.name}"
+
+            result.append(AssignmentWithDetails(
+                id=str(a.id),
+                staff_id=a.staff_id,
+                staff_name=staff.name if staff else "Unknown",
+                venue_id=str(a.venue_id),
+                venue_name=venue.name if venue else "Unknown",
+                area_id=str(a.area_id) if a.area_id else None,
+                area_name=None,
+                resource_id=str(a.resource_id) if a.resource_id else None,
+                resource_label=resource_label,
+                scope=scope_val,
+                starts_at=a.starts_at,
+                ends_at=a.ends_at,
+                is_active=a.is_active,
+            ))
+
+        return result
+    except Exception as exc:
+        logger.exception("Error listing all assignments")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+@router.delete("/staff-assignments/{assignment_id}", status_code=204)
+async def delete_staff_assignment(
+    assignment_id: str,
+    user: User = Depends(require_roles("ADMIN")),
+    session: AsyncSession = Depends(get_db),
+) -> None:
+    """Delete a staff assignment (scoped to admin's venue)."""
+    try:
+        from sqlalchemy import select as sa_select
+        from app.models.venue import StaffAssignment as SA
+
+        venue_scope_ids, _ = await _operation_scope(user, session)
+
+        stmt = sa_select(SA).where(SA.id == uuid.UUID(assignment_id))
+        result = await session.execute(stmt)
+        assignment = result.scalar_one_or_none()
+        if not assignment:
+            raise HTTPException(status_code=404, detail="Assignment not found")
+
+        if venue_scope_ids is not None:
+            if assignment.venue_id not in venue_scope_ids:
+                raise HTTPException(status_code=403, detail="Assignment is not in your venue")
+
+        await session.delete(assignment)
+        admin_id = user.id
+        await session.commit()
+
+        logger.info("Staff assignment %s deleted by %s", assignment_id, admin_id)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Error deleting assignment")
         raise HTTPException(status_code=500, detail="Internal server error") from exc

@@ -51,7 +51,11 @@ class ApiConstants {
   static const String adminStaffOrdersEndpoint = '/api/admin/orders/staff';
   static const String adminMenuEndpoint = '/api/admin/menu';
   static const String adminAnalyticsEndpoint = '/api/admin/analytics';
+  static const String adminRecentActivityEndpoint = '/api/admin/recent-activity';
   static const String adminResourcesEndpoint = '/api/admin/resources';
+  static const String adminStaffEndpoint = '/api/admin/staff';
+  static const String adminStaffAssignmentsEndpoint = '/api/admin/staff-assignments';
+  static const String adminStaffAssignmentsAllEndpoint = '/api/admin/staff-assignments/all';
 
   static String get realtimeNotificationsWsEndpoint {
     final uri = Uri.parse(baseUrl);

@@ -250,14 +250,17 @@ class _StaffBillingScreenState extends ConsumerState<StaffBillingScreen>
             children: [
               const Icon(Icons.receipt_long,
                   color: AppColors.primary, size: 22),
-              const SizedBox(width: 8),
-              const Text(
-                'Quản lý hoá đơn',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                ),
-              ),
+               const SizedBox(width: 8),
+               const Flexible(
+                 child: Text(
+                   'Quản lý hoá đơn',
+                   style: TextStyle(
+                     fontWeight: FontWeight.w700,
+                     fontSize: 16,
+                   ),
+                   overflow: TextOverflow.ellipsis,
+                 ),
+               ),
               const Spacer(),
               // Date picker
               InkWell(

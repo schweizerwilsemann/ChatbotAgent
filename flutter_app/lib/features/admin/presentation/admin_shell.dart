@@ -46,6 +46,12 @@ class _AdminShellState extends ConsumerState<AdminShell> {
       route: '/admin/menu',
     ),
     _AdminNavItem(
+      icon: Icons.people_outline,
+      selectedIcon: Icons.people,
+      label: 'Nhân viên',
+      route: '/admin/staff',
+    ),
+    _AdminNavItem(
       icon: Icons.receipt_long_outlined,
       selectedIcon: Icons.receipt_long,
       label: 'Hoá đơn',

@@ -4,8 +4,31 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
+import 'package:sports_venue_chatbot/features/admin/data/admin_api.dart';
 import 'package:sports_venue_chatbot/features/admin/data/admin_models.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/dashboard_provider.dart';
+
+// ─── Recent Activity Provider ────────────────────────────────────────────
+
+final recentActivityProvider =
+    AsyncNotifierProvider<_RecentActivityNotifier, List<ActivityItem>>(
+  _RecentActivityNotifier.new,
+);
+
+class _RecentActivityNotifier extends AsyncNotifier<List<ActivityItem>> {
+  @override
+  Future<List<ActivityItem>> build() => _fetch();
+
+  Future<List<ActivityItem>> _fetch() async {
+    final api = ref.read(adminApiProvider);
+    return api.getRecentActivity();
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(_fetch);
+  }
+}
 
 /// Dashboard / Tổng quát screen for admin.
 ///
@@ -22,9 +45,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    // Load dashboard data on first build
     Future.microtask(() {
       ref.read(dashboardProvider.notifier).loadDashboard();
+      ref.read(recentActivityProvider.notifier).refresh();
     });
   }
 
@@ -352,49 +375,12 @@ class _QuickActionChip extends StatelessWidget {
 
 // ─── Recent Activity ────────────────────────────────────────────────────────
 
-class _RecentActivitySection extends StatelessWidget {
+class _RecentActivitySection extends ConsumerWidget {
   const _RecentActivitySection();
 
   @override
-  Widget build(BuildContext context) {
-    // TODO: Replace with real activity data from API
-    const activities = [
-      _ActivityItem(
-        icon: Icons.sports_tennis,
-        title: 'Đặt sân Billiards #3',
-        subtitle: 'Khách: Nguyễn Văn A • 14:00 - 16:00',
-        time: '5 phút trước',
-        color: AppColors.billiardsColor,
-      ),
-      _ActivityItem(
-        icon: Icons.shopping_bag_outlined,
-        title: 'Order item - Bàn #5',
-        subtitle: '2x Cà phê sữa, 1x thuê vợt',
-        time: '12 phút trước',
-        color: AppColors.warning,
-      ),
-      _ActivityItem(
-        icon: Icons.sports_tennis,
-        title: 'Đặt sân Pickleball #1',
-        subtitle: 'Khách: Trần Thị B • 16:00 - 18:00',
-        time: '25 phút trước',
-        color: AppColors.pickleballColor,
-      ),
-      _ActivityItem(
-        icon: Icons.payment,
-        title: 'Thanh toán #INV-0042',
-        subtitle: 'Tổng: 350.000đ • Đã thanh toán',
-        time: '1 giờ trước',
-        color: AppColors.success,
-      ),
-      _ActivityItem(
-        icon: Icons.cancel_outlined,
-        title: 'Huỷ đặt sân Badminton #2',
-        subtitle: 'Khách: Lê Văn C • Lý do: Bận',
-        time: '2 giờ trước',
-        color: AppColors.error,
-      ),
-    ];
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activityAsync = ref.watch(recentActivityProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -415,30 +401,43 @@ class _RecentActivitySection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        ...activities.map((a) => _ActivityTile(activity: a)),
+        activityAsync.when(
+          loading: () => const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+          error: (e, _) => const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Text(
+              'Không thể tải hoạt động',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+          data: (activities) {
+            if (activities.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: Text(
+                    'Chưa có hoạt động nào hôm nay',
+                    style: TextStyle(color: AppColors.textSecondary),
+                  ),
+                ),
+              );
+            }
+            return Column(
+              children:
+                  activities.map((a) => _ActivityTile(activity: a)).toList(),
+            );
+          },
+        ),
       ],
     );
   }
 }
 
-class _ActivityItem {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final String time;
-  final Color color;
-
-  const _ActivityItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.time,
-    required this.color,
-  });
-}
-
 class _ActivityTile extends StatelessWidget {
-  final _ActivityItem activity;
+  final ActivityItem activity;
 
   const _ActivityTile({required this.activity});
 
@@ -456,8 +455,9 @@ class _ActivityTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: activity.color.withValues(alpha: 0.12),
-            child: Icon(activity.icon, color: activity.color, size: 18),
+            backgroundColor: activity.colorValue.withValues(alpha: 0.12),
+            child:
+                Icon(activity.iconData, color: activity.colorValue, size: 18),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -484,7 +484,7 @@ class _ActivityTile extends StatelessWidget {
             ),
           ),
           Text(
-            activity.time,
+            activity.timeAgo,
             style: const TextStyle(
               color: AppColors.textHint,
               fontSize: 11,

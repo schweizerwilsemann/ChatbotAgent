@@ -157,3 +157,20 @@ class AnalyticsResponse(BaseModel):
     bookings_by_court: list[CourtBookingCount]
     orders_by_hour: list[HourOrderCount]
     order_count_by_day: list[DayOrderCount]
+
+
+# --- Recent Activity ---
+
+
+class ActivityItem(BaseModel):
+    type: str
+    title: str
+    subtitle: str
+    time_ago: str
+    icon: str
+    color: str
+    created_at: datetime
+
+
+class RecentActivityResponse(BaseModel):
+    activities: list[ActivityItem]

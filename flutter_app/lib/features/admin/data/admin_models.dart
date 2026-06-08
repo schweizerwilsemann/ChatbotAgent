@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 // ─── Helper ─────────────────────────────────────────────────────────────────
 
 /// Safely convert a JSON value (num or String) to double.
@@ -843,5 +845,67 @@ class AnalyticsData {
       'orders_by_hour': ordersByHour.map((e) => e.toJson()).toList(),
       'order_count_by_day': orderCountByDay.map((e) => e.toJson()).toList(),
     };
+  }
+}
+
+// ─── Recent Activity ──────────────────────────────────────────────────────
+
+class ActivityItem {
+  final String type;
+  final String title;
+  final String subtitle;
+  final String timeAgo;
+  final String icon;
+  final String color;
+  final DateTime createdAt;
+
+  const ActivityItem({
+    required this.type,
+    required this.title,
+    required this.subtitle,
+    required this.timeAgo,
+    required this.icon,
+    required this.color,
+    required this.createdAt,
+  });
+
+  factory ActivityItem.fromJson(Map<String, dynamic> json) {
+    return ActivityItem(
+      type: json['type'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      subtitle: json['subtitle'] as String? ?? '',
+      timeAgo: json['time_ago'] as String? ?? '',
+      icon: json['icon'] as String? ?? 'circle',
+      color: json['color'] as String? ?? '#888888',
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+  }
+
+  IconData get iconData {
+    switch (icon) {
+      case 'sports_tennis':
+        return Icons.sports_tennis;
+      case 'shopping_bag_outlined':
+        return Icons.shopping_bag_outlined;
+      case 'cancel_outlined':
+        return Icons.cancel_outlined;
+      case 'check_circle_outline':
+        return Icons.check_circle_outline;
+      case 'payment':
+        return Icons.payment;
+      case 'calendar_today':
+        return Icons.calendar_today;
+      default:
+        return Icons.circle;
+    }
+  }
+
+  Color get colorValue {
+    try {
+      final hex = color.replaceFirst('#', '');
+      return Color(int.parse('FF$hex', radix: 16));
+    } catch (_) {
+      return const Color(0xFF888888);
+    }
   }
 }
