@@ -21,10 +21,11 @@ final staffChatProvider =
     storage: ref.watch(secureStorageProvider),
     requestId: requestId,
   );
-
   // Set current user role for optimistic messages
   final authState = ref.read(authStateProvider);
   notifier.currentUserRole = authState.valueOrNull?.role.toLowerCase() ?? '';
+  debugPrint(
+      '[StaffChat] Provider created for requestId=$requestId, currentUserRole=${notifier.currentUserRole}');
 
   // Wire call signaling globally (persists even after screen disposal)
   final callNotifier = ref.read(callProvider.notifier);
@@ -238,7 +239,7 @@ class StaffChatNotifier extends StateNotifier<StaffChatState> {
     );
 
     debugPrint(
-        '[StaffChat] Sending message: id=${msg.id}, content=${msg.content}');
+        '[StaffChat] Sending message: id=${msg.id}, content=${msg.content}, currentUserRole=$currentUserRole, senderRole=${msg.senderRole}');
 
     // Optimistic append
     state = state.copyWith(messages: [...state.messages, msg]);

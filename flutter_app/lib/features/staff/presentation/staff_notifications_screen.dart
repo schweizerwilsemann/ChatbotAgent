@@ -545,7 +545,7 @@ class _OrderNotificationSummary extends StatelessWidget {
     if (status.startsWith('paid')) {
       final method =
           status.contains('_') ? status.split('_').last.toUpperCase() : '';
-      return method.isNotEmpty ? 'Đã thanh toán bằng $method' : 'Đã thanh toán';
+      return method.isNotEmpty ? 'Đã TT bằng $method' : 'Đã thanh toán';
     }
     if (status == 'failed') return 'Thanh toán lỗi';
     return 'Chưa thanh toán';
