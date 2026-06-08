@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/features/auth/domain/auth_repository.dart';
+import 'package:sports_venue_chatbot/features/call/presentation/call_overlay.dart';
+import 'package:sports_venue_chatbot/features/call/presentation/call_provider.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/staff_chat_provider.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/widgets/staff_chat_bubble.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/widgets/staff_chat_input.dart';
@@ -8,11 +11,13 @@ import 'package:sports_venue_chatbot/features/staff_chat/presentation/widgets/st
 class CustomerStaffChatScreen extends ConsumerStatefulWidget {
   final String requestId;
   final String? staffName;
+  final String? staffId;
 
   const CustomerStaffChatScreen({
     super.key,
     required this.requestId,
     this.staffName,
+    this.staffId,
   });
 
   @override
@@ -43,9 +48,32 @@ class _CustomerStaffChatScreenState
     });
   }
 
+  Future<void> _initiateCall() async {
+    final staffId = widget.staffId ?? '';
+
+    if (staffId.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Không tìm thấy nhân viên')),
+        );
+      }
+      return;
+    }
+
+    final storage = ref.read(secureStorageProvider);
+    final token = await storage.read(key: 'auth_token') ?? '';
+
+    await ref.read(callProvider.notifier).startCall(
+          roomId: widget.requestId,
+          calleeId: staffId,
+          token: token,
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
     final chatState = ref.watch(staffChatProvider(widget.requestId));
+    final callState = ref.watch(callProvider);
 
     ref.listen<StaffChatState>(staffChatProvider(widget.requestId), (_, next) {
       if (next.messages.isNotEmpty) _scrollToBottom();
@@ -95,6 +123,11 @@ class _CustomerStaffChatScreenState
           ],
         ),
         actions: [
+          if (!chatState.isRoomClosed)
+            CallButton(
+              enabled: !callState.isActive && chatState.isOtherOnline,
+              onPressed: _initiateCall,
+            ),
           if (!chatState.isRoomClosed)
             IconButton(
               icon: const Icon(Icons.close),

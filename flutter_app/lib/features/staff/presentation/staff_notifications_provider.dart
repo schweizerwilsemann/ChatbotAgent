@@ -257,6 +257,14 @@ class StaffNotificationsNotifier
 
       // Handle regular notifications
       final notification = StaffNotification.fromJson(decoded);
+
+      // Skip staff's own chat messages — don't notify yourself
+      if (notification.eventType == 'staff_chat_message' &&
+          notification.source == 'staff') {
+        debugPrint('[StaffNoti] Skipping own chat message');
+        return;
+      }
+
       final exists =
           state.notifications.any((item) => item.id == notification.id);
       final updated =

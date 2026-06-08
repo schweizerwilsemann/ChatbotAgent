@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/features/booking/data/booking_api.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/customer_staff_chat_screen.dart';
@@ -10,11 +11,52 @@ import 'package:sports_venue_chatbot/features/staff_request/presentation/widgets
 import 'package:sports_venue_chatbot/features/venue/presentation/selected_venue_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/app_snackbar.dart';
 
-class StaffRequestBubble extends ConsumerWidget {
+class StaffRequestBubble extends ConsumerStatefulWidget {
   const StaffRequestBubble({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StaffRequestBubble> createState() => _StaffRequestBubbleState();
+}
+
+class _StaffRequestBubbleState extends ConsumerState<StaffRequestBubble> {
+  StreamSubscription<StaffRequest>? _acceptedSub;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _listenAccepted();
+    });
+  }
+
+  void _listenAccepted() {
+    _acceptedSub?.cancel();
+    _acceptedSub = ref
+        .read(staffRequestProvider.notifier)
+        .acceptedStream
+        .listen((request) {
+      if (!mounted) return;
+      // Auto-navigate to chat room when staff accepts
+      Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute(
+          builder: (_) => CustomerStaffChatScreen(
+            requestId: request.id,
+            staffName: request.acceptedByName,
+            staffId: request.acceptedBy,
+          ),
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _acceptedSub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(staffRequestProvider);
 
     ref.listen<StaffRequestState>(staffRequestProvider, (previous, next) {
@@ -45,6 +87,7 @@ class StaffRequestBubble extends ConsumerWidget {
                     builder: (_) => CustomerStaffChatScreen(
                       requestId: request.id,
                       staffName: request.acceptedByName,
+                      staffId: request.acceptedBy,
                     ),
                   ),
                 );

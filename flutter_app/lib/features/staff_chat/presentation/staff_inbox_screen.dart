@@ -102,10 +102,11 @@ class StaffInboxNotifier extends StateNotifier<StaffInboxState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final data = await _api.getMyRooms();
-      final rooms =
-          data.map((e) => StaffChatRoomItem.fromJson(e)).toList();
+      if (!mounted) return;
+      final rooms = data.map((e) => StaffChatRoomItem.fromJson(e)).toList();
       state = state.copyWith(rooms: rooms, isLoading: false);
     } catch (e) {
+      if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
         error: 'Không thể tải danh sách hội thoại.',
@@ -160,8 +161,7 @@ class _StaffInboxScreenState extends ConsumerState<StaffInboxScreen>
           IconButton(
             tooltip: 'Làm mới',
             icon: const Icon(Icons.refresh),
-            onPressed: () =>
-                ref.read(staffInboxProvider.notifier).loadRooms(),
+            onPressed: () => ref.read(staffInboxProvider.notifier).loadRooms(),
           ),
         ],
         bottom: TabBar(
@@ -222,8 +222,7 @@ class _RoomList extends ConsumerWidget {
     }
 
     return RefreshIndicator(
-      onRefresh: () =>
-          ref.read(staffInboxProvider.notifier).loadRooms(),
+      onRefresh: () => ref.read(staffInboxProvider.notifier).loadRooms(),
       child: ListView.separated(
         itemCount: rooms.length,
         separatorBuilder: (_, __) => const Divider(height: 1, indent: 72),
@@ -251,6 +250,7 @@ class _RoomTile extends StatelessWidget {
           extra: {
             'customerName': room.userName,
             'resourceLabel': room.resourceLabel,
+            'customerId': room.userId,
           },
         );
       },
@@ -294,8 +294,7 @@ class _RoomTile extends StatelessWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (room.resourceLabel != null &&
-              room.resourceLabel!.isNotEmpty) ...[
+          if (room.resourceLabel != null && room.resourceLabel!.isNotEmpty) ...[
             const SizedBox(height: 2),
             Text(
               room.resourceLabel!,

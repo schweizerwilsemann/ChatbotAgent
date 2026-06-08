@@ -1,19 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/network/api_exception.dart';
+import 'package:sports_venue_chatbot/features/staff_chat/presentation/staff_chat_provider.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/staff_inbox_screen.dart';
 import 'package:sports_venue_chatbot/features/staff_request/data/staff_request_models.dart';
 import 'package:sports_venue_chatbot/features/staff_request/domain/staff_request_repository.dart';
 
-final staffRequestManagementProvider =
-    StateNotifierProvider<
-      StaffRequestManagementNotifier,
-      StaffRequestManagementState
-    >((ref) {
-      return StaffRequestManagementNotifier(
-        ref.watch(staffRequestRepositoryProvider),
-        ref,
-      );
-    });
+final staffRequestManagementProvider = StateNotifierProvider<
+    StaffRequestManagementNotifier, StaffRequestManagementState>((ref) {
+  return StaffRequestManagementNotifier(
+    ref.watch(staffRequestRepositoryProvider),
+    ref,
+  );
+});
 
 class StaffRequestManagementState {
   final List<StaffRequest> requests;
@@ -48,9 +46,8 @@ class StaffRequestManagementState {
       requests: requests ?? this.requests,
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : (error ?? this.error),
-      successMessage: clearSuccess
-          ? null
-          : (successMessage ?? this.successMessage),
+      successMessage:
+          clearSuccess ? null : (successMessage ?? this.successMessage),
     );
   }
 }
@@ -61,7 +58,7 @@ class StaffRequestManagementNotifier
   final Ref _ref;
 
   StaffRequestManagementNotifier(this._repository, this._ref)
-    : super(const StaffRequestManagementState());
+      : super(const StaffRequestManagementState());
 
   Future<void> loadRequests() async {
     state = state.copyWith(
@@ -88,6 +85,10 @@ class StaffRequestManagementNotifier
       final updated = await _repository.acceptRequest(requestId);
       _replaceRequest(updated, successMessage: 'Đã tiếp nhận yêu cầu.');
       _ref.invalidate(staffInboxProvider);
+
+      // Connect chat WebSocket immediately so call signaling works
+      // even if staff is not on the chat screen yet
+      _ref.read(staffChatProvider(requestId));
     } on ApiException catch (e) {
       state = state.copyWith(error: e.message);
     } catch (_) {
@@ -136,9 +137,8 @@ class StaffRequestManagementNotifier
 
   void _removeRequest(String requestId, {required String successMessage}) {
     state = state.copyWith(
-      requests: state.requests
-          .where((request) => request.id != requestId)
-          .toList(),
+      requests:
+          state.requests.where((request) => request.id != requestId).toList(),
       successMessage: successMessage,
     );
   }

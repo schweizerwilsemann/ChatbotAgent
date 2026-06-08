@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sports_venue_chatbot/core/services/local_notification_service.dart';
+import 'package:sports_venue_chatbot/features/staff_chat/presentation/staff_chat_provider.dart';
 import 'package:sports_venue_chatbot/features/staff_request/data/staff_request_models.dart';
 import 'package:sports_venue_chatbot/features/staff_request/domain/staff_request_repository.dart';
 
@@ -10,6 +13,7 @@ final staffRequestProvider =
     StateNotifierProvider<StaffRequestNotifier, StaffRequestState>((ref) {
   return StaffRequestNotifier(
     ref.watch(staffRequestRepositoryProvider),
+    ref,
   );
 });
 
@@ -53,9 +57,19 @@ class StaffRequestState {
 
 class StaffRequestNotifier extends StateNotifier<StaffRequestState> {
   final StaffRequestRepository _repository;
+  final Ref _ref;
   Timer? _pollTimer;
+  String? _connectedRequestId;
 
-  StaffRequestNotifier(this._repository) : super(const StaffRequestState()) {
+  final StreamController<StaffRequest> _acceptedController =
+      StreamController<StaffRequest>.broadcast();
+
+  /// Emits when a staff request is accepted (detected via polling).
+  /// UI listens to auto-navigate to chat room.
+  Stream<StaffRequest> get acceptedStream => _acceptedController.stream;
+
+  StaffRequestNotifier(this._repository, this._ref)
+      : super(const StaffRequestState()) {
     _loadActiveRequest();
   }
 
@@ -81,7 +95,24 @@ class StaffRequestNotifier extends StateNotifier<StaffRequestState> {
       final activeId = state.activeRequest!.id;
       final match = requests.where((r) => r.id == activeId).firstOrNull;
       if (match != null && match.status != state.activeRequest!.status) {
+        final oldStatus = state.activeRequest!.status;
         state = state.copyWith(activeRequest: match);
+
+        // When staff accepts the request → notify customer + emit event
+        if (oldStatus == StaffRequestStatus.pending &&
+            match.status == StaffRequestStatus.accepted) {
+          final staffName = match.acceptedByName ?? 'Nhân viên';
+          LocalNotificationService().showOperationNotification(
+            title: 'Yêu cầu đã được tiếp nhận',
+            body: '$staffName đã tiếp nhận yêu cầu. Mở chat ngay!',
+          );
+          _acceptedController.add(match);
+
+          // Connect chat WebSocket immediately so we can receive messages
+          // even when customer is not on the chat screen
+          _connectChatForNotifications(match.id);
+        }
+
         if (!state.hasActiveRequest) {
           _stopPolling();
         }
@@ -171,20 +202,47 @@ class StaffRequestNotifier extends StateNotifier<StaffRequestState> {
       if (active != null) {
         state = state.copyWith(activeRequest: active);
         _startPolling();
+
+        // If already accepted, connect chat WebSocket immediately
+        if (active.status == StaffRequestStatus.accepted) {
+          _connectChatForNotifications(active.id);
+        }
       }
     } catch (_) {
       // Silently fail
     }
   }
 
+  /// Connect the chat WebSocket for a request so we can receive messages
+  /// and show notifications even when the customer is outside the chat screen.
+  void _connectChatForNotifications(String requestId) {
+    if (_connectedRequestId == requestId) return;
+    _connectedRequestId = requestId;
+
+    final chatNotifier = _ref.read(staffChatProvider(requestId).notifier);
+    chatNotifier.onNewMessageFromOther = (msg) {
+      // Only notify for staff messages (customer is the recipient)
+      if (msg.senderRole == 'staff') {
+        debugPrint(
+            '[StaffRequest] New message from staff: ${msg.content}, showing notification');
+        LocalNotificationService().showOperationNotification(
+          title: msg.senderName.isNotEmpty ? msg.senderName : 'Nhân viên',
+          body: msg.content,
+        );
+      }
+    };
+  }
+
   void resetActiveRequest() {
     _stopPolling();
+    _connectedRequestId = null;
     state = state.copyWith(clearActiveRequest: true);
   }
 
   @override
   void dispose() {
     _stopPolling();
+    _acceptedController.close();
     super.dispose();
   }
 }

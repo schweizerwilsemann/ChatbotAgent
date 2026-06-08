@@ -134,6 +134,39 @@ class StaffChatService:
     async def clear_busy(self, staff_id: str) -> None:
         await redis_client.delete(f"staff_chat:staff_busy:{staff_id}")
 
+    # ── Call state ───────────────────────────────────────────────────
+
+    CALL_TTL = 3600  # 1 hour max call duration
+
+    async def set_call_state(
+        self, room_id: str, state: str, caller_id: str, callee_id: str
+    ) -> None:
+        key = f"staff_chat:call:{room_id}"
+        data = {
+            "state": state,
+            "caller_id": caller_id,
+            "callee_id": callee_id,
+            "started_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await redis_client.set_json(key, data, ex=self.CALL_TTL)
+
+    async def get_call_state(self, room_id: str) -> dict | None:
+        return await redis_client.get_json(f"staff_chat:call:{room_id}")
+
+    async def clear_call_state(self, room_id: str) -> None:
+        await redis_client.delete(f"staff_chat:call:{room_id}")
+
+    async def is_staff_in_call(self, staff_id: str) -> str | None:
+        """Return the room_id where staff is currently in a call, or None."""
+        keys = await redis_client.scan_keys("staff_chat:call:*")
+        for key in keys:
+            call = await redis_client.get_json(key)
+            if call and call.get("state") == "connected":
+                if call.get("caller_id") == staff_id or call.get("callee_id") == staff_id:
+                    # Extract room_id from key "staff_chat:call:{room_id}"
+                    return key.split("staff_chat:call:", 1)[1]
+        return None
+
     # ── Helpers ───────────────────────────────────────────────────────
 
     async def list_rooms_for_staff(self, staff_id: str) -> list[dict]:

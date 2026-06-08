@@ -17,6 +17,7 @@ import 'package:sports_venue_chatbot/features/auth/presentation/login_screen.dar
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_screen.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_qr_scan_screen.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/voice_agent_call_screen.dart';
+import 'package:sports_venue_chatbot/features/call/presentation/incoming_call_screen.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_screen.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/customer_staff_chat_screen.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/staff_chat_screen.dart';
@@ -83,7 +84,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       // Logged-in staff/admin on customer routes → their area
-      if (isLoggedIn && !isManagementRoute) {
+      // Exception: allow call, voice-agent, and staff-chat routes for all roles
+      final isCallRoute = location == '/call' || location == '/voice-agent';
+      final isStaffChatRoute = location.startsWith('/staff-chat/') ||
+          location.startsWith('/staff-operator-chat/');
+      if (isLoggedIn &&
+          !isManagementRoute &&
+          !isCallRoute &&
+          !isStaffChatRoute) {
         if (userRole == 'ADMIN') return '/admin/dashboard';
         if (userRole == 'STAFF') return '/staff/requests';
       }
@@ -306,15 +314,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const VoiceAgentCallScreen(),
       ),
       GoRoute(
+        path: '/call',
+        name: 'call',
+        builder: (context, state) => const IncomingCallScreen(),
+      ),
+      GoRoute(
         path: '/staff-chat/:requestId',
         name: 'staff_chat',
         builder: (context, state) {
           final requestId = state.pathParameters['requestId']!;
           final extra = state.extra as Map<String, dynamic>?;
-          // Customer uses this route
           return CustomerStaffChatScreen(
             requestId: requestId,
             staffName: extra?['staffName'] as String?,
+            staffId: extra?['staffId'] as String?,
           );
         },
       ),
@@ -324,11 +337,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final requestId = state.pathParameters['requestId']!;
           final extra = state.extra as Map<String, dynamic>?;
-          // Staff uses this route
           return StaffChatScreen(
             requestId: requestId,
             customerName: extra?['customerName'] as String?,
             resourceLabel: extra?['resourceLabel'] as String?,
+            customerId: extra?['customerId'] as String?,
           );
         },
       ),

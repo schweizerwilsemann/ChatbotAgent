@@ -9,7 +9,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.media.RingtoneManager
+import android.media.Ringtone
 import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.Log
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -18,10 +23,14 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterFragmentActivity() {
     private val channelName = "sports_venue_chatbot/notifications"
     private val vnpayChannelName = "sports_venue_chatbot/vnpay"
+    private val ringtoneChannelName = "sports_venue_chatbot/call_ringtone"
     private val notificationChannelId = "operations_notifications"
     private val notificationPermissionRequestCode = 1701
 
     private var vnpayResult: MethodChannel.Result? = null
+    private var currentRingtone: Ringtone? = null
+    private var vibrator: Vibrator? = null
+    private var isRinging = false
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -50,6 +59,21 @@ class MainActivity : FlutterFragmentActivity() {
                         val tmnCode = call.argument<String>("tmnCode") ?: ""
                         val isSandbox = call.argument<Boolean>("isSandbox") ?: true
                         openVnpaySdk(paymentUrl, tmnCode, isSandbox, result)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, ringtoneChannelName)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "startRingtone" -> {
+                        startRingtone()
+                        result.success(null)
+                    }
+                    "stopRingtone" -> {
+                        stopRingtone()
+                        result.success(null)
                     }
                     else -> result.notImplemented()
                 }
@@ -178,5 +202,57 @@ class MainActivity : FlutterFragmentActivity() {
         val notifId = System.currentTimeMillis().toInt()
         manager.notify(notifId, notification)
         Log.d("MainActivity", "Notification shown with id=$notifId")
+    }
+
+    private fun startRingtone() {
+        if (isRinging) return
+        isRinging = true
+
+        try {
+            val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+            currentRingtone = RingtoneManager.getRingtone(applicationContext, ringtoneUri)
+            currentRingtone?.play()
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error playing ringtone", e)
+        }
+
+        try {
+            vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                vibratorManager.defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            }
+
+            val pattern = longArrayOf(0, 1000, 500, 1000, 500)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator?.vibrate(VibrationEffect.createWaveform(pattern, 0))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator?.vibrate(pattern, 0)
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error vibrating", e)
+        }
+    }
+
+    private fun stopRingtone() {
+        if (!isRinging) return
+        isRinging = false
+
+        try {
+            currentRingtone?.stop()
+            currentRingtone = null
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error stopping ringtone", e)
+        }
+
+        try {
+            vibrator?.cancel()
+            vibrator = null
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error stopping vibration", e)
+        }
     }
 }

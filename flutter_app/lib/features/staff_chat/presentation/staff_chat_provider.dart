@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sports_venue_chatbot/core/constants/api_constants.dart';
 import 'package:sports_venue_chatbot/features/auth/domain/auth_repository.dart';
+import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
+import 'package:sports_venue_chatbot/features/call/presentation/call_provider.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/data/staff_chat_models.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/domain/staff_chat_repository.dart';
 import 'package:uuid/uuid.dart';
@@ -13,11 +16,31 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 final staffChatProvider =
     StateNotifierProvider.family<StaffChatNotifier, StaffChatState, String>(
         (ref, requestId) {
-  return StaffChatNotifier(
+  final notifier = StaffChatNotifier(
     repository: ref.watch(staffChatRepositoryProvider),
     storage: ref.watch(secureStorageProvider),
     requestId: requestId,
   );
+
+  // Set current user role for optimistic messages
+  final authState = ref.read(authStateProvider);
+  notifier.currentUserRole = authState.valueOrNull?.role.toLowerCase() ?? '';
+
+  // Wire call signaling globally (persists even after screen disposal)
+  final callNotifier = ref.read(callProvider.notifier);
+  final callState = ref.read(callProvider);
+  notifier.onCallSignaling = (data) {
+    callNotifier.handleSignalingMessage(data);
+  };
+  // Only attach outgoing signaling if no call is active
+  // (to prevent overriding during an active call in another room)
+  if (!callState.isActive) {
+    callNotifier.attachSignaling((msg) {
+      notifier.sendSignalingMessage(msg);
+    });
+  }
+
+  return notifier;
 });
 
 class StaffChatState {
@@ -67,6 +90,17 @@ class StaffChatNotifier extends StateNotifier<StaffChatState> {
   Timer? _heartbeatTimer;
   Timer? _reconnectTimer;
   static const _uuid = Uuid();
+
+  /// The role of the current user ('staff' or 'customer').
+  /// Set by the provider so optimistic messages have the correct senderRole.
+  String currentUserRole = '';
+
+  /// Callback for call signaling messages. Set by CallNotifier.
+  void Function(Map<String, dynamic>)? onCallSignaling;
+
+  /// Callback when a new message arrives from the other party.
+  /// Used for showing notifications when user is outside the chat screen.
+  void Function(StaffChatMessage message)? onNewMessageFromOther;
 
   StaffChatNotifier({
     required StaffChatRepository repository,
@@ -137,8 +171,21 @@ class StaffChatNotifier extends StateNotifier<StaffChatState> {
       switch (type) {
         case 'message':
           final msg = StaffChatMessage.fromJson(data);
-          if (!state.messages.any((m) => m.id == msg.id)) {
+          debugPrint(
+              '[StaffChat] Received message: id=${msg.id}, senderRole=${msg.senderRole}, content=${msg.content}');
+          // Dedup by ID first, then by content for optimistic messages
+          // (optimistic messages have empty senderRole and client-generated ID)
+          final isDuplicate = state.messages.any((m) => m.id == msg.id) ||
+              state.messages.any((m) =>
+                  m.content == msg.content &&
+                  (m.senderRole == msg.senderRole || m.senderRole.isEmpty) &&
+                  msg.timestamp.difference(m.timestamp).inSeconds.abs() < 5);
+          if (!isDuplicate) {
             state = state.copyWith(messages: [...state.messages, msg]);
+            // Notify listeners about new message from other party
+            onNewMessageFromOther?.call(msg);
+          } else {
+            debugPrint('[StaffChat] Duplicate message, skipping');
           }
           break;
 
@@ -162,6 +209,15 @@ class StaffChatNotifier extends StateNotifier<StaffChatState> {
           state = state.copyWith(isRoomClosed: true);
           _disconnect();
           break;
+
+        case 'call_offer':
+        case 'call_answer':
+        case 'call_ice_candidate':
+        case 'call_end':
+        case 'call_reject':
+        case 'call_busy':
+          onCallSignaling?.call(data);
+          break;
       }
     } catch (_) {
       // Ignore malformed messages
@@ -174,12 +230,15 @@ class StaffChatNotifier extends StateNotifier<StaffChatState> {
     final msg = StaffChatMessage(
       id: _uuid.v4(),
       roomId: _requestId,
-      senderId: '', // Will be set by server
+      senderId: '',
       senderName: '',
-      senderRole: '',
+      senderRole: currentUserRole,
       content: content.trim(),
       timestamp: DateTime.now(),
     );
+
+    debugPrint(
+        '[StaffChat] Sending message: id=${msg.id}, content=${msg.content}');
 
     // Optimistic append
     state = state.copyWith(messages: [...state.messages, msg]);
@@ -197,6 +256,14 @@ class StaffChatNotifier extends StateNotifier<StaffChatState> {
   void sendTyping() {
     try {
       _channel?.sink.add(jsonEncode({'type': 'typing'}));
+    } catch (_) {
+      // Ignore
+    }
+  }
+
+  void sendSignalingMessage(Map<String, dynamic> data) {
+    try {
+      _channel?.sink.add(jsonEncode(data));
     } catch (_) {
       // Ignore
     }

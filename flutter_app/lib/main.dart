@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart' show appFlavor;
+import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_venue_chatbot/core/config/flavor_config.dart';
@@ -10,6 +11,8 @@ import 'package:sports_venue_chatbot/core/theme/app_scroll_behavior.dart';
 import 'package:sports_venue_chatbot/core/theme/app_theme.dart';
 import 'package:sports_venue_chatbot/features/auth/data/auth_models.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
+import 'package:sports_venue_chatbot/features/call/data/call_models.dart';
+import 'package:sports_venue_chatbot/features/call/presentation/call_provider.dart';
 import 'package:sports_venue_chatbot/features/settings/presentation/app_settings_provider.dart';
 import 'package:sports_venue_chatbot/features/staff/presentation/staff_notifications_provider.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/customer_chat_notifications_provider.dart';
@@ -81,7 +84,57 @@ class _SportsVenueChatbotAppState extends ConsumerState<SportsVenueChatbotApp> {
       supportedLocales: const [
         Locale('vi', 'VN'),
       ],
+      builder: (context, child) {
+        return _GlobalCallListener(
+          router: router,
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
+  }
+}
+
+class _GlobalCallListener extends ConsumerStatefulWidget {
+  final Widget child;
+  final GoRouter router;
+  const _GlobalCallListener({required this.child, required this.router});
+
+  @override
+  ConsumerState<_GlobalCallListener> createState() =>
+      _GlobalCallListenerState();
+}
+
+class _GlobalCallListenerState extends ConsumerState<_GlobalCallListener> {
+  bool _onCallScreen = false;
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen<CallState>(callProvider, (prev, next) {
+      final wasIdle = prev == null || prev.status == CallStatus.idle;
+      final isNowRinging = next.status == CallStatus.incomingRinging ||
+          next.status == CallStatus.outgoingRinging;
+      final isNowIdle = next.status == CallStatus.idle;
+
+      debugPrint(
+          '[GlobalCallListener] State: ${prev?.status} -> ${next.status}, '
+          'wasIdle=$wasIdle, isNowRinging=$isNowRinging, _onCallScreen=$_onCallScreen');
+
+      if (wasIdle && isNowRinging && !_onCallScreen) {
+        _onCallScreen = true;
+        debugPrint('[GlobalCallListener] Pushing /call immediately');
+        widget.router.push('/call');
+      }
+
+      if (isNowIdle && _onCallScreen) {
+        _onCallScreen = false;
+        debugPrint('[GlobalCallListener] Popping /call');
+        if (widget.router.canPop()) {
+          widget.router.pop();
+        }
+      }
+    });
+
+    return widget.child;
   }
 }
 

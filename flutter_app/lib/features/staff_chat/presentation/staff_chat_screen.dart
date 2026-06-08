@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
+import 'package:sports_venue_chatbot/features/auth/domain/auth_repository.dart';
+import 'package:sports_venue_chatbot/features/call/presentation/call_overlay.dart';
+import 'package:sports_venue_chatbot/features/call/presentation/call_provider.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/data/staff_chat_api.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/staff_chat_provider.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/widgets/staff_chat_bubble.dart';
@@ -12,12 +15,14 @@ class StaffChatScreen extends ConsumerStatefulWidget {
   final String requestId;
   final String? customerName;
   final String? resourceLabel;
+  final String? customerId;
 
   const StaffChatScreen({
     super.key,
     required this.requestId,
     this.customerName,
     this.resourceLabel,
+    this.customerId,
   });
 
   @override
@@ -26,7 +31,6 @@ class StaffChatScreen extends ConsumerStatefulWidget {
 
 class _StaffChatScreenState extends ConsumerState<StaffChatScreen> {
   final _scrollController = ScrollController();
-  bool _initialScrollDone = false;
 
   @override
   void dispose() {
@@ -47,14 +51,48 @@ class _StaffChatScreenState extends ConsumerState<StaffChatScreen> {
     });
   }
 
+  Future<void> _initiateCall() async {
+    final room = await _getRoomInfo();
+    final customerId = widget.customerId ?? room?['user_id'] as String? ?? '';
+
+    if (customerId.isEmpty) {
+      if (mounted) {
+        AppSnackBar.showError(context, 'Không tìm thấy khách hàng');
+      }
+      return;
+    }
+
+    final storage = ref.read(secureStorageProvider);
+    final token = await storage.read(key: 'auth_token') ?? '';
+
+    await ref.read(callProvider.notifier).startCall(
+          roomId: widget.requestId,
+          calleeId: customerId,
+          token: token,
+        );
+  }
+
+  Future<Map<String, dynamic>?> _getRoomInfo() async {
+    try {
+      final api = ref.read(staffChatApiProvider);
+      final rooms = await api.getMyRooms();
+      for (final room in rooms) {
+        if (room['request_id'] == widget.requestId) {
+          return room;
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final chatState = ref.watch(staffChatProvider(widget.requestId));
+    final callState = ref.watch(callProvider);
 
     ref.listen<StaffChatState>(staffChatProvider(widget.requestId), (_, next) {
       if (next.messages.isNotEmpty) {
         _scrollToBottom();
-        _initialScrollDone = true;
       }
     });
 
@@ -77,11 +115,14 @@ class _StaffChatScreenState extends ConsumerState<StaffChatScreen> {
                   const Icon(Icons.location_on,
                       size: 12, color: AppColors.textSecondary),
                   const SizedBox(width: 2),
-                  Text(
-                    widget.resourceLabel!,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textSecondary,
+                  Flexible(
+                    child: Text(
+                      widget.resourceLabel!,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -97,17 +138,20 @@ class _StaffChatScreenState extends ConsumerState<StaffChatScreen> {
                   ),
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  chatState.isRoomClosed
-                      ? 'Đã kết thúc'
-                      : chatState.isOtherOnline
-                          ? 'Đang trực tuyến'
-                          : 'Ngoại tuyến',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: chatState.isRoomClosed
-                        ? AppColors.error
-                        : AppColors.textSecondary,
+                Flexible(
+                  child: Text(
+                    chatState.isRoomClosed
+                        ? 'Đã kết thúc'
+                        : chatState.isOtherOnline
+                            ? 'Đang trực tuyến'
+                            : 'Ngoại tuyến',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: chatState.isRoomClosed
+                          ? AppColors.error
+                          : AppColors.textSecondary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -115,6 +159,11 @@ class _StaffChatScreenState extends ConsumerState<StaffChatScreen> {
           ],
         ),
         actions: [
+          if (!chatState.isRoomClosed)
+            CallButton(
+              enabled: !callState.isActive && chatState.isOtherOnline,
+              onPressed: _initiateCall,
+            ),
           if (!chatState.isRoomClosed)
             TextButton.icon(
               icon: const Icon(Icons.check_circle_outline, size: 18),

@@ -139,25 +139,37 @@ class CustomerChatNotificationsNotifier
         return;
       }
 
-      if (decoded['event_type']?.toString() != 'staff_chat_message') {
-        debugPrint(
-            '[CustomerNoti] Ignoring non-chat event: ${decoded['event_type']}');
+      // Handle staff chat messages (when customer is outside the chat room)
+      if (decoded['event_type']?.toString() == 'staff_chat_message') {
+        final payload = decoded['payload'];
+        if (payload is Map<String, dynamic> &&
+            payload['sender_role']?.toString() == 'staff') {
+          debugPrint(
+              '[CustomerNoti] Staff chat message received, showing notification');
+          _localNotifications.showOperationNotification(
+            title: decoded['title']?.toString() ?? 'Tin nhắn mới',
+            body: decoded['message']?.toString() ?? '',
+          );
+          return;
+        }
+        debugPrint('[CustomerNoti] Ignoring non-staff chat message');
         return;
       }
 
-      final payload = decoded['payload'];
-      if (payload is Map<String, dynamic> &&
-          payload['sender_role']?.toString() != 'staff') {
-        debugPrint('[CustomerNoti] Ignoring non-staff message');
+      if (decoded['event_type']?.toString() == 'staff_request_accepted' ||
+          decoded['event_type']?.toString() == 'staff_request') {
+        debugPrint(
+            '[CustomerNoti] Staff request event: ${decoded['event_type']}');
+        _localNotifications.showOperationNotification(
+          title: decoded['title']?.toString() ?? 'Cập nhật yêu cầu',
+          body: decoded['message']?.toString() ??
+              'Nhân viên đã tiếp nhận yêu cầu của bạn.',
+        );
         return;
       }
 
       debugPrint(
-          '[CustomerNoti] Showing native notification: ${decoded['title']}');
-      _localNotifications.showOperationNotification(
-        title: decoded['title']?.toString() ?? 'Tin nhắn mới',
-        body: decoded['message']?.toString() ?? '',
-      );
+          '[CustomerNoti] Unhandled event type: ${decoded['event_type']}');
     } catch (e) {
       debugPrint('[CustomerNoti] Error handling WS message: $e');
       return;

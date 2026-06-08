@@ -488,6 +488,10 @@ class _BookingManagementScreenState
                 },
                 icon: const Icon(Icons.refresh),
                 label: const Text('Thử lại'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.textOnPrimary,
+                ),
               ),
             ],
           ),
@@ -739,11 +743,14 @@ class _BookingCard extends StatelessWidget {
                 const Icon(Icons.phone,
                     size: 14, color: AppColors.textSecondary),
                 const SizedBox(width: 4),
-                Text(
-                  booking.userPhone!,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 13,
+                Flexible(
+                  child: Text(
+                    booking.userPhone!,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -757,31 +764,37 @@ class _BookingCard extends StatelessWidget {
               const Icon(Icons.access_time,
                   size: 16, color: AppColors.textSecondary),
               const SizedBox(width: 6),
-              Text(
-                '${booking.startTime} – ${booking.endTime}',
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 14,
+              Flexible(
+                child: Text(
+                  '${booking.startTime} – ${booking.endTime}',
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 14,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               if (booking.totalPrice != null) ...[
-                const Spacer(),
+                const SizedBox(width: 8),
                 const Icon(
                   Icons.payments_outlined,
                   size: 16,
                   color: AppColors.success,
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  NumberFormat.currency(
-                    locale: 'vi_VN',
-                    symbol: '₫',
-                    decimalDigits: 0,
-                  ).format(booking.totalPrice),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.success,
-                    fontSize: 14,
+                Flexible(
+                  child: Text(
+                    NumberFormat.currency(
+                      locale: 'vi_VN',
+                      symbol: '₫',
+                      decimalDigits: 0,
+                    ).format(booking.totalPrice),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.success,
+                      fontSize: 14,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -825,6 +838,10 @@ class _BookingCard extends StatelessWidget {
                 icon: const Icon(Icons.receipt_long, size: 18),
                 label: const Text('Tính tiền'),
                 style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: BorderSide(
+                    color: AppColors.primary.withValues(alpha: 0.45),
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -840,6 +857,10 @@ class _BookingCard extends StatelessWidget {
                   icon: const Icon(Icons.schedule, size: 18),
                   label: const Text('Đổi giờ'),
                   style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: BorderSide(
+                      color: AppColors.primary.withValues(alpha: 0.45),
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -889,9 +910,9 @@ class _BookingCard extends StatelessWidget {
                       icon: const Icon(Icons.cancel_outlined, size: 18),
                       label: const Text('Huỷ'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.error,
+                        foregroundColor: AppColors.primary,
                         side: BorderSide(
-                          color: AppColors.error.withValues(alpha: 0.4),
+                          color: AppColors.primary.withValues(alpha: 0.4),
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -932,10 +953,7 @@ class _BookingCard extends StatelessWidget {
                               : 'Hoàn thành',
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          booking.status == AdminBookingStatus.pending
-                              ? AppColors.success
-                              : AppColors.info,
+                      backgroundColor: AppColors.primary,
                       foregroundColor: AppColors.textOnPrimary,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
@@ -1185,6 +1203,10 @@ class _RescheduleDialogState extends State<_RescheduleDialog> {
         ),
         ElevatedButton(
           onPressed: _submit,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: AppColors.textOnPrimary,
+          ),
           child: const Text('Lưu đổi giờ'),
         ),
       ],

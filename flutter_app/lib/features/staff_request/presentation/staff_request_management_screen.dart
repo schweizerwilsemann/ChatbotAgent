@@ -187,6 +187,7 @@ class _StaffRequestManagementScreenState
       extra: {
         'customerName': request.userName,
         'resourceLabel': request.resourceLabel,
+        'customerId': request.userId,
       },
     );
   }
