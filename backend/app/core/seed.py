@@ -579,6 +579,27 @@ async def ensure_multi_tenant_columns(engine: AsyncEngine) -> None:
             "UPDATE service_resources SET hourly_rate = 80000  WHERE sport_type = 'billiards'  AND hourly_rate IS NULL",
             "UPDATE service_resources SET hourly_rate = 120000 WHERE sport_type = 'pickleball' AND hourly_rate IS NULL",
             "UPDATE service_resources SET hourly_rate = 100000 WHERE sport_type = 'badminton'  AND hourly_rate IS NULL",
+            # Cameras table
+            """CREATE TABLE IF NOT EXISTS cameras (
+                id UUID PRIMARY KEY,
+                venue_id UUID NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+                resource_id UUID REFERENCES service_resources(id) ON DELETE SET NULL,
+                name VARCHAR(255) NOT NULL,
+                ip_address VARCHAR(45) NOT NULL,
+                port INTEGER NOT NULL DEFAULT 554,
+                username VARCHAR(128) NOT NULL DEFAULT 'admin',
+                password VARCHAR(255) NOT NULL DEFAULT '',
+                camera_brand VARCHAR(20) NOT NULL DEFAULT 'custom',
+                rtsp_url_override VARCHAR(1024),
+                is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+                deleted_at TIMESTAMPTZ,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_cameras_venue_id ON cameras (venue_id)",
+            "CREATE INDEX IF NOT EXISTS ix_cameras_resource_id ON cameras (resource_id)",
+            "CREATE INDEX IF NOT EXISTS ix_cameras_is_deleted ON cameras (is_deleted)",
         ]
         for statement in statements:
             await conn.execute(text(statement))

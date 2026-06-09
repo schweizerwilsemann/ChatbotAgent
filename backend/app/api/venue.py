@@ -85,7 +85,7 @@ async def list_resources(
     venue_id: str | None = Query(None),
     sport_type: str | None = Query(None),
     resource_type: str | None = Query(None),
-    status: str | None = Query("active"),
+    status: str | None = Query(None),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> list[ServiceResourceResponse]:

@@ -12,6 +12,9 @@ import 'package:sports_venue_chatbot/features/admin/presentation/billing_screen.
 import 'package:sports_venue_chatbot/features/admin/presentation/staff_management_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/admin_notifications_screen.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/resource_pricing_screen.dart';
+import 'package:sports_venue_chatbot/features/admin/presentation/resource_management_screen.dart';
+import 'package:sports_venue_chatbot/features/admin/presentation/camera_management_screen.dart';
+import 'package:sports_venue_chatbot/features/camera/presentation/staff_camera_screen.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
 import 'package:sports_venue_chatbot/features/billing/presentation/customer_billing_screen.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/login_screen.dart';
@@ -276,6 +279,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ResourcePricingScreen(),
       ),
       GoRoute(
+        path: '/admin/resources',
+        name: 'admin_resources',
+        builder: (context, state) => const ResourceManagementScreen(),
+      ),
+      GoRoute(
+        path: '/admin/cameras',
+        name: 'admin_cameras',
+        builder: (context, state) => const CameraManagementScreen(),
+      ),
+      GoRoute(
         path: '/admin/notifications',
         name: 'admin_notifications',
         builder: (context, state) => const AdminNotificationsScreen(),
@@ -289,6 +302,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/staff/profile',
         name: 'staff_profile',
         builder: (context, state) => const StaffProfileScreen(),
+      ),
+      GoRoute(
+        path: '/staff/cameras',
+        name: 'staff_cameras',
+        builder: (context, state) => const StaffCameraScreen(),
       ),
       GoRoute(
         path: '/payment',

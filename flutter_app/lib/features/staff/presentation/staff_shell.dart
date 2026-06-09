@@ -128,6 +128,9 @@ class _StaffShellState extends ConsumerState<StaffShell> {
                 case 'profile':
                   context.push('/staff/profile');
                   break;
+                case 'cameras':
+                  context.push('/staff/cameras');
+                  break;
                 case 'settings':
                   context.push('/staff/settings');
                   break;
@@ -166,6 +169,15 @@ class _StaffShellState extends ConsumerState<StaffShell> {
                 child: ListTile(
                   leading: Icon(Icons.person_outline),
                   title: Text('Hồ sơ'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'cameras',
+                child: ListTile(
+                  leading: Icon(Icons.videocam_outlined),
+                  title: Text('Camera sân'),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),

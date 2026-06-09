@@ -1,5 +1,6 @@
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 from app.models.booking import Booking
+from app.models.camera import Camera, CameraBrand
 from app.models.menu import MenuItem
 from app.models.notification import Notification
 from app.models.order import Order, OrderItem
@@ -21,6 +22,8 @@ __all__ = [
     "TimestampMixin",
     "UUIDPrimaryKeyMixin",
     "Booking",
+    "Camera",
+    "CameraBrand",
     "MenuItem",
     "Notification",
     "Order",

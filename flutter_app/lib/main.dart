@@ -5,6 +5,7 @@ import 'package:flutter/services.dart' show appFlavor;
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:sports_venue_chatbot/core/config/flavor_config.dart';
 import 'package:sports_venue_chatbot/core/router/app_router.dart';
 import 'package:sports_venue_chatbot/core/theme/app_scroll_behavior.dart';
@@ -21,6 +22,7 @@ Future<void> main() async => _runApp(FlavorConfig.resolveFlavor(appFlavor));
 
 Future<void> _runApp(Flavor flavor) async {
   WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized();
   Intl.defaultLocale = 'vi_VN';
   await initializeDateFormatting('vi_VN');
   await initializeDateFormatting('en_US');

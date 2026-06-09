@@ -15,6 +15,7 @@ from app.agent.tools.query_faq import set_neo4j_client
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
 from app.api.booking import router as booking_router
+from app.api.camera import router as camera_router
 from app.api.chat import router as chat_router
 
 # API routers
@@ -166,6 +167,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(chat_router)
 app.include_router(booking_router)
+app.include_router(camera_router)
 app.include_router(order_router)
 app.include_router(menu_router)
 app.include_router(staff_router)

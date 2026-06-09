@@ -222,6 +222,8 @@ DATABASE_URL=postgresql+asyncpg://postgres:your_password@localhost:5432/sports_v
 - `orders` - F&B orders with booking_id FK
 - `order_items` - individual items
 - `venues`, `service_resources` - venue & court management
+- `cameras` - IP camera configuration with RTSP credentials
+- `staff_assignments` - staff access control (venue/area/resource scope)
 - `menu_items` - food/drink menu
 - `payments` - payment transactions (Stripe/VNPay)
 - `staff_requests` - customer support requests
@@ -297,8 +299,8 @@ All knowledge files in `backend/data_pipeline/raw_data/`:
 | Realtime | 4 | WebSocket notifications, list, mark read |
 | VNPay Payment | 3 | Create, callback, query |
 | Stripe Payment | 6 | PaymentIntent, checkout, webhook, config |
-| Admin | 12 | Dashboard, bookings, orders, menu, analytics |
-| Venue | 6+ | CRUD venues, resources, staff assignments |
+| Admin | 15 | Dashboard, bookings, orders, menu, analytics, cameras |
+| Venue | 8+ | CRUD venues, resources, staff assignments, cameras |
 
 ### Key API Groups
 
@@ -377,12 +379,31 @@ All knowledge files in `backend/data_pipeline/raw_data/`:
 - Staff request management screen
 - Notification inbox with unread badge
 - Room-scoped WebSocket for chat
+- **Camera monitoring** - View RTSP camera feeds for assigned courts
 
 ### Admin Features
 - Dashboard with analytics
 - Booking/order management
 - Menu CRUD (ADMIN only)
 - Revenue statistics
+- **Resource management** - Add/edit courts, toggle status (active/maintenance/inactive)
+- **Camera management** - CRUD camera IP, assign cameras to courts
+- **Staff assignment** - Assign staff to venues/areas/resources with scope-based access
+
+### Camera System (New)
+- RTSP camera integration (Hikvision, Dahua, Seetong, FPT)
+- Admin: Configure camera (IP, port, credentials, brand)
+- Admin: Assign camera to specific court/table
+- Staff: View camera grid with thumbnail preview
+- Staff: Tap to open full-screen RTSP live stream
+- Venue-scoped access control (admin/staff only see their venue's cameras)
+
+### Resource Management (New)
+- Admin: View all courts/tables with status
+- Filter by status: Active / Maintenance / Inactive
+- Quick toggle: Activate / Maintenance / Disable
+- Display: court name, area, code, hourly rate
+- Status affects booking availability (maintenance/inactive = not bookable)
 
 ---
 

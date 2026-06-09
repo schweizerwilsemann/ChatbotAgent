@@ -125,8 +125,14 @@ class _AdminShellState extends ConsumerState<AdminShell> {
                 case 'analytics':
                   context.push('/admin/analytics');
                   break;
+                case 'resources':
+                  context.push('/admin/resources');
+                  break;
                 case 'resource_pricing':
                   context.push('/admin/resource-pricing');
+                  break;
+                case 'cameras':
+                  context.push('/admin/cameras');
                   break;
                 case 'profile':
                   context.push('/admin/profile');
@@ -178,6 +184,24 @@ class _AdminShellState extends ConsumerState<AdminShell> {
                 child: ListTile(
                   leading: Icon(Icons.attach_money),
                   title: Text('Cấu hình giá sân'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'resources',
+                child: ListTile(
+                  leading: Icon(Icons.grid_view_outlined),
+                  title: Text('Quản lý sân'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'cameras',
+                child: ListTile(
+                  leading: Icon(Icons.videocam_outlined),
+                  title: Text('Quản lý Camera'),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
