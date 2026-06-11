@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Thuê Huấn Luyện Viên</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, sans-serif; background: #f5f0eb; color: #2c2c2c; min-height: 100vh; padding-bottom: 20px; }
+
+/* Header */
+.header { background: linear-gradient(135deg, #0097a7, #00838f); padding: 20px 16px; color: #fff; }
+.header h1 { font-size: 20px; font-weight: 800; }
+.header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+.header-stats { display: flex; gap: 16px; margin-top: 14px; }
+.stat-box { background: rgba(255,255,255,0.15); padding: 8px 14px; border-radius: 12px; }
+.stat-num { font-size: 18px; font-weight: 800; }
+.stat-label { font-size: 10px; opacity: 0.8; }
+
+/* Sport filter */
+.filter-row { display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto; }
+.filter-chip { padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; border: 1px solid #e0d6cc; background: #fff; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.filter-chip.active { background: #0097a7; color: #fff; border-color: #0097a7; }
+
+/* Coach card */
+.coach-list { padding: 0 16px; }
+.coach-card { background: #fff; border-radius: 16px; margin-bottom: 12px; overflow: hidden; border: 1px solid #e8e0d8; }
+.coach-top { display: flex; padding: 14px; gap: 12px; }
+.coach-avatar { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; }
+.coach-info { flex: 1; }
+.coach-name { font-size: 16px; font-weight: 700; }
+.coach-sport { font-size: 12px; color: #888; margin-top: 2px; }
+.coach-badges { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+.badge { padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 600; }
+.badge.exp { background: #e8f5e9; color: #2e7d32; }
+.badge.cert { background: #e3f2fd; color: #1565c0; }
+.badge.hot { background: #fce4ec; color: #c62828; }
+
+.coach-rating { display: flex; align-items: center; gap: 4px; margin-top: 4px; font-size: 13px; }
+.stars { color: #f9a825; }
+.rating-num { font-weight: 700; }
+.rating-count { color: #888; font-size: 11px; }
+
+/* Schedule */
+.coach-schedule { padding: 0 14px 14px; }
+.schedule-label { font-size: 12px; color: #888; margin-bottom: 8px; font-weight: 600; }
+.time-slots { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+.slot { padding: 6px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; border: 1px solid #e0d6cc; background: #fff; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.slot.selected { background: #0097a7; color: #fff; border-color: #0097a7; }
+.slot.booked { background: #f5f5f5; color: #bbb; border-color: #eee; cursor: default; }
+
+/* Price & book */
+.coach-bottom { display: flex; align-items: center; padding: 0 14px 14px; gap: 12px; }
+.coach-price { flex: 1; }
+.price-label { font-size: 11px; color: #888; }
+.price-val { font-size: 20px; font-weight: 800; color: #0097a7; }
+.price-unit { font-size: 12px; font-weight: 400; color: #888; }
+.book-btn { background: #0097a7; color: #fff; border: none; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.1s; }
+.book-btn:active { transform: scale(0.96); }
+.book-btn:disabled { background: #bbb; cursor: default; }
+
+/* Detail modal */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 40; display: none; }
+.modal-overlay.open { display: block; }
+.modal-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 20px 20px 0 0; max-height: 85vh; overflow-y: auto; }
+.modal-header { padding: 20px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+.modal-avatar { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+.modal-name { font-size: 20px; font-weight: 800; }
+.modal-sport { color: #888; font-size: 14px; }
+.modal-body { padding: 20px; }
+.modal-section { margin-bottom: 20px; }
+.modal-section h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #0097a7; }
+.modal-section p { font-size: 13px; color: #555; line-height: 1.5; }
+.modal-schedule-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.modal-slot { padding: 10px; border-radius: 10px; text-align: center; border: 1px solid #e0d6cc; cursor: pointer; transition: all 0.2s; }
+.modal-slot.selected { background: #0097a7; color: #fff; border-color: #0097a7; }
+.modal-slot.booked { background: #f5f5f5; color: #bbb; cursor: default; }
+.modal-slot .slot-time { font-size: 14px; font-weight: 700; }
+.modal-slot .slot-status { font-size: 10px; margin-top: 2px; }
+.modal-book-btn { width: 100%; padding: 16px; background: #0097a7; color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px; }
+.modal-book-btn:disabled { background: #bbb; }
+
+/* Booking success */
+.booking-success { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 50; display: none; align-items: center; justify-content: center; }
+.booking-success.open { display: flex; }
+.booking-card { background: #fff; border-radius: 20px; padding: 32px; text-align: center; max-width: 300px; width: 90%; }
+.booking-card .icon { font-size: 56px; margin-bottom: 12px; }
+.booking-card h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+.booking-card p { font-size: 14px; color: #888; margin-bottom: 20px; line-height: 1.4; }
+.booking-card button { width: 100%; padding: 14px; background: #27ae60; color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
+
+.toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: #2c2c2c; color: #fff; padding: 10px 20px; border-radius: 24px; font-size: 13px; font-weight: 600; z-index: 60; opacity: 0; transition: opacity 0.3s; }
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏋️ Thuê Huấn Luyện Viên</h1>
+  <p>Đặt PT cá nhân theo giờ, tại sân</p>
+  <div class="header-stats">
+    <div class="stat-box"><div class="stat-num">12</div><div class="stat-label">HLV đang online</div></div>
+    <div class="stat-box"><div class="stat-num">4.8</div><div class="stat-label">Đánh giá TB</div></div>
+    <div class="stat-box"><div class="stat-num">98%</div><div class="stat-label">Hài lòng</div></div>
+  </div>
+</div>
+
+<div class="filter-row">
+  <div class="filter-chip active" onclick="filterSport('all', this)">Tất cả</div>
+  <div class="filter-chip" onclick="filterSport('pickleball', this)">🏓 Pickleball</div>
+  <div class="filter-chip" onclick="filterSport('badminton', this)">🏸 Cầu lông</div>
+  <div class="filter-chip" onclick="filterSport('billiards', this)">🎱 Bida</div>
+  <div class="filter-chip" onclick="filterSport('fitness', this)">💪 Fitness</div>
+</div>
+
+<div class="coach-list" id="coach-list"></div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detail-modal" onclick="closeDetail()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-avatar" id="modal-avatar"></div>
+      <div class="modal-name" id="modal-name"></div>
+      <div class="modal-sport" id="modal-sport"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <h4>Giới thiệu</h4>
+        <p id="modal-bio"></p>
+      </div>
+      <div class="modal-section">
+        <h4>Chứng chỉ</h4>
+        <p id="modal-certs"></p>
+      </div>
+      <div class="modal-section">
+        <h4>Chọn lịch trống</h4>
+        <div class="modal-schedule-grid" id="modal-schedule"></div>
+      </div>
+      <div class="modal-section">
+        <h4>Ghi chú cho HLV (tùy chọn)</h4>
+        <input type="text" id="modal-note" placeholder="VD: Em mới bắt đầu, cần học cơ bản..."
+          style="width:100%;padding:12px;border:1px solid #e0d6cc;border-radius:10px;font-size:14px;outline:none;">
+      </div>
+      <button class="modal-book-btn" id="modal-book-btn" onclick="confirmBooking()">
+        Đặt lịch • <span id="modal-price"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="booking-success" id="booking-success">
+  <div class="booking-card">
+    <div class="icon">✅</div>
+    <h3>Đặt lịch thành công!</h3>
+    <p id="booking-detail"></p>
+    <button onclick="closeBookingSuccess()">Đã hiểu</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const coaches = [
+  {
+    id: 1, name: 'Nguyễn Minh Tuấn', sport: 'pickleball', avatar: '🏓',
+    bg: '#e3f2fd', exp: '5 năm', cert: 'USAPA Certified', hot: true,
+    rating: 4.9, reviews: 128, price: 200000,
+    bio: 'HLV trưởng CLB Pickleball TP.HCM. Đã đào tạo hơn 200 học viên từ newbie đến thi đấu. Chuyên dạy kỹ thuật serve, dink shot và chiến thuật đôi.',
+    certs: 'USAPA Level 2 Coach • HLV trưởng CLB Pickleball SG • VĐV top 10 giải quốc gia 2024',
+    slots: [
+      {time: '07:00', status: 'available'}, {time: '09:00', status: 'available'},
+      {time: '11:00', status: 'booked'}, {time: '14:00', status: 'available'},
+      {time: '16:00', status: 'available'}, {time: '18:00', status: 'booked'},
+    ]
+  },
+  {
+    id: 2, name: 'Trần Thị Hương', sport: 'badminton', avatar: '🏸',
+    bg: '#fff3e0', exp: '7 năm', cert: 'BWF Coach', hot: true,
+    rating: 4.8, reviews: 95, price: 180000,
+    bio: 'Cựu VĐV tuyển quốc gia cầu lông. Chuyên dạy kỹ thuật đánh đôi, footwork và smash. Giảng dạy nhẹ nhàng, dễ hiểu cho người mới.',
+    certs: 'BWF Level 3 Coach • Cựu VĐV tuyển QG • HLV CLB Cầu lông Bình Thanh',
+    slots: [
+      {time: '06:00', status: 'available'}, {time: '08:00', status: 'available'},
+      {time: '10:00', status: 'available'}, {time: '14:00', status: 'booked'},
+      {time: '16:00', status: 'available'}, {time: '19:00', status: 'available'},
+    ]
+  },
+  {
+    id: 3, name: 'Lê Hoàng Nam', sport: 'billiards', avatar: '🎱',
+    bg: '#e8f5e9', exp: '4 năm', cert: 'WPA Trainer',
+    rating: 4.7, reviews: 67, price: 150000,
+    bio: 'Chuyên gia bida pool và carom. Dạy từ cơ bản đến nâng cao: aim, cue ball control, diamond system. Phong cách dạy thực hành, ít lý thuyết.',
+    certs: 'WPA Certified Trainer • VĐV top 16 giải quốc gia • HLV CLB Bida SG',
+    slots: [
+      {time: '10:00', status: 'available'}, {time: '13:00', status: 'available'},
+      {time: '15:00', status: 'booked'}, {time: '17:00', status: 'available'},
+      {time: '19:00', status: 'available'}, {time: '21:00', status: 'available'},
+    ]
+  },
+  {
+    id: 4, name: 'Phạm Gia Huy', sport: 'pickleball', avatar: '🏓',
+    bg: '#fce4ec', exp: '3 năm', cert: 'PPR Coach',
+    rating: 4.6, reviews: 42, price: 160000,
+    bio: 'HLV trẻ năng động, chuyên dạy pickleball cho nhóm bạn bè và gia đình. Kỹ thuật cơ bản, luật chơi và chiến thuật đôi.',
+    certs: 'PPR Certified Coach • HLV CLB Pickleball Thủ Đức',
+    slots: [
+      {time: '08:00', status: 'available'}, {time: '10:00', status: 'booked'},
+      {time: '14:00', status: 'available'}, {time: '16:00', status: 'available'},
+      {time: '18:00', status: 'available'}, {time: '20:00', status: 'available'},
+    ]
+  },
+  {
+    id: 5, name: 'Nguyễn Văn Khang', sport: 'fitness', avatar: '💪',
+    bg: '#f3e5f5', exp: '6 năm', cert: 'ACE CPT',
+    rating: 4.9, reviews: 156, price: 250000,
+    bio: 'Chuyên gia thể hình & thể lực thể thao. Thiết kế bài tập riêng cho từng môn: tăng sức mạnh cho bida, endurance cho cầu lông, agility cho pickleball.',
+    certs: 'ACE Certified Personal Trainer • NASM Performance Enhancement • Chuyên gia dinh dưỡng thể thao',
+    slots: [
+      {time: '05:30', status: 'available'}, {time: '07:00', status: 'available'},
+      {time: '09:00', status: 'booked'}, {time: '15:00', status: 'available'},
+      {time: '17:00', status: 'available'}, {time: '19:30', status: 'available'},
+    ]
+  },
+  {
+    id: 6, name: 'Đỗ Thùy Linh', sport: 'badminton', avatar: '🏸',
+    bg: '#e0f7fa', exp: '4 năm', cert: 'BWF Level 2',
+    rating: 4.5, reviews: 38, price: 160000,
+    bio: 'HLV nữ chuyên dạy cầu lông cho nữ và trẻ em. Kiên nhẫn, vui tính. Chuyên kỹ thuật cơ bản, footwork và giao bóng.',
+    certs: 'BWF Level 2 Coach • HLV CLB Cầu lông Phú Nhuận',
+    slots: [
+      {time: '07:00', status: 'available'}, {time: '09:00', status: 'available'},
+      {time: '14:00', status: 'available'}, {time: '16:00', status: 'booked'},
+      {time: '18:00', status: 'available'}, {time: '20:00', status: 'available'},
+    ]
+  },
+];
+
+let currentSport = 'all';
+let selectedCoach = null;
+let selectedSlot = null;
+
+function formatPrice(p) { return p.toLocaleString('vi-VN') + 'đ'; }
+
+function filterSport(sport, el) {
+  currentSport = sport;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderCoaches();
+}
+
+function renderCoaches() {
+  const list = document.getElementById('coach-list');
+  const filtered = currentSport === 'all' ? coaches : coaches.filter(c => c.sport === currentSport);
+  list.innerHTML = filtered.map(c => `
+    <div class="coach-card">
+      <div class="coach-top">
+        <div class="coach-avatar" style="background:${c.bg}">${c.avatar}</div>
+        <div class="coach-info">
+          <div class="coach-name">${c.name}</div>
+          <div class="coach-sport">${sportLabel(c.sport)} • ${c.exp} kinh nghiệm</div>
+          <div class="coach-badges">
+            <span class="badge exp">${c.exp}</span>
+            <span class="badge cert">${c.cert}</span>
+            ${c.hot ? '<span class="badge hot">🔥 Hot</span>' : ''}
+          </div>
+          <div class="coach-rating">
+            <span class="stars">★</span>
+            <span class="rating-num">${c.rating}</span>
+            <span class="rating-count">(${c.reviews} đánh giá)</span>
+          </div>
+        </div>
+      </div>
+      <div class="coach-schedule">
+        <div class="schedule-label">Lịch trống hôm nay</div>
+        <div class="time-slots">
+          ${c.slots.map((s, i) => `
+            <div class="slot ${s.status === 'booked' ? 'booked' : ''}"
+                 onclick="${s.status === 'available' ? `selectSlot(${c.id}, ${i}, this)` : ''}">
+              ${s.time}${s.status === 'booked' ? ' ✕' : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="coach-bottom">
+        <div class="coach-price">
+          <div class="price-label">Giá mỗi giờ</div>
+          <div class="price-val">${formatPrice(c.price)} <span class="price-unit">/giờ</span></div>
+        </div>
+        <button class="book-btn" onclick="openDetail(${c.id})">Xem chi tiết</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function sportLabel(s) {
+  const map = {pickleball:'🏓 Pickleball', badminton:'🏸 Cầu lông', billiards:'🎱 Bida', fitness:'💪 Fitness'};
+  return map[s] || s;
+}
+
+function selectSlot(coachId, slotIdx, el) {
+  document.querySelectorAll('.slot.selected').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function openDetail(coachId) {
+  selectedCoach = coaches.find(c => c.id === coachId);
+  selectedSlot = null;
+  document.getElementById('modal-avatar').style.background = selectedCoach.bg;
+  document.getElementById('modal-avatar').textContent = selectedCoach.avatar;
+  document.getElementById('modal-name').textContent = selectedCoach.name;
+  document.getElementById('modal-sport').textContent = sportLabel(selectedCoach.sport) + ' • ' + selectedCoach.exp;
+  document.getElementById('modal-bio').textContent = selectedCoach.bio;
+  document.getElementById('modal-certs').textContent = selectedCoach.certs;
+  document.getElementById('modal-price').textContent = formatPrice(selectedCoach.price);
+  document.getElementById('modal-book-btn').disabled = true;
+
+  const grid = document.getElementById('modal-schedule');
+  grid.innerHTML = selectedCoach.slots.map((s, i) => `
+    <div class="modal-slot ${s.status === 'booked' ? 'booked' : ''}"
+         onclick="${s.status === 'available' ? `selectModalSlot(${i}, this)` : ''}">
+      <div class="slot-time">${s.time}</div>
+      <div class="slot-status">${s.status === 'booked' ? 'Đã đặt' : 'Trống'}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detail-modal').classList.remove('open');
+}
+
+function selectModalSlot(idx, el) {
+  selectedSlot = idx;
+  document.querySelectorAll('.modal-slot.selected').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('modal-book-btn').disabled = false;
+}
+
+function confirmBooking() {
+  if (selectedSlot === null || !selectedCoach) return;
+  const slot = selectedCoach.slots[selectedSlot];
+  const note = document.getElementById('modal-note').value;
+
+  document.getElementById('booking-detail').innerHTML = `
+    <strong>${selectedCoach.name}</strong><br>
+    ${sportLabel(selectedCoach.sport)} • Hôm nay lúc <strong>${slot.time}</strong><br>
+    ${formatPrice(selectedCoach.price)}/giờ<br>
+    ${note ? 'Ghi chú: ' + note : ''}
+  `;
+
+  selectedCoach.slots[selectedSlot].status = 'booked';
+  closeDetail();
+  document.getElementById('booking-success').classList.add('open');
+  renderCoaches();
+}
+
+function closeBookingSuccess() {
+  document.getElementById('booking-success').classList.remove('open');
+  document.getElementById('modal-note').value = '';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1500);
+}
+
+renderCoaches();
+</script>
+</body>
+</html>

@@ -23,6 +23,8 @@ import 'package:sports_venue_chatbot/features/booking/presentation/booking_qr_sc
 import 'package:sports_venue_chatbot/features/chat/presentation/voice_agent_call_screen.dart';
 import 'package:sports_venue_chatbot/features/call/presentation/incoming_call_screen.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_screen.dart';
+import 'package:sports_venue_chatbot/features/explore/presentation/explore_screen.dart';
+import 'package:sports_venue_chatbot/features/explore/presentation/mini_app_webview_screen.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/customer_staff_chat_screen.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/staff_chat_screen.dart';
 import 'package:sports_venue_chatbot/features/staff_chat/presentation/staff_inbox_screen.dart';
@@ -88,14 +90,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       // Logged-in staff/admin on customer routes → their area
-      // Exception: allow call, voice-agent, and staff-chat routes for all roles
+      // Exception: allow call, voice-agent, staff-chat, and explore routes for all roles
       final isCallRoute = location == '/call' || location == '/voice-agent';
       final isStaffChatRoute = location.startsWith('/staff-chat/') ||
           location.startsWith('/staff-operator-chat/');
+      final isExploreRoute = location == '/explore' || location == '/mini-app';
       if (isLoggedIn &&
           !isManagementRoute &&
           !isCallRoute &&
-          !isStaffChatRoute) {
+          !isStaffChatRoute &&
+          !isExploreRoute) {
         if (userRole == 'ADMIN') return '/admin/dashboard';
         if (userRole == 'STAFF') return '/staff/requests';
       }
@@ -151,6 +155,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'booking',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: BookingScreen()),
+          ),
+          GoRoute(
+            path: '/explore',
+            name: 'explore',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ExploreScreen()),
           ),
           GoRoute(
             path: '/menu',
@@ -342,6 +352,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/call',
         name: 'call',
         builder: (context, state) => const IncomingCallScreen(),
+      ),
+      GoRoute(
+        path: '/mini-app',
+        name: 'mini_app',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return MiniAppWebViewScreen(
+            title: extra['title'] as String,
+            assetPath: extra['assetPath'] as String,
+          );
+        },
       ),
       GoRoute(
         path: '/staff-chat/:requestId',

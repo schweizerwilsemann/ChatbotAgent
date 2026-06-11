@@ -90,3 +90,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   default-flavor: appDev
+  assets:
+    - assets/mini_apps/

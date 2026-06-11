@@ -2,79 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
-import 'package:sports_venue_chatbot/core/constants/app_spacing.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
-import 'package:sports_venue_chatbot/features/staff/presentation/staff_notifications_provider.dart';
 import 'package:sports_venue_chatbot/shared/widgets/floating_bottom_nav.dart';
-import 'package:sports_venue_chatbot/shared/widgets/glass_app_bar.dart';
 
-/// Shell screen for Staff role.
-///
-/// Provides a limited navigation for staff members:
-/// - Đặt sân (Bookings management)
-/// - Yêu cầu (Customer support requests)
-/// - Thực đơn (Menu management)
-/// - Thông báo (Notifications/Requests)
-///
-/// Staff cannot access Dashboard, Analytics, or Billing (revenue data).
-class StaffShell extends ConsumerStatefulWidget {
+class PartnerShell extends ConsumerStatefulWidget {
   final Widget child;
 
-  const StaffShell({super.key, required this.child});
+  const PartnerShell({super.key, required this.child});
 
   @override
-  ConsumerState<StaffShell> createState() => _StaffShellState();
+  ConsumerState<PartnerShell> createState() => _PartnerShellState();
 }
 
-class _StaffShellState extends ConsumerState<StaffShell> {
+class _PartnerShellState extends ConsumerState<PartnerShell> {
   int _currentIndex = 0;
-  bool _notificationsStarted = false;
 
-  static const List<_StaffNavItem> _navItems = [
-    _StaffNavItem(
-      icon: Icons.calendar_month_outlined,
-      selectedIcon: Icons.calendar_month,
-      label: 'Đặt sân',
-      route: '/staff/bookings',
+  static const List<_PartnerNavItem> _navItems = [
+    _PartnerNavItem(
+      icon: Icons.store_outlined,
+      selectedIcon: Icons.store,
+      label: 'Cửa hàng',
+      route: '/partner/dashboard',
     ),
-    _StaffNavItem(
-      icon: Icons.assignment_turned_in_outlined,
-      selectedIcon: Icons.assignment_turned_in,
-      label: 'Yêu cầu',
-      route: '/staff/requests',
-    ),
-    _StaffNavItem(
+    _PartnerNavItem(
       icon: Icons.restaurant_menu_outlined,
       selectedIcon: Icons.restaurant_menu,
       label: 'Thực đơn',
-      route: '/staff/menu',
+      route: '/partner/menu',
     ),
-    _StaffNavItem(
+    _PartnerNavItem(
       icon: Icons.receipt_long_outlined,
       selectedIcon: Icons.receipt_long,
-      label: 'Hoá đơn',
-      route: '/staff/billing',
-    ),
-    _StaffNavItem(
-      icon: Icons.chat_bubble_outline,
-      selectedIcon: Icons.chat_bubble,
-      label: 'Tin nhắn',
-      route: '/staff/inbox',
+      label: 'Đơn hàng',
+      route: '/partner/orders',
     ),
   ];
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _maybeStartNotifications();
-    });
-  }
-
-  void _maybeStartNotifications() {
-    if (_notificationsStarted) return;
-    _notificationsStarted = true;
-    ref.read(staffNotificationsProvider.notifier).start();
   }
 
   void _onTabTapped(int index) {
@@ -98,48 +64,43 @@ class _StaffShellState extends ConsumerState<StaffShell> {
     final user = ref.watch(authStateProvider).valueOrNull;
 
     return Scaffold(
-      appBar: GlassAppBar(
-        title: const Row(
+      appBar: AppBar(
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 0,
+        title: Row(
           children: [
-            Icon(Icons.support_agent, color: AppColors.primary, size: 24),
-            SizedBox(width: AppSpacing.sm),
-            Flexible(child: Text('Nhân viên')),
+            const Icon(Icons.storefront, color: Color(0xFFE67E22), size: 24),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                user?.name ?? 'Đối tác',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         actions: [
-          _NotificationBell(onTap: () => context.go('/staff/notifications')),
           PopupMenuButton<String>(
             icon: CircleAvatar(
               radius: 16,
-              backgroundColor: AppColors.primarySurface,
+              backgroundColor: const Color(0xFFE67E22).withOpacity(0.15),
               child: Text(
                 (user?.name.isNotEmpty == true)
                     ? user!.name[0].toUpperCase()
                     : '?',
                 style: const TextStyle(
-                  color: AppColors.primary,
+                  color: Color(0xFFE67E22),
                   fontWeight: FontWeight.w700,
                   fontSize: 14,
                 ),
               ),
             ),
             onSelected: (value) {
-              switch (value) {
-                case 'explore':
-                  context.push('/explore');
-                  break;
-                case 'profile':
-                  context.push('/staff/profile');
-                  break;
-                case 'cameras':
-                  context.push('/staff/cameras');
-                  break;
-                case 'settings':
-                  context.push('/staff/settings');
-                  break;
-                case 'logout':
-                  _confirmLogout(context, ref);
-                  break;
+              if (value == 'logout') {
+                _confirmLogout(context, ref);
+              } else if (value == 'settings') {
+                context.push('/partner/settings');
               }
             },
             itemBuilder: (context) => [
@@ -157,41 +118,15 @@ class _StaffShellState extends ConsumerState<StaffShell> {
                       ),
                     ),
                     const Text(
-                      'NHÂN VIÊN',
+                      'ĐỐI TÁC',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: Color(0xFFE67E22),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const Divider(),
                   ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'explore',
-                child: ListTile(
-                  leading: Icon(Icons.explore_outlined),
-                  title: Text('Khám phá'),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'profile',
-                child: ListTile(
-                  leading: Icon(Icons.person_outline),
-                  title: Text('Hồ sơ'),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'cameras',
-                child: ListTile(
-                  leading: Icon(Icons.videocam_outlined),
-                  title: Text('Camera sân'),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
                 ),
               ),
               const PopupMenuItem(
@@ -227,7 +162,7 @@ class _StaffShellState extends ConsumerState<StaffShell> {
                 icon: item.icon,
                 selectedIcon: item.selectedIcon,
                 label: item.label,
-                color: AppColors.primary,
+                color: const Color(0xFFE67E22),
               ),
             )
             .toList(),
@@ -265,42 +200,13 @@ class _StaffShellState extends ConsumerState<StaffShell> {
   }
 }
 
-// ─── Notification bell with unread count ────────────────────────────────────
-
-class _NotificationBell extends ConsumerWidget {
-  final VoidCallback onTap;
-
-  const _NotificationBell({required this.onTap});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final notifState = ref.watch(staffNotificationsProvider);
-    final count = notifState.unreadCount;
-
-    return IconButton(
-      tooltip: 'Thông báo vận hành',
-      onPressed: onTap,
-      icon: Badge(
-        isLabelVisible: count > 0,
-        label: Text(
-          count > 99 ? '99+' : '$count',
-          style: const TextStyle(fontSize: 10, color: AppColors.textOnPrimary),
-        ),
-        child: const Icon(Icons.notifications_outlined),
-      ),
-    );
-  }
-}
-
-// ─── Navigation item model ──────────────────────────────────────────────────
-
-class _StaffNavItem {
+class _PartnerNavItem {
   final IconData icon;
   final IconData selectedIcon;
   final String label;
   final String route;
 
-  const _StaffNavItem({
+  const _PartnerNavItem({
     required this.icon,
     required this.selectedIcon,
     required this.label,

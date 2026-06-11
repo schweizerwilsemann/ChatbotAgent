@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sport Reflex</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, sans-serif; background: #1a1a2e; color: #fff; overflow: hidden; height: 100vh; }
+
+/* Screens */
+.screen { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
+.screen.active { display: flex; }
+
+/* Home */
+.logo { font-size: 48px; margin-bottom: 8px; }
+.title { font-size: 28px; font-weight: 800; background: linear-gradient(135deg, #e74c3c, #f39c12); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.subtitle { color: #888; margin: 8px 0 32px; font-size: 14px; }
+
+.menu-btn { width: 260px; padding: 16px; margin: 6px; border: none; border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.1s; }
+.menu-btn:active { transform: scale(0.96); }
+.menu-btn.primary { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; }
+.menu-btn.secondary { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); }
+.menu-btn small { display: block; font-weight: 400; font-size: 12px; opacity: 0.7; margin-top: 4px; }
+
+/* Game area */
+.game-hud { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); z-index: 10; }
+.hud-item { text-align: center; }
+.hud-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+.hud-value { font-size: 22px; font-weight: 800; }
+.hud-value.score { color: #f39c12; }
+.hud-value.time { color: #e74c3c; }
+.hud-value.combo { color: #2ecc71; }
+
+#game-area { position: fixed; top: 56px; left: 0; right: 0; bottom: 0; }
+
+/* Targets */
+.target { position: absolute; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: #fff; transition: transform 0.1s; animation: popIn 0.3s ease-out; user-select: none; -webkit-user-select: none; }
+.target:active { transform: scale(0.8); }
+@keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.target.normal { background: radial-gradient(circle at 30% 30%, #e74c3c, #c0392b); box-shadow: 0 4px 20px rgba(231,76,60,0.5); }
+.target.fast { background: radial-gradient(circle at 30% 30%, #f39c12, #e67e22); box-shadow: 0 4px 20px rgba(243,156,18,0.5); }
+.target.bonus { background: radial-gradient(circle at 30% 30%, #2ecc71, #27ae60); box-shadow: 0 4px 20px rgba(46,204,113,0.5); }
+.target.bomb { background: radial-gradient(circle at 30% 30%, #95a5a6, #7f8c8d); box-shadow: 0 4px 20px rgba(149,165,166,0.4); }
+
+.target .pts { position: absolute; top: -24px; font-size: 14px; font-weight: 800; animation: floatUp 0.6s ease-out forwards; pointer-events: none; }
+@keyframes floatUp { to { transform: translateY(-30px); opacity: 0; } }
+
+/* Game over */
+.gameover-box { text-align: center; }
+.gameover-box h2 { font-size: 32px; margin-bottom: 8px; }
+.final-score { font-size: 64px; font-weight: 900; color: #f39c12; }
+.stat-row { display: flex; justify-content: center; gap: 24px; margin: 16px 0 24px; }
+.stat { text-align: center; }
+.stat-val { font-size: 20px; font-weight: 700; }
+.stat-lbl { font-size: 11px; color: #888; }
+
+/* Leaderboard */
+.lb-table { width: 100%; max-width: 320px; margin-top: 16px; }
+.lb-row { display: flex; align-items: center; padding: 10px 12px; border-radius: 10px; margin-bottom: 4px; }
+.lb-row.me { background: rgba(243,156,18,0.15); border: 1px solid rgba(243,156,18,0.3); }
+.lb-rank { width: 28px; font-weight: 800; font-size: 14px; color: #888; }
+.lb-row.me .lb-rank { color: #f39c12; }
+.lb-name { flex: 1; font-weight: 600; font-size: 14px; }
+.lb-pts { font-weight: 700; font-size: 14px; color: #f39c12; }
+</style>
+</head>
+<body>
+
+<!-- Home Screen -->
+<div id="screen-home" class="screen active">
+  <div class="logo">⚡</div>
+  <div class="title">Sport Reflex</div>
+  <div class="subtitle">Tap nhanh - Ghi điểm - Chờ sân không chán</div>
+  <button class="menu-btn primary" onclick="startGame('classic')">
+    Chơi ngay
+    <small>30 giây - Ghi nhiều điểm nhất</small>
+  </button>
+  <button class="menu-btn secondary" onclick="startGame('survival')">
+    Sinh tồn
+    <small>3 mạng - Chơi đến khi thua</small>
+  </button>
+  <button class="menu-btn secondary" onclick="showScreen('screen-lb')">
+    Bảng xếp hạng
+  </button>
+</div>
+
+<!-- Game Screen -->
+<div id="screen-game" class="screen">
+  <div class="game-hud">
+    <div class="hud-item"><div class="hud-label">Điểm</div><div class="hud-value score" id="hud-score">0</div></div>
+    <div class="hud-item"><div class="hud-label">Combo</div><div class="hud-value combo" id="hud-combo">x1</div></div>
+    <div class="hud-item"><div class="hud-label" id="hud-time-label">Thời gian</div><div class="hud-value time" id="hud-time">30</div></div>
+  </div>
+  <div id="game-area"></div>
+</div>
+
+<!-- Game Over Screen -->
+<div id="screen-gameover" class="screen">
+  <div class="gameover-box">
+    <h2>Hết game!</h2>
+    <div class="final-score" id="final-score">0</div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val" id="stat-hits">0</div><div class="stat-lbl">Trúng</div></div>
+      <div class="stat"><div class="stat-val" id="stat-miss">0</div><div class="stat-lbl">Miss</div></div>
+      <div class="stat"><div class="stat-val" id="stat-combo">0</div><div class="stat-lbl">Max Combo</div></div>
+    </div>
+    <button class="menu-btn primary" onclick="startGame(currentMode)">Chơi lại</button>
+    <button class="menu-btn secondary" onclick="showScreen('screen-home')">Về trang chủ</button>
+  </div>
+</div>
+
+<!-- Leaderboard Screen -->
+<div id="screen-lb" class="screen">
+  <h2 style="margin-bottom:4px;">🏆 Bảng xếp hạng</h2>
+  <p style="color:#888;font-size:13px;margin-bottom:8px;">Top người chơi tuần này</p>
+  <div class="lb-table" id="lb-table"></div>
+  <br>
+  <button class="menu-btn secondary" onclick="showScreen('screen-home')">Quay lại</button>
+</div>
+
+<script>
+let score = 0, combo = 0, maxCombo = 0, hits = 0, misses = 0, lives = 3;
+let gameTimer = null, spawnTimer = null, timeLeft = 30, currentMode = 'classic';
+let leaderboard = [
+  {name: 'Minh Anh', pts: 1850},
+  {name: 'Tuấn Kiệt', pts: 1620},
+  {name: 'Phương Linh', pts: 1480},
+  {name: 'Đức Trọng', pts: 1350},
+  {name: 'Thanh Tâm', pts: 1200},
+  {name: 'Hoàng Long', pts: 1050},
+  {name: 'Ngọc Hân', pts: 920},
+];
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startGame(mode) {
+  currentMode = mode;
+  score = 0; combo = 0; maxCombo = 0; hits = 0; misses = 0; lives = 3;
+  timeLeft = mode === 'classic' ? 30 : 99;
+  document.getElementById('game-area').innerHTML = '';
+  updateHUD();
+  showScreen('screen-game');
+  document.getElementById('hud-time-label').textContent = mode === 'classic' ? 'Thời gian' : 'Mạng';
+
+  if (mode === 'classic') {
+    gameTimer = setInterval(() => { timeLeft--; updateHUD(); if (timeLeft <= 0) endGame(); }, 1000);
+  } else {
+    document.getElementById('hud-time').textContent = '❤️'.repeat(lives);
+  }
+
+  spawnTimer = setInterval(spawnTarget, mode === 'classic' ? 700 : 800);
+}
+
+function spawnTarget() {
+  const area = document.getElementById('game-area');
+  const size = 44 + Math.random() * 28;
+  const x = Math.random() * (area.clientWidth - size);
+  const y = Math.random() * (area.clientHeight - size - 20) + 10;
+
+  const types = ['normal', 'normal', 'normal', 'fast', 'bonus', 'bomb'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  const pts = type === 'bonus' ? 30 : type === 'fast' ? 20 : type === 'bomb' ? -50 : 10;
+
+  const el = document.createElement('div');
+  el.className = 'target ' + type;
+  el.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px;line-height:${size}px;`;
+  el.textContent = type === 'bomb' ? '💣' : type === 'bonus' ? '⭐' : pts;
+
+  el.ontouchstart = el.onmousedown = (e) => {
+    e.preventDefault();
+    if (type === 'bomb') {
+      if (currentMode === 'survival') { lives--; if (lives <= 0) { endGame(); return; } }
+      else { score = Math.max(0, score - 30); }
+      combo = 0;
+    } else {
+      combo++;
+      if (combo > maxCombo) maxCombo = combo;
+      const multiplier = Math.min(combo, 5);
+      const earned = pts * multiplier;
+      score += earned;
+      hits++;
+      showPoints(el, earned, type);
+    }
+    updateHUD();
+    el.remove();
+  };
+
+  area.appendChild(el);
+
+  const lifetime = type === 'fast' ? 1200 : type === 'bonus' ? 1500 : 2000;
+  setTimeout(() => {
+    if (el.parentNode) {
+      el.remove();
+      if (type !== 'bomb') { combo = 0; misses++; updateHUD(); }
+    }
+  }, lifetime);
+}
+
+function showPoints(el, pts, type) {
+  const span = document.createElement('span');
+  span.className = 'pts';
+  span.textContent = (pts > 0 ? '+' : '') + pts;
+  span.style.color = type === 'bonus' ? '#2ecc71' : type === 'fast' ? '#f39c12' : '#e74c3c';
+  el.appendChild(span);
+}
+
+function updateHUD() {
+  document.getElementById('hud-score').textContent = score;
+  document.getElementById('hud-combo').textContent = combo > 1 ? 'x' + combo : 'x1';
+  document.getElementById('hud-combo').style.color = combo >= 5 ? '#e74c3c' : combo >= 3 ? '#f39c12' : '#2ecc71';
+  if (currentMode === 'classic') {
+    document.getElementById('hud-time').textContent = timeLeft;
+  } else {
+    document.getElementById('hud-time').textContent = '❤️'.repeat(Math.max(0, lives));
+  }
+}
+
+function endGame() {
+  clearInterval(gameTimer);
+  clearInterval(spawnTimer);
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('stat-hits').textContent = hits;
+  document.getElementById('stat-miss').textContent = misses;
+  document.getElementById('stat-combo').textContent = 'x' + maxCombo;
+
+  const me = {name: 'Bạn', pts: score};
+  leaderboard.push(me);
+  leaderboard.sort((a, b) => b.pts - a.pts);
+  leaderboard = leaderboard.slice(0, 10);
+
+  showScreen('screen-gameover');
+}
+
+function renderLeaderboard() {
+  const table = document.getElementById('lb-table');
+  table.innerHTML = leaderboard.map((e, i) => `
+    <div class="lb-row ${e.name === 'Bạn' ? 'me' : ''}">
+      <div class="lb-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i+1)}</div>
+      <div class="lb-name">${e.name}</div>
+      <div class="lb-pts">${e.pts}</div>
+    </div>
+  `).join('');
+}
+
+renderLeaderboard();
+</script>
+</body>
+</html>
