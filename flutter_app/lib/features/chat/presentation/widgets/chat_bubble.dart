@@ -8,6 +8,7 @@ import 'package:sports_venue_chatbot/shared/utils/date_utils.dart';
 class ChatBubble extends StatelessWidget {
   final ChatMessage message;
   final bool showTimestamp;
+  final bool isStreaming;
   final void Function(String orderId, String paymentStatus)?
       onPaymentStatusChanged;
 
@@ -15,6 +16,7 @@ class ChatBubble extends StatelessWidget {
     super.key,
     required this.message,
     this.showTimestamp = true,
+    this.isStreaming = false,
     this.onPaymentStatusChanged,
   });
 
@@ -77,56 +79,62 @@ class ChatBubble extends StatelessWidget {
                                 height: 1.4,
                               ),
                             )
-                          : MarkdownBody(
-                              data: message.content,
-                              styleSheet: MarkdownStyleSheet(
-                                p: const TextStyle(
-                                  color: AppColors.botBubbleText,
-                                  fontSize: 15,
-                                  height: 1.4,
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                MarkdownBody(
+                                  data: message.content,
+                                  styleSheet: MarkdownStyleSheet(
+                                    p: const TextStyle(
+                                      color: AppColors.botBubbleText,
+                                      fontSize: 15,
+                                      height: 1.4,
+                                    ),
+                                    strong: const TextStyle(
+                                      color: AppColors.botBubbleText,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    em: const TextStyle(
+                                      color: AppColors.botBubbleText,
+                                      fontSize: 15,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                    listBullet: const TextStyle(
+                                      color: AppColors.botBubbleText,
+                                      fontSize: 15,
+                                    ),
+                                    code: TextStyle(
+                                      backgroundColor: AppColors.botBubbleBorder
+                                          .withValues(alpha: 0.3),
+                                      color: AppColors.botBubbleText,
+                                      fontSize: 13,
+                                      fontFamily: 'monospace',
+                                    ),
+                                    codeblockDecoration: BoxDecoration(
+                                      color: AppColors.botBubbleBorder
+                                          .withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    h1: const TextStyle(
+                                      color: AppColors.botBubbleText,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    h2: const TextStyle(
+                                      color: AppColors.botBubbleText,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    h3: const TextStyle(
+                                      color: AppColors.botBubbleText,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
-                                strong: const TextStyle(
-                                  color: AppColors.botBubbleText,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                em: const TextStyle(
-                                  color: AppColors.botBubbleText,
-                                  fontSize: 15,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                                listBullet: const TextStyle(
-                                  color: AppColors.botBubbleText,
-                                  fontSize: 15,
-                                ),
-                                code: TextStyle(
-                                  backgroundColor: AppColors.botBubbleBorder
-                                      .withValues(alpha: 0.3),
-                                  color: AppColors.botBubbleText,
-                                  fontSize: 13,
-                                  fontFamily: 'monospace',
-                                ),
-                                codeblockDecoration: BoxDecoration(
-                                  color: AppColors.botBubbleBorder
-                                      .withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                h1: const TextStyle(
-                                  color: AppColors.botBubbleText,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                h2: const TextStyle(
-                                  color: AppColors.botBubbleText,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                h3: const TextStyle(
-                                  color: AppColors.botBubbleText,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                                if (isStreaming) _buildStreamingCursor(),
+                              ],
                             ),
                       if (message.toolsUsed != null &&
                           message.toolsUsed!.isNotEmpty) ...[
@@ -282,6 +290,63 @@ class ChatBubble extends StatelessWidget {
       default:
         return tool;
     }
+  }
+
+  Widget _buildStreamingCursor() {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 500),
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value > 0.5 ? 1.0 : 0.0,
+          child: child,
+        );
+      },
+      onEnd: () {},
+      child: _BlinkingCursor(),
+    );
+  }
+}
+
+class _BlinkingCursor extends StatefulWidget {
+  @override
+  State<_BlinkingCursor> createState() => _BlinkingCursorState();
+}
+
+class _BlinkingCursorState extends State<_BlinkingCursor>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Container(
+          width: 2,
+          height: 16,
+          margin: const EdgeInsets.only(left: 2, top: 2),
+          color: AppColors.botBubbleText.withValues(alpha: _animation.value),
+        );
+      },
+    );
   }
 }
 

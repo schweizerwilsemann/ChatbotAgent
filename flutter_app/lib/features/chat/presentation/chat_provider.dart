@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sports_venue_chatbot/core/network/api_exception.dart';
@@ -184,6 +185,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
 
     final buffer = StringBuffer();
     List<String> toolsUsed = [];
+    Map<String, dynamic>? metadata;
 
     _streamSubscription = _repository
         .sendMessageStream(content, state.sessionId,
@@ -199,6 +201,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
             timestamp: DateTime.now(),
             toolsUsed: toolsUsed.isNotEmpty ? toolsUsed : null,
             sessionId: state.sessionId,
+            metadata: metadata,
           );
 
           state = state.copyWith(
@@ -218,8 +221,18 @@ class ChatNotifier extends StateNotifier<ChatState> {
           return;
         }
 
+        // Save session_id from backend
+        if (chunk.sessionId != null && chunk.sessionId!.isNotEmpty) {
+          state = state.copyWith(sessionId: chunk.sessionId);
+        }
+
         if (chunk.toolName != null) {
           toolsUsed.add(chunk.toolName!);
+        }
+
+        // Capture metadata from chunk
+        if (chunk.metadata != null) {
+          metadata = chunk.metadata;
         }
 
         buffer.write(chunk.content);
@@ -238,13 +251,27 @@ class ChatNotifier extends StateNotifier<ChatState> {
         // Ensure streaming is marked as complete
         if (state.isStreaming) {
           if (buffer.isNotEmpty) {
+            String content = buffer.toString();
+            Map<String, dynamic>? finalMetadata = metadata;
+
+            // Parse metadata from content if marker is present
+            if (content.contains('__METADATA__:')) {
+              final metaIndex = content.indexOf('__METADATA__:');
+              final metaJson = content.substring(metaIndex + 13);
+              try {
+                finalMetadata = jsonDecode(metaJson) as Map<String, dynamic>;
+              } catch (_) {}
+              content = content.substring(0, metaIndex).trim();
+            }
+
             final assistantMessage = ChatMessage(
               id: _uuid.v4(),
               role: 'assistant',
-              content: buffer.toString(),
+              content: content,
               timestamp: DateTime.now(),
               toolsUsed: toolsUsed.isNotEmpty ? toolsUsed : null,
               sessionId: state.sessionId,
+              metadata: finalMetadata,
             );
 
             state = state.copyWith(

@@ -7,6 +7,7 @@ import 'package:sports_venue_chatbot/core/constants/app_colors.dart';
 import 'package:sports_venue_chatbot/core/utils/responsive.dart';
 import 'package:sports_venue_chatbot/features/admin/presentation/realtime_event_provider.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
+import 'package:sports_venue_chatbot/features/chat/data/chat_models.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/chat_provider.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/voice_input_provider.dart';
 import 'package:sports_venue_chatbot/features/chat/presentation/widgets/chat_bubble.dart';
@@ -102,7 +103,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _textController.clear();
     _focusNode.requestFocus();
 
-    ref.read(chatProvider.notifier).sendMessage(text);
+    ref.read(chatProvider.notifier).sendMessageStream(text);
 
     // Scroll to bottom after a short delay to allow the message to be added
     Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
@@ -228,11 +229,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     : _buildMessagesList(chatState),
               ),
 
-              // Streaming content preview
-              if (chatState.isStreaming &&
-                  chatState.streamingContent.isNotEmpty)
-                _buildStreamingPreview(chatState),
-
               // Input area
               _buildInputArea(chatState),
             ],
@@ -335,7 +331,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget _buildMessagesList(ChatState chatState) {
     final messageCount = chatState.messages.length +
         (chatState.isLoading ? 1 : 0) +
-        (chatState.isStreaming && chatState.streamingContent.isEmpty ? 1 : 0);
+        (chatState.isStreaming && chatState.streamingContent.isEmpty ? 1 : 0) +
+        (chatState.isStreaming && chatState.streamingContent.isNotEmpty
+            ? 1
+            : 0);
 
     return Align(
       alignment: Alignment.topCenter,
@@ -358,6 +357,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               );
             }
 
+            // Show streaming content in a bubble
+            if (chatState.isStreaming &&
+                chatState.streamingContent.isNotEmpty) {
+              return ChatBubble(
+                message: ChatMessage(
+                  id: 'streaming',
+                  role: 'assistant',
+                  content: chatState.streamingContent,
+                  timestamp: DateTime.now(),
+                ),
+                showTimestamp: false,
+                isStreaming: true,
+              );
+            }
+
             // Show typing indicator when loading or streaming with no content yet
             if (chatState.isLoading ||
                 (chatState.isStreaming && chatState.streamingContent.isEmpty)) {
@@ -367,40 +381,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             return const SizedBox.shrink();
           },
         ),
-      ),
-    );
-  }
-
-  Widget _buildStreamingPreview(ChatState chatState) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: AppColors.primarySurface.withValues(alpha: 0.3),
-      child: Row(
-        children: [
-          const SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: AppColors.primary,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              chatState.streamingContent.length > 100
-                  ? '${chatState.streamingContent.substring(0, 100)}...'
-                  : chatState.streamingContent,
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppColors.textSecondary,
-                fontStyle: FontStyle.italic,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -131,12 +131,16 @@ class StreamChunk {
   final bool isDone;
   final String? toolName;
   final String? error;
+  final Map<String, dynamic>? metadata;
+  final String? sessionId;
 
   const StreamChunk({
     required this.content,
     this.isDone = false,
     this.toolName,
     this.error,
+    this.metadata,
+    this.sessionId,
   });
 
   factory StreamChunk.fromJson(Map<String, dynamic> json) =>

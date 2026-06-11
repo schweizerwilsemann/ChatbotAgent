@@ -70,6 +70,8 @@ StreamChunk _$StreamChunkFromJson(Map<String, dynamic> json) => StreamChunk(
       isDone: json['is_done'] as bool? ?? false,
       toolName: json['tool_name'] as String?,
       error: json['error'] as String?,
+      metadata: json['metadata'] as Map<String, dynamic>?,
+      sessionId: json['session_id'] as String?,
     );
 
 Map<String, dynamic> _$StreamChunkToJson(StreamChunk instance) =>
@@ -78,4 +80,6 @@ Map<String, dynamic> _$StreamChunkToJson(StreamChunk instance) =>
       'is_done': instance.isDone,
       'tool_name': instance.toolName,
       'error': instance.error,
+      'metadata': instance.metadata,
+      'session_id': instance.sessionId,
     };

@@ -77,13 +77,14 @@ class ChatApi {
               return;
             }
 
-            try {
-              final json = jsonDecode(data) as Map<String, dynamic>;
-              yield StreamChunk.fromJson(json);
-            } catch (e) {
-              // If not valid JSON, treat as plain text chunk
-              yield StreamChunk(content: data);
+            // Check for session marker (not JSON)
+            if (data.startsWith('__SESSION__:')) {
+              final sessionId = data.substring(12);
+              yield StreamChunk(content: '', sessionId: sessionId);
+              continue;
             }
+
+            yield* _parseChunk(data);
           }
         }
       }
@@ -92,16 +93,32 @@ class ChatApi {
       if (buffer.isNotEmpty && buffer.startsWith('data: ')) {
         final data = buffer.substring(6).trim();
         if (data != '[DONE]') {
-          try {
-            final json = jsonDecode(data) as Map<String, dynamic>;
-            yield StreamChunk.fromJson(json);
-          } catch (e) {
-            yield StreamChunk(content: data);
-          }
+          yield* _parseChunk(data);
         }
       }
     } catch (e) {
       yield StreamChunk(content: '', error: e.toString(), isDone: true);
+    }
+  }
+
+  Stream<StreamChunk> _parseChunk(String data) async* {
+    try {
+      final json = jsonDecode(data) as Map<String, dynamic>;
+      yield StreamChunk.fromJson(json);
+    } catch (e) {
+      // Check for metadata marker
+      if (data.startsWith('__METADATA__:')) {
+        final metaJson = data.substring(13);
+        try {
+          final metadata = jsonDecode(metaJson) as Map<String, dynamic>;
+          yield StreamChunk(content: '', metadata: metadata);
+        } catch (_) {
+          yield StreamChunk(content: data);
+        }
+      } else {
+        // If not valid JSON, treat as plain text chunk
+        yield StreamChunk(content: data);
+      }
     }
   }
 
