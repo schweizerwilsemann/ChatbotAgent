@@ -13,6 +13,7 @@ class UserRole(str, enum.Enum):
     CUSTOMER = "CUSTOMER"
     STAFF = "STAFF"
     ADMIN = "ADMIN"
+    PARTNER = "PARTNER"
 
 
 class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):

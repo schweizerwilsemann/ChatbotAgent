@@ -1,6 +1,8 @@
 import json
 import logging
+from collections.abc import AsyncGenerator
 from datetime import datetime, timedelta
+from decimal import Decimal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from app.agent.context import current_chat_context, current_user_id
@@ -10,6 +12,15 @@ from app.core.redis_client import redis_client
 from app.schemas.chat import ChatResponse
 
 logger = logging.getLogger(__name__)
+
+
+def _json_default(obj):
+    """Handle non-JSON-serializable types (Decimal, datetime, etc.)."""
+    if isinstance(obj, Decimal):
+        return float(obj)
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
 
 class ChatService:
@@ -32,7 +43,8 @@ class ChatService:
         self._add_time_context(chat_context)
         enriched_message = self._enrich_message_with_context(message, chat_context)
 
-        history.append({"role": "user", "content": message})
+        # Save enriched message to history so LLM sees context from previous turns
+        history.append({"role": "user", "content": enriched_message})
 
         try:
             user_token = current_user_id.set(user_id)
@@ -107,6 +119,10 @@ class ChatService:
                 + ", ".join(str(label) for label in resource_labels[:8])
             )
 
+        pricing_info = context.get("pricing_info") or []
+        if pricing_info:
+            parts.append("giá thuê sân=" + ", ".join(pricing_info))
+
         prefix = "[Ngữ cảnh hiện tại: " + "; ".join(parts) + "]"
         return f"{prefix}\n{message}"
 
@@ -139,6 +155,71 @@ class ChatService:
         except Exception:
             logger.warning("Failed to load session %s, starting fresh", session_id)
         return []
+
+    async def process_message_stream(
+        self,
+        message: str,
+        session_id: str,
+        user_id: str = "chatbot_user",
+        context: dict | None = None,
+    ) -> AsyncGenerator[str, None]:
+        """Stream chat response tokens as they are generated."""
+        history = await self._load_history(session_id)
+
+        chat_context = dict(context or {})
+        self._add_time_context(chat_context)
+        enriched_message = self._enrich_message_with_context(message, chat_context)
+
+        # Save enriched message to history so LLM sees context from previous turns
+        history.append({"role": "user", "content": enriched_message})
+
+        # DEBUG: Log history length and last 2 messages
+        logger.info(
+            "[CHAT] session=%s | history_len=%d | enriched_msg=%.200s...",
+            session_id,
+            len(history),
+            enriched_message,
+        )
+        if len(history) >= 3:
+            logger.info(
+                "[CHAT] prev_user_msg=%.200s...",
+                history[-3].get("content", "")[:200],
+            )
+
+        full_response = ""
+        try:
+            user_token = current_user_id.set(user_id)
+            context_token = current_chat_context.set(chat_context)
+            try:
+                async for chunk in self._agent.process_stream(
+                    message=enriched_message,
+                    session_history=history,
+                ):
+                    full_response += chunk
+                    yield chunk
+            finally:
+                current_chat_context.reset(context_token)
+                current_user_id.reset(user_token)
+        except Exception:
+            logger.exception("Agent stream failed for session %s", session_id)
+            error_msg = "Xin lỗi, tôi đang gặp sự cố. Vui lòng thử lại sau."
+            full_response = error_msg
+            yield error_msg
+
+        # Yield metadata as final chunk (for booking/order cards)
+        metadata = chat_context.get("order_metadata")
+        if metadata:
+            yield f"__METADATA__:{json.dumps(metadata, ensure_ascii=False, default=_json_default)}"
+
+        # DEBUG: Log final response
+        logger.info(
+            "[CHAT] response=%.200s... | metadata=%s",
+            full_response[:200],
+            "yes" if metadata else "no",
+        )
+
+        history.append({"role": "assistant", "content": full_response})
+        await self._save_history(session_id, history)
 
     async def _save_history(self, session_id: str, history: list[dict]) -> None:
         """Save conversation history to Redis with TTL."""

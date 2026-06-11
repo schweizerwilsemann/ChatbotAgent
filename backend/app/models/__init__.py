@@ -4,6 +4,14 @@ from app.models.camera import Camera, CameraBrand
 from app.models.menu import MenuItem
 from app.models.notification import Notification
 from app.models.order import Order, OrderItem
+from app.models.partner import (
+    PartnerMenuItem,
+    PartnerOrder,
+    PartnerOrderItem,
+    PartnerOrderStatus,
+    PartnerStore,
+    PartnerStoreStatus,
+)
 from app.models.staff_request import StaffRequest
 from app.models.user import User, UserRole
 from app.models.venue import (
@@ -28,6 +36,12 @@ __all__ = [
     "Notification",
     "Order",
     "OrderItem",
+    "PartnerMenuItem",
+    "PartnerOrder",
+    "PartnerOrderItem",
+    "PartnerOrderStatus",
+    "PartnerStore",
+    "PartnerStoreStatus",
     "StaffRequest",
     "User",
     "UserRole",

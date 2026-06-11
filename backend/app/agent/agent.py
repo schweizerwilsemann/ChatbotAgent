@@ -2,6 +2,8 @@ import json
 import logging
 import os
 import re
+import time
+from collections.abc import AsyncGenerator
 from dataclasses import dataclass, field
 
 from langchain.agents import AgentExecutor, create_tool_calling_agent
@@ -16,6 +18,9 @@ from app.core.config import settings
 from app.core.neo4j_client import Neo4jClient
 
 logger = logging.getLogger(__name__)
+
+# Sticky fallback: sau khi fallback, giữ model đó trong 24h
+_FALLBACK_COOLDOWN_SECONDS = 86400  # 24 hours
 
 
 @dataclass
@@ -41,6 +46,9 @@ class VenueAgent:
         self._agent_executor = self._build_agent(self._llm)
         self._fallback_agent_executor = None
         self._fallback_provider = None
+        self._active_executor = self._agent_executor  # Currently active executor
+        self._active_provider = settings.LLM_PROVIDER.lower()
+        self._fallback_activated_at: float = 0  # Timestamp when fallback was activated
         logger.info(
             "LLM config — provider: %s | model: %s | MiMo key: %s",
             settings.LLM_PROVIDER,
@@ -164,6 +172,33 @@ class VenueAgent:
         """Pre-compute intent embeddings. Call once during startup."""
         await self._intent_router.initialize()
 
+    def _get_active_executor(self) -> AgentExecutor:
+        """Get the active executor, checking if primary should be restored."""
+        # Nếu đang dùng fallback và đã hết cooldown → thử primary lại
+        if self._fallback_activated_at > 0:
+            elapsed = time.time() - self._fallback_activated_at
+            if elapsed >= _FALLBACK_COOLDOWN_SECONDS:
+                logger.info(
+                    "Fallback cooldown expired (%.0f hours), restoring primary",
+                    elapsed / 3600,
+                )
+                self._fallback_activated_at = 0
+                self._active_executor = self._agent_executor
+                self._active_provider = settings.LLM_PROVIDER.lower()
+        return self._active_executor
+
+    def _activate_fallback(self) -> None:
+        """Switch to fallback executor and record timestamp."""
+        if self._fallback_agent_executor:
+            self._active_executor = self._fallback_agent_executor
+            self._active_provider = self._fallback_provider
+            self._fallback_activated_at = time.time()
+            logger.warning(
+                "Activated fallback: %s (will restore primary in %d hours)",
+                self._fallback_provider,
+                _FALLBACK_COOLDOWN_SECONDS // 3600,
+            )
+
     async def process(self, message: str, session_history: list[dict]) -> AgentResponse:
         """Process a user message through the AI agent."""
         routed = await self._intent_router.route(message)
@@ -174,8 +209,10 @@ class VenueAgent:
             session_history[:-1] if session_history else []
         )
 
+        executor = self._get_active_executor()
+
         try:
-            result = await self._agent_executor.ainvoke(
+            result = await executor.ainvoke(
                 {
                     "input": message,
                     "chat_history": chat_history,
@@ -192,14 +229,15 @@ class VenueAgent:
             return AgentResponse(output=output, tools_used=tools_used, metadata=metadata)
 
         except Exception as exc:
-            if self._should_fallback_to_ollama(exc) and self._fallback_agent_executor:
+            if self._should_fallback(exc) and self._fallback_agent_executor:
                 logger.warning(
-                    "%s rate limit hit, falling back to %s",
-                    settings.LLM_PROVIDER,
+                    "%s failed, activating sticky fallback to %s",
+                    self._active_provider,
                     self._fallback_provider,
                 )
+                self._activate_fallback()
                 try:
-                    result = await self._fallback_agent_executor.ainvoke(
+                    result = await self._active_executor.ainvoke(
                         {
                             "input": message,
                             "chat_history": chat_history,
@@ -224,8 +262,8 @@ class VenueAgent:
                 tools_used=[],
             )
 
-    @staticmethod
-    def _should_fallback_to_ollama(exc: Exception) -> bool:
+    def _should_fallback(self, exc: Exception) -> bool:
+        """Check if error should trigger fallback."""
         text = str(exc).lower()
         return (
             "429" in text
@@ -324,6 +362,77 @@ class VenueAgent:
             elif role == "assistant":
                 messages.append(AIMessage(content=content))
         return messages
+
+    async def process_stream(
+        self, message: str, session_history: list[dict]
+    ) -> AsyncGenerator[str, None]:
+        """Stream response tokens as they are generated."""
+        routed = await self._intent_router.route(message)
+        if routed:
+            yield routed.answer
+            return
+
+        chat_history = self._convert_history(
+            session_history[:-1] if session_history else []
+        )
+
+        # DEBUG: Log history being sent to LLM
+        logger.info(
+            "[AGENT] history_msgs=%d | last_user=%.200s...",
+            len(chat_history),
+            message[:200],
+        )
+        for i, msg in enumerate(chat_history[-4:]):
+            logger.info("[AGENT]   hist[%d] %s: %.150s...", i, type(msg).__name__, str(msg.content)[:150])
+
+        executor = self._get_active_executor()
+
+        try:
+            async for event in executor.astream_events(
+                {
+                    "input": message,
+                    "chat_history": chat_history,
+                },
+                version="v2",
+            ):
+                kind = event.get("event", "")
+                if kind == "on_chat_model_stream":
+                    chunk = event.get("data", {}).get("chunk")
+                    if chunk and hasattr(chunk, "content"):
+                        content = chunk.content
+                        if content:
+                            yield content
+        except Exception as exc:
+            if self._should_fallback(exc) and self._fallback_agent_executor:
+                logger.warning(
+                    "%s failed, activating sticky fallback to %s (stream)",
+                    self._active_provider,
+                    self._fallback_provider,
+                )
+                self._activate_fallback()
+                try:
+                    async for event in self._active_executor.astream_events(
+                        {
+                            "input": message,
+                            "chat_history": chat_history,
+                        },
+                        version="v2",
+                    ):
+                        kind = event.get("event", "")
+                        if kind == "on_chat_model_stream":
+                            chunk = event.get("data", {}).get("chunk")
+                            if chunk and hasattr(chunk, "content"):
+                                content = chunk.content
+                                if content:
+                                    yield content
+                except Exception:
+                    logger.exception(
+                        "%s fallback stream failed", self._fallback_provider
+                    )
+                    yield "Xin lỗi, tôi gặp lỗi khi xử lý yêu cầu."
+            else:
+                logger.exception("Agent stream failed")
+                yield "Xin lỗi, tôi gặp lỗi khi xử lý yêu cầu."
 
     @staticmethod
     def _extract_tools_used(result: dict) -> list[str]:

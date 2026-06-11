@@ -1,17 +1,25 @@
 """Intent Router — classifies user messages to route them efficiently.
 
-Primary approach: embedding-based semantic similarity.
-Fallback: keyword matching (when embedding service is unavailable).
+Optimized version with:
+- Keyword-first routing (embedding only when needed)
+- Redis caching for intent results
+- Reduced exemplar phrases for faster embedding
 """
 
+import hashlib
 import logging
 import math
 import unicodedata
 from dataclasses import dataclass
 
+from app.core.redis_client import redis_client
+
 logger = logging.getLogger(__name__)
 
 SUPPORTED_SPORTS = ("Bida", "Pickleball", "Cầu lông")
+
+# Cache TTL for intent routing results (10 minutes)
+_INTENT_CACHE_TTL = 600
 
 
 @dataclass(frozen=True)
@@ -20,12 +28,12 @@ class IntentResult:
 
 
 class IntentRouter:
-    """Semantic intent router using embedding similarity.
+    """Semantic intent router with keyword-first strategy and Redis caching.
 
-    Falls back to keyword-based matching when the embedding service is down.
+    Flow: keyword match → cache check → embedding (only if needed)
     """
 
-    # ── Intent exemplar phrases ───────────────────────────────────────
+    # ── Reduced exemplar phrases (only high-confidence patterns) ──────
     _GREETING_EXAMPLES: list[str] = [
         "xin chào",
         "chào bạn",
@@ -35,21 +43,12 @@ class IntentRouter:
         "chào buổi sáng",
         "chào buổi tối",
         "bạn ơi",
-        "ơi bạn",
         "chào",
         "hế lô",
         "xin chào bạn",
         "chào anh",
         "chào chị",
-        "good morning",
-        "chào buổi chiều",
         "alo",
-        "ô kê",
-        "chao ban",
-        "xin chao",
-        "chào bạn ơi",
-        "hello bạn",
-        "hi bạn",
         "chào mừng",
         "cảm ơn bạn",
         "thank you",
@@ -63,140 +62,88 @@ class IntentRouter:
         "tin tức thể thao mới nhất",
         "điểm thi đại học",
         "cách làm bánh mì",
-        "bài hát yêu thích",
         "phim hay nhất năm nay",
         "dự báo thời tiết",
         "giá xăng dầu hôm nay",
         "cách học tiếng anh hiệu quả",
-        "đặt vé máy bay giá rẻ",
         "nhà hàng ngon ở hà nội",
-        "cách trồng rau sạch",
         "giải toán cao cấp",
         "lập trình python cơ bản",
         "bệnh đau đầu nên uống thuốc gì",
-        "mua xe ô tô trả góp",
         "thời tiết hà nội hôm nay",
-        "tin tức thời sự trong nước",
         "cách giảm cân nhanh nhất",
         "tử vi hôm nay của tôi",
-        "giá điện thoại iphone 15",
-        "mẹo chăm sóc da mặt",
         "chính trị thế giới",
         "cổ phiếu hôm nay",
-        "mua nhà ở đâu",
         "du lịch đà nẵng",
     ]
 
     _DOMAIN_EXAMPLES: list[str] = [
-        # Pickleball
+        # Pickleball core
         "luật pickleball",
         "kỹ thuật pickleball",
         "cách chơi pickleball cho người mới",
         "pickleball là gì",
-        "quy tắc pickleball",
-        "luật chơi pickleball chi tiết",
-        "cho tôi biết luật pickleball",
-        "kỹ thuật đánh pickleball nâng cao",
-        "pickleball có mấy set",
         "cách phát bóng pickleball",
-        # Billiards / Bida
+        # Billiards core
         "luật bida",
         "kỹ thuật bida",
         "cách chơi bida lỗ",
         "bida là gì",
-        "quy tắc bida 8 bi",
-        "luật chơi bida 9 bi",
-        "kỹ thuật đánh bida cơ bản",
         "cách cầm cơ bida",
-        "billiards rules",
-        "cách đánh bida hay",
         "kỹ thuật kéo cơ bida",
-        "cách tính điểm bida",
-        # Badminton / Cầu lông
+        # Badminton core
         "luật cầu lông",
         "kỹ thuật cầu lông",
         "cách chơi cầu lông",
         "cầu lông là gì",
-        "luật cầu lông mới nhất",
         "kỹ thuật smash cầu lông",
         "cách cầm vợt cầu lông",
-        "cách phát cầu lông",
-        "kỹ thuật lưới cầu lông",
-        # Venue operations — standalone & combined
+        # Venue operations
         "đặt sân",
         "đặt bàn",
         "đặt chỗ",
         "đặt sân bida",
-        "đặt sân pickleball",
-        "đặt bàn bida",
         "book sân",
-        "book sân cầu lông",
         "thực đơn",
-        "thực đơn đồ uống",
         "menu quán",
         "gọi đồ ăn",
         "gọi đồ uống",
         "gọi nhân viên",
-        "gọi nhân viên hỗ trợ",
         "kiểm tra lịch đặt sân",
         "hủy đặt sân",
-        "thay đổi lịch đặt",
         "giá thuê sân",
         "giá bao nhiêu",
         "giờ mở cửa",
-        "giờ đóng cửa",
-        "mấy giờ mở cửa",
         "địa chỉ quán ở đâu",
         "số điện thoại liên hệ",
         "có khuyến mãi không",
-        "ưu đãi hôm nay",
         # Knowledge queries
         "luật chơi thể thao",
         "kỹ thuật thể thao",
         "hướng dẫn chơi",
         "mẹo chơi hay",
-        # Food ordering — direct item mentions (no explicit verb)
+        # Food ordering - direct item mentions
         "khoai tây chiên 2 phần",
         "cà phê sữa cho tôi",
         "cho tôi 2 coca cola",
         "lấy 1 bia tiger",
         "khoai tây chiên với cafe sữa",
-        "2 phần khoai tây chiên và cà phê",
-        "1 coca cola và khoai tây chiên",
         "cho tôi cà phê đen",
         "gọi 2 phần khô bò",
         "lấy thêm nước suối",
         "thuê vợt cầu lông",
         "thuê vợt pickleball",
-        "lấy băng đeo tay",
-        "mua quấn cán vợt",
-        "cần ống cầu lông",
         "thuê cơ bida",
-        "thue vot cau long",
-        "lay bang deo tay",
-        "khoai tây chiên 1 phần",
-        "cafe sữa đi",
-        "trà đá và đậu phộng",
-        "bánh tráng trộn 1 phần",
-        "khô gà lá chanh 2 phần",
-        "bia tiger 3 chai",
-        "order khoai tây chiên",
-        "mua 2 cà phê sữa",
-        # Staff request variants
+        # Staff request
         "gặp nhân viên",
         "nhờ nhân viên giúp",
-        "cần người hỗ trợ",
         "gọi người phục vụ",
         "tính tiền cho tôi",
         "muốn thanh toán",
-        "mang thêm nước",
-        "sân bị hư",
-        "đèn hỏng rồi",
-        "cơ bida bị gãy",
-        # Non-diacritics variants (model doesn't always bridge these)
+        # Non-diacritics variants
         "dat san",
         "dat ban",
-        "dat cho",
         "book san",
         "luat bida",
         "luat pickleball",
@@ -204,12 +151,6 @@ class IntentRouter:
         "ky thuat bida",
         "ky thuat pickleball",
         "ky thuat cau long",
-        "mo cua",
-        "gia bao nhieu",
-        "o dau",
-        "lien he",
-        "huy dat san",
-        "kiem tra lich",
         "goi nhan vien",
         "tinh tien",
         "thanh toan",
@@ -234,131 +175,41 @@ class IntentRouter:
     _SPORTS_OVERVIEW_THRESHOLD = 0.70
     _OFF_TOPIC_THRESHOLD = 0.55
 
-    # ── Keyword fallback data ─────────────────────────────────────────
+    # ── Keyword data (prioritized for fast matching) ──────────────────
     _KW_SPORT_KW = ("môn nào", "môn gì", "những môn", "hỗ trợ môn")
     _KW_KNOWLEDGE_KW = ("kỹ thuật", "kĩ thuật", "luật", "kiến thức")
 
-    _KW_DOMAIN_KW: tuple[str, ...] = (
-        "bida",
-        "billiards",
-        "pool",
-        "snooker",
-        "pickleball",
-        "cầu lông",
-        "badminton",
-        "sân",
-        "court",
-        "đặt sân",
-        "đặt bàn",
-        "book",
-        "đặt chỗ",
-        "thực đơn",
-        "menu",
-        "đồ uống",
-        "thức ăn",
-        "đồ ăn",
-        "order",
-        "gọi đồ",
-        "gọi món",
-        "đặt hàng",
-        "thuê",
-        "thue",
-        "nhân viên",
-        "staff",
-        "hỗ trợ",
-        "support",
-        "gọi nhân viên",
-        "gặp nhân viên",
-        "phục vụ",
-        "tính tiền",
-        "thanh toán",
-        "trả tiền",
-        "lịch",
-        "schedule",
-        "lịch sử",
-        "đặt trước",
-        "hủy",
-        "cancel",
-        "thay đổi",
-        "đổi lịch",
-        "luật",
-        "kỹ thuật",
-        "kĩ thuật",
-        "kiến thức",
-        "luật chơi",
-        "cách chơi",
-        "hướng dẫn",
-        "mẹo",
-        "tip",
-        "giá",
-        "giờ mở cửa",
-        "địa chỉ",
-        "liên hệ",
-        "số điện thoại",
-        "mấy giờ",
-        "ở đâu",
-        "bao nhiêu",
-        "mở cửa",
-        "đóng cửa",
-        "khuyến mãi",
-        "giảm giá",
-        "ưu đãi",
-        # Food items & ordering — direct mentions
-        "khoai tây",
-        "cà phê",
-        "cafe",
-        "coca cola",
-        "coca",
-        "bia tiger",
-        "bia",
-        "trà đá",
-        "nước suối",
-        "khô bò",
-        "khô gà",
-        "đậu phộng",
-        "bánh tráng",
-        "sting",
-        "vợt",
-        "vot",
-        "băng đeo tay",
-        "bang deo tay",
-        "quấn cán",
-        "quan can",
-        "cầu lông",
-        "cau long",
-        "thuê vợt",
-        "thue vot",
-        "phần",
-        "cho tôi",
-        "cho mình",
-        "lấy",
-        # Maintenance & equipment
-        "hư",
-        "hỏng",
-        "gãy",
-        "đèn",
-        "quạt",
-        "cơ bida",
-        "bàn bida",
-        "sân hỏng",
+    _KW_GREETING_KW: tuple[str, ...] = (
+        "xin chào", "hello", "hi", "chào", "hey",
+        "cảm ơn", "tks", "thanks", "thank you",
+        "tạm biệt", "bye", "goodbye",
+        "ơi", "ơi bạn", "bạn ơi",
     )
 
-    _KW_GREETING_KW: tuple[str, ...] = (
-        "xin chào",
-        "hello",
-        "hi",
-        "chào",
-        "hey",
-        "cảm ơn",
-        "tks",
-        "thanks",
-        "thank you",
-        "tạm biệt",
-        "bye",
-        "goodbye",
-        "ơi",
-        "ơi bạn",
-        "bạn ơi",
+    _KW_DOMAIN_KW: tuple[str, ...] = (
+        "bida", "billiards", "pool", "snooker",
+        "pickleball", "cầu lông", "badminton",
+        "sân", "court", "đặt sân", "đặt bàn", "book", "đặt chỗ",
+        "thực đơn", "menu", "đồ uống", "thức ăn", "đồ ăn",
+        "order", "gọi đồ", "gọi món", "đặt hàng",
+        "thuê", "thue", "nhân viên", "staff", "hỗ trợ", "support",
+        "gọi nhân viên", "gặp nhân viên", "phục vụ",
+        "tính tiền", "thanh toán", "trả tiền",
+        "lịch", "schedule", "lịch sử", "đặt trước", "hủy", "cancel",
+        "thay đổi", "đổi lịch",
+        "luật", "kỹ thuật", "kĩ thuật", "kiến thức", "luật chơi",
+        "cách chơi", "hướng dẫn", "mẹo", "tip",
+        "giá", "giá cả", "bao nhiêu", "bao nhiêu tiền", "chi phí",
+        "giờ mở cửa", "địa chỉ", "liên hệ", "số điện thoại",
+        "mấy giờ", "ở đâu", "mở cửa", "đóng cửa",
+        "khuyến mãi", "giảm giá", "ưu đãi",
+        "khoai tây", "cà phê", "cafe", "coca cola", "coca",
+        "bia tiger", "bia", "trà đá", "nước suối",
+        "khô bò", "khô gà", "đậu phộng", "bánh tráng", "sting",
+        "vợt", "vot", "băng đeo tay", "quấn cán", "quan can",
+        "cau long", "thuê vợt", "thue vot", "phần",
+        "cho tôi", "cho mình", "lấy",
+        "hư", "hỏng", "gãy", "đèn", "quạt", "cơ bida", "bàn bida",
     )
 
     # ══════════════════════════════════════════════════════════════════
@@ -366,12 +217,6 @@ class IntentRouter:
     # ══════════════════════════════════════════════════════════════════
 
     def __init__(self, embedder=None) -> None:
-        """
-        Args:
-            embedder: An object with an ``embed_query(text) -> list[float] | None``
-                      async method (e.g. ``NodeEmbedder``).  If *None* the router
-                      operates in keyword-fallback mode only.
-        """
         self._embedder = embedder
         self._greeting_embs: list[list[float]] = []
         self._domain_embs: list[list[float]] = []
@@ -380,11 +225,7 @@ class IntentRouter:
         self._embedding_ready = False
 
     async def initialize(self) -> None:
-        """Pre-compute embeddings for every intent exemplar.
-
-        Call once during application startup, after the embedding service
-        (e.g. Ollama) is available.
-        """
+        """Pre-compute embeddings for every intent exemplar."""
         if not self._embedder:
             logger.warning("No embedder — IntentRouter stays in keyword-fallback mode")
             return
@@ -419,20 +260,117 @@ class IntentRouter:
     # Public routing interface
     # ══════════════════════════════════════════════════════════════════
 
+    # Keywords that indicate dynamic content (prices, hours, availability)
+    # These should NEVER be cached because they change frequently
+    _DYNAMIC_KEYWORDS: tuple[str, ...] = (
+        "giá", "giá cả", "bao nhiêu", "bao nhiêu tiền", "chi phí",
+        "giờ mở cửa", "giờ đóng cửa", "mấy giờ mở", "mấy giờ đóng",
+        "khuyến mãi", "giảm giá", "ưu đãi", "promotion",
+        "còn trống", "còn sân", "đang mở", "đang đóng",
+    )
+
+    def _is_dynamic_query(self, message: str) -> bool:
+        """Check if message asks for dynamic info that shouldn't be cached."""
+        text = message.lower().strip()
+        norm = self._strip_diacritics(text)
+        for kw in self._DYNAMIC_KEYWORDS:
+            kw_norm = self._strip_diacritics(kw)
+            if kw_norm in norm:
+                return True
+        return False
+
     async def route(self, message: str) -> IntentResult | None:
-        """Classify *message* and return an ``IntentResult`` or *None*.
-
-        * ``None`` → message should be forwarded to the LLM.
-        * ``IntentResult`` → the router already has a canned answer.
-
-        Uses embeddings when available, keyword matching otherwise.
+        """Classify message with optimized flow:
+        1. Check Redis cache (skip for dynamic queries)
+        2. Try keyword matching (fast, no API call)
+        3. Try embedding matching (only when keyword is ambiguous)
         """
+        is_dynamic = self._is_dynamic_query(message)
+
+        # 1. Check cache first (skip for dynamic queries like price, hours)
+        cache_key = self._cache_key(message)
+        if not is_dynamic:
+            try:
+                cached = await redis_client.get(cache_key)
+                if cached is not None:
+                    if cached == "__NONE__":
+                        return None
+                    return IntentResult(answer=cached)
+            except Exception:
+                logger.debug("Intent cache read skipped", exc_info=True)
+
+        # 2. Keyword-first routing (fast path - no API call)
+        keyword_result = self._route_keyword(message)
+
+        # If keyword gives a definitive answer (sports overview), use it
+        # But DON'T cache dynamic queries
+        if keyword_result is not None:
+            if not is_dynamic:
+                await self._cache_result(cache_key, keyword_result.answer)
+            return keyword_result
+
+        # 3. Embedding routing (only when keyword is ambiguous AND embedder available)
         if self._embedding_ready:
-            return await self._route_embedding(message)
-        return self._route_keyword(message)
+            embedding_result = await self._route_embedding(message)
+            if embedding_result is not None:
+                if not is_dynamic:
+                    await self._cache_result(cache_key, embedding_result.answer)
+                return embedding_result
+
+        # 4. Pass through to LLM
+        # Don't cache dynamic queries at all
+        if not is_dynamic:
+            await self._cache_result(cache_key, "__NONE__", ttl=120)
+        return None
 
     # ══════════════════════════════════════════════════════════════════
-    # Embedding-based routing (primary)
+    # Cache helpers
+    # ══════════════════════════════════════════════════════════════════
+
+    @staticmethod
+    def _cache_key(message: str) -> str:
+        normalized = " ".join(message.lower().strip().split())
+        digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:16]
+        return f"intent:{digest}"
+
+    @staticmethod
+    async def _cache_result(key: str, value: str, ttl: int | None = None) -> None:
+        try:
+            await redis_client.set(key, value, ex=ttl or _INTENT_CACHE_TTL)
+        except Exception:
+            logger.debug("Intent cache write skipped", exc_info=True)
+
+    # ══════════════════════════════════════════════════════════════════
+    # Keyword-based routing (fast path)
+    # ══════════════════════════════════════════════════════════════════
+
+    def _route_keyword(self, message: str) -> IntentResult | None:
+        text = message.lower().strip()
+        norm = self._strip_diacritics(text)
+
+        # 1. Supported-sports overview (definitive answer)
+        if self._kw_match(norm, self._KW_SPORT_KW) and self._kw_match(
+            norm, self._KW_KNOWLEDGE_KW
+        ):
+            return self._make_sports_answer()
+
+        # 2. Greeting — pass through to LLM (not definitive)
+        if self._kw_match(norm, self._KW_GREETING_KW):
+            return None
+
+        # 3. Domain keywords found — pass through to LLM (needs semantic understanding)
+        if self._kw_match(norm, self._KW_DOMAIN_KW):
+            return None
+
+        # 4. Short messages — let LLM handle
+        if len(text) <= 5:
+            return None
+
+        # 5. No keyword match — ambiguous, needs embedding check
+        return None
+
+    # ══════════════════════════════════════════════════════════════════
+    # Embedding-based routing (fallback when keyword is ambiguous)
     # ══════════════════════════════════════════════════════════════════
 
     async def _route_embedding(self, message: str) -> IntentResult | None:
@@ -441,7 +379,7 @@ class IntentRouter:
             logger.warning(
                 "Embedding failed for '%s' — falling back to keywords", message[:60]
             )
-            return self._route_keyword(message)
+            return None
 
         greet_sim = self._max_sim(query_emb, self._greeting_embs)
         domain_sim = self._max_sim(query_emb, self._domain_embs)
@@ -457,19 +395,13 @@ class IntentRouter:
             off_sim,
         )
 
-        # Decision: find the dominant category, check thresholds.
-        # Order matters — greetings & domain get priority.
-
-        # 1. Greeting → pass through to LLM
+        # Decision logic
         if greet_sim >= self._GREETING_THRESHOLD and greet_sim >= off_sim:
             return None
 
-        # 2. Domain query → pass through to LLM
         if domain_sim >= self._DOMAIN_THRESHOLD and domain_sim >= off_sim:
             return None
 
-        # 3. Supported-sports overview → canned answer
-        #    (only when clearly the top category AND above domain)
         if (
             sports_sim >= self._SPORTS_OVERVIEW_THRESHOLD
             and sports_sim > domain_sim
@@ -477,10 +409,6 @@ class IntentRouter:
         ):
             return self._make_sports_answer()
 
-        # 4. Off-topic → DO NOT block. Let the LLM handle it.
-        #    The LLM's system prompt already constrains the domain.
-        #    Blocking here prevents semantic understanding of messages
-        #    like menu item orders that don't match predefined patterns.
         if off_sim >= self._OFF_TOPIC_THRESHOLD and off_sim > domain_sim:
             logger.info(
                 "Possible off-topic (embedding, score=%.3f) but passing to LLM: %s",
@@ -488,42 +416,7 @@ class IntentRouter:
                 message[:80],
             )
 
-        # 5. Always give the LLM a chance to handle the message
         return None
-
-    # ══════════════════════════════════════════════════════════════════
-    # Keyword-based routing (fallback)
-    # ══════════════════════════════════════════════════════════════════
-
-    def _route_keyword(self, message: str) -> IntentResult | None:
-        text = message.lower().strip()
-        norm = self._strip_diacritics(text)
-
-        # 1. Supported-sports overview
-        if self._kw_match(norm, self._KW_SPORT_KW) and self._kw_match(
-            norm, self._KW_KNOWLEDGE_KW
-        ):
-            return self._make_sports_answer()
-
-        # 2. Domain relevance check — pass through to LLM even if not matched.
-        #    The LLM's system prompt constrains the domain; we no longer block
-        #    messages that don't match keywords, because that prevents the LLM
-        #    from semantically understanding messages like menu item orders.
-        if not self._kw_is_relevant(text, norm):
-            logger.info(
-                "Possible off-topic (keyword) but passing to LLM: %s", text[:80]
-            )
-
-        return None
-
-    def _kw_is_relevant(self, text: str, norm: str) -> bool:
-        if len(text) <= 5:
-            return True
-        if self._kw_match(norm, self._KW_GREETING_KW):
-            return True
-        if self._kw_match(norm, self._KW_DOMAIN_KW):
-            return True
-        return False
 
     # ══════════════════════════════════════════════════════════════════
     # Canned answers
@@ -537,20 +430,6 @@ class IntentRouter:
                 "Hiện mình hỗ trợ kiến thức luật chơi và kỹ thuật cho 3 môn:\n"
                 f"{sports}\n\n"
                 "Bạn muốn tìm kỹ thuật của môn nào trước?"
-            )
-        )
-
-    @staticmethod
-    def _make_off_topic_answer() -> IntentResult:
-        return IntentResult(
-            answer=(
-                "Xin lỗi, mình chỉ hỗ trợ về bida, pickleball và cầu lông 🎱🏸🏓\n"
-                "Bạn có thể hỏi mình về:\n"
-                "• Luật chơi, kỹ thuật\n"
-                "• Đặt sân\n"
-                "• Thực đơn & đặt hàng\n"
-                "• Gọi nhân viên hỗ trợ\n"
-                "• Kiểm tra lịch sử đặt sân"
             )
         )
 
@@ -585,7 +464,6 @@ class IntentRouter:
 
     @staticmethod
     def _strip_diacritics(text: str) -> str:
-        """Strip Vietnamese diacritics for fuzzy matching."""
         nfkd = unicodedata.normalize("NFKD", text)
         return "".join(c for c in nfkd if not unicodedata.combining(c))
 

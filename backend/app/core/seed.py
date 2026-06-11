@@ -526,6 +526,7 @@ async def ensure_user_password_column(engine: AsyncEngine) -> None:
 async def ensure_multi_tenant_columns(engine: AsyncEngine) -> None:
     async with engine.begin() as conn:
         statements = [
+            "ALTER TYPE user_role_enum ADD VALUE IF NOT EXISTS 'PARTNER'",
             "ALTER TYPE booking_status_enum ADD VALUE IF NOT EXISTS 'checked_in'",
             "ALTER TYPE staff_request_type_enum ADD VALUE IF NOT EXISTS 'early_arrival'",
             "ALTER TYPE staff_request_type_enum ADD VALUE IF NOT EXISTS 'late_arrival'",
@@ -1055,3 +1056,129 @@ async def seed_default_menu(
     if badminton_venue:
         total += len(BADMINTON_MENU_ITEMS)
     logger.info("Menu ensured: %d items", total)
+
+
+# ── Partner Stores Seed ────────────────────────────────
+
+PARTNER_PHONE_TRA_SUA = "0911111111"
+PARTNER_PHONE_COM_GA = "0922222222"
+PARTNER_PHONE_BANH_MI = "0933333333"
+
+PARTNER_STORES = [
+    {
+        "phone": PARTNER_PHONE_TRA_SUA,
+        "owner_name": "Chủ Trà Sữa Mèo",
+        "store_name": "Trà Sữa Mèo",
+        "description": "Trà sữa & đồ uống giải khát, giao tận sân",
+        "category": "drink",
+        "delivery_minutes": 15,
+        "items": [
+            {"name": "Trà Sữa Truyền Thống", "price": Decimal("28000"), "category": "drink", "description": "Trà sữa + trân châu đen"},
+            {"name": "Trà Đào Cam Sả", "price": Decimal("32000"), "category": "drink", "description": "Trà đào thơm mát"},
+            {"name": "Trà Vải", "price": Decimal("30000"), "category": "drink", "description": "Trà vải thiều lạnh"},
+            {"name": "Sinh Tố Bơ", "price": Decimal("35000"), "category": "drink", "description": "Bơ sữa đặc sánh"},
+            {"name": "Matcha Đá Xay", "price": Decimal("38000"), "category": "drink", "description": "Matcha Nhật kem tươi"},
+            {"name": "Kem Vanilla", "price": Decimal("15000"), "category": "dessert", "description": "Kem vanilla mềm mịn"},
+        ],
+    },
+    {
+        "phone": PARTNER_PHONE_COM_GA,
+        "owner_name": "Chủ Cơm Gà 123",
+        "store_name": "Cơm Gà 123",
+        "description": "Cơm gà, mì xào, đồ ăn nhanh giao tại sân",
+        "category": "food",
+        "delivery_minutes": 20,
+        "items": [
+            {"name": "Cơm Gà Chiên", "price": Decimal("45000"), "category": "food", "description": "Cơm + gà chiên giòn + salad"},
+            {"name": "Cơm Sườn Nướng", "price": Decimal("50000"), "category": "food", "description": "Cơm + sườn nướng mật ong"},
+            {"name": "Mì Xào Hải Sản", "price": Decimal("55000"), "category": "food", "description": "Mì xào tôm mực rau củ"},
+            {"name": "Bánh Mì Thịt", "price": Decimal("25000"), "category": "food", "description": "Bánh mì pate thịt nguội"},
+            {"name": "Coca Cola", "price": Decimal("15000"), "category": "drink", "description": "Lon 330ml"},
+            {"name": "Nước Suối", "price": Decimal("10000"), "category": "drink", "description": "La Vie 500ml"},
+        ],
+    },
+    {
+        "phone": PARTNER_PHONE_BANH_MI,
+        "owner_name": "Chủ Bánh Mì Ngon",
+        "store_name": "Bánh Mì Ngon",
+        "description": "Bánh mì & đồ ăn vặt, giá sinh viên",
+        "category": "food",
+        "delivery_minutes": 10,
+        "items": [
+            {"name": "Bánh Mì Pate", "price": Decimal("15000"), "category": "food", "description": "Bánh mì pate truyền thống"},
+            {"name": "Bánh Mì Gà", "price": Decimal("20000"), "category": "food", "description": "Bánh mì gà xé phay"},
+            {"name": "Xúc Xích Nướng", "price": Decimal("20000"), "category": "food", "description": "Xúc xích nướng than"},
+            {"name": "Khoai Tây Chiên", "price": Decimal("25000"), "category": "food", "description": "Khoai giòn kèm sốt"},
+            {"name": "Bánh Tráng Trộn", "price": Decimal("20000"), "category": "food", "description": "Bánh tráng sa tế"},
+            {"name": "Trà Đá", "price": Decimal("5000"), "category": "drink", "description": "Trà đá mát lạnh"},
+        ],
+    },
+]
+
+
+async def seed_partner_stores(
+    session: AsyncSession,
+    *,
+    billiards_venue: Venue | None = None,
+) -> None:
+    from app.models.partner import PartnerMenuItem as PMenuItem
+    from app.models.partner import PartnerStore, PartnerStoreStatus
+
+    venue = billiards_venue  # Default venue for partner stores
+
+    for store_data in PARTNER_STORES:
+        # Ensure partner user
+        user = await _ensure_user(
+            session,
+            phone=store_data["phone"],
+            name=store_data["owner_name"],
+            role=UserRole.PARTNER,
+        )
+
+        # Check if store exists
+        result = await session.execute(
+            select(PartnerStore).where(
+                PartnerStore.owner_user_id == str(user.id),
+                PartnerStore.is_deleted == False,  # noqa: E712
+            )
+        )
+        store = result.scalar_one_or_none()
+
+        if store is None:
+            store = PartnerStore(
+                owner_user_id=str(user.id),
+                venue_id=venue.id if venue else None,
+                name=store_data["store_name"],
+                description=store_data["description"],
+                category=store_data["category"],
+                status=PartnerStoreStatus.active,
+                is_open=True,
+                delivery_fee=Decimal("15000"),
+                estimated_delivery_minutes=store_data["delivery_minutes"],
+            )
+            session.add(store)
+            await session.flush()
+
+        # Seed menu items
+        for item_data in store_data["items"]:
+            existing = await session.execute(
+                select(PMenuItem).where(
+                    PMenuItem.store_id == store.id,
+                    PMenuItem.name == item_data["name"],
+                    PMenuItem.is_deleted == False,  # noqa: E712
+                )
+            )
+            if existing.scalar_one_or_none() is None:
+                session.add(
+                    PMenuItem(
+                        store_id=store.id,
+                        name=item_data["name"],
+                        description=item_data.get("description", ""),
+                        price=item_data["price"],
+                        category=item_data["category"],
+                        is_available=True,
+                    )
+                )
+
+    await session.flush()
+    logger.info("Partner stores ensured: %d stores", len(PARTNER_STORES))

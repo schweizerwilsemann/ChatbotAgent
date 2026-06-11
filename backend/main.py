@@ -11,7 +11,7 @@ from app.agent.tools import (
     query_knowledge,
     recommend_menu,
 )
-from app.agent.tools.query_faq import set_neo4j_client
+from app.agent.tools.query_faq import set_neo4j_client, ensure_indexes
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
 from app.api.booking import router as booking_router
@@ -29,6 +29,8 @@ from app.api.staff_chat import router as staff_chat_router
 from app.api.staff_request import router as staff_request_router
 from app.api.stripe import router as stripe_router
 from app.api.venue import router as venue_router
+from app.api.partner import router as partner_router
+from app.core.cache_warmer import warm_all_caches
 from app.core.config import settings
 from app.core.database import async_session_factory, engine
 from app.core.neo4j_client import Neo4jClient
@@ -39,6 +41,7 @@ from app.core.seed import (
     seed_customer_user,
     seed_default_menu,
     seed_default_venue,
+    seed_partner_stores,
 )
 from app.kg.embeddings import NodeEmbedder
 from app.models.base import Base
@@ -81,6 +84,10 @@ async def lifespan(app: FastAPI):
             pickleball_venue=pickleball_venue,
             badminton_venue=badminton_venue,
         )
+        await seed_partner_stores(
+            session,
+            billiards_venue=billiards_venue,
+        )
         await session.commit()
 
     neo4j_client = Neo4jClient(
@@ -92,6 +99,7 @@ async def lifespan(app: FastAPI):
         await neo4j_client.connect()
         await neo4j_client.verify_connectivity()
         set_neo4j_client(neo4j_client)
+        await ensure_indexes()
         logger.info("Neo4j connected.")
     except Exception:
         logger.warning("Neo4j unavailable; knowledge tool disabled", exc_info=True)
@@ -101,6 +109,12 @@ async def lifespan(app: FastAPI):
 
     await redis_client.connect()
     logger.info("Redis ready.")
+
+    # Pre-warm caches for faster cold-start
+    try:
+        await warm_all_caches()
+    except Exception:
+        logger.warning("Cache pre-warming failed", exc_info=True)
 
     try:
         embedder = NodeEmbedder()
@@ -178,6 +192,7 @@ app.include_router(realtime_router)
 app.include_router(admin_router)
 app.include_router(payment_router)
 app.include_router(stripe_router)
+app.include_router(partner_router)
 
 
 @app.get("/health")

@@ -1,7 +1,9 @@
+import json
 import logging
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.auth import get_current_user
@@ -77,6 +79,66 @@ async def chat(
         raise HTTPException(status_code=500, detail=f"Internal error: {exc}") from exc
 
 
+@router.post("/chat/stream")
+async def chat_stream(
+    request: ChatRequest,
+    _: None = Depends(rate_limit(limit=30, window_seconds=60, scope="chat")),
+    user: User = Depends(get_current_user),
+    chat_service: ChatService = Depends(_get_chat_service),
+    session: AsyncSession = Depends(get_db),
+) -> StreamingResponse:
+    """Stream chat response tokens via Server-Sent Events."""
+    try:
+        session_id = request.session_id or str(uuid.uuid4())
+
+        # Detach user data BEFORE entering generator (session closes after return)
+        user_id = str(user.id)
+        user_name = user.name or ""
+        user_phone = user.phone or ""
+
+        context = dict(request.context) if request.context else {}
+        context.setdefault("user_id", user_id)
+        context.setdefault("user_name", user_name)
+        context.setdefault("user_phone", user_phone)
+        if request.context and "venue_id" in request.context:
+            context["venue_id"] = request.context["venue_id"]
+            context["venue_name"] = request.context.get("venue_name", "")
+        context = await _hydrate_venue_context(context, user, session)
+
+        async def event_generator():
+            # Send session_id first so frontend can save it
+            yield f"data: __SESSION__:{session_id}\n\n"
+            
+            async for chunk in chat_service.process_message_stream(
+                message=request.message,
+                session_id=session_id,
+                user_id=user_id,
+                context=context,
+            ):
+                # Filter out markers from stream (already handled separately)
+                if chunk.startswith("__SESSION__:"):
+                    continue
+                if chunk.startswith("__METADATA__:"):
+                    # Send metadata as separate SSE event
+                    yield f"data: {chunk}\n\n"
+                    continue
+                yield f"data: {json.dumps({'content': chunk}, ensure_ascii=False)}\n\n"
+            yield "data: [DONE]\n\n"
+
+        return StreamingResponse(
+            event_generator(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
+        )
+    except Exception as exc:
+        logger.exception("Error in chat stream")
+        raise HTTPException(status_code=500, detail=f"Internal error: {exc}") from exc
+
+
 async def _hydrate_venue_context(
     context: dict,
     user: User,
@@ -112,6 +174,7 @@ async def _hydrate_venue_context(
     )
     court_types: list[str] = []
     resource_labels: list[str] = []
+    pricing_info: list[str] = []
     for row in rows:
         resource = row["resource"]
         court_type = _court_type_from_resource(resource)
@@ -121,6 +184,12 @@ async def _hydrate_venue_context(
             label = getattr(resource, "name", None) or getattr(resource, "code", None)
             if label:
                 resource_labels.append(str(label))
+            # Collect pricing info
+            hourly_rate = getattr(resource, "hourly_rate", None)
+            if hourly_rate is not None:
+                rate_str = f"{int(hourly_rate):,}".replace(",", ".")
+                type_label = COURT_TYPE_LABELS.get(court_type, court_type)
+                pricing_info.append(f"{type_label}: {rate_str}đ/giờ")
 
     if court_types:
         context["available_court_types"] = court_types
@@ -136,6 +205,8 @@ async def _hydrate_venue_context(
             )
     if resource_labels:
         context["available_resource_labels"] = resource_labels[:12]
+    if pricing_info:
+        context["pricing_info"] = pricing_info
 
     return context
 
