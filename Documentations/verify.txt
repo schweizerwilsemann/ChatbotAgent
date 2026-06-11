@@ -1,0 +1,4 @@
+Total paragraphs: 1000
+Total tables: 44
+
+--- Headings after 544 ---

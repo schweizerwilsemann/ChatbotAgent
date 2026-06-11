@@ -2,6 +2,7 @@
 
 AI Agent chatbot cho quán bida / pickleball / cau long.
 Tich hop Knowledge Graph (Neo4j) + Tool Calling + Mobile App (Flutter).
+Super App voi Mini App (WebView) va Partner F&B system.
 
 ---
 
@@ -21,6 +22,8 @@ Tich hop Knowledge Graph (Neo4j) + Tool Calling + Mobile App (Flutter).
 - [Knowledge Base](#knowledge-base)
 - [API Reference](#api-reference)
 - [Features](#features)
+- [Super App & Mini Apps](#super-app--mini-apps)
+- [Partner F&B System](#partner-fb-system)
 - [Running the Application](#running-the-application)
 - [Demo Accounts](#demo-accounts)
 - [Troubleshooting](#troubleshooting)
@@ -35,6 +38,8 @@ Tich hop Knowledge Graph (Neo4j) + Tool Calling + Mobile App (Flutter).
 |  (Chat UI, Booking, Menu, Auth)     |
 |  (Staff Chat, Staff Requests)       |
 |  (Payment: Stripe/VNPay SDK)        |
+|  (Explore: Mini Apps via WebView)   |
+|  (Partner Shell: CRUD menu/orders)  |
 +--------------+----------------------+
                | HTTP / WebSocket
 +--------------v----------------------+
@@ -42,6 +47,7 @@ Tich hop Knowledge Graph (Neo4j) + Tool Calling + Mobile App (Flutter).
 |  /chat /booking /order /staff       |
 |  /payment /stripe /realtime         |
 |  /staff/chat /staff/requests        |
+|  /partner (stores, menu, orders)    |
 +---+---------------------------+-----+
     |                           |
 +---v-----------+   +-----------v---------+
@@ -88,7 +94,7 @@ ChatbotAgent/
 |   +-- requirements.txt
 |   +-- .env / .env.example
 |   +-- app/
-|   |   +-- api/                       # FastAPI routers (13 modules)
+|   |   +-- api/                       # FastAPI routers (15 modules)
 |   |   |   +-- auth.py                # Authentication
 |   |   |   +-- chat.py                # AI Chat
 |   |   |   +-- booking.py             # Booking + Bill
@@ -102,6 +108,7 @@ ChatbotAgent/
 |   |   |   +-- stripe.py              # Stripe payment
 |   |   |   +-- admin.py               # Admin management
 |   |   |   +-- venue.py               # Venue/resource
+|   |   |   +-- partner.py             # Partner F&B system (NEW)
 |   |   |
 |   |   +-- agent/                     # AI Agent core
 |   |   |   +-- agent.py               # VenueAgent (LangChain)
@@ -118,23 +125,31 @@ ChatbotAgent/
 |   |   |   +-- user.py, booking.py, order.py
 |   |   |   +-- menu.py, venue.py, payment.py
 |   |   |   +-- staff_request.py, notification.py
+|   |   |   +-- camera.py, partner.py  # Partner models (NEW)
 |   |   |
-|   |   +-- schemas/                   # Pydantic schemas (59 classes)
+|   |   +-- schemas/                   # Pydantic schemas
+|   |   |   +-- ..., partner.py        # Partner schemas (NEW)
 |   |   +-- services/                  # Business logic
 |   |   +-- repositories/              # DB access layer
 |   |   +-- core/
 |   |       +-- config.py, database.py
 |   |       +-- neo4j_client.py, redis_client.py
+|   |       +-- seed.py                # Seed data (incl. partners)
 |   |
 |   +-- data_pipeline/                 # KG build pipeline
 |   +-- Dockerfile
 |
 +-- flutter_app/
 |   +-- pubspec.yaml
+|   +-- assets/
+|   |   +-- mini_apps/                 # Mini App HTML/CSS/JS (NEW)
+|   |       +-- mini_game.html         # Sport Reflex game
+|   |       +-- fnb_partner.html       # F&B partner ordering
+|   |       +-- coach_booking.html     # Coach/trainer booking
 |   +-- lib/
 |       +-- main.dart
 |       +-- core/                      # Constants, theme, network, router
-|       +-- features/                  # 13 feature modules
+|       +-- features/                  # 17 feature modules
 |       |   +-- chat/                  # Chat with AI
 |       |   +-- booking/               # Court booking + billing
 |       |   +-- menu/                  # Food & drink ordering
@@ -147,6 +162,11 @@ ChatbotAgent/
 |       |   +-- billing/               # Customer billing
 |       |   +-- profile/               # User profile
 |       |   +-- venue/                 # Venue selection
+|       |   +-- explore/               # Explore tab + Mini Apps (NEW)
+|       |   +-- partner/               # Partner shell + CRUD (NEW)
+|       |   +-- camera/                # Camera monitoring
+|       |   +-- call/                  # WebRTC voice call
+|       |   +-- settings/              # App settings
 |       |   +-- shared/                # Shared widgets
 |       +-- shared/
 |
@@ -217,17 +237,21 @@ DATABASE_URL=postgresql+asyncpg://postgres:your_password@localhost:5432/sports_v
 ```
 
 **Tables auto-created on startup:**
-- `users` - customer/staff/admin accounts
+- `users` - customer/staff/admin/partner accounts
 - `bookings` - court bookings with payment_status
 - `orders` - F&B orders with booking_id FK
 - `order_items` - individual items
 - `venues`, `service_resources` - venue & court management
 - `cameras` - IP camera configuration with RTSP credentials
 - `staff_assignments` - staff access control (venue/area/resource scope)
-- `menu_items` - food/drink menu
+- `menu_items` - food/drink menu (venue internal)
 - `payments` - payment transactions (Stripe/VNPay)
 - `staff_requests` - customer support requests
 - `notifications` - real-time notification records
+- `partner_stores` - partner F&B store profiles (NEW)
+- `partner_menu_items` - partner menu items (NEW)
+- `partner_orders` - customer orders from partners (NEW)
+- `partner_order_items` - individual items in partner orders (NEW)
 
 ### Redis Setup
 
@@ -284,7 +308,7 @@ All knowledge files in `backend/data_pipeline/raw_data/`:
 
 ## API Reference
 
-### Endpoints (65 REST + 2 WebSocket)
+### Endpoints (80+ REST + 2 WebSocket)
 
 | Group | Endpoints | Description |
 |-------|-----------|-------------|
@@ -301,6 +325,7 @@ All knowledge files in `backend/data_pipeline/raw_data/`:
 | Stripe Payment | 6 | PaymentIntent, checkout, webhook, config |
 | Admin | 15 | Dashboard, bookings, orders, menu, analytics, cameras |
 | Venue | 8+ | CRUD venues, resources, staff assignments, cameras |
+| **Partner** | **12** | **Store CRUD, menu CRUD, order management (NEW)** |
 
 ### Key API Groups
 
@@ -346,6 +371,21 @@ All knowledge files in `backend/data_pipeline/raw_data/`:
 | GET | /api/booking/{id}/bill | Get bill for specific booking |
 | GET | /api/admin/bookings/{id}/bill | Admin view booking bill |
 
+**Partner APIs (NEW):**
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/partner/me/store | Get partner's own store |
+| PATCH | /api/partner/me/store | Update store info |
+| GET | /api/partner/me/menu | List own menu items |
+| POST | /api/partner/me/menu | Add menu item |
+| PATCH | /api/partner/me/menu/{id} | Update menu item |
+| DELETE | /api/partner/me/menu/{id} | Delete menu item |
+| GET | /api/partner/me/orders | List store orders |
+| PATCH | /api/partner/me/orders/{id}/status | Update order status |
+| GET | /api/partner/stores | List active stores (public) |
+| GET | /api/partner/stores/{id}/menu | Get store menu (public) |
+| POST | /api/partner/orders | Create order (customer) |
+
 ### Agent Tools
 
 | Tool | Trigger | Action |
@@ -390,6 +430,22 @@ All knowledge files in `backend/data_pipeline/raw_data/`:
 - **Camera management** - CRUD camera IP, assign cameras to courts
 - **Staff assignment** - Assign staff to venues/areas/resources with scope-based access
 
+### Explore & Mini App Features (New)
+- **Explore tab** - Discovery page for mini apps (Customer + Staff)
+- **Mini apps via WebView** - HTML/CSS/JS apps embedded in Flutter
+- **Sport Reflex game** - Tap game for waiting time
+- **F&B Partner ordering** - Order from external partners, delivered to court
+- **Coach booking** - Book personal trainers by the hour
+- **Data injection** - Flutter fetches API, injects into WebView via JS
+
+### Partner Features (New)
+- **Partner role** - New user role with scoped access
+- **Partner shell** - Dashboard, menu management, order management
+- **Menu CRUD** - Partners add/edit/delete their own products
+- **Order lifecycle** - pending → accepted → preparing → ready → delivering → delivered
+- **Public API** - Stores and menus accessible without auth (for mini app)
+- **Scoped access** - Partners only see their own store data
+
 ### Camera System (New)
 - RTSP camera integration (Hikvision, Dahua, Seetong, FPT)
 - Admin: Configure camera (IP, port, credentials, brand)
@@ -404,6 +460,88 @@ All knowledge files in `backend/data_pipeline/raw_data/`:
 - Quick toggle: Activate / Maintenance / Disable
 - Display: court name, area, code, hourly rate
 - Status affects booking availability (maintenance/inactive = not bookable)
+
+---
+
+## Super App & Mini Apps
+
+### Concept
+
+App Flutter đóng vai trò "Super App" — nhúng các mini app HTML/CSS/JS chạy trong WebView. Không cần update app khi thêm mini app mới.
+
+### Mini Apps (HTML/CSS/JS)
+
+| Mini App | File | Mô tả |
+|----------|------|-------|
+| Sport Reflex | `mini_game.html` | Game tap target 30s, combo system, leaderboard |
+| F&B Partner | `fnb_partner.html` | Đặt đồ từ đối tác, fetch từ API |
+| Coach Booking | `coach_booking.html` | Đặt HLV cá nhân theo giờ |
+
+### Architecture
+
+```
+Flutter App (Super App Shell)
+    ├── Tab "Khám phá" (ExploreScreen)
+    │   ├── Grid mini apps
+    │   └── Tap → MiniAppWebViewScreen
+    │       └── WebView load asset HTML
+    │           ├── Flutter inject data via runJavaScript()
+    │           └── HTML sends events via JavaScriptChannel
+    └── Admin có thể disable explore từ dashboard
+```
+
+### Communication Flow
+
+```
+1. Flutter loads HTML: loadFlutterAsset('assets/mini_apps/fnb_partner.html')
+2. onPageFinished → Flutter fetches API → runJavaScript('loadStores(...)')
+3. User taps "Đặt hàng" → JS: PartnerBridge.postMessage(JSON.stringify({...}))
+4. Flutter receives → POST /api/partner/orders → runJavaScript('onOrderSuccess(...)')
+```
+
+---
+
+## Partner F&B System
+
+### Concept
+
+Đối tác F&B (quán nước, quán ăn nhỏ) đăng ký qua hệ thống. Họ dùng chính app Flutter để quản lý cửa hàng, menu, và nhận đơn. Không cần API riêng.
+
+### Roles
+
+| Role | Phone | Tính năng |
+|------|-------|-----------|
+| CUSTOMER | `0900000000` | Đặt sân, đặt đồ, chat AI, khám phá mini apps |
+| STAFF | `0111111112` | Quản lý booking, yêu cầu, menu venue, camera |
+| ADMIN | `0111111111` | Dashboard, quản lý toàn bộ, cấu hình |
+| **PARTNER** | `0911111111` | **Quản lý cửa hàng, menu, nhận đơn (NEW)** |
+
+### Partner Flow
+
+```
+1. Admin tạo tài khoản PARTNER (gán venue)
+2. Partner login → PartnerShell (3 tabs: Dashboard, Menu, Đơn hàng)
+3. Partner CRUD menu items (tên, giá, mô tả, trạng thái)
+4. Khách đặt hàng qua mini app → Partner nhận notification
+5. Partner xác nhận → chuẩn bị → giao → hoàn tất
+```
+
+### Seed Partner Stores
+
+| Store | Owner | Phone | Category | Items |
+|-------|-------|-------|----------|-------|
+| Trà Sữa Mèo | Chủ Trà Sữa Mèo | `0911111111` | drink | 6 món (15k-38k) |
+| Cơm Gà 123 | Chủ Cơm Gà 123 | `0922222222` | food | 6 món (10k-55k) |
+| Bánh Mì Ngon | Chủ Bánh Mì Ngon | `0933333333` | food | 6 món (5k-25k) |
+
+### Menu nội bộ vs Đối tác
+
+| | Menu nội bộ (tab Dịch vụ) | F&B Partner (mini app) |
+|---|---|---|
+| Ai bán | Chính venue tự phục vụ | Đối tác bên ngoài |
+| Giao ai | Staff venue giao tại bàn | Nhân viên đối tác giao đến sân |
+| Menu | Cà phê, nước suối, đồ ăn vặt | Trà sữa, cơm gà, bánh mì... |
+| Payment | Qua hệ thống venue | Qua hệ thống partner |
 
 ---
 
@@ -452,11 +590,15 @@ Seed data tao san 3 venue theo loai san, moi venue co admin + staff rieng.
 | Admin Cau long | Quan ly Cau long | `0333333333` | `123456` | Nha thi dau Cau long Binh Thanh |
 | Staff Cau long | NV Cau long | `0333333334` | `123456` | Nha thi dau Cau long Binh Thanh |
 | Khach hang | Khach hang | `0900000000` | `123456` | (mac dinh: CLB Bida) |
+| **Partner Tra sua** | **Chu Tra Sua Meo** | `0911111111` | `123456` | **CLB Bida SG (NEW)** |
+| **Partner Com ga** | **Chu Com Ga 123** | `0922222222` | `123456` | **CLB Bida SG (NEW)** |
+| **Partner Banh mi** | **Chu Banh Mi Ngon** | `0933333333` | `123456` | **CLB Bida SG (NEW)** |
 
 **Seed data:**
 - CLB Bida Sai Gon - 8 ban bida (B01-B08)
 - San Pickleball Thu Duc - 6 san pickleball (P01-P06)
 - Nha thi dau Cau long Binh Thanh - 6 san cau long (C01-C06)
+- 3 partner stores voi 18 menu items (NEW)
 
 Staff chi thay request tu venue minh duoc assign. Khach goi nhan vien se tu dong detect tu booking dang active.
 
