@@ -57,6 +57,28 @@ class AuthStateNotifier extends StateNotifier<AsyncValue<User?>> {
     }
   }
 
+  Future<bool> register({
+    required String phone,
+    required String name,
+    required String password,
+  }) async {
+    try {
+      final user = await _repository.register(
+        phone: phone,
+        name: name,
+        password: password,
+      );
+      state = AsyncValue.data(user);
+      return true;
+    } on ApiException catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return false;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return false;
+    }
+  }
+
   /// Log out and clear the stored session
   Future<void> logout() async {
     await _repository.logout();
@@ -130,6 +152,64 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
 final loginProvider = StateNotifierProvider<LoginNotifier, LoginState>((ref) {
   return LoginNotifier(ref.watch(authStateProvider.notifier));
+});
+
+class RegisterState {
+  final bool isLoading;
+  final String? error;
+
+  const RegisterState({this.isLoading = false, this.error});
+
+  RegisterState copyWith({
+    bool? isLoading,
+    String? error,
+    bool clearError = false,
+  }) {
+    return RegisterState(
+      isLoading: isLoading ?? this.isLoading,
+      error: clearError ? null : (error ?? this.error),
+    );
+  }
+}
+
+class RegisterNotifier extends StateNotifier<RegisterState> {
+  final AuthStateNotifier _authNotifier;
+
+  RegisterNotifier(this._authNotifier) : super(const RegisterState());
+
+  Future<bool> register({
+    required String phone,
+    required String name,
+    required String password,
+  }) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    final success = await _authNotifier.register(
+      phone: phone,
+      name: name,
+      password: password,
+    );
+    if (!success) {
+      final error = _authNotifier.state.error;
+      state = state.copyWith(
+        isLoading: false,
+        error: error is ApiException
+            ? error.message
+            : 'Đăng ký thất bại. Vui lòng thử lại.',
+      );
+    } else {
+      state = state.copyWith(isLoading: false);
+    }
+    return success;
+  }
+
+  void clearError() {
+    state = state.copyWith(clearError: true);
+  }
+}
+
+final registerProvider =
+    StateNotifierProvider<RegisterNotifier, RegisterState>((ref) {
+  return RegisterNotifier(ref.watch(authStateProvider.notifier));
 });
 
 class ChangePasswordState {

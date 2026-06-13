@@ -12,6 +12,23 @@ class AuthApi {
 
   AuthApi(this._dioClient);
 
+  /// Register a customer account and return its authenticated session.
+  Future<AuthResponse> register({
+    required String phone,
+    required String name,
+    required String password,
+  }) async {
+    final response = await _dioClient.post<Map<String, dynamic>>(
+      ApiConstants.authRegisterEndpoint,
+      data: {
+        'phone': phone,
+        'name': name,
+        'password': password,
+      },
+    );
+    return AuthResponse.fromJson(response.data!);
+  }
+
   /// Login with phone number and password, returns auth response with token
   Future<AuthResponse> login(String phone, String password) async {
     try {

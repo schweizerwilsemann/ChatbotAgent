@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sports_venue_chatbot/features/auth/domain/auth_repository.dart';
@@ -8,13 +10,10 @@ import 'package:sports_venue_chatbot/features/venue/data/venue_model.dart';
 final venuesProvider = FutureProvider<List<Venue>>((ref) async {
   final user = ref.watch(authStateProvider).valueOrNull;
   if (user == null) {
-    await ref.read(selectedVenueProvider.notifier).clear();
     return const <Venue>[];
   }
 
-  final venues = await ref.watch(venueApiProvider).getVenues();
-  await ref.read(selectedVenueProvider.notifier).restore(venues);
-  return venues;
+  return ref.watch(venueApiProvider).getVenues();
 });
 
 class SelectedVenueNotifier extends StateNotifier<Venue?> {
@@ -26,6 +25,8 @@ class SelectedVenueNotifier extends StateNotifier<Venue?> {
 
   Future<void> restore(List<Venue> venues) async {
     if (venues.isEmpty) {
+      await _storage.delete(key: _selectedVenueIdKey);
+      if (!mounted) return;
       state = null;
       return;
     }
@@ -36,6 +37,7 @@ class SelectedVenueNotifier extends StateNotifier<Venue?> {
     }
 
     final storedId = await _storage.read(key: _selectedVenueIdKey);
+    if (!mounted) return;
     final selected = venues.cast<Venue?>().firstWhere(
           (venue) => venue?.id == storedId,
           orElse: () => venues.first,
@@ -52,12 +54,26 @@ class SelectedVenueNotifier extends StateNotifier<Venue?> {
   }
 
   Future<void> clear() async {
-    state = null;
     await _storage.delete(key: _selectedVenueIdKey);
+    if (!mounted) return;
+    state = null;
   }
 }
 
 final selectedVenueProvider =
     StateNotifierProvider<SelectedVenueNotifier, Venue?>((ref) {
-  return SelectedVenueNotifier(ref.watch(secureStorageProvider));
+  final notifier = SelectedVenueNotifier(ref.watch(secureStorageProvider));
+
+  ref.listen<AsyncValue<List<Venue>>>(
+    venuesProvider,
+    (_, next) {
+      final venues = next.valueOrNull;
+      if (venues != null) {
+        unawaited(notifier.restore(venues));
+      }
+    },
+    fireImmediately: true,
+  );
+
+  return notifier;
 });

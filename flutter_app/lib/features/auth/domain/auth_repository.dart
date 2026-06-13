@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sports_venue_chatbot/core/network/api_exception.dart';
 import 'package:sports_venue_chatbot/features/auth/data/auth_api.dart';
 import 'package:sports_venue_chatbot/features/auth/data/auth_models.dart';
+import 'package:sports_venue_chatbot/features/auth/domain/vietnam_phone_number.dart';
 
 final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
   return const FlutterSecureStorage();
@@ -17,6 +18,11 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 
 /// Abstract auth repository interface
 abstract class IAuthRepository {
+  Future<User> register({
+    required String phone,
+    required String name,
+    required String password,
+  });
   Future<User> login(String phone, String password);
   Future<User> getProfile(String userId);
   Future<void> changePassword({
@@ -39,6 +45,41 @@ class AuthRepository implements IAuthRepository {
   AuthRepository(this._authApi, this._secureStorage);
 
   @override
+  Future<User> register({
+    required String phone,
+    required String name,
+    required String password,
+  }) async {
+    try {
+      final phoneError = VietnamPhoneNumber.validateForRegistration(phone);
+      if (phoneError != null) {
+        throw ValidationException(message: phoneError);
+      }
+      if (name.trim().isEmpty) {
+        throw ValidationException(message: 'Vui lòng nhập họ và tên');
+      }
+      if (password.length < 8) {
+        throw ValidationException(message: 'Mật khẩu tối thiểu 8 ký tự');
+      }
+
+      final authResponse = await _authApi.register(
+        phone: VietnamPhoneNumber.normalize(phone),
+        name: name.trim(),
+        password: password,
+      );
+      await _persistSession(authResponse);
+      return authResponse.user;
+    } on ApiException {
+      rethrow;
+    } catch (_) {
+      throw ServerException(
+        message: 'Đăng ký thất bại. Vui lòng thử lại.',
+        statusCode: 500,
+      );
+    }
+  }
+
+  @override
   Future<User> login(String phone, String password) async {
     try {
       if (phone.trim().isEmpty) {
@@ -48,11 +89,11 @@ class AuthRepository implements IAuthRepository {
         throw ValidationException(message: 'Vui lòng nhập mật khẩu');
       }
 
-      final authResponse = await _authApi.login(phone.trim(), password);
-
-      // Persist token and user ID for auto-login
-      await _secureStorage.write(key: _tokenKey, value: authResponse.token);
-      await _secureStorage.write(key: _userIdKey, value: authResponse.user.id);
+      final authResponse = await _authApi.login(
+        VietnamPhoneNumber.normalize(phone),
+        password,
+      );
+      await _persistSession(authResponse);
 
       return authResponse.user;
     } on ApiException {
@@ -140,5 +181,10 @@ class AuthRepository implements IAuthRepository {
       await logout();
       return null;
     }
+  }
+
+  Future<void> _persistSession(AuthResponse authResponse) async {
+    await _secureStorage.write(key: _tokenKey, value: authResponse.token);
+    await _secureStorage.write(key: _userIdKey, value: authResponse.user.id);
   }
 }

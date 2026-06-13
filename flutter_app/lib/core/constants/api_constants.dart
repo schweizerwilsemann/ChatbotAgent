@@ -35,6 +35,7 @@ class ApiConstants {
       '/api/realtime/notifications';
   static const String realtimeNotificationsReadAllEndpoint =
       '/api/realtime/notifications/read-all';
+  static const String authRegisterEndpoint = '/api/auth/register';
   static const String authLoginEndpoint = '/api/auth/login';
   static const String authVerifyEndpoint = '/api/auth/verify';
   static const String authChangePasswordEndpoint = '/api/auth/change-password';

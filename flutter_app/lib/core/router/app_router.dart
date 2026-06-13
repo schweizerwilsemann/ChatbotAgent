@@ -16,6 +16,7 @@ import 'package:sports_venue_chatbot/features/admin/presentation/resource_manage
 import 'package:sports_venue_chatbot/features/admin/presentation/camera_management_screen.dart';
 import 'package:sports_venue_chatbot/features/camera/presentation/staff_camera_screen.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/auth_provider.dart';
+import 'package:sports_venue_chatbot/features/auth/presentation/register_screen.dart';
 import 'package:sports_venue_chatbot/features/billing/presentation/customer_billing_screen.dart';
 import 'package:sports_venue_chatbot/features/auth/presentation/login_screen.dart';
 import 'package:sports_venue_chatbot/features/booking/presentation/booking_screen.dart';
@@ -51,6 +52,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
       final isSplashRoute = location == '/splash';
       final isLoginRoute = location == '/login';
+      final isRegisterRoute = location == '/register';
+      final isPublicAuthRoute = isLoginRoute || isRegisterRoute;
       final isAdminRoute =
           location == '/admin' || location.startsWith('/admin/');
       final isStaffRoute = location == '/staff' ||
@@ -70,10 +73,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       // Not logged in → login
-      if (!isLoggedIn && !isLoginRoute) return '/login';
+      if (!isLoggedIn && !isPublicAuthRoute) return '/login';
 
-      // Logged in on login page → redirect by role
-      if (isLoggedIn && isLoginRoute) {
+      // Logged in on an auth page → redirect by role
+      if (isLoggedIn && isPublicAuthRoute) {
         if (userRole == 'ADMIN') return '/admin/dashboard';
         if (userRole == 'STAFF') return '/staff/requests';
         return '/home';
@@ -127,6 +130,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/register',
+        name: 'register',
+        builder: (context, state) => const RegisterScreen(),
       ),
       GoRoute(
         path: '/scan-qr',
