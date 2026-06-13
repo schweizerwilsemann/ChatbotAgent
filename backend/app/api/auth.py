@@ -1,6 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends, Header, HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -10,12 +11,13 @@ from app.core.security import (
     parse_dev_token,
     verify_password,
 )
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import (
     AuthResponse,
     PasswordChangeRequest,
     UserLogin,
+    UserRegister,
     UserResponse,
 )
 
@@ -73,6 +75,36 @@ def require_roles(*roles: str):
         return user
 
     return _dependency
+
+
+@router.post("/auth/register", response_model=AuthResponse, status_code=201)
+async def register(
+    data: UserRegister,
+    session: AsyncSession = Depends(get_db),
+) -> AuthResponse:
+    repo = UserRepository(session)
+    if await repo.get_by_phone(data.phone) is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="Số điện thoại đã được đăng ký",
+        )
+
+    try:
+        user = await repo.create(
+            {
+                "phone": data.phone,
+                "name": data.name,
+                "password_hash": hash_password(data.password),
+                "role": UserRole.CUSTOMER,
+            }
+        )
+    except IntegrityError as exc:
+        await session.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="Số điện thoại đã được đăng ký",
+        ) from exc
+    return AuthResponse(user=user, token=create_dev_token(user.id))
 
 
 @router.post("/auth/login", response_model=AuthResponse)
