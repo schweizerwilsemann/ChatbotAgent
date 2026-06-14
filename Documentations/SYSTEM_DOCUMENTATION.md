@@ -107,10 +107,44 @@ Relationships: DUNG_DE, LIEN_QUAN, LA_LOAI, THUOC, SU_DUNG, QUY_DINH
 
 ### 3.2 AI Agent với Tool Calling
 
-**Khái niệm**: AI Agent là hệ thống AI có khả năng:
-1. **Nhận diện ý định** (Intent Recognition) từ câu hỏi người dùng
-2. **Chọn tool phù hợp** (Tool Selection) để thực hiện tác vụ
-3. **Thực thi tool** (Tool Execution) và trả kết quả
+**Ý tưởng triển khai**: Chatbot LLM thông thường chỉ thực hiện luồng
+`message -> LLM -> text`. AI Agent của hệ thống bổ sung vòng lặp
+`message -> quyết định -> function call -> observation -> final answer`.
+LLM hiểu ngôn ngữ và chọn hành động, còn Python tool cùng service/repository
+thực hiện nghiệp vụ trên dữ liệu thật.
+
+Agent được xây dựng bằng `create_tool_calling_agent` và `AgentExecutor` của
+LangChain. Khi khởi tạo, backend truyền system prompt và danh sách tool cho
+LLM. Từ chữ ký hàm, type hint và docstring của các hàm `@tool`, LangChain tạo
+JSON schema mô tả function. LLM chỉ sinh một yêu cầu có cấu trúc gồm tên tool
+và arguments; LLM không trực tiếp chạy Python, SQL hay Cypher.
+
+Luồng kỹ thuật của một function call:
+
+1. `ChatService` tải `chat_history` từ Redis và enrich message bằng user,
+   venue, ngày giờ, múi giờ, loại sân và giá.
+2. `IntentRouter` kiểm tra cache, keyword và embedding. Các yêu cầu nghiệp vụ
+   được chuyển tiếp cho `VenueAgent`.
+3. `AgentExecutor` gửi prompt, history, tool schemas và `agent_scratchpad` cho
+   LLM.
+4. LLM trả `AgentFinish` hoặc `tool_call(name, args)`.
+5. `AgentExecutor` ánh xạ tên tool sang hàm Python và gọi `ainvoke(args)`.
+6. Tool lấy `current_user_id` và `current_chat_context` từ `ContextVar`, sau đó
+   gọi service/repository.
+7. Kết quả tool được thêm vào `agent_scratchpad` dưới dạng observation và gửi
+   lại cho LLM.
+8. LLM tổng hợp câu trả lời cuối; backend trả thêm `tools_used` và metadata.
+
+Ba loại trạng thái được tách riêng:
+
+- `chat_history`: bộ nhớ hội thoại nhiều lượt, lưu trong Redis với TTL.
+- `agent_scratchpad`: action/observation tạm thời trong một lần chạy agent.
+- Business state: booking, order, menu trong PostgreSQL; tri thức trong Neo4j.
+
+`AgentExecutor` giới hạn tối đa 5 vòng lặp, bật xử lý lỗi parse và trả
+`intermediate_steps` để xác định tool đã dùng. Vì vậy đây là bounded agent:
+model chỉ được gọi các function đăng ký trước, không có quyền thực thi mã tùy
+ý hoặc truy cập database trực tiếp.
 
 **Các tool hiện có**:
 
@@ -118,10 +152,30 @@ Relationships: DUNG_DE, LIEN_QUAN, LA_LOAI, THUOC, SU_DUNG, QUY_DINH
 |------|---------|-----------|
 | `query_knowledge` | Hỏi luật, kỹ thuật | Truy vấn Neo4j knowledge graph |
 | `book_court` | Đặt sân | Kiểm tra availability, tạo booking |
-| `order_food` | Gọi đồ | Tạo order, liên kết booking |
+| `order_menu_items` | Gọi đồ/thuê dụng cụ | Khớp item, tạo order, liên kết booking |
+| `recommend_menu` | Hỏi thực đơn/gợi ý | Tìm theo sở thích hoặc món bán chạy |
 | `call_staff` | Gọi nhân viên | Tạo staff request, thông báo WebSocket |
 | `check_schedule` | Xem lịch | Query bookings theo ngày |
-| `order_menu_items` | Đặt món | Đặt từ menu với booking association |
+
+Ví dụ logic khi đặt sân:
+
+```json
+{
+  "name": "book_court",
+  "args": {
+    "court_type": "billiards",
+    "court_number": 1,
+    "start_time": "2026-06-14T20:00:00",
+    "end_time": "2026-06-14T22:00:00",
+    "notes": ""
+  }
+}
+```
+
+Function call trên chỉ là dữ liệu điều khiển nội bộ. `book_court` tiếp tục
+chuẩn hóa loại sân, parse thời gian, xác định venue/resource, kiểm tra trùng
+lịch bằng `BookingService`, tạo transaction PostgreSQL và trả booking thật.
+LLM chỉ được phép diễn đạt lại kết quả đó.
 
 ### 3.3 Real-time Communication (WebSocket)
 

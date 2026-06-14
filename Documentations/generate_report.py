@@ -137,6 +137,23 @@ def add_mermaid_block(doc, title, mermaid_code):
     code_p.paragraph_format.element.get_or_add_pPr().append(shading)
 
 
+def add_code_block(doc, code):
+    """Add a formatted source-code block."""
+    code_p = doc.add_paragraph()
+    code_run = code_p.add_run(code)
+    code_run.font.name = "Consolas"
+    code_run.font.size = Pt(9)
+    pf = code_p.paragraph_format
+    pf.space_before = Pt(2)
+    pf.space_after = Pt(6)
+    pf.line_spacing = 1.15
+    shading = parse_xml(
+        f'<w:shd {nsdecls("w")} w:fill="F5F5F5" w:val="clear"/>'
+    )
+    code_p.paragraph_format.element.get_or_add_pPr().append(shading)
+    return code_p
+
+
 def create_report():
     doc = Document()
 
@@ -555,7 +572,7 @@ def create_report():
         ("CHƯƠNG 4. HIỆN THỰC CHƯƠNG TRÌNH", "47"),
         ("4.1. Cấu trúc thư mục dự án", "47"),
         ("4.2. Hiện thực Backend", "48"),
-        ("4.2.1. AI Agent Implementation", "48"),
+        ("4.2.1. Hiện thực AI Agent và Function Calling", "48"),
         ("4.2.2. Knowledge Graph Pipeline", "50"),
         ("4.2.3. Database Models", "52"),
         ("4.2.4. API Endpoints", "53"),
@@ -953,9 +970,12 @@ def create_report():
     )
 
     add_body_text(doc,
-        "Trong đồ án này, LangChain kết hợp với Ollama (hoặc Gemini API) để xử lý "
-        "chat, phát hiện ý định (intent) và gọi các tool: query_knowledge (tra cứu KG), "
-        "book_court (đặt sân), order_food (gọi món), call_staff (gọi nhân viên)."
+        "Trong đồ án này, LangChain kết hợp với Google Gemini, MiMo hoặc Ollama để "
+        "xử lý hội thoại và thực hiện Function Calling. LLM không truy cập trực tiếp "
+        "cơ sở dữ liệu mà chỉ được phép gọi sáu tool đã đăng ký: query_knowledge "
+        "(tra cứu Knowledge Graph), book_court (đặt sân), order_menu_items (đặt món), "
+        "recommend_menu (gợi ý thực đơn), call_staff (gọi nhân viên) và "
+        "check_schedule (kiểm tra lịch)."
     )
 
     # 1.3.4. Neo4j
@@ -1294,10 +1314,10 @@ def create_report():
         "1. Người dùng (Customer) nhập tin nhắn vào Flutter App.",
         "2. Flutter App gửi POST request đến /api/chat với message và session_id.",
         "3. ChatService nhận request và gọi VenueAgent.process().",
-        "4. IntentRouter phân tích ý định người dùng (embedding-based classification).",
-        "5. Nếu ý định là câu hỏi đơn giản (greeting, goodbye), IntentRouter trả lời trực tiếp.",
-        "6. Nếu ý định phức tạp, VenueAgent gọi LLM (Ollama/Gemini) với system prompt.",
-        "7. LLM phân tích và quyết định gọi tool phù hợp (query_knowledge, book_court, order_food, call_staff).",
+        "4. IntentRouter kiểm tra Redis cache, keyword và embedding similarity để tối ưu định tuyến.",
+        "5. Router chỉ trả lời trực tiếp trường hợp chắc chắn; yêu cầu nghiệp vụ được chuyển đến VenueAgent.",
+        "6. VenueAgent gọi LLM provider đang hoạt động với system prompt, history và tool schemas.",
+        "7. LLM quyết định trả lời trực tiếp hoặc gọi tool phù hợp (query_knowledge, book_court, order_menu_items, recommend_menu, call_staff, check_schedule).",
         "8. Tool được thực thi: query_knowledge truy vấn Neo4j, book_court insert PostgreSQL.",
         "9. Kết quả tool được trả về LLM để tổng hợp phản hồi.",
         "10. Phản hồi được gửi trả về Flutter App qua HTTP response.",
@@ -2023,8 +2043,8 @@ def create_report():
 
     agent_items = [
         "VenueAgent: Agent chính sử dụng LangChain với Tool Calling.",
-        "IntentRouter: Phân loại ý định người dùng (embedding-based).",
-        "Tools: query_knowledge, book_court, order_food, call_staff, check_schedule, recommend_menu.",
+        "IntentRouter: Tối ưu đường đi trước LLM bằng Redis cache, keyword matching và embedding similarity.",
+        "Tools: query_knowledge, book_court, order_menu_items, recommend_menu, call_staff, check_schedule.",
         "Knowledge Graph Query: Truy vấn Neo4j bằng Cypher, full-text search.",
         "Fallback Mechanism: Tự động chuyển sang LLM dự phòng khi rate limit.",
     ]
@@ -2037,16 +2057,16 @@ def create_report():
     add_body_text(doc, "Luồng xử lý khi người dùng gửi tin nhắn chat:")
 
     flow_items = [
-        "1. Flutter App gửi POST /api/chat với message và session_id.",
-        "2. ChatRouter nhận request, gọi ChatService.process_message().",
-        "3. ChatService lấy session history từ Redis.",
-        "4. ChatService gọi VenueAgent.process(message, history).",
-        "5. IntentRouter kiểm tra intent đơn giản (greeting, goodbye).",
-        "6. Nếu phức tạp, gọi LLM AgentExecutor với tools.",
-        "7. LLM quyết định gọi tool nào (query_knowledge, book_court, v.v.).",
-        "8. Tool thực thi, truy vấn database (Neo4j/PostgreSQL).",
-        "9. Kết quả tool trả về LLM để tổng hợp phản hồi.",
-        "10. Phản hồi trả về Flutter App, lưu vào Redis session.",
+        "1. Flutter App gửi POST /api/chat hoặc /api/chat/stream với message, session_id và context.",
+        "2. ChatRouter xác thực người dùng và bổ sung dữ liệu venue từ PostgreSQL.",
+        "3. ChatService lấy lịch sử hội thoại từ Redis, thêm thời gian, múi giờ, giá và loại sân vào message.",
+        "4. IntentRouter kiểm tra cache, keyword và embedding để xử lý nhanh trường hợp chắc chắn hoặc chuyển tiếp đến LLM.",
+        "5. VenueAgent gọi LangChain AgentExecutor với system prompt, chat history và danh sách tool.",
+        "6. LLM quyết định trả lời trực tiếp hoặc phát sinh function call gồm tên tool và arguments có cấu trúc.",
+        "7. AgentExecutor gọi tool; tool truy vấn Neo4j/PostgreSQL và thực hiện nghiệp vụ trong service/repository.",
+        "8. Kết quả tool được đưa lại vào scratchpad để LLM tổng hợp câu trả lời tự nhiên.",
+        "9. Backend trả text, danh sách tools_used và metadata booking/order; chế độ stream gửi dữ liệu bằng SSE.",
+        "10. ChatService lưu message đã enrich và phản hồi vào Redis với TTL để duy trì hội thoại nhiều lượt.",
     ]
     for item in flow_items:
         add_body_text(doc, item)
@@ -2248,70 +2268,339 @@ def create_report():
     add_heading_custom(doc, "4.2. Hiện thực Backend", level=2)
 
     # 4.2.1. AI Agent Implementation
-    add_heading_custom(doc, "4.2.1. AI Agent Implementation", level=3)
+    add_heading_custom(doc, "4.2.1. Hiện thực AI Agent và Function Calling", level=3)
 
+    add_body_text(doc, "A. Ý tưởng thiết kế", bold=True)
     add_body_text(doc,
-        "AI Agent được xây dựng bằng LangChain với kiến trúc Tool Calling. "
-        "Agent chính (VenueAgent) sử dụng LLM để phân tích ý định người dùng "
-        "và quyết định gọi tool phù hợp."
+        "AI Agent được thiết kế như một lớp điều phối thông minh giữa giao diện hội thoại "
+        "và các dịch vụ nghiệp vụ. LLM chịu trách nhiệm hiểu ngôn ngữ tự nhiên, xác định "
+        "thông tin còn thiếu và chọn hành động phù hợp; LLM không tự thực hiện truy vấn "
+        "database và không được tự tạo kết quả nghiệp vụ. Mọi thao tác cần dữ liệu chính xác "
+        "như đặt sân, đặt món, xem lịch, gọi nhân viên hoặc tra cứu tri thức đều phải đi qua "
+        "tool đã được backend kiểm soát. Thiết kế này kết hợp tính linh hoạt của mô hình ngôn "
+        "ngữ với tính xác định, kiểm thử được và an toàn của mã nguồn truyền thống."
+    )
+    add_body_text(doc,
+        "Agent trong hệ thống là agent có phạm vi giới hạn (bounded agent). Không gian hành "
+        "động chỉ gồm sáu function được đăng ký trước, số vòng suy luận tối đa là 5 và toàn "
+        "bộ tool chạy trong backend. Vì vậy LLM không có quyền thực thi mã tùy ý, truy cập "
+        "file hệ thống hoặc gửi câu lệnh SQL/Cypher do người dùng cung cấp."
     )
 
-    add_body_text(doc, "Cấu trúc Agent:")
+    add_body_text(doc, "B. Từ chatbot sinh văn bản đến AI Agent có khả năng hành động", bold=True)
+    add_body_text(doc,
+        "Chatbot LLM thông thường có luồng Input -> LLM -> Text output. Mô hình có thể giải "
+        "thích cách đặt sân nhưng không biết sân nào còn trống, không thể tạo booking thật và "
+        "cũng không có cơ chế xác nhận thao tác đã thành công. Nếu yêu cầu LLM tự trả lời, "
+        "model có thể sinh ra giá, mã đặt sân hoặc trạng thái không tồn tại. AI Agent bổ sung "
+        "một lớp điều khiển hành động: sau khi đọc yêu cầu, model được quyền chọn một function "
+        "trong danh sách cho phép; backend thực thi function trên dữ liệu thật; kết quả thực "
+        "thi được đưa trở lại model trước khi model tạo câu trả lời cuối cùng."
+    )
+    create_table_with_header(
+        doc,
+        ["Tiêu chí", "Chatbot LLM thông thường", "AI Agent trong hệ thống"],
+        [
+            ["Luồng xử lý", "Message -> LLM -> Text", "Message -> LLM decision -> Tool -> Observation -> LLM -> Text"],
+            ["Nguồn sự thật", "Kiến thức trong model và prompt", "PostgreSQL, Neo4j, Redis và kết quả service"],
+            ["Khả năng hành động", "Chỉ tư vấn bằng văn bản", "Tạo booking/order/request và truy vấn lịch thật"],
+            ["Độ tin cậy", "Có thể hallucinate dữ liệu động", "Dữ liệu động bắt buộc qua function có validation"],
+            ["Khả năng kiểm thử", "Khó tách lỗi hiểu ngôn ngữ và lỗi nghiệp vụ", "Tool/service được unit test độc lập với LLM"],
+            ["Quyền hạn", "Không có ranh giới hành động rõ", "Chỉ được gọi sáu function đã đăng ký"],
+        ],
+    )
+    add_body_text(doc,
+        "Do đó, điểm làm hệ thống trở thành agent không nằm ở việc sử dụng một model lớn hơn, "
+        "mà nằm ở vòng lặp quyết định - hành động - quan sát. Model đóng vai trò bộ lập kế "
+        "hoạch ở mức hội thoại; mã nguồn Python và các service vẫn là nơi thực thi và kiểm "
+        "soát nghiệp vụ."
+    )
 
-    agent_structure = [
-        "VenueAgent: Agent chính, xử lý chat message.",
-        "IntentRouter: Phân loại intent nhanh (embedding-based) cho các câu hỏi đơn giản.",
-        "SimpleVenueAgent: Fallback agent khi LLM không khả dụng.",
-        "Tools: Các hàm xử lý nghiệp vụ (book_court, order_food, call_staff, query_knowledge).",
+    add_body_text(doc, "C. Các thành phần triển khai", bold=True)
+    create_table_with_header(
+        doc,
+        ["Thành phần", "Vai trò trong luồng AI"],
+        [
+            ["Chat API", "Xác thực user, nhận message/session/context và bổ sung dữ liệu venue đáng tin cậy."],
+            ["ChatService", "Quản lý lịch sử Redis, enrich message, gắn ContextVar và trả text/metadata."],
+            ["IntentRouter", "Tối ưu trước LLM bằng cache, keyword và cosine similarity của embedding."],
+            ["VenueAgent", "Khởi tạo LLM, prompt, AgentExecutor, tool registry và cơ chế fallback."],
+            ["AgentExecutor", "Điều khiển vòng lặp LLM -> function call -> tool result -> LLM."],
+            ["Tools", "Adapter có schema giữa LLM và service/repository của hệ thống."],
+            ["SimpleVenueAgent", "Fallback xác định khi không thể khởi tạo agent dùng LLM."],
+            ["Redis", "Lưu chat history, intent cache và cache kết quả Knowledge Graph."],
+            ["PostgreSQL/Neo4j", "Nguồn dữ liệu nghiệp vụ động và nguồn tri thức thể thao."],
+        ],
+    )
+
+    add_body_text(doc, "D. Cơ chế Function Calling ở mức kỹ thuật", bold=True)
+    add_body_text(doc,
+        "Mỗi tool được khai báo bằng decorator @tool của LangChain. Từ tên hàm, type hint, "
+        "tham số và docstring, LangChain tạo mô tả công cụ cùng JSON schema gửi cho LLM. "
+        "Ví dụ, book_court yêu cầu court_type, court_number, start_time, end_time và notes. "
+        "Khi hiểu rằng người dùng đã cung cấp đủ dữ kiện, LLM không trả một câu xác nhận giả "
+        "mà phát sinh một function call có cấu trúc. AgentExecutor nhận function call, ánh xạ "
+        "tên tool sang hàm Python tương ứng, truyền arguments, chờ kết quả bất đồng bộ và đưa "
+        "kết quả về lại LLM dưới dạng observation."
+    )
+    add_body_text(doc,
+        "Sau khi nhận observation, LLM tổng hợp câu trả lời cuối cùng bằng tiếng Việt. Cách "
+        "làm này tách rõ hai loại đầu ra: văn bản hội thoại do LLM sinh và trạng thái nghiệp "
+        "vụ do code xác định. AgentExecutor được cấu hình handle_parsing_errors=True để tiếp "
+        "tục xử lý khi model trả sai định dạng, return_intermediate_steps=True để ghi nhận "
+        "tools_used, và max_iterations=5 để tránh vòng lặp gọi tool không giới hạn."
+    )
+
+    add_body_text(doc, "D.1. Đăng ký function và tạo schema", bold=True)
+    add_body_text(doc,
+        "Tại thời điểm startup, backend tạo VenueAgent và truyền danh sách Python function "
+        "đã được bọc thành LangChain tool. create_tool_calling_agent kết hợp LLM, danh sách "
+        "tool và ChatPromptTemplate. Tool schema được suy ra từ chữ ký hàm. Ví dụ chữ ký "
+        "book_court(court_type: str, court_number: int, start_time: str, end_time: str, "
+        "notes: str = '') trở thành một object schema trong đó bốn trường đầu là dữ liệu "
+        "quan trọng cho thao tác đặt sân. Docstring mô tả ý nghĩa, miền giá trị và định dạng "
+        "ISO 8601; LLM dùng chính mô tả này để biết khi nào gọi tool và cách tạo arguments."
+    )
+
+    add_body_text(doc, "D.2. Dạng dữ liệu mà LLM phát sinh", bold=True)
+    add_body_text(doc,
+        "Function Calling không có nghĩa là LLM tự chạy hàm. LLM chỉ trả về một yêu cầu có "
+        "cấu trúc trong AIMessage.tool_calls. Về mặt logic, một yêu cầu đặt sân có dạng:"
+    )
+    add_body_text(doc, "Ví dụ dữ liệu function call (biểu diễn logic):", bold=True)
+    add_code_block(doc, """{
+  "name": "book_court",
+  "args": {
+    "court_type": "billiards",
+    "court_number": 1,
+    "start_time": "2026-06-14T20:00:00",
+    "end_time": "2026-06-14T22:00:00",
+    "notes": ""
+  }
+}""")
+    add_body_text(doc,
+        "Đây là dữ liệu điều khiển nội bộ, không phải nội dung hiển thị cho người dùng. "
+        "AgentExecutor đọc trường name, tìm tool cùng tên trong registry và truyền args vào "
+        "hàm Python. LLM không gọi trực tiếp REST API, không giữ database connection và "
+        "không tự commit transaction."
+    )
+
+    add_body_text(doc, "D.3. Vòng lặp AgentExecutor", bold=True)
+    agent_loop = [
+        "Bước 1 - Model invocation: AgentExecutor gửi system prompt, chat_history, input, tool schemas và agent_scratchpad đến LLM.",
+        "Bước 2 - Decision: LLM trả AgentFinish nếu có thể trả lời ngay, hoặc AgentAction/tool_call nếu cần hành động.",
+        "Bước 3 - Dispatch: AgentExecutor ánh xạ tên function sang tool object và invoke tool bất đồng bộ với arguments.",
+        "Bước 4 - Observation: Chuỗi kết quả hoặc lỗi từ tool được đóng gói thành tool message và thêm vào agent_scratchpad.",
+        "Bước 5 - Re-invocation: LLM được gọi lại với observation mới. Model có thể gọi thêm tool, hỏi người dùng hoặc tạo final answer.",
+        "Bước 6 - Termination: Vòng lặp kết thúc khi có AgentFinish, khi đạt max_iterations=5 hoặc khi lỗi được cơ chế parsing/fallback xử lý.",
     ]
-    for item in agent_structure:
-        add_bullet_point(doc, item)
+    for item in agent_loop:
+        add_body_text(doc, item)
+    add_body_text(doc,
+        "agent_scratchpad là bộ nhớ làm việc tạm thời của một lượt chạy agent. Nó chứa các "
+        "action và observation đã xảy ra trong vòng lặp hiện tại để model không quên mình "
+        "đã gọi function nào. Scratchpad khác với chat_history: chat_history tồn tại qua "
+        "nhiều lượt trong Redis, còn scratchpad chỉ phục vụ quá trình xử lý một request."
+    )
 
-    add_body_text(doc, "Luồng xử lý:")
+    add_body_text(doc, "D.4. Cách Agent chọn function", bold=True)
+    add_body_text(doc,
+        "Việc chọn function không được thực hiện bằng câu lệnh if/else cố định cho từng ý "
+        "định. LLM suy luận dựa trên bốn nguồn: system prompt, mô tả của từng tool, nội dung "
+        "message hiện tại và chat history. IntentRouter chỉ là lớp tối ưu trước LLM; nó không "
+        "thay thế cơ chế chọn tool. Với các yêu cầu nghiệp vụ, router trả None để chuyển tiếp "
+        "cho VenueAgent. Ví dụ, từ câu 'Mai 8 giờ tối đặt cho tôi một bàn bida trong 2 tiếng', "
+        "prompt yêu cầu model quy đổi 'mai' theo current_date/current_timezone, suy ra "
+        "start_time/end_time và gọi book_court khi đã đủ dữ liệu."
+    )
 
+    add_body_text(doc, "D.5. Các tầng kiểm tra trước khi thay đổi dữ liệu", bold=True)
+    create_table_with_header(
+        doc,
+        ["Tầng", "Kiểm tra kỹ thuật"],
+        [
+            ["Tool schema", "Kiểu và tên arguments; tham số bắt buộc/tùy chọn được công bố cho model."],
+            ["Tool function", "Parse JSON/ISO date, chuẩn hóa court_type, kiểm tra quantity và xử lý lỗi đầu vào."],
+            ["Context bảo mật", "user_id và venue_id lấy từ xác thực/ContextVar, không cho LLM tùy ý gán."],
+            ["Service layer", "Kiểm tra availability, business rule, trạng thái menu, active booking và quyền venue."],
+            ["Repository/Database", "Truy vấn dữ liệu thật, transaction và commit chỉ khi nghiệp vụ thành công."],
+            ["Response layer", "Chỉ trả metadata đã tạo từ entity database; không lấy mã booking/order từ text của LLM."],
+        ],
+    )
+
+    add_body_text(doc, "D.6. Ví dụ kỹ thuật: hội thoại đặt sân nhiều lượt", bold=True)
+    booking_example = [
+        "Lượt 1 - User: 'Đặt một bàn bida tối mai'. Agent thấy thiếu giờ và thời lượng nên chưa gọi function, chỉ hỏi thêm.",
+        "Lượt 2 - User: '8 giờ, chơi 2 tiếng, bàn nào cũng được'. Chat history cho model biết loại sân và ngày từ lượt trước; context cho biết ngày hiện tại, timezone và venue.",
+        "LLM tạo tool call book_court với start_time=20:00, end_time=22:00 và court_number=1 theo quy ước của prompt.",
+        "Tool lấy current_user_id và venue_id từ ContextVar, ánh xạ bàn trong venue, gọi BookingService.check_availability().",
+        "Nếu bàn bận, tool kiểm tra các bàn thay thế và trả danh sách còn trống. Observation này giúp LLM hỏi người dùng chọn phương án khác.",
+        "Nếu bàn trống, tool tạo BookingCreate, commit PostgreSQL, ghi metadata gồm booking id, thời gian, giá và payment_status.",
+        "LLM nhận chuỗi xác nhận thật từ tool rồi diễn đạt phản hồi; Flutter nhận thêm metadata để hiển thị card thanh toán.",
+    ]
+    for item in booking_example:
+        add_body_text(doc, item)
+
+    add_body_text(doc, "Danh sách tool được cấp cho Agent:", bold=True)
+    create_table_with_header(
+        doc,
+        ["Tool", "Arguments chính", "Nguồn dữ liệu / tác động"],
+        [
+            ["query_knowledge", "query", "Neo4j full-text search; lấy node và quan hệ liên quan; chỉ đọc."],
+            ["book_court", "court_type, court_number, start_time, end_time, notes", "Kiểm tra trùng lịch, tạo booking PostgreSQL, phát metadata thanh toán."],
+            ["order_menu_items", "items (JSON), notes", "Khớp tên món, liên kết booking hiện tại, tạo order PostgreSQL."],
+            ["recommend_menu", "preference, limit", "Tìm món theo sở thích hoặc lấy món bán chạy từ PostgreSQL."],
+            ["call_staff", "message, table_number, request_type", "Tạo staff request và thông báo cho bộ phận vận hành."],
+            ["check_schedule", "date, court_type", "Đọc lịch booking theo ngày, venue và loại sân."],
+        ],
+    )
+
+    add_body_text(doc, "E. Luồng xử lý một tin nhắn", bold=True)
     agent_flow = [
-        "1. Nhận message từ người dùng.",
-        "2. IntentRouter kiểm tra intent đơn giản (greeting, goodbye).",
-        "3. Nếu phức tạp, gọi LLM AgentExecutor.",
-        "4. LLM phân tích và gọi tool phù hợp.",
-        "5. Tool thực thi, trả kết quả về LLM.",
-        "6. LLM tổng hợp phản hồi cuối cùng.",
+        "1. Flutter gửi message, session_id và context của venue đến /api/chat hoặc /api/chat/stream.",
+        "2. Backend xác thực user; venue_id được kiểm tra quyền truy cập và dùng để lấy loại sân, tài nguyên, múi giờ và giá từ PostgreSQL.",
+        "3. ChatService tải lịch sử theo session_id từ Redis và thêm current_date, current_time, timezone, venue, loại sân, tài nguyên và pricing vào message.",
+        "4. IntentRouter bỏ qua cache cho dữ liệu động; với dữ liệu tĩnh, router kiểm tra Redis, keyword và embedding. Router chỉ trả lời trực tiếp khi có kết quả chắc chắn như danh sách môn được hỗ trợ; các yêu cầu nghiệp vụ vẫn được chuyển cho LLM.",
+        "5. VenueAgent chuyển system prompt, lịch sử và message hiện tại vào AgentExecutor. LLM chọn trả lời trực tiếp, hỏi thêm dữ kiện hoặc gọi một tool.",
+        "6. Tool dùng current_user_id/current_chat_context để thực hiện đúng user và venue, gọi service/repository, validate dữ liệu và commit transaction khi thành công.",
+        "7. Kết quả tool được LLM diễn đạt lại. Backend đồng thời lấy tools_used và metadata có cấu trúc để Flutter hiển thị booking/order card.",
+        "8. Phản hồi và enriched message được lưu lại Redis với TTL. Ở chế độ streaming, text được gửi từng phần qua Server-Sent Events.",
     ]
     for item in agent_flow:
         add_body_text(doc, item)
+
+    add_body_text(doc, "F. Prompt engineering và chống hallucination", bold=True)
+    prompt_rules = [
+        "Bắt buộc trả lời tiếng Việt và không hiển thị JSON, tên tool, arguments hoặc cú pháp nội bộ.",
+        "Kiến thức luật/kỹ thuật phải truy vấn Knowledge Graph; không tìm thấy thì phải nói chưa có thông tin.",
+        "Giá, giờ mở cửa, khuyến mãi và dữ liệu động chỉ được lấy từ context hoặc database, tuyệt đối không tự bịa.",
+        "Booking được điều khiển theo state hội thoại: loại sân, thời gian bắt đầu, thời lượng và số sân/bàn; đủ dữ liệu thì phải gọi book_court.",
+        "Tool description quy định schema đầu vào, còn service/repository tiếp tục kiểm tra availability, quyền truy cập, item tồn tại và transaction.",
+    ]
+    for item in prompt_rules:
+        add_bullet_point(doc, item)
+
+    add_body_text(doc, "G. Graph RAG trong Agent", bold=True)
+    add_body_text(doc,
+        "Khi LLM chọn query_knowledge, tool chuẩn hóa câu hỏi và kiểm tra Redis cache. Nếu "
+        "cache miss, Neo4j full-text index entity_fulltext tìm trên thuộc tính name và "
+        "description của các node Rule, Technique, Equipment, Sport, Concept và GameType. "
+        "Neo4j/Lucene sinh relevance score; hệ thống giữ kết quả có score lớn hơn 0,3, sắp "
+        "xếp giảm dần và lấy tối đa 5 record. Với mỗi node, truy vấn OPTIONAL MATCH lấy thêm "
+        "một node liên quan để cung cấp ngữ cảnh đồ thị. Nếu full-text index không khả dụng, "
+        "tool fallback sang CONTAINS, tìm từng keyword và prefix. Context truy xuất được đưa "
+        "lại cho LLM để tạo câu trả lời, thay vì để LLM trả lời hoàn toàn từ kiến thức tham số."
+    )
+
+    add_body_text(doc, "H. Memory, context và dữ liệu có cấu trúc", bold=True)
+    add_body_text(doc,
+        "Memory hội thoại được triển khai bằng Redis theo khóa session:{session_id}, mặc định "
+        "TTL 1 giờ. Hệ thống lưu enriched message thay vì chỉ lưu câu người dùng, nhờ đó các "
+        "lượt sau vẫn thấy venue, ngày giờ và dữ kiện đã thu thập. ContextVar current_user_id "
+        "và current_chat_context truyền identity/context đến tool mà không đưa các tham số "
+        "nhạy cảm này cho LLM tự lựa chọn. Khi booking hoặc order thành công, tool ghi "
+        "order_metadata vào context; ChatService trả metadata riêng để giao diện dựng card "
+        "thanh toán, tránh phải phân tích ngược văn bản do LLM sinh."
+    )
+
+    add_body_text(doc, "I. Khả năng chịu lỗi và fallback", bold=True)
+    fallback_items = [
+        "Primary LLM được chọn bằng cấu hình: Google, MiMo hoặc Ollama.",
+        "Nếu provider chính gặp lỗi rate limit/quota, VenueAgent chuyển sang MiMo; nếu MiMo không được cấu hình thì dùng Ollama.",
+        "Sau khi chuyển provider, cơ chế sticky fallback giữ model dự phòng trong 24 giờ rồi mới thử lại model chính.",
+        "Nếu agent dùng LLM không thể khởi tạo, backend chuyển sang SimpleVenueAgent để duy trì một số chức năng menu, order, booking guidance và gọi nhân viên.",
+        "Nếu Neo4j không kết nối lúc startup, query_knowledge trả trạng thái không khả dụng thay vì giả lập tri thức.",
+        "Agent có cơ chế phát hiện trường hợp model in function call ra văn bản và cố thực thi lại query_knowledge khi có thể.",
+    ]
+    for item in fallback_items:
+        add_bullet_point(doc, item)
+
+    add_body_text(doc, "J. Các tính năng AI được hiện thực", bold=True)
+    ai_features = [
+        "Hiểu ngôn ngữ tự nhiên tiếng Việt và hội thoại nhiều lượt.",
+        "Function Calling để biến yêu cầu tự nhiên thành thao tác nghiệp vụ có kiểm soát.",
+        "Graph RAG để grounding câu trả lời luật và kỹ thuật vào Neo4j.",
+        "Semantic intent routing bằng embedding và cosine similarity kết hợp keyword/cache.",
+        "Context-aware reasoning theo user, venue, loại sân, tài nguyên, múi giờ và giá thực tế.",
+        "Gợi ý thực đơn và fuzzy matching tên món khi người dùng nhập không chính xác.",
+        "Streaming phản hồi bằng SSE và trả metadata có cấu trúc cho giao diện.",
+        "Multi-provider LLM, sticky fallback và deterministic fallback.",
+    ]
+    for item in ai_features:
+        add_bullet_point(doc, item)
+
+    add_body_text(doc, "K. Đánh giá thiết kế và giới hạn hiện tại", bold=True)
+    create_table_with_header(
+        doc,
+        ["Khía cạnh", "Đánh giá"],
+        [
+            ["Ưu điểm", "LLM linh hoạt trong hiểu câu nhưng hành động bị giới hạn bởi tool; dữ liệu động có nguồn xác định; dễ thêm tool mới; hỗ trợ multi-tenant và hội thoại nhiều lượt."],
+            ["Tính kiểm thử", "Tool có thể unit test độc lập với LLM; service/repository giữ business rule; tools_used và metadata giúp quan sát kết quả."],
+            ["Chi phí/độ trễ", "Cache, keyword-first routing, precomputed embeddings và SSE giảm số lần gọi model và thời gian chờ cảm nhận."],
+            ["Giới hạn Graph RAG", "Runtime query_knowledge đang dùng lexical full-text search; vector index/node embedding đã có pipeline nhưng hybrid_search chưa được nối vào tool production."],
+            ["Giới hạn fallback", "SimpleVenueAgent không hỗ trợ đầy đủ Knowledge Graph và khả năng hiểu ngôn ngữ thấp hơn LLM agent."],
+            ["Rủi ro còn lại", "Chất lượng phụ thuộc prompt/tool description; cần bổ sung evaluation set, tracing, tool authorization chi tiết và kiểm thử hội thoại end-to-end."],
+        ],
+    )
 
     doc.add_paragraph()
     add_body_text(doc, "[Chèn hình Agent Flow Diagram tại đây]", bold=True)
 
     # ── AI Agent Flow (Mermaid) ──
-    add_mermaid_block(doc, "Luồng xử lý AI Agent:", """flowchart TD
-    A[Nhận message từ user] --> B{IntentRouter\nphân tích intent}
-    B -->|Greeting/Goodbye| C[Trả lời trực tiếp\nkhông gọi LLM]
-    B -->|Hỏi luật/kỹ thuật| D[Gọi LLM AgentExecutor]
-    B -->|Đặt sân| D
-    B -->|Gọi món| D
-    B -->|Gọi nhân viên| D
+    add_mermaid_block(doc, "Luồng xử lý AI Agent và Function Calling:", """flowchart TD
+    A[Flutter gửi message + session + venue context] --> B[Chat API xác thực user\nvà hydrate context từ PostgreSQL]
+    B --> C[ChatService tải history Redis\nvà enrich thời gian, venue, giá]
+    C --> D{IntentRouter}
+    D -->|Cache/câu chắc chắn| E[Trả lời nhanh]
+    D -->|Cần suy luận| F[LangChain AgentExecutor]
+    F --> G{LLM quyết định}
+    G -->|Thiếu dữ kiện| H[Hỏi thêm người dùng]
+    G -->|Không cần hành động| I[Trả lời trực tiếp theo prompt]
+    G -->|Function call| J{Chọn tool}
+    J -->|query_knowledge| K[(Neo4j Knowledge Graph)]
+    J -->|book_court / check_schedule| L[(PostgreSQL Booking)]
+    J -->|order / recommend_menu| M[(PostgreSQL Menu & Order)]
+    J -->|call_staff| N[Staff Request + Notification]
+    K --> O[Tool result / observation]
+    L --> O
+    M --> O
+    N --> O
+    O --> F
+    F --> P[Final answer + tools_used + metadata]
+    E --> Q[SSE/JSON response về Flutter]
+    H --> Q
+    I --> Q
+    P --> Q
+    Q --> R[Lưu enriched history vào Redis]
+""")
 
-    D --> E[LLM phân tích\nvà chọn tool]
+    add_mermaid_block(doc, "Sequence kỹ thuật của một function call:", """sequenceDiagram
+    participant U as Người dùng
+    participant API as Chat API/ChatService
+    participant IR as IntentRouter
+    participant AE as AgentExecutor
+    participant LLM as LLM Provider
+    participant T as LangChain Tool
+    participant S as Service/Repository
+    participant DB as PostgreSQL/Neo4j
 
-    E -->|query_knowledge| F[Truy vấn Neo4j\nCypher + Fulltext]
-    E -->|book_court| G[Kiểm tra availability\nInsert PostgreSQL]
-    E -->|order_food| H[Tạo order\nLink booking]
-    E -->|call_staff| I[Tạo staff request\nNotify WebSocket]
-    E -->|check_schedule| J[Query bookings\ntheo ngày]
-    E -->|Không cần tool| K[LLM trả lời trực tiếp]
-
-    F --> L[Kết quả tool\ntrả về LLM]
-    G --> L
-    H --> L
-    I --> L
-    J --> L
-
-    L --> M[LLM tổng hợp\nphản hồi cuối cùng]
-    K --> M
-    C --> M
-
-    M --> N[Trả response\nvề Flutter App]
+    U->>API: message + session_id + venue context
+    API->>API: Xác thực, hydrate context, load Redis history
+    API->>IR: enriched message
+    IR-->>API: pass-through nếu cần suy luận
+    API->>AE: input + chat_history
+    AE->>LLM: prompt + tool schemas + scratchpad
+    LLM-->>AE: tool_call(name, args)
+    AE->>T: ainvoke(args)
+    T->>S: gọi nghiệp vụ với user/venue từ ContextVar
+    S->>DB: query/validate/transaction
+    DB-->>S: dữ liệu hoặc kết quả commit
+    S-->>T: domain result
+    T-->>AE: observation
+    AE->>LLM: scratchpad + observation
+    LLM-->>AE: final answer
+    AE-->>API: output + intermediate_steps
+    API-->>U: text/SSE + tools_used + metadata
 """)
 
     # ── Payment Decision Flow (Mermaid) ──
@@ -2944,7 +3233,7 @@ def create_report():
     # ===== SAVE =====
     output_path = os.path.join(
         os.path.dirname(__file__),
-        "BaoCao_DoAnTotNghiep_ChatbotAI.docx"
+        "BaoCaoDoAn_SportsVenueChatbot.docx"
     )
     doc.save(output_path)
     print(f"Report saved to: {output_path}")
