@@ -7,6 +7,7 @@ Optimized version with:
 """
 
 import hashlib
+import json
 import logging
 import math
 import unicodedata
@@ -20,6 +21,7 @@ SUPPORTED_SPORTS = ("Bida", "Pickleball", "Cầu lông")
 
 # Cache TTL for intent routing results (10 minutes)
 _INTENT_CACHE_TTL = 600
+_INTENT_EMBEDDING_CACHE_TTL = 604800
 
 
 @dataclass(frozen=True)
@@ -230,6 +232,9 @@ class IntentRouter:
             logger.warning("No embedder — IntentRouter stays in keyword-fallback mode")
             return
 
+        if await self._load_embedding_cache():
+            return
+
         logger.info("Pre-computing intent embeddings…")
         self._greeting_embs = await self._precompute(self._GREETING_EXAMPLES)
         self._domain_embs = await self._precompute(self._DOMAIN_EXAMPLES)
@@ -251,10 +256,78 @@ class IntentRouter:
                 len(self._sports_embs),
                 len(self._off_topic_embs),
             )
+            await self._save_embedding_cache()
         else:
             logger.warning(
                 "All embedding pre-computations failed — staying in keyword mode"
             )
+
+    def _embedding_cache_key(self) -> str:
+        payload = {
+            "model": getattr(self._embedder, "model_name", "unknown"),
+            "profile": getattr(self._embedder, "embedding_profile", "default"),
+            "greeting": self._GREETING_EXAMPLES,
+            "domain": self._DOMAIN_EXAMPLES,
+            "sports": self._SUPPORTED_SPORTS_EXAMPLES,
+            "off_topic": self._OFF_TOPIC_EXAMPLES,
+        }
+        serialized = json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        digest = hashlib.sha256(serialized.encode("utf-8")).hexdigest()[:20]
+        return f"intent:embeddings:v1:{digest}"
+
+    async def _load_embedding_cache(self) -> bool:
+        try:
+            cached = await redis_client.get_json(self._embedding_cache_key())
+        except Exception:
+            logger.debug("Intent embedding cache read skipped", exc_info=True)
+            return False
+
+        if not isinstance(cached, dict):
+            return False
+
+        groups = (
+            cached.get("greeting"),
+            cached.get("domain"),
+            cached.get("sports"),
+            cached.get("off_topic"),
+        )
+        if not all(isinstance(group, list) for group in groups):
+            return False
+
+        (
+            self._greeting_embs,
+            self._domain_embs,
+            self._sports_embs,
+            self._off_topic_embs,
+        ) = groups
+        total = sum(len(group) for group in groups)
+        if total == 0:
+            return False
+
+        self._embedding_ready = True
+        logger.info("Intent embeddings loaded from Redis cache (%d vectors)", total)
+        return True
+
+    async def _save_embedding_cache(self) -> None:
+        payload = {
+            "greeting": self._greeting_embs,
+            "domain": self._domain_embs,
+            "sports": self._sports_embs,
+            "off_topic": self._off_topic_embs,
+        }
+        try:
+            await redis_client.set_json(
+                self._embedding_cache_key(),
+                payload,
+                ex=_INTENT_EMBEDDING_CACHE_TTL,
+            )
+        except Exception:
+            logger.debug("Intent embedding cache write skipped", exc_info=True)
 
     # ══════════════════════════════════════════════════════════════════
     # Public routing interface
@@ -374,7 +447,7 @@ class IntentRouter:
     # ══════════════════════════════════════════════════════════════════
 
     async def _route_embedding(self, message: str) -> IntentResult | None:
-        query_emb = await self._embedder.embed_query(message)
+        query_emb = await self._embed_intent(message)
         if not query_emb:
             logger.warning(
                 "Embedding failed for '%s' — falling back to keywords", message[:60]
@@ -442,12 +515,22 @@ class IntentRouter:
         embs: list[list[float]] = []
         for text in examples:
             try:
-                emb = await self._embedder.embed_query(text)
+                emb = await self._embed_intent(text)
                 if emb:
                     embs.append(emb)
             except Exception:
                 logger.debug("Failed to embed '%s'", text)
         return embs
+
+    async def _embed_intent(self, text: str) -> list[float] | None:
+        embed_classification = getattr(
+            self._embedder,
+            "embed_classification",
+            None,
+        )
+        if embed_classification:
+            return await embed_classification(text)
+        return await self._embedder.embed_query(text)
 
     @staticmethod
     def _max_sim(query: list[float], category: list[list[float]]) -> float:

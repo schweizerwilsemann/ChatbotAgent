@@ -3,6 +3,15 @@ import re
 
 from app.agent.agent import AgentResponse
 from app.agent.context import current_chat_context, current_user_id
+from app.agent.order_confirmation import (
+    is_affirmative_message,
+    is_negative_message,
+    is_order_confirmation_prompt,
+    is_order_note_question,
+    latest_assistant_message,
+    normalize_message,
+    strip_internal_context,
+)
 from app.core.database import async_session_factory
 from app.repositories.booking_repository import BookingRepository
 from app.repositories.menu_repository import MenuRepository
@@ -23,16 +32,51 @@ class SimpleVenueAgent:
         return None
 
     async def process(self, message: str, session_history: list[dict]) -> AgentResponse:
-        text = message.strip().lower()
-        if self._is_menu_question(text):
-            return AgentResponse(
-                output=await self._menu_answer(message),
-                tools_used=["menu"],
+        chat_context = current_chat_context.get() or {}
+        raw_message = str(chat_context.get("_current_user_message") or message).strip()
+        text = raw_message.lower()
+        previous_assistant = latest_assistant_message(session_history)
+
+        if is_order_confirmation_prompt(previous_assistant):
+            pending = self._pending_order_from_history(session_history)
+            if is_negative_message(raw_message):
+                return AgentResponse(
+                    output="Mình đã hủy yêu cầu, chưa tạo đơn hàng nào.",
+                    tools_used=[],
+                )
+            if pending and is_affirmative_message(raw_message):
+                order_message, notes = pending
+                ordered = await self._try_create_order(order_message, notes=notes)
+                if ordered:
+                    return ordered
+            if pending:
+                order_message, _ = pending
+                return await self._build_order_confirmation(
+                    order_message,
+                    notes=self._normalize_notes(raw_message),
+                )
+
+        if is_order_note_question(previous_assistant):
+            order_message = self._order_request_before_latest_assistant(
+                session_history
             )
+            if order_message:
+                return await self._build_order_confirmation(
+                    order_message,
+                    notes=self._normalize_notes(raw_message),
+                )
+
         if self._is_order_request(text):
-            ordered = await self._try_create_order(message)
-            if ordered:
-                return ordered
+            matched_items = await self._match_order_items(raw_message)
+            if matched_items:
+                return AgentResponse(
+                    output=(
+                        "Bạn có yêu cầu đặc biệt hoặc ghi chú gì cho món không ạ? "
+                        "Ví dụ ít ngọt, ít sữa, ít đá, đá riêng, không cay hoặc sốt riêng. "
+                        "Nếu không có, bạn trả lời “không có”."
+                    ),
+                    tools_used=[],
+                )
             return AgentResponse(
                 output=(
                     "Bạn muốn đặt món nào? Hiện mình có thể đặt theo tên món trong thực đơn. "
@@ -40,8 +84,14 @@ class SimpleVenueAgent:
                 ),
                 tools_used=[],
             )
+
+        if self._is_menu_question(text):
+            return AgentResponse(
+                output=await self._menu_answer(raw_message),
+                tools_used=["menu"],
+            )
         if self._is_staff_request(text):
-            return await self._try_call_staff(message)
+            return await self._try_call_staff(raw_message)
         if "đặt sân" in text or "dat san" in text:
             chat_context = current_chat_context.get() or {}
             court_type = chat_context.get("court_type")
@@ -216,21 +266,62 @@ class SimpleVenueAgent:
                 return word
         return ""
 
-    async def _try_create_order(self, message: str) -> AgentResponse | None:
+    async def _match_order_items(self, message: str) -> list[OrderItemCreate]:
         async with async_session_factory() as session:
             menu_repo = MenuRepository(session)
             chat_context = current_chat_context.get() or {}
             venue_id = self._optional_str(chat_context.get("venue_id"))
             menu_items = await menu_repo.list_available(venue_id=venue_id)
             matched_items: list[OrderItemCreate] = []
-            lowered = message.lower()
+            normalized_message = self._normalize_menu_text(message)
             for item in menu_items:
-                if item.name.lower() not in lowered:
+                normalized_name = self._normalize_menu_text(item.name)
+                if normalized_name not in normalized_message:
                     continue
                 quantity = self._extract_quantity_near_item(message, item.name)
                 matched_items.append(
                     OrderItemCreate(item_name=item.name, quantity=quantity)
                 )
+            return matched_items
+
+    async def _build_order_confirmation(
+        self,
+        order_message: str,
+        notes: str,
+    ) -> AgentResponse:
+        matched_items = await self._match_order_items(order_message)
+        if not matched_items:
+            return AgentResponse(
+                output=(
+                    "Mình chưa xác định được món trong yêu cầu trước. "
+                    "Bạn vui lòng gửi lại tên món và số lượng."
+                ),
+                tools_used=[],
+            )
+
+        items_summary = ", ".join(
+            f"{item.quantity} {item.item_name}" for item in matched_items
+        )
+        return AgentResponse(
+            output=(
+                f"Mình xin tóm tắt: {items_summary}. "
+                f"Ghi chú: {notes}. "
+                "Bạn xác nhận muốn đặt các món này đúng không ạ?"
+            ),
+            tools_used=[],
+        )
+
+    async def _try_create_order(
+        self,
+        message: str,
+        *,
+        notes: str,
+    ) -> AgentResponse | None:
+        async with async_session_factory() as session:
+            menu_repo = MenuRepository(session)
+            chat_context = current_chat_context.get() or {}
+            venue_id = self._optional_str(chat_context.get("venue_id"))
+            matched_items = await self._match_order_items(message)
 
             if not matched_items:
                 return None
@@ -273,7 +364,7 @@ class SimpleVenueAgent:
                     resource_label=resource_label,
                     table_number=table_number,
                     items=matched_items,
-                    notes="Đặt qua chatbot dev fallback",
+                    notes=notes,
                 )
             )
             await session.commit()
@@ -286,23 +377,120 @@ class SimpleVenueAgent:
             output=(
                 f"Đặt hàng thành công. Mã đơn: {order.id}\n"
                 f"{summary}\n"
+                f"Ghi chú: {notes}\n"
                 f"Tổng cộng: {order.total_price:,.0f} VND. Nhân viên đã nhận thông báo."
             ),
             tools_used=["order_menu_items"],
+            metadata={
+                "type": "order",
+                "id": str(order.id),
+                "items": [
+                    {
+                        "name": item.item_name,
+                        "quantity": item.quantity,
+                        "unit_price": item.unit_price,
+                        "total_price": item.total_price,
+                    }
+                    for item in order.items
+                ],
+                "total_price": order.total_price,
+                "payment_status": order.payment_status,
+                "resource_label": order.resource_label or "",
+                "table_number": order.table_number,
+                "notes": notes,
+            },
         )
 
     @staticmethod
+    def _normalize_notes(message: str) -> str:
+        normalized = message.strip()
+        if is_negative_message(normalized) or normalized.lower() in {
+            "không có",
+            "khong co",
+            "không cần",
+            "khong can",
+        }:
+            return "Không có"
+        return normalized[:500] or "Không có"
+
+    @staticmethod
+    def _order_request_before_latest_assistant(
+        history: list[dict],
+    ) -> str | None:
+        latest_assistant_index = None
+        for index in range(len(history) - 1, -1, -1):
+            if history[index].get("role") == "assistant":
+                latest_assistant_index = index
+                break
+        if latest_assistant_index is None:
+            return None
+
+        for index in range(latest_assistant_index - 1, -1, -1):
+            if history[index].get("role") == "user":
+                return strip_internal_context(str(history[index].get("content") or ""))
+        return None
+
+    @classmethod
+    def _pending_order_from_history(
+        cls,
+        history: list[dict],
+    ) -> tuple[str, str] | None:
+        confirmation_index = None
+        for index in range(len(history) - 1, -1, -1):
+            entry = history[index]
+            if entry.get("role") == "assistant" and is_order_confirmation_prompt(
+                str(entry.get("content") or "")
+            ):
+                confirmation_index = index
+                break
+        if confirmation_index is None:
+            return None
+
+        notes = None
+        note_question_index = None
+        for index in range(confirmation_index - 1, -1, -1):
+            entry = history[index]
+            if notes is None and entry.get("role") == "user":
+                notes = cls._normalize_notes(
+                    strip_internal_context(str(entry.get("content") or ""))
+                )
+            if entry.get("role") == "assistant" and is_order_note_question(
+                str(entry.get("content") or "")
+            ):
+                note_question_index = index
+                break
+
+        if notes is None or note_question_index is None:
+            return None
+
+        for index in range(note_question_index - 1, -1, -1):
+            entry = history[index]
+            if entry.get("role") == "user":
+                order_message = strip_internal_context(
+                    str(entry.get("content") or "")
+                )
+                return order_message, notes
+        return None
+
+    @staticmethod
     def _extract_quantity_near_item(message: str, item_name: str) -> int:
-        escaped = re.escape(item_name)
+        normalized_message = SimpleVenueAgent._normalize_menu_text(message)
+        normalized_name = SimpleVenueAgent._normalize_menu_text(item_name)
+        escaped = re.escape(normalized_name)
         patterns = [
             rf"(\d+)\s+{escaped}",
             rf"{escaped}\s+x?\s*(\d+)",
         ]
         for pattern in patterns:
-            match = re.search(pattern, message, flags=re.IGNORECASE)
+            match = re.search(pattern, normalized_message)
             if match:
                 return max(1, min(int(match.group(1)), 99))
         return 1
+
+    @staticmethod
+    def _normalize_menu_text(value: str) -> str:
+        normalized = normalize_message(value)
+        return re.sub(r"\bcafe\b", "ca phe", normalized)
 
     @staticmethod
     def _optional_str(value) -> str | None:
