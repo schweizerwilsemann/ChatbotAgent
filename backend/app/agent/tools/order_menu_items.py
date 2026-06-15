@@ -5,6 +5,10 @@ from difflib import SequenceMatcher
 from langchain_core.tools import tool
 
 from app.agent.context import current_chat_context, current_user_id
+from app.agent.order_confirmation import (
+    order_creation_is_confirmed,
+    order_payload_matches_confirmation,
+)
 from app.core.database import async_session_factory
 from app.repositories.booking_repository import BookingRepository
 from app.repositories.menu_repository import MenuRepository
@@ -85,16 +89,28 @@ def _resolve_item_name(raw_name: str, menu_items: list) -> tuple[str, str | None
 
 @tool
 async def order_menu_items(items: str, notes: str = "") -> str:
-    """Đặt item trong thực đơn cho khách. Nhận danh sách item dạng JSON.
+    """Tạo đơn sau khi khách đã xác nhận tóm tắt món và ghi chú.
 
     Args:
         items: Danh sách item dạng JSON string, ví dụ:
             '[{"item_name": "Cà phê đen", "quantity": 2}, {"item_name": "Vợt cho thuê", "quantity": 1}]'
-        notes: Ghi chú thêm (tùy chọn), ví dụ: "ít đá", "thuê trong 2 giờ"
+        notes: Yêu cầu đặc biệt của khách. Dùng "Không có" nếu khách không có ghi chú.
 
     Returns:
         Xác nhận đặt hàng hoặc thông báo lỗi
     """
+    chat_context = current_chat_context.get() or {}
+    notes = str(notes or "").strip() or "Không có"
+    if not order_creation_is_confirmed(chat_context):
+        return (
+            "CHƯA TẠO ĐƠN: khách chưa xác nhận đúng quy trình. "
+            "Trước tiên phải hỏi khách có yêu cầu đặc biệt hoặc ghi chú gì không. "
+            "Sau khi khách trả lời, hãy tóm tắt món, số lượng và dòng "
+            "'Ghi chú: ...', rồi hỏi 'Bạn xác nhận muốn đặt ...?'. "
+            "Chỉ gọi lại công cụ khi tin nhắn kế tiếp của khách là câu đồng ý "
+            "ngắn gọn. Nếu khách sửa món hoặc ghi chú, phải tóm tắt và xác nhận lại."
+        )
+
     try:
         items_list = json.loads(items)
         if not isinstance(items_list, list) or len(items_list) == 0:
@@ -102,7 +118,13 @@ async def order_menu_items(items: str, notes: str = "") -> str:
     except json.JSONDecodeError:
         return '❌ Định dạng JSON không hợp lệ. Ví dụ: [{"item_name": "Cà phê đen", "quantity": 2}]'
 
-    chat_context = current_chat_context.get() or {}
+    if not order_payload_matches_confirmation(chat_context, items_list, notes):
+        return (
+            "CHƯA TẠO ĐƠN: món hoặc ghi chú truyền vào không khớp với bản tóm tắt "
+            "khách vừa xác nhận. Hãy tóm tắt lại đầy đủ món, số lượng và "
+            "'Ghi chú: ...', sau đó xin khách xác nhận lại."
+        )
+
     selected_venue_id = _optional_str(chat_context.get("venue_id"))
     selected_venue_name = _optional_str(chat_context.get("venue_name"))
 

@@ -1,5 +1,4 @@
 import hashlib
-import json
 import logging
 from typing import Any
 
@@ -8,16 +7,30 @@ from langchain_core.tools import tool
 from app.core.config import settings
 from app.core.neo4j_client import Neo4jClient
 from app.core.redis_client import redis_client
+from app.kg.query import HybridKnowledgeRetriever
 
 logger = logging.getLogger(__name__)
 
 _neo4j_client: Neo4jClient | None = None
+_retriever: HybridKnowledgeRetriever | None = None
 
 
-def set_neo4j_client(client: Neo4jClient) -> None:
-    """Set the Neo4j client instance for this tool module."""
-    global _neo4j_client
+def set_neo4j_client(client: Neo4jClient | None, embedder: Any | None = None) -> None:
+    """Configure the Neo4j client and optional semantic embedder."""
+    global _neo4j_client, _retriever
     _neo4j_client = client
+    _retriever = (
+        HybridKnowledgeRetriever(
+            client,
+            embedder=embedder,
+            embedding_timeout_seconds=settings.KG_EMBEDDING_TIMEOUT_SECONDS,
+            embedding_failure_cooldown_seconds=(
+                settings.KG_EMBEDDING_FAILURE_COOLDOWN_SECONDS
+            ),
+        )
+        if client
+        else None
+    )
 
 
 async def ensure_indexes() -> None:
@@ -39,15 +52,15 @@ async def ensure_indexes() -> None:
 
 @tool
 async def query_knowledge(query: str) -> str:
-    """Truy cập knowledge graph để trả lời câu hỏi về luật chơi, kỹ thuật thể thao (bida, pickleball, cầu lông).
+    """Tra cứu Knowledge Graph về luật và kỹ thuật bida, pickleball, cầu lông.
 
     Args:
         query: Câu hỏi của người dùng về luật chơi hoặc kỹ thuật thể thao
 
     Returns:
-        Thông tin liên quan từ knowledge graph
+        Ngữ cảnh tri thức lấy bằng hybrid full-text/vector retrieval và graph traversal
     """
-    if not _neo4j_client:
+    if not _retriever:
         return "Knowledge graph chưa được kết nối. Vui lòng thử lại sau."
 
     question = query
@@ -59,81 +72,15 @@ async def query_knowledge(query: str) -> str:
     except Exception:
         logger.debug("KG cache read skipped", exc_info=True)
 
-    # ── 1. Try fulltext index search ─────────────────────────────────
     try:
-        cypher_query = """
-        CALL db.index.fulltext.queryNodes("entity_fulltext", $question)
-        YIELD node, score
-        WHERE score > 0.3
-        OPTIONAL MATCH (node)-[r]-(related)
-        RETURN node.name AS title,
-               node.description AS content,
-               labels(node)[0] AS sport,
-               labels(node) AS labels,
-               type(r) AS relationship,
-               related.name AS related_title,
-               related.description AS related_content,
-               score
-        ORDER BY score DESC
-        LIMIT 5
-        """
-        results = await _neo4j_client.execute_query(
-            cypher_query, {"question": question}
-        )
-
+        results = await _retriever.retrieve(question, limit=5)
         if results:
             formatted = _format_results(results)
             await _cache_result(cache_key, formatted)
             return formatted
-    except Exception:
-        logger.warning(
-            "Fulltext index 'entity_fulltext' not available, falling back to keyword search"
-        )
-
-    # ── 2. Fallback: keyword search with fuzzy matching ──────────────
-    try:
-        # Extract nouns/keywords by removing common Vietnamese function words
-        # Use regex to find Vietnamese words (including diacritics)
-        words = question.split()
-        # Keep words with 2+ chars, prioritize longer words
-        keywords = sorted(
-            [w for w in words if len(w) >= 2],
-            key=len,
-            reverse=True
-        )[:5]  # Take top 5 longest words (likely nouns/content words)
-
-        if not keywords:
-            keywords = [question]
-
-        # Strategy 1: Try combined keywords
-        combined = " ".join(keywords[:3])
-        results = await _search_by_keyword(combined)
-
-        # Strategy 2: If no results, try individual keywords (OR logic)
-        if not results:
-            for kw in keywords:
-                if len(kw) < 3:
-                    continue
-                results = await _search_by_keyword(kw)
-                if results:
-                    break
-
-        # Strategy 3: If still no results, try partial matching with longest word
-        if not results and keywords:
-            longest = keywords[0]
-            if len(longest) >= 4:
-                # Try first 4+ chars as prefix
-                results = await _search_by_prefix(longest[:4])
-
-        if results:
-            formatted = _format_results(results)
-            await _cache_result(cache_key, formatted)
-            return formatted
-
     except Exception as exc:
-        logger.warning("Keyword search also failed: %s", exc)
+        logger.exception("Knowledge retrieval failed: %s", exc)
 
-    # ── 3. Nothing found ──────────────────────────────────────────────
     not_found = "Tôi không tìm thấy thông tin liên quan trong cơ sở dữ liệu. Bạn có thể hỏi cụ thể hơn về bida, pickleball hoặc cầu lông không?"
     await _cache_result(cache_key, not_found, ttl=900)
     return not_found
@@ -142,7 +89,7 @@ async def query_knowledge(query: str) -> str:
 def _cache_key(question: str) -> str:
     normalized = " ".join(question.lower().strip().split())
     digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
-    return f"kg:answer:{settings.KG_CACHE_VERSION}:{digest}"
+    return f"kg:answer:{settings.KG_CACHE_VERSION}:hybrid-v1:{digest}"
 
 
 async def _cache_result(
@@ -157,28 +104,40 @@ async def _cache_result(
 
 
 def _format_results(results: list[dict[str, Any]]) -> str:
-    """Format Neo4j query results into readable text."""
+    """Format hybrid retrieval results as grounded context for the LLM."""
     formatted_parts = []
-    seen = set()
+    seen_primary = set()
 
     for record in results:
-        title = record.get("title", "")
-        content = record.get("content", "")
+        title = record.get("name", "")
+        content = record.get("description", "")
 
-        if title and title not in seen:
-            seen.add(title)
-            sport = record.get("sport", "")
+        if title and title not in seen_primary:
+            seen_primary.add(title)
+            entity_type = record.get("type", "")
             section = f"**{title}**"
-            if sport:
-                section += f" ({sport})"
+            if entity_type:
+                section += f" [{entity_type}]"
             if content:
                 section += f"\n{content}"
 
-            related_title = record.get("related_title")
-            related_content = record.get("related_content")
-            if related_title and related_title not in seen:
-                seen.add(related_title)
-                rel_text = f"\n  → Liên quan: {related_title}"
+            source = record.get("source")
+            if source:
+                section += f"\nNguồn: {source}"
+
+            seen_related = {title}
+            for related in record.get("related_entities", []):
+                related_title = related.get("name")
+                if not related_title or related_title in seen_related:
+                    continue
+                seen_related.add(related_title)
+                relationship_path = related.get("relationship_path") or []
+                relation_label = " → ".join(relationship_path) or "LIEN_QUAN"
+                distance = related.get("distance", 1)
+                rel_text = (
+                    f"\n- {relation_label} ({distance} bước): {related_title}"
+                )
+                related_content = related.get("description")
                 if related_content:
                     rel_text += f" — {related_content}"
                 section += rel_text
@@ -190,55 +149,3 @@ def _format_results(results: list[dict[str, Any]]) -> str:
         if formatted_parts
         else "Không tìm thấy thông tin phù hợp."
     )
-
-
-async def _search_by_keyword(keyword: str) -> list[dict[str, Any]] | None:
-    """Search Neo4j nodes by keyword in name or description."""
-    if not _neo4j_client:
-        return None
-    query = """
-    MATCH (n)
-    WHERE n.description IS NOT NULL
-    AND (toLower(n.description) CONTAINS toLower($keyword)
-         OR toLower(n.name) CONTAINS toLower($keyword))
-    OPTIONAL MATCH (n)-[r]-(related)
-    RETURN n.name AS title,
-           n.description AS content,
-           labels(n)[0] AS sport,
-           labels(n) AS labels,
-           type(r) AS relationship,
-           related.name AS related_title,
-           related.description AS related_content
-    LIMIT 5
-    """
-    try:
-        results = await _neo4j_client.execute_query(query, {"keyword": keyword})
-        return results if results else None
-    except Exception:
-        return None
-
-
-async def _search_by_prefix(prefix: str) -> list[dict[str, Any]] | None:
-    """Search Neo4j nodes by prefix using STARTS WITH."""
-    if not _neo4j_client:
-        return None
-    query = """
-    MATCH (n)
-    WHERE n.description IS NOT NULL
-    AND (toLower(n.name) STARTS WITH toLower($prefix)
-         OR toLower(n.description) CONTAINS toLower($prefix))
-    OPTIONAL MATCH (n)-[r]-(related)
-    RETURN n.name AS title,
-           n.description AS content,
-           labels(n)[0] AS sport,
-           labels(n) AS labels,
-           type(r) AS relationship,
-           related.name AS related_title,
-           related.description AS related_content
-    LIMIT 5
-    """
-    try:
-        results = await _neo4j_client.execute_query(query, {"prefix": prefix})
-        return results if results else None
-    except Exception:
-        return None
