@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     MENU_CACHE_VERSION: str = "v1"
     KG_CACHE_TTL_SECONDS: int = 21600
     KG_CACHE_VERSION: str = "v1"
+    KG_EMBEDDING_TIMEOUT_SECONDS: float = 3.0
+    KG_EMBEDDING_FAILURE_COOLDOWN_SECONDS: float = 60.0
+    KG_AUTO_EMBED_ON_STARTUP: bool = True
+    KG_AUTO_EMBED_MAX_NODES: int = 500
 
     # LLM
     GEMINI_API_KEY: str = ""
@@ -43,8 +47,8 @@ class Settings(BaseSettings):
     MIMO_MODEL: str = "mimo-v2.5"
 
     # Embedding
-    EMBEDDING_MODEL: str = "models/text-embedding-004"
-    EMBEDDING_DIMENSION: int = 768
+    EMBEDDING_API_URL: str = "http://localhost:11434/api/embeddings"
+    EMBEDDING_MODEL: str = "nomic-embed-text"
 
     # Payment Service (gRPC)
     PAYMENT_SERVICE_HOST: str = "localhost"

@@ -45,6 +45,9 @@ class ChatService:
 
         # Save enriched message to history so LLM sees context from previous turns
         history.append({"role": "user", "content": enriched_message})
+        chat_context["_current_user_message"] = message
+        chat_context["_session_history"] = history
+        chat_context["_session_id"] = session_id
 
         try:
             user_token = current_user_id.set(user_id)
@@ -172,6 +175,9 @@ class ChatService:
 
         # Save enriched message to history so LLM sees context from previous turns
         history.append({"role": "user", "content": enriched_message})
+        chat_context["_current_user_message"] = message
+        chat_context["_session_history"] = history
+        chat_context["_session_id"] = session_id
 
         # DEBUG: Log history length and last 2 messages
         logger.info(

@@ -1,5 +1,6 @@
+import asyncio
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 from app.agent.agent import VenueAgent
 from app.agent.simple_agent import SimpleVenueAgent
@@ -60,11 +61,38 @@ neo4j_client: Neo4jClient | None = None
 chat_service: ChatService | None = None
 
 
+async def _sync_knowledge_embeddings(
+    embedder: NodeEmbedder,
+    client: Neo4jClient,
+) -> None:
+    try:
+        stats = await embedder.sync_missing_embeddings(
+            client,
+            max_nodes=settings.KG_AUTO_EMBED_MAX_NODES,
+        )
+        logger.info(
+            "Startup knowledge embedding sync finished: checked=%d stored=%d",
+            stats["checked"],
+            stats["stored"],
+        )
+    except asyncio.CancelledError:
+        raise
+    except Exception:
+        logger.warning(
+            "Startup knowledge embedding sync failed; lexical KG search remains available",
+            exc_info=True,
+        )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global neo4j_client, chat_service
 
     logger.info("Starting %s (%s)", settings.APP_NAME, settings.APP_ENV)
+    embedder = NodeEmbedder(
+        embedding_api_url=settings.EMBEDDING_API_URL,
+        model_name=settings.EMBEDDING_MODEL,
+    )
 
     # --- Startup ---
     async with engine.begin() as conn:
@@ -98,7 +126,7 @@ async def lifespan(app: FastAPI):
     try:
         await neo4j_client.connect()
         await neo4j_client.verify_connectivity()
-        set_neo4j_client(neo4j_client)
+        set_neo4j_client(neo4j_client, embedder=embedder)
         await ensure_indexes()
         logger.info("Neo4j connected.")
     except Exception:
@@ -117,7 +145,6 @@ async def lifespan(app: FastAPI):
         logger.warning("Cache pre-warming failed", exc_info=True)
 
     try:
-        embedder = NodeEmbedder()
         agent = VenueAgent(
             tools=[
                 query_knowledge,
@@ -148,9 +175,22 @@ async def lifespan(app: FastAPI):
     set_chat_service(chat_service)
     logger.info("Chat service initialized.")
 
+    if neo4j_client and settings.KG_AUTO_EMBED_ON_STARTUP:
+        app.state.kg_embedding_task = asyncio.create_task(
+            _sync_knowledge_embeddings(embedder, neo4j_client),
+            name="kg-embedding-sync",
+        )
+        logger.info("Knowledge embedding sync scheduled in background.")
+
     yield
 
     # --- Shutdown ---
+    embedding_task = getattr(app.state, "kg_embedding_task", None)
+    if embedding_task and not embedding_task.done():
+        embedding_task.cancel()
+        with suppress(asyncio.CancelledError):
+            await embedding_task
+
     if neo4j_client:
         await neo4j_client.close()
         logger.info("Neo4j connection closed.")

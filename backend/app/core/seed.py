@@ -552,6 +552,7 @@ async def ensure_multi_tenant_columns(engine: AsyncEngine) -> None:
             "ALTER TABLE orders ADD COLUMN IF NOT EXISTS resource_id UUID",
             "ALTER TABLE orders ADD COLUMN IF NOT EXISTS resource_label VARCHAR(255)",
             "ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) NOT NULL DEFAULT 'unpaid'",
+            "ALTER TABLE orders ADD COLUMN IF NOT EXISTS notes TEXT",
             "CREATE INDEX IF NOT EXISTS ix_orders_venue_id ON orders (venue_id)",
             "CREATE INDEX IF NOT EXISTS ix_orders_booking_id ON orders (booking_id)",
             "CREATE INDEX IF NOT EXISTS ix_orders_resource_id ON orders (resource_id)",
