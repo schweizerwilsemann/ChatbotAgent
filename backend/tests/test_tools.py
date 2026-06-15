@@ -19,27 +19,48 @@ async def test_query_knowledge_tool_no_client():
 
 
 @pytest.mark.asyncio
-async def test_query_knowledge_tool_with_results():
+@patch("app.agent.tools.query_faq.redis_client")
+async def test_query_knowledge_tool_with_results(mock_redis):
     """Test query_knowledge returns formatted results from Neo4j."""
     mock_client = AsyncMock()
-    mock_client.execute_query.return_value = [
-        {
-            "title": "Luật bida 8 bi",
-            "content": "Mục tiêu là đánh bóng vào lỗ.",
-            "sport": "billiards",
-            "labels": ["FAQ"],
-            "relationship": "RELATED_TO",
-            "related_title": "Kỹ thuật cơ bản",
-            "related_content": "Cầm cơ đúng cách.",
-            "score": 0.95,
-        }
-    ]
+    mock_redis.get = AsyncMock(return_value=None)
+    mock_redis.set = AsyncMock()
+
+    async def execute_query(query, params):
+        if "db.index.fulltext.queryNodes" in query:
+            return [
+                {
+                    "node_id": "rule-1",
+                    "name": "Luật bida 8 bi",
+                    "type": "Rule",
+                    "description": "Mục tiêu là đánh bóng vào lỗ.",
+                    "source": "WPA",
+                    "score": 0.95,
+                }
+            ]
+        if "MATCH path" in query:
+            return [
+                {
+                    "seed_id": "rule-1",
+                    "related_name": "Bida",
+                    "related_type": "Sport",
+                    "related_description": "Môn thể thao bida.",
+                    "related_source": "WPA",
+                    "relationship_path": ["THUOC"],
+                    "distance": 1,
+                }
+            ]
+        return []
+
+    mock_client.execute_query.side_effect = execute_query
     set_neo4j_client(mock_client)
 
     result = await query_knowledge.ainvoke("luật bida")
 
     assert "Luật bida 8 bi" in result
-    assert "billiards" in result
+    assert "[Rule]" in result
+    assert "THUOC (1 bước): Bida" in result
+    assert "Nguồn: WPA" in result
 
 
 @pytest.mark.asyncio
