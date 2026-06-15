@@ -11,8 +11,12 @@ import os
 import sys
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+BACKEND_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BACKEND_ROOT))
+load_dotenv(BACKEND_ROOT / ".env")
 
 from app.kg.embeddings import NodeEmbedder
 
@@ -122,6 +126,58 @@ async def fetch_all_nodes(driver) -> list[dict]:
     return all_nodes
 
 
+async def verify_vector_search(driver, embedder: NodeEmbedder) -> bool:
+    """Verify that the vector index is online and returns knowledge nodes."""
+    query_embedding = await embedder.embed_query(
+        "Luật giao bóng pickleball như thế nào?"
+    )
+    if not query_embedding:
+        logger.warning("Vector smoke test skipped because query embedding failed")
+        return False
+
+    async with driver.session() as session:
+        index_result = await session.run(
+            "SHOW INDEXES YIELD name, type, state, labelsOrTypes, properties "
+            "WHERE name = 'entity_embedding_index' "
+            "RETURN name, type, state, labelsOrTypes, properties"
+        )
+        indexes = await index_result.data()
+        if not indexes:
+            logger.error("Vector index entity_embedding_index was not found")
+            return False
+
+        index = indexes[0]
+        logger.info(
+            "Vector index: state=%s labels=%s properties=%s",
+            index["state"],
+            index["labelsOrTypes"],
+            index["properties"],
+        )
+        if index["state"] != "ONLINE":
+            logger.warning("Vector index is not ONLINE yet")
+            return False
+
+        search_result = await session.run(
+            "CALL db.index.vector.queryNodes("
+            "'entity_embedding_index', 3, $embedding"
+            ") YIELD node, score "
+            "RETURN node.name AS name, score "
+            "ORDER BY score DESC",
+            embedding=query_embedding,
+        )
+        matches = await search_result.data()
+        if not matches:
+            logger.error("Vector smoke test returned no knowledge nodes")
+            return False
+
+        logger.info(
+            "Vector smoke test top match: %s (score=%.4f)",
+            matches[0]["name"],
+            matches[0]["score"],
+        )
+        return True
+
+
 async def main() -> None:
     """Generate and store embeddings for all knowledge graph nodes."""
     logger.info("Starting node embedding pipeline")
@@ -165,15 +221,11 @@ async def main() -> None:
             logger.error("Cannot verify Neo4j connection. Aborting.")
             return
 
-        # Fetch all nodes
-        nodes = await fetch_all_nodes(driver)
-        if not nodes:
-            logger.warning("No nodes found in Neo4j. Run 03_build_graph.py first.")
-            return
-
-        # Generate and store embeddings
-        logger.info("Generating embeddings for %d nodes...", len(nodes))
-        stored_count = await embedder.embed_and_store(driver, nodes)
+        max_nodes = int(os.environ.get("EMBEDDING_MAX_NODES", "10000"))
+        stats = await embedder.sync_missing_embeddings(
+            driver,
+            max_nodes=max_nodes,
+        )
 
         # Verify embeddings were stored
         logger.info("Verifying stored embeddings...")
@@ -194,9 +246,13 @@ async def main() -> None:
 
         logger.info("=" * 60)
         logger.info("Node embedding pipeline complete!")
-        logger.info("  Total nodes processed: %d", len(nodes))
-        logger.info("  Embeddings stored: %d", stored_count)
+        logger.info("  Nodes checked: %d", stats["checked"])
+        logger.info("  Embeddings stored: %d", stats["stored"])
         logger.info("  Verified in graph: %d", total_embedded)
+        logger.info(
+            "  Vector search ready: %s",
+            await verify_vector_search(driver, embedder),
+        )
         logger.info("=" * 60)
 
     finally:
