@@ -250,17 +250,17 @@ class _StaffBillingScreenState extends ConsumerState<StaffBillingScreen>
             children: [
               const Icon(Icons.receipt_long,
                   color: AppColors.primary, size: 22),
-               const SizedBox(width: 8),
-               const Flexible(
-                 child: Text(
-                   'Quản lý hoá đơn',
-                   style: TextStyle(
-                     fontWeight: FontWeight.w700,
-                     fontSize: 16,
-                   ),
-                   overflow: TextOverflow.ellipsis,
-                 ),
-               ),
+              const SizedBox(width: 8),
+              const Flexible(
+                child: Text(
+                  'Quản lý hoá đơn',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               const Spacer(),
               // Date picker
               InkWell(
@@ -981,6 +981,30 @@ class _BookingBillCard extends StatelessWidget {
                 ],
               ),
             ),
+          if (order.notes != null && order.notes!.trim().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, bottom: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.notes,
+                    size: 15,
+                    color: AppColors.warning,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Ghi chú: ${order.notes}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           const Divider(height: 8),
           Row(
             children: [
@@ -1215,6 +1239,30 @@ class _StandaloneOrderCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            if (order.notes != null && order.notes!.trim().isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 4, bottom: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.notes,
+                      size: 15,
+                      color: AppColors.warning,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        'Ghi chú: ${order.notes}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],

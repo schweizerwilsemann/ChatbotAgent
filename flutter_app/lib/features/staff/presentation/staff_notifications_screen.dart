@@ -436,6 +436,7 @@ class _OrderNotificationSummary extends StatelessWidget {
         : orderId.substring(0, 8);
     final status = payload['status']?.toString();
     final paymentStatus = payload['payment_status']?.toString();
+    final notes = payload['notes']?.toString().trim();
     final total = _moneyText(payload['total_price']);
 
     return Container(
@@ -497,6 +498,30 @@ class _OrderNotificationSummary extends StatelessWidget {
               ),
             );
           }),
+          if (notes != null && notes.isNotEmpty) ...[
+            const Divider(height: 14),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.notes,
+                  size: 16,
+                  color: AppColors.warning,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'Ghi chú: $notes',
+                    style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
           if (total != null) ...[
             const Divider(height: 14),
             Row(
