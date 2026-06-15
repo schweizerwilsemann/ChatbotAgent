@@ -362,8 +362,9 @@ def create_report():
         "tra cứu luật chơi, kỹ thuật, đặt sân và gọi đồ uống. Việc xây dựng "
         "chatbot AI giúp giải quyết các vấn đề trên, nâng cao trải nghiệm "
         "khách hàng và tối ưu hóa quy trình phục vụ. Bên cạnh đó, nhu cầu "
-        "thanh toán trực tuyến ngày càng cao, đòi hỏi hệ thống cần tích hợp "
-        "các cổng thanh toán phổ biến như Stripe và VNPay."
+        "thanh toán trực tuyến ngày càng cao. Trong phạm vi đồ án, Stripe được "
+        "tích hợp để thử nghiệm thanh toán; VNPay được nghiên cứu ở mức prototype "
+        "nhằm khảo sát phương án tích hợp cổng thanh toán trong nước."
     )
 
     add_body_text(doc,
@@ -372,7 +373,7 @@ def create_report():
         "(2) hỗ trợ đặt sân theo thời gian thực; "
         "(3) đặt đồ uống từ menu; "
         "(4) gọi nhân viên hỗ trợ; "
-        "(5) tích hợp thanh toán trực tuyến (Stripe, VNPay); "
+        "(5) tích hợp thanh toán Stripe và xây dựng prototype nghiên cứu VNPay; "
         "(6) cung cấp ứng dụng di động đa nền tảng."
     )
 
@@ -381,8 +382,10 @@ def create_report():
         "phát triển phần mềm theo mô hình Agile và ứng dụng các công nghệ AI "
         "hiện đại (LangChain, LLM, Knowledge Graph). Dữ liệu tri thức thể thao "
         "được thu thập từ các nguồn chính thức (WPA, USAPA, BWF) và xây dựng "
-        "thành Knowledge Graph trong Neo4j. Hệ thống được triển khai bằng "
-        "Docker Compose với kiến trúc microservice."
+        "thành Knowledge Graph trong Neo4j. Backend FastAPI được xây dựng theo "
+        "kiến trúc monolith, tập trung các API và nghiệp vụ trong một ứng dụng. "
+        "Docker Compose chỉ được dùng để thử nghiệm riêng prototype Java VNPay, "
+        "không phải để triển khai toàn hệ thống theo kiến trúc microservices."
     )
 
     add_body_text(doc,
@@ -420,8 +423,8 @@ def create_report():
         "Thiết kế và xây dựng ứng dụng di động Flutter đa nền tảng.",
         "Tích hợp AI Agent với các tool: tra cứu kiến thức, đặt sân, gọi đồ uống, gọi nhân viên.",
         "Thiết kế cơ sở dữ liệu PostgreSQL cho dữ liệu nghiệp vụ.",
-        "Tích hợp thanh toán trực tuyến: Stripe (quốc tế) và VNPay (trong nước).",
-        "Triển khai hệ thống bằng Docker Compose.",
+        "Tích hợp thanh toán Stripe và nghiên cứu phương án tích hợp VNPay trong nước.",
+        "Đóng gói prototype Java VNPay bằng Docker Compose để phục vụ nghiên cứu, thử nghiệm.",
         "Thử nghiệm và đánh giá hệ thống.",
     ]
     for task in tasks:
@@ -434,9 +437,9 @@ def create_report():
         "Hệ thống chatbot AI hoạt động, trả lời được câu hỏi về luật chơi và kỹ thuật thể thao.",
         "Chức năng đặt sân thể thao hoạt động theo thời gian thực.",
         "Chức năng đặt đồ uống từ menu hoạt động.",
-        "Chức năng thanh toán trực tuyến hoạt động (Stripe và VNPay).",
+        "Chức năng thanh toán Stripe hoạt động; mã nguồn VNPay dừng ở mức prototype và chưa kiểm thử sandbox.",
         "Ứng dụng di động Flutter chạy được trên Android và iOS.",
-        "Hệ thống triển khai được bằng Docker Compose.",
+        "Prototype Java VNPay có cấu hình Docker Compose riêng; Docker Compose không đại diện cho phương án triển khai toàn hệ thống.",
         "Tài liệu mã nguồn và báo cáo đồ án hoàn chỉnh.",
     ]
     for req in product_reqs:
@@ -577,7 +580,7 @@ def create_report():
         ("4.2.3. Database Models", "52"),
         ("4.2.4. API Endpoints", "53"),
         ("4.2.5. Payment Implementation", "54"),
-        ("4.2.6. Docker Deployment", "56"),
+        ("4.2.6. Docker Compose cho prototype VNPay", "56"),
         ("4.3. Hiện thực Frontend (Flutter App)", "57"),
         ("4.3.1. Cấu trúc Feature-based", "57"),
         ("4.3.2. State Management với Riverpod", "58"),
@@ -642,10 +645,10 @@ def create_report():
         ("Bảng 3.15", "Staff Request APIs"),
         ("Bảng 3.16", "Staff Chat APIs"),
         ("Bảng 3.17", "Realtime Notification APIs"),
-        ("Bảng 3.18", "VNPay Payment APIs"),
+        ("Bảng 3.18", "VNPay Prototype APIs"),
         ("Bảng 3.19", "Stripe Payment APIs"),
         ("Bảng 4.1", "Môi trường triển khai"),
-        ("Bảng 4.2", "Docker Services"),
+        ("Bảng 4.2", "Docker Compose cho prototype VNPay"),
         ("Bảng 4.3", "Flutter Dependencies"),
     ]
 
@@ -687,7 +690,7 @@ def create_report():
         ("Hình 2.4", "Sequence Diagram - Chat"),
         ("Hình 2.5", "Sequence Diagram - Booking"),
         ("Hình 2.6", "Sequence Diagram - Payment (Stripe)"),
-        ("Hình 2.7", "Sequence Diagram - Payment (VNPay)"),
+        ("Hình 2.7", "Sequence Diagram - Prototype VNPay"),
         ("Hình 3.1", "Sơ đồ quan hệ các bảng (ERD)"),
         ("Hình 3.2", "Sơ đồ kiến trúc hệ thống"),
         ("Hình 3.3", "Luồng xử lý yêu cầu"),
@@ -695,8 +698,8 @@ def create_report():
         ("Hình 4.2", "Cấu trúc thư mục frontend"),
         ("Hình 4.3", "Luồng xử lý AI Agent"),
         ("Hình 4.4", "Luồng thanh toán Stripe"),
-        ("Hình 4.5", "Luồng thanh toán VNPay"),
-        ("Hình 4.6", "Kiến trúc Docker Deployment"),
+        ("Hình 4.5", "Luồng thử nghiệm prototype VNPay"),
+        ("Hình 4.6", "Phạm vi Docker Compose cho prototype VNPay"),
         ("Hình 4.7", "Màn hình đăng nhập"),
         ("Hình 4.8", "Màn hình chính (Home Screen)"),
         ("Hình 4.9", "Giao diện Chat với AI Agent"),
@@ -706,7 +709,7 @@ def create_report():
         ("Hình 4.13", "Màn hình giỏ hàng (Cart)"),
         ("Hình 4.14", "Dialog chọn phương thức thanh toán"),
         ("Hình 4.15", "Màn hình thanh toán Stripe (Payment Sheet)"),
-        ("Hình 4.16", "Màn hình thanh toán VNPay"),
+        ("Hình 4.16", "Màn hình prototype VNPay"),
         ("Hình 4.17", "Kết quả thanh toán thành công"),
         ("Hình 4.18", "Màn hình gọi nhân viên (Call Staff Dialog)"),
         ("Hình 4.19", "Màn hình danh sách yêu cầu (Staff Requests)"),
@@ -844,7 +847,7 @@ def create_report():
         "Đồ án này tập trung vào việc xây dựng Chatbot AI cho quán thể thao "
         "tích hợp Knowledge Graph và Tool Calling với các tính năng chính: "
         "tra cứu kiến thức thể thao (luật, kỹ thuật), đặt sân, gọi đồ uống, "
-        "gọi nhân viên, thanh toán trực tuyến (Stripe, VNPay) và quản lý yêu cầu khách hàng."
+        "gọi nhân viên, thanh toán Stripe, nghiên cứu tích hợp VNPay và quản lý yêu cầu khách hàng."
     )
 
     # 1.2. Nhiệm vụ của đồ án
@@ -864,8 +867,8 @@ def create_report():
         "Xây dựng backend API với FastAPI (Python) xử lý các nghiệp vụ: xác thực, đặt sân, đặt đồ uống, quản lý nhân viên và tích hợp AI Agent.",
         "Tích hợp công nghệ Tool Calling với LangChain để chatbot có thể tự động gọi các hàm xử lý nghiệp vụ khi phát hiện ý định người dùng.",
         "Sử dụng Knowledge Graph (Neo4j) để lưu trữ và truy vấn tri thức thể thao một cách có cấu trúc, hỗ trợ tìm kiếm ngữ nghĩa.",
-        "Tích hợp thanh toán trực tuyến qua Stripe và VNPay, hỗ trợ đa phương thức thanh toán cho khách hàng.",
-        "Triển khai hệ thống bằng Docker Compose với kiến trúc microservice.",
+        "Tích hợp thanh toán trực tuyến qua Stripe; xây dựng prototype VNPay để nghiên cứu luồng ký yêu cầu, callback và giao tiếp gRPC.",
+        "Xây dựng backend FastAPI theo kiến trúc monolith; chỉ dùng Docker Compose cho prototype Java VNPay, không xem đây là hệ thống microservices.",
     ]
     for p in purposes:
         add_bullet_point(doc, p)
@@ -882,7 +885,7 @@ def create_report():
         "Gọi nhân viên hỗ trợ khi cần thiết.",
         "Xem lịch sử đặt sân và trạng thái đơn hàng.",
         "Đăng nhập/đăng ký tài khoản khách hàng.",
-        "Thanh toán trực tuyến qua Stripe hoặc VNPay.",
+        "Thanh toán trực tuyến qua Stripe; chức năng VNPay chỉ ở mức thử nghiệm kỹ thuật và chưa khả dụng cho người dùng.",
         "Quản lý danh sách sân, menu đồ uống cho admin.",
         "Quản lý giá dịch vụ và xem hóa đơn chi tiết cho admin.",
         "Thông báo real-time cho nhân viên khi có yêu cầu mới.",
@@ -914,8 +917,8 @@ def create_report():
         ["Mobile Framework", "Flutter 3.1+"],
         ["AI Framework", "LangChain 0.3.1 + Ollama"],
         ["Cơ sở dữ liệu", "PostgreSQL 14+, Neo4j 5.x, Redis 7+"],
-        ["Thanh toán", "Stripe SDK (Python), VNPay SDK (Java/Flutter)"],
-        ["Triển khai", "Docker, Docker Compose"],
+        ["Thanh toán", "Stripe SDK (Python); prototype VNPay (Java/gRPC/Flutter) chưa kiểm thử sandbox"],
+        ["Triển khai", "Chạy phát triển cục bộ; Docker Compose chỉ cho prototype Java VNPay"],
         ["IDE / Editor", "VS Code, Android Studio, IntelliJ IDEA"],
     ]
     create_table_with_header(doc, env_headers, env_data)
@@ -1050,10 +1053,13 @@ def create_report():
     )
 
     add_body_text(doc,
-        "Trong đồ án này, VNPay được tích hợp thông qua kiến trúc microservice: "
-        "một Java service đóng vai trò proxy/gateway xử lý giao thức VNPay, "
-        "giao tiếp với Python backend qua gRPC. Frontend sử dụng VNPay Native SDK "
-        "qua Flutter Method Channel để mở trang thanh toán trực tiếp trên thiết bị."
+        "Trong đồ án này, phần VNPay chỉ là prototype nghiên cứu tích hợp. "
+        "Một Java service thử nghiệm được xây dựng để tạo tham số, ký yêu cầu VNPay "
+        "và giao tiếp với Python backend qua gRPC; phía Flutter có mã thử nghiệm "
+        "cho luồng mở trang thanh toán. Prototype chưa có mã website/merchant "
+        "(VNPAY_TMN_CODE) và khóa bí mật (VNPAY_HASH_SECRET), vì vậy chưa thể "
+        "kết nối, thanh toán hay xác minh callback end-to-end trên sandbox VNPay. "
+        "Thành phần này không được xem là chức năng thanh toán đã hoàn thiện."
     )
 
     # 1.3.9. Docker
@@ -1066,11 +1072,11 @@ def create_report():
     )
 
     add_body_text(doc,
-        "Trong đồ án này, Docker được sử dụng để triển khai hệ thống với "
-        "4 dịch vụ: PostgreSQL (cơ sở dữ liệu), Redis (cache/message broker), "
-        "Java Payment Service (VNPay gateway), và Python Backend (FastAPI). "
-        "Tất cả giao tiếp qua mạng nội bộ (bridge network), chỉ Python Backend "
-        "được expose ra ngoài qua port 8000."
+        "Trong phạm vi hiện thực và đánh giá của đồ án, Docker Compose chỉ phục vụ "
+        "việc đóng gói/chạy thử Java Payment Service của prototype VNPay. Backend "
+        "FastAPI và các hạ tầng dữ liệu được chạy trong môi trường phát triển riêng, "
+        "không được đánh giá như một cụm dịch vụ triển khai bằng Compose. Vì vậy "
+        "không thể dùng cấu hình Docker này làm căn cứ gọi hệ thống là microservices."
     )
 
     add_page_break(doc)
@@ -1096,7 +1102,7 @@ def create_report():
         ["6", "Xem lịch sử", "Xem lịch sử đặt sân, trạng thái đơn hàng."],
         ["7", "Đăng nhập/Đăng ký", "Xác thực người dùng bằng số điện thoại và mật khẩu."],
         ["8", "Quản lý (Admin)", "Quản lý sân, menu, nhân viên, thống kê doanh thu."],
-        ["9", "Thanh toán trực tuyến", "Thanh toán booking và order qua Stripe (quốc tế) hoặc VNPay (trong nước)."],
+        ["9", "Thanh toán trực tuyến", "Thanh toán booking và order qua Stripe; VNPay là prototype nghiên cứu chưa khả dụng trên sandbox."],
         ["10", "Quản lý giá dịch vụ", "Admin cấu hình giá sân, xem hóa đơn chi tiết booking."],
     ]
     create_table_with_header(doc, func_headers, func_data)
@@ -1111,7 +1117,7 @@ def create_report():
         ["Khả năng mở rộng", "Kiến trúc multi-tenant, hỗ trợ nhiều quán thể thao trên cùng hệ thống."],
         ["Đa nền tảng", "Ứng dụng chạy trên cả iOS và Android từ một codebase Flutter."],
         ["Tính sẵn sàng", "Fallback mechanism: khi LLM chính lỗi, tự chuyển sang LLM dự phòng."],
-        ["Thanh toán", "Hỗ trợ đa phương thức thanh toán: Stripe (quốc tế), VNPay (trong nước), xác nhận qua webhook."],
+        ["Thanh toán", "Stripe hỗ trợ luồng thanh toán và webhook; VNPay mới có mã prototype, chưa có merchant code/hash secret để kiểm thử sandbox."],
     ]
     create_table_with_header(doc, nf_headers, nf_data)
 
@@ -1130,7 +1136,7 @@ def create_report():
         "Trả lời tự động các câu hỏi về luật chơi, kỹ thuật thông qua Knowledge Graph (Neo4j) với Graph RAG.",
         "Hỗ trợ đặt sân thể thao theo thời gian thực, kiểm tra tình trạng sân trống.",
         "Hỗ trợ đặt đồ uống/đồ ăn từ menu của quán.",
-        "Tích hợp thanh toán trực tuyến qua Stripe (quốc tế) và VNPay (trong nước).",
+        "Tích hợp thanh toán trực tuyến qua Stripe; nghiên cứu thiết kế tích hợp VNPay trong nước ở mức prototype.",
         "Gửi yêu cầu gọi nhân viên hỗ trợ qua hệ thống thông báo real-time.",
         "Quản lý tài khoản người dùng với phân quyền: Customer, Staff, Admin.",
         "Cung cấp ứng dụng di động Flutter đa nền tảng với giao diện chat thân thiện.",
@@ -1244,7 +1250,7 @@ def create_report():
     Staff -->|Hoàn thành| UC08a[UC08a: Đóng yêu cầu]
 """)
 
-    add_mermaid_block(doc, "Use Case - Thanh toán:", """graph LR
+    add_mermaid_block(doc, "Use Case - Thanh toán (VNPay là prototype):", """graph LR
     Customer((Customer))
     System((Hệ thống))
     Stripe((Stripe))
@@ -1252,13 +1258,13 @@ def create_report():
 
     Customer -->|Chọn thanh toán| UC11[UC11: Thanh toán]
     Customer -->|Chọn Stripe| UC11a[UC11a: Stripe Payment]
-    Customer -->|Chọn VNPay| UC11b[UC11b: VNPay Payment]
+    Customer -->|Thử nghiệm VNPay| UC11b[UC11b: VNPay prototype]
     UC11a --> System
     UC11b --> System
     System -->|PaymentIntent| Stripe
-    System -->|Payment URL| VNPay
+    System -.->|Chưa kiểm thử sandbox| VNPay
     Stripe -->|Webhook xác nhận| System
-    VNPay -->|Callback| System
+    VNPay -.->|Callback dự kiến| System
     System -->|Cập nhật trạng thái| Customer
 """)
 
@@ -1295,10 +1301,10 @@ def create_report():
     uc_payment_data = [
         ["Use Case", "UC11 - Thanh toán trực tuyến"],
         ["Actor", "Customer"],
-        ["Mô tả", "Người dùng thanh toán booking hoặc order qua Stripe hoặc VNPay."],
+        ["Mô tả", "Người dùng thanh toán booking hoặc order qua Stripe. Nhánh VNPay mô tả prototype nghiên cứu, chưa phải chức năng sử dụng được."],
         ["Precondition", "Người dùng đã tạo booking/order thành công, chưa thanh toán."],
-        ["Main Flow", "1. Người dùng chọn 'Thanh toán ngay' sau khi đặt sân/đồ uống.\n2. Hệ thống hiển thị dialog chọn phương thức: Stripe hoặc VNPay.\n3a. Nếu Stripe: Hệ thống tạo Checkout Session, mở WebView thanh toán.\n3b. Nếu VNPay: Hệ thống tạo payment URL, mở VNPay Native SDK.\n4. Người dùng hoàn tất thanh toán trên cổng thanh toán.\n5. Hệ thống nhận xác nhận (webhook/callback), cập nhật trạng thái."],
-        ["Alternative Flow", "3a. Nếu Stripe lỗi, hiển thị thông báo và cho phép thử lại.\n4a. Nếu người dùng hủy thanh toán, trạng thái giữ nguyên 'unpaid'."],
+        ["Main Flow", "1. Người dùng chọn 'Thanh toán ngay' sau khi đặt sân/đồ uống.\n2. Hệ thống mở luồng Stripe.\n3. Backend tạo phiên thanh toán và frontend mở giao diện Stripe.\n4. Người dùng hoàn tất thanh toán.\n5. Hệ thống nhận webhook và cập nhật trạng thái."],
+        ["Alternative Flow", "3a. Nếu Stripe lỗi, hiển thị thông báo và cho phép thử lại.\n3b. Nhánh VNPay chỉ dùng để nghiên cứu mã nguồn; do thiếu VNPAY_TMN_CODE và VNPAY_HASH_SECRET nên trả lỗi cấu hình, không mở được giao dịch sandbox.\n4a. Nếu người dùng hủy thanh toán, trạng thái giữ nguyên 'unpaid'."],
         ["Postcondition", "Trạng thái thanh toán được cập nhật: 'paid' hoặc 'failed'."],
     ]
     create_table_with_header(doc, uc_payment_headers, uc_payment_data)
@@ -1334,7 +1340,7 @@ def create_report():
         "3. Tool book_court kiểm tra sân trống trong database PostgreSQL.",
         "4. Nếu sân trống, tạo bản ghi booking mới với status 'confirmed'.",
         "5. Trả về xác nhận đặt sân cho người dùng qua chatbot.",
-        "6. Hệ thống hiển thị dialog thanh toán với 2 lựa chọn: Stripe hoặc VNPay.",
+        "6. Hệ thống hiển thị luồng thanh toán Stripe; tùy chọn VNPay nếu xuất hiện chỉ mang tính thử nghiệm và chưa khả dụng.",
     ]
     for item in booking_seq:
         add_body_text(doc, item)
@@ -1453,27 +1459,26 @@ def create_report():
     F-->>C: Thanh toán thành công
 """)
 
-    add_mermaid_block(doc, "Sequence - Thanh toán VNPay:", """sequenceDiagram
+    add_mermaid_block(doc, "Sequence - Prototype VNPay (chưa kiểm thử sandbox):", """sequenceDiagram
     participant C as Customer
     participant F as Flutter App
     participant B as FastAPI Backend
     participant JV as Java Payment Service
-    participant V as VNPay API
+    participant V as VNPay Sandbox
 
-    C->>F: Chọn thanh toán VNPay
+    C->>F: Chọn nhánh thử nghiệm VNPay
     F->>B: POST /api/payment/create {order_type, order_id, amount}
     B->>JV: gRPC: createPayment
-    JV->>V: Tạo VNPay payment URL
-    V-->>JV: payment_url
-    JV-->>B: payment_url
-    B-->>F: {payment_url}
-    F->>F: Mở VNPay Native SDK (MethodChannel)
-    C->>V: Chọn ngân hàng, hoàn tất
-    V-->>B: Callback URL
-    B->>B: Xác thực chữ ký VNPay
-    B->>DB: Cập nhật payment_status = 'paid'
-    B-->>F: Kết quả thanh toán
-    F-->>C: Thanh toán thành công
+    JV->>JV: Đọc TMN_CODE và HASH_SECRET
+    alt Thiếu thông tin merchant (trạng thái hiện tại)
+        JV-->>B: Lỗi cấu hình
+        B-->>F: VNPay chưa khả dụng
+        F-->>C: Không thể mở giao dịch sandbox
+    else Có thông tin merchant trong tương lai
+        JV->>V: Gửi URL đã ký
+        V-->>B: Callback dự kiến
+        B->>B: Xác thực chữ ký
+    end
 """)
 
     add_mermaid_block(doc, "Sequence - Gọi nhân viên (Staff Request):", """sequenceDiagram
@@ -1933,7 +1938,7 @@ def create_report():
         "│           Flutter App               │  Presentation Layer\n"
         "│  (Chat UI, Booking, Menu, Auth)     │\n"
         "│  (Staff Chat, Staff Requests)       │\n"
-        "│  (Payment: Stripe/VNPay SDK)        │\n"
+        "│  (Stripe; VNPay prototype UI)       │\n"
         "└──────────────┬──────────────────────┘\n"
         "               │ HTTP / WebSocket\n"
         "┌──────────────▼──────────────────────┐\n"
@@ -1944,14 +1949,15 @@ def create_report():
         "└──────┬───────────────────┬──────────┘\n"
         "       │                   │\n"
         "┌──────▼──────┐    ┌───────▼─────────┐\n"
-        "│  AI Agent   │    │ Payment Service │  Domain Layer\n"
-        "│  LangChain  │    │  (Java/VNPay)   │\n"
+        "│  AI Agent   │    │ Payment Module  │  Domain Layer\n"
+        "│  LangChain  │    │ Stripe + VNPay* │\n"
         "│  Tool Call  │    │  Stripe SDK     │\n"
         "└──────┬──────┘    └───────┬─────────┘\n"
         "       │                   │\n"
         "┌──────▼───────────────────▼─────────┐\n"
         "│         Infrastructure Layer        │\n"
-        "│  PostgreSQL │ Neo4j │ Redis │ Docker│\n"
+        "│  PostgreSQL │ Neo4j │ Redis         │\n"
+        "│  * VNPay: prototype nghiên cứu       │\n"
         "└─────────────────────────────────────┘"
     )
 
@@ -1995,7 +2001,8 @@ def create_report():
         Neo[(Neo4j KG)]
         Redis[(Redis)]
         Stripe[Stripe API]
-        VNPay[VNPay API]
+        VNPayProto[Java VNPay prototype]
+        VNPay[VNPay Sandbox\nchưa kiểm thử]
     end
 
     Mobile -->|HTTP/WS| Backend
@@ -2010,7 +2017,8 @@ def create_report():
     StaffChatSvc --> Redis
     NotifSvc --> PG
     StripeAPI --> Stripe
-    PayAPI --> VNPay
+    PayAPI --> VNPayProto
+    VNPayProto -.->|thiếu merchant credentials| VNPay
 """)
 
     # 3.3.3. Mô tả thành phần trong kiến trúc
@@ -2045,7 +2053,7 @@ def create_report():
         "VenueAgent: Agent chính sử dụng LangChain với Tool Calling.",
         "IntentRouter: Tối ưu đường đi trước LLM bằng Redis cache, keyword matching và embedding similarity.",
         "Tools: query_knowledge, book_court, order_menu_items, recommend_menu, call_staff, check_schedule.",
-        "Knowledge Graph Query: Truy vấn Neo4j bằng Cypher, full-text search.",
+        "Knowledge Graph Query: Hybrid full-text/vector search, RRF và mở rộng quan hệ Neo4j tối đa hai bước.",
         "Fallback Mechanism: Tự động chuyển sang LLM dự phòng khi rate limit.",
     ]
     for item in agent_items:
@@ -2091,6 +2099,7 @@ def create_report():
         "Hiện tại chỉ hỗ trợ 3 môn thể thao (bida, pickleball, cầu lông), cần mở rộng thêm.",
         "Chưa có hệ thống đánh giá và phản hồi từ khách hàng.",
         "Cần bổ sung analytics và reporting nâng cao cho admin.",
+        "Prototype VNPay chưa thể kiểm thử sandbox do chưa có VNPAY_TMN_CODE và VNPAY_HASH_SECRET.",
         "Hướng phát triển: tích hợp voice chat, hỗ trợ đa ngôn ngữ, thêm môn thể thao.",
         "Hướng phát triển: triển khai lên cloud (AWS, GCP) với CI/CD pipeline.",
     ]
@@ -2165,12 +2174,12 @@ def create_report():
     # 3.4.7. Payment APIs
     add_heading_custom(doc, "3.4.7. Payment APIs", level=3)
 
-    add_body_text(doc, "VNPay Payment APIs:", bold=True)
+    add_body_text(doc, "VNPay Prototype APIs (chưa kiểm thử sandbox):", bold=True)
 
     vnpay_api_data = [
-        ["POST", "/api/payment/create", "Tạo URL thanh toán VNPay"],
-        ["GET", "/api/payment/callback", "Callback từ VNPay sau thanh toán"],
-        ["GET", "/api/payment/query", "Truy vấn trạng thái giao dịch VNPay"],
+        ["POST", "/api/payment/create", "Prototype tạo URL; hiện không dùng được do thiếu TMN_CODE/HASH_SECRET"],
+        ["GET", "/api/payment/callback", "Mã xử lý callback dự kiến; chưa xác minh end-to-end"],
+        ["GET", "/api/payment/query", "Mã truy vấn thử nghiệm; chưa gọi được sandbox"],
     ]
     create_table_with_header(doc, auth_headers, vnpay_api_data)
 
@@ -2197,7 +2206,7 @@ def create_report():
         "CORS Protection: Chỉ cho phép các origin được whitelist truy cập API.",
         "Input Validation: Tất cả request body được validate bằng Pydantic schemas.",
         "Rate Limiting: Giới hạn số request để tránh abuse (thông qua LLM provider).",
-        "Webhook Signature Verification: Xác thực chữ ký webhook từ Stripe và VNPay.",
+        "Webhook Signature Verification: Stripe được xác thực trong luồng tích hợp; VNPay mới có mã xác thực dự kiến và chưa kiểm chứng với callback sandbox.",
         "Payment Deduplication: Kiểm tra trùng lặp giao dịch bằng mã giao dịch cổng thanh toán.",
     ]
     for item in security_items:
@@ -2228,7 +2237,7 @@ def create_report():
         "│   │   │   ├── chat.py         # Chat\n"
         "│   │   │   ├── booking.py      # Đặt sân\n"
         "│   │   │   ├── order.py        # Đơn hàng\n"
-        "│   │   │   ├── payment.py      # VNPay payment\n"
+        "│   │   │   ├── payment.py      # VNPay prototype API\n"
         "│   │   │   ├── stripe.py       # Stripe payment\n"
         "│   │   │   └── admin.py        # Quản trị\n"
         "│   │   ├── agent/              # AI Agent core\n"
@@ -2240,10 +2249,10 @@ def create_report():
         "│   ├── data_pipeline/          # KG build pipeline\n"
         "│   └── Dockerfile              # Backend container\n"
         "│\n"
-        "├── java-payment-service/       # VNPay Gateway (Java)\n"
+        "├── java-payment-service/       # Prototype nghiên cứu VNPay (Java)\n"
         "│   ├── Dockerfile\n"
         "│   ├── pom.xml\n"
-        "│   └── src/                    # gRPC + VNPay integration\n"
+        "│   └── src/                    # gRPC + mã tích hợp VNPay thử nghiệm\n"
         "│\n"
         "├── flutter_app/                # Mobile App (Flutter)\n"
         "│   ├── lib/\n"
@@ -2252,14 +2261,14 @@ def create_report():
         "│   │   │   ├── booking/        # Booking feature\n"
         "│   │   │   ├── menu/           # Menu feature\n"
         "│   │   │   ├── auth/           # Authentication\n"
-        "│   │   │   ├── payment/        # Payment (Stripe/VNPay)\n"
+        "│   │   │   ├── payment/        # Stripe + giao diện prototype VNPay\n"
         "│   │   │   ├── admin/          # Admin panel\n"
         "│   │   │   └── profile/        # User profile\n"
         "│   │   ├── core/               # Constants, theme, router\n"
         "│   │   └── shared/             # Shared widgets\n"
         "│   └── pubspec.yaml\n"
         "│\n"
-        "├── docker-compose.yml          # Multi-service deployment\n"
+        "├── docker-compose.yml          # Cấu hình thử nghiệm prototype VNPay\n"
         "├── .dockerignore\n"
         "└── proto/                      # gRPC protobuf definitions"
     )
@@ -2446,7 +2455,7 @@ def create_report():
         doc,
         ["Tool", "Arguments chính", "Nguồn dữ liệu / tác động"],
         [
-            ["query_knowledge", "query", "Neo4j full-text search; lấy node và quan hệ liên quan; chỉ đọc."],
+            ["query_knowledge", "query", "Neo4j hybrid full-text/vector; RRF; mở rộng quan hệ 1-2 bước; chỉ đọc."],
             ["book_court", "court_type, court_number, start_time, end_time, notes", "Kiểm tra trùng lịch, tạo booking PostgreSQL, phát metadata thanh toán."],
             ["order_menu_items", "items (JSON), notes", "Khớp tên món, liên kết booking hiện tại, tạo order PostgreSQL."],
             ["recommend_menu", "preference, limit", "Tìm món theo sở thích hoặc lấy món bán chạy từ PostgreSQL."],
@@ -2483,13 +2492,23 @@ def create_report():
     add_body_text(doc, "G. Graph RAG trong Agent", bold=True)
     add_body_text(doc,
         "Khi LLM chọn query_knowledge, tool chuẩn hóa câu hỏi và kiểm tra Redis cache. Nếu "
-        "cache miss, Neo4j full-text index entity_fulltext tìm trên thuộc tính name và "
-        "description của các node Rule, Technique, Equipment, Sport, Concept và GameType. "
-        "Neo4j/Lucene sinh relevance score; hệ thống giữ kết quả có score lớn hơn 0,3, sắp "
-        "xếp giảm dần và lấy tối đa 5 record. Với mỗi node, truy vấn OPTIONAL MATCH lấy thêm "
-        "một node liên quan để cung cấp ngữ cảnh đồ thị. Nếu full-text index không khả dụng, "
-        "tool fallback sang CONTAINS, tìm từng keyword và prefix. Context truy xuất được đưa "
+        "cache miss, hệ thống chạy song song hai nguồn truy hồi: Neo4j full-text index "
+        "entity_fulltext trên name/description và vector search trên entity_embedding_index. "
+        "Hai danh sách có thang điểm khác nhau được hợp nhất bằng Reciprocal Rank Fusion (RRF), "
+        "sau đó tăng hạng theo loại entity và môn thể thao được phát hiện trong câu hỏi. Từ các "
+        "node ứng viên, Cypher duyệt các quan hệ THUOC, QUY_DINH, DUNG_DE, SU_DUNG, LA_LOAI và "
+        "LIEN_QUAN trong phạm vi một đến hai bước để bổ sung ngữ cảnh đồ thị. Nếu Ollama, vector "
+        "index hoặc full-text index không khả dụng, tool tự giảm cấp sang full-text hoặc keyword "
+        "CONTAINS, nên truy vấn tri thức vẫn hoạt động ở mức lexical. Context truy xuất được đưa "
         "lại cho LLM để tạo câu trả lời, thay vì để LLM trả lời hoàn toàn từ kiến thức tham số."
+    )
+    add_body_text(doc,
+        "Embedding của Knowledge Graph được quản lý tăng dần. Khi backend khởi động, một "
+        "background task gọi sync_missing_embeddings() và chỉ xử lý node thiếu vector hoặc "
+        "bị stale do thay đổi model, profile, name hay description; API không phải chờ toàn "
+        "bộ quá trình này. Với nomic-embed-text, hệ thống dùng task prefix search_document "
+        "cho node và search_query cho câu hỏi. Đã kiểm tra 418/418 node có embedding và "
+        "entity_embedding_index ở trạng thái ONLINE."
     )
 
     add_body_text(doc, "H. Memory, context và dữ liệu có cấu trúc", bold=True)
@@ -2536,8 +2555,8 @@ def create_report():
         [
             ["Ưu điểm", "LLM linh hoạt trong hiểu câu nhưng hành động bị giới hạn bởi tool; dữ liệu động có nguồn xác định; dễ thêm tool mới; hỗ trợ multi-tenant và hội thoại nhiều lượt."],
             ["Tính kiểm thử", "Tool có thể unit test độc lập với LLM; service/repository giữ business rule; tools_used và metadata giúp quan sát kết quả."],
-            ["Chi phí/độ trễ", "Cache, keyword-first routing, precomputed embeddings và SSE giảm số lần gọi model và thời gian chờ cảm nhận."],
-            ["Giới hạn Graph RAG", "Runtime query_knowledge đang dùng lexical full-text search; vector index/node embedding đã có pipeline nhưng hybrid_search chưa được nối vào tool production."],
+            ["Chi phí/độ trễ", "Cache, keyword-first routing, incremental KG embedding và SSE giảm số lần gọi model. Vector mẫu của IntentRouter được cache Redis 7 ngày; chỉ lần đầu hoặc khi model/profile/danh sách mẫu thay đổi mới sinh lại."],
+            ["Giới hạn Graph RAG", "Runtime đã dùng hybrid full-text/vector và graph expansion 1-2 bước; 418 node đã có embedding và index ONLINE. Tuy nhiên smoke test tiếng Việt chưa cho top-1 phù hợp, nên nomic-embed-text chưa được xem là tối ưu và hệ thống vẫn phải dựa vào lexical retrieval, RRF và graph context. Chưa có bộ benchmark retrieval định lượng."],
             ["Giới hạn fallback", "SimpleVenueAgent không hỗ trợ đầy đủ Knowledge Graph và khả năng hiểu ngôn ngữ thấp hơn LLM agent."],
             ["Rủi ro còn lại", "Chất lượng phụ thuộc prompt/tool description; cần bổ sung evaluation set, tracing, tool authorization chi tiết và kiểm thử hội thoại end-to-end."],
         ],
@@ -2608,7 +2627,7 @@ def create_report():
     A[Đặt sân / Đặt hàng thành công] --> B{Chọn phương thức\nthanh toán?}
 
     B -->|Stripe| C[POST /stripe/create-payment-intent]
-    B -->|VNPay| D[POST /payment/create]
+    B -->|VNPay prototype| D[POST /payment/create]
     B -->|Để sau| E[Lưu trạng thái unpaid]
 
     C --> F[Stripe PaymentIntent\ntrả client_secret]
@@ -2619,16 +2638,11 @@ def create_report():
     I -->|Thất bại| K[Hiển thị lỗi]
     I -->|Hủy| E
 
-    D --> L[Java Service tạo\nVNPay payment URL]
-    L --> M[Flutter: mở VNPay SDK]
-    M --> N[User chọn ngân hàng]
-    N --> O{Thanh toán?}
-    O -->|Thành công| P[Callback: xác thực chữ ký]
-    O -->|Thất bại| K
-    O -->|Hủy| E
+    D --> L[Java Service kiểm tra\nTMN_CODE + HASH_SECRET]
+    L --> M[Thiếu thông tin merchant]
+    M --> K[Thông báo VNPay chưa khả dụng]
 
     J --> Q[Cập nhật payment_status = paid]
-    P --> Q
     Q --> R[Cập nhật booking/order]
     R --> S[Hiển kết quả thành công]
 """)
@@ -2663,15 +2677,15 @@ def create_report():
     PLACE --> PAY2{Thanh toán?}
 
     PAY1 -->|Stripe| STRIPE[Stripe Payment Sheet]
-    PAY1 -->|VNPay| VNPAY[VNPay SDK]
+    PAY1 -->|VNPay prototype| VNPAY[Chưa khả dụng]
     PAY1 -->|Để sau| HOME
 
     PAY2 -->|Stripe| STRIPE
-    PAY2 -->|VNPay| VNPAY
+    PAY2 -->|VNPay prototype| VNPAY
     PAY2 -->|Để sau| HOME
 
     STRIPE --> RESULT{Kết quả}
-    VNPAY --> RESULT
+    VNPAY -->|Thiếu cấu hình merchant| HOME
     RESULT -->|OK| SUCCESS[Thành công]
     RESULT -->|Fail| RETRY[Thử lại]
     SUCCESS --> HOME
@@ -2695,7 +2709,7 @@ def create_report():
         "Step 1 - Scrape/Collect: Thu thập dữ liệu từ web (BeautifulSoup), PDF (pdfplumber), YouTube (yt-dlp).",
         "Step 2 - Extract Entities: Sử dụng LLM (Ollama qwen2.5-coder:7b) để trích xuất entities và relationships.",
         "Step 3 - Build Graph: Loại bỏ trùng lặp, tạo constraints/indexes, insert vào Neo4j.",
-        "Step 4 - Embed Nodes: Tạo vector embeddings cho entity names/descriptions.",
+        "Step 4 - Embed Nodes: Gắn label KnowledgeEntity, tạo vector index một-label tương thích Neo4j 5 và sinh embedding name/description bằng nomic-embed-text. Script và backend startup đều dùng incremental sync, chỉ cập nhật node thiếu hoặc stale.",
     ]
     for step in pipeline_steps:
         add_bullet_point(doc, step)
@@ -2744,7 +2758,7 @@ def create_report():
         "Order: POST /api/order/, GET /api/order/{id}, PUT /api/order/{id}/status",
         "Menu: GET /api/menu/",
         "Staff: POST /api/staff/notify, POST /api/staff-request/",
-        "VNPay Payment: POST /api/payment/create, GET /api/payment/callback, GET /api/payment/query",
+        "VNPay prototype: POST /api/payment/create, GET /api/payment/callback, GET /api/payment/query (chưa kiểm thử sandbox)",
         "Stripe Payment: POST /api/stripe/create-checkout, POST /api/stripe/webhook, GET /api/stripe/config",
         "Venue: CRUD quản lý quán thể thao",
         "Admin: Quản lý hệ thống (chỉ admin), quản lý giá dịch vụ",
@@ -2758,8 +2772,9 @@ def create_report():
     add_heading_custom(doc, "4.2.5. Payment Implementation", level=3)
 
     add_body_text(doc,
-        "Hệ thống thanh toán được thiết kế theo kiến trúc microservice, "
-        "hỗ trợ hai cổng thanh toán: Stripe (quốc tế) và VNPay (trong nước)."
+        "Thanh toán là một module trong backend FastAPI monolith, không phải một "
+        "microservice độc lập. Stripe là luồng tích hợp có thể vận hành trong "
+        "môi trường thử nghiệm; VNPay là prototype Java/gRPC tách riêng để nghiên cứu."
     )
 
     add_body_text(doc, "Kiến trúc thanh toán:", bold=True)
@@ -2767,8 +2782,9 @@ def create_report():
     payment_arch = [
         "PaymentService: Service chính xử lý logic thanh toán, quản lý trạng thái payment.",
         "Stripe Integration: Backend tạo Checkout Session bằng Stripe Python SDK, frontend mở WebView.",
-        "VNPay Integration: Java microservice đóng vai trò proxy VNPay, giao tiếp với backend qua gRPC.",
-        "Webhook Handling: Stripe webhook xác nhận server-to-server, VNPay callback redirect người dùng.",
+        "VNPay Prototype: Java service thử nghiệm tạo tham số và chữ ký, giao tiếp với backend qua gRPC; đây không phải microservice production.",
+        "Giới hạn VNPay: Chưa có VNPAY_TMN_CODE và VNPAY_HASH_SECRET nên chưa tạo được giao dịch, callback hoặc truy vấn hợp lệ trên sandbox.",
+        "Webhook Handling: Stripe dùng webhook server-to-server; VNPay mới hiện thực mã callback dự kiến, chưa được kiểm chứng end-to-end.",
         "Payment Status Flow: unpaid -> pending -> paid/failed, cập nhật lên booking/order.",
     ]
     for item in payment_arch:
@@ -2791,44 +2807,41 @@ def create_report():
         add_body_text(doc, item)
 
     doc.add_paragraph()
-    add_body_text(doc, "Luồng thanh toán VNPay:", bold=True)
+    add_body_text(doc, "Trạng thái prototype VNPay:", bold=True)
 
     vnpay_flow = [
-        "1. Người dùng chọn thanh toán qua VNPay.",
-        "2. Frontend gọi POST /api/payment/create với order_id, amount.",
-        "3. Backend gọi Java Payment Service tạo VNPay payment URL.",
-        "4. Frontend mở VNPay Native SDK (Method Channel) với payment URL.",
-        "5. Người dùng chọn ngân hàng và hoàn tất thanh toán.",
-        "6. VNPay redirect về callback URL, backend xác thực chữ ký.",
-        "7. Backend cập nhật payment_status = 'paid', trả kết quả.",
+        "1. Mã nguồn đã có API Python, gRPC contract và Java service cho hướng tích hợp VNPay.",
+        "2. Java service yêu cầu VNPAY_TMN_CODE và VNPAY_HASH_SECRET để tạo chữ ký hợp lệ.",
+        "3. Đồ án chưa được VNPay cấp các thông tin merchant này.",
+        "4. Vì vậy luồng hiện tại dừng ở lỗi cấu hình; không tạo được payment URL sandbox.",
+        "5. Các bước mở trang thanh toán, nhận callback, xác thực chữ ký và cập nhật trạng thái chỉ là thiết kế dự kiến, chưa có kết quả kiểm thử end-to-end.",
     ]
     for item in vnpay_flow:
         add_body_text(doc, item)
 
-    # 4.2.6. Docker Deployment
-    add_heading_custom(doc, "4.2.6. Docker Deployment", level=3)
+    # 4.2.6. Docker Compose cho prototype VNPay
+    add_heading_custom(doc, "4.2.6. Docker Compose cho prototype VNPay", level=3)
 
     add_body_text(doc,
-        "Hệ thống được đóng gói thành 4 Docker services, quản lý bởi Docker Compose:"
+        "Docker Compose trong phạm vi báo cáo chỉ được sử dụng để đóng gói và "
+        "chạy thử Java Payment Service của prototype VNPay. Đây không phải cấu "
+        "hình triển khai toàn hệ thống và không chứng minh kiến trúc microservices."
     )
 
     docker_headers = ["Service", "Image", "Port", "Mô tả"]
     docker_data = [
-        ["postgres", "postgres:16-alpine", "internal", "PostgreSQL database, healthcheck"],
-        ["redis", "redis:7-alpine", "internal", "Cache & message broker, healthcheck"],
-        ["java-payment", "custom build", "internal:9090", "VNPay gateway, giao tiếp gRPC"],
-        ["python-backend", "custom build", "8000:8000", "FastAPI API server"],
+        ["java-payment", "custom build", "9090 (gRPC)", "Prototype VNPay phục vụ nghiên cứu; chưa chạy được sandbox do thiếu merchant credentials"],
     ]
     create_table_with_header(doc, docker_headers, docker_data)
 
     doc.add_paragraph()
-    add_body_text(doc, "Đặc điểm triển khai Docker:", bold=True)
+    add_body_text(doc, "Phạm vi và giới hạn Docker Compose:", bold=True)
 
     docker_features = [
-        "Mạng nội bộ (bridge network): Các service giao tiếp qua mạng 'internal', chỉ backend expose ra ngoài.",
-        "Health checks: PostgreSQL và Redis có health check, backend chỉ khởi động khi dependencies sẵn sàng.",
-        "Volume persistence: Dữ liệu PostgreSQL được persist qua Docker volume 'pgdata'.",
-        "Environment variables: Cấu hình qua .env file, bao gồm database URL, Redis URL, Stripe keys, VNPay config.",
+        "Chỉ dùng để tạo môi trường chạy lặp lại cho thành phần Java thử nghiệm.",
+        "Service nhận cấu hình VNPay qua biến môi trường VNPAY_TMN_CODE và VNPAY_HASH_SECRET.",
+        "Hai biến cấu hình merchant hiện chưa có, nên container chỉ phục vụ kiểm tra build, khởi động và nghiên cứu mã tích hợp.",
+        "Backend FastAPI, PostgreSQL, Redis và Neo4j không được đánh giá như các service độc lập trong một deployment Compose hoàn chỉnh.",
     ]
     for item in docker_features:
         add_bullet_point(doc, item)
@@ -2859,7 +2872,7 @@ def create_report():
         "Booking Feature: Chọn loại sân, thời gian, xem sân trống, xác nhận đặt, thanh toán.",
         "Menu Feature: Hiển thị danh sách đồ uống, đặt hàng.",
         "Auth Feature: Đăng nhập/đăng ký với số điện thoại.",
-        "Payment Feature: Thanh toán qua Stripe (Native Payment Sheet) và VNPay (Native SDK).",
+        "Payment Feature: Thanh toán qua Stripe; giao diện/mã cầu nối VNPay chỉ là prototype chưa khả dụng trên sandbox.",
         "Billing Feature: Xem hóa đơn đặt sân tổng hợp (phí sân + đơn hàng).",
         "Profile Feature: Quản lý thông tin cá nhân, đổi mật khẩu, đăng xuất.",
         "Admin Feature: Quản lý booking, billing, resource pricing, dashboard analytics.",
@@ -2978,13 +2991,13 @@ def create_report():
 
     payment_screens = [
         ("Hình 4.14 - Dialog chọn phương thức thanh toán:", "Sau khi đặt sân hoặc đặt đồ uống, "
-         "hệ thống hiển thị dialog cho phép chọn phương thức: Stripe (quốc tế) hoặc VNPay (trong nước). "
-         "Có nút 'Để sau' nếu người dùng chưa muốn thanh toán ngay."),
+         "hệ thống hỗ trợ luồng Stripe. Tùy chọn VNPay nếu được hiển thị chỉ phục vụ "
+         "minh họa prototype và phải ghi rõ chưa khả dụng. Có nút 'Để sau' nếu người dùng chưa muốn thanh toán ngay."),
         ("Hình 4.15 - Màn hình thanh toán Stripe (Payment Sheet):", "Stripe Native Payment Sheet "
          "hiển thị trực tiếp trong app (không qua WebView). Người dùng nhập thông tin thẻ "
          "và xác nhận thanh toán. Hỗ trợ Visa, Mastercard, JCB."),
-        ("Hình 4.16 - Màn hình thanh toán VNPay:", "VNPay Native SDK mở trang thanh toán "
-         "trên thiết bị. Người dùng chọn ngân hàng và hoàn tất giao dịch."),
+        ("Hình 4.16 - Màn hình prototype VNPay:", "Giao diện minh họa hướng tích hợp VNPay. "
+         "Chưa có giao dịch sandbox thực tế vì thiếu VNPAY_TMN_CODE và VNPAY_HASH_SECRET."),
         ("Hình 4.17 - Kết quả thanh toán thành công:", "Hiển thị kết quả thanh toán "
          "với mã giao dịch, số tiền, và trạng thái. Có nút quay về trang chính."),
     ]
@@ -3092,15 +3105,15 @@ def create_report():
 
     deploy_headers = ["Thành phần", "Mô tả"]
     deploy_data = [
-        ["Backend Server", "FastAPI chạy trên localhost:8000 (development), Docker container"],
+        ["Backend Server", "FastAPI chạy trên localhost:8000 trong môi trường phát triển"],
         ["Ollama", "LLM local trên localhost:11434, model qwen2.5-coder:7b"],
         ["Neo4j AuraDB", "Cloud-hosted Knowledge Graph (free tier)"],
-        ["PostgreSQL", "Docker container (postgres:16-alpine) hoặc WSL (Ubuntu)"],
-        ["Redis", "Docker container (redis:7-alpine) hoặc WSL (Ubuntu)"],
-        ["Java Payment Service", "Docker container, port 9090, VNPay gateway"],
+        ["PostgreSQL", "Chạy trong môi trường phát triển cục bộ/WSL"],
+        ["Redis", "Chạy trong môi trường phát triển cục bộ/WSL"],
+        ["Java Payment Service", "Prototype VNPay chạy thử bằng Docker, gRPC port 9090; chưa có merchant credentials"],
         ["Stripe", "Stripe API (test mode), webhook endpoint"],
         ["Flutter App", "Chạy trên Android emulator hoặc thiết bị thật"],
-        ["Docker Compose", "Quản lý 4 services: postgres, redis, java-payment, python-backend"],
+        ["Docker Compose", "Chỉ dùng cho Java Payment Service thử nghiệm, không triển khai toàn hệ thống"],
     ]
     create_table_with_header(doc, deploy_headers, deploy_data)
 
@@ -3110,15 +3123,16 @@ def create_report():
     results = [
         "Hệ thống chatbot AI hoạt động, trả lời được câu hỏi về luật chơi và kỹ thuật bida, pickleball, cầu lông.",
         "Knowledge Graph với 418 entities và 441 relationships được xây dựng thành công trên Neo4j.",
+        "Đã lưu embedding cho 418/418 node tri thức; vector index ONLINE và backend tự đồng bộ tăng dần trong background khi khởi động.",
         "Chức năng đặt sân hoạt động, kiểm tra sân trống theo thời gian thực.",
         "Chức năng đặt đồ uống hoạt động, hiển thị menu với giá VND.",
         "Chức năng gọi nhân viên hoạt động qua hệ thống thông báo real-time.",
-        "Tích hợp thanh toán trực tuyến: Stripe (quốc tế) và VNPay (trong nước) hoạt động.",
-        "Hệ thống xác nhận thanh toán qua webhook (Stripe) và callback (VNPay).",
+        "Tích hợp thanh toán Stripe trong môi trường thử nghiệm; đã xây dựng prototype nghiên cứu VNPay nhưng chưa thể vận hành trên sandbox.",
+        "Stripe có luồng xác nhận qua webhook; mã callback VNPay chưa được kiểm chứng do thiếu VNPAY_TMN_CODE và VNPAY_HASH_SECRET.",
         "Admin quản lý giá dịch vụ, xem hóa đơn chi tiết booking với tổng tiền.",
         "Ứng dụng Flutter chạy được trên cả Android và iOS.",
         "Hệ thống có fallback mechanism khi LLM chính lỗi.",
-        "Triển khai bằng Docker Compose với 4 dịch vụ containerized.",
+        "Docker Compose mới được dùng để đóng gói/chạy thử Java Payment Service của prototype VNPay, chưa phải phương án triển khai hệ thống.",
     ]
     for item in results:
         add_bullet_point(doc, item)
@@ -3135,6 +3149,8 @@ def create_report():
         "Tích hợp hệ thống đánh giá và phản hồi từ khách hàng.",
         "Phát triển ứng dụng web version (Flutter Web).",
         "Tích hợp thêm cổng thanh toán MoMo.",
+        "Đăng ký tài khoản merchant VNPay, nhận VNPAY_TMN_CODE/VNPAY_HASH_SECRET và hoàn thiện kiểm thử sandbox, callback, đối soát trước khi đưa vào sử dụng.",
+        "Xây dựng bộ câu hỏi đánh giá retrieval cho ba môn và thử nghiệm embedding model đa ngôn ngữ phù hợp tiếng Việt trước khi điều chỉnh trọng số hybrid search.",
     ]
     for item in future:
         add_bullet_point(doc, item)
@@ -3231,7 +3247,7 @@ def create_report():
     )
 
     # ===== SAVE =====
-    output_path = os.path.join(
+    output_path = os.environ.get("REPORT_OUTPUT_PATH") or os.path.join(
         os.path.dirname(__file__),
         "BaoCaoDoAn_SportsVenueChatbot.docx"
     )

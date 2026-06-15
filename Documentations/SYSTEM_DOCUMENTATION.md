@@ -101,9 +101,27 @@ Relationships: DUNG_DE, LIEN_QUAN, LA_LOAI, THUOC, SU_DUNG, QUY_DINH
 ```
 
 **Graph RAG (Retrieval-Augmented Generation)**:
-- Truy vấn tri thức từ Neo4j bằng full-text search
+- Chạy song song full-text search và vector search trên Neo4j
+- Hợp nhất thứ hạng bằng Reciprocal Rank Fusion (RRF)
+- Mở rộng quan hệ tri thức trong phạm vi 1-2 bước
+- Fallback sang keyword `CONTAINS` khi embedding hoặc index không khả dụng
 - Kết hợp với LLM để tạo câu trả lời chính xác
 - Giảm hallucination bằng cách grounding vào dữ liệu thực
+
+**Vòng đời embedding**:
+- Pipeline đã lưu embedding cho 418/418 node tri thức và vector index
+  `entity_embedding_index` đang ở trạng thái `ONLINE`.
+- Khi backend khởi động, tác vụ nền gọi `sync_missing_embeddings()` nhưng chỉ
+  xử lý node thiếu embedding hoặc stale do thay đổi model, profile, name hay
+  description. Tác vụ không chặn quá trình mở API.
+- Với `nomic-embed-text`, document, query và intent dùng đúng các task prefix
+  tương ứng: `search_document:`, `search_query:` và `classification:`.
+- Các embedding mẫu của `IntentRouter` được cache trong Redis 7 ngày theo hash
+  của model/profile/danh sách mẫu. Vì vậy lần đầu hoặc khi cấu hình thay đổi mới
+  sinh lại toàn bộ vector; các lần restart sau đọc cache.
+- Vector search đã chạy được về mặt kỹ thuật, nhưng kiểm tra thực tế tiếng Việt
+  chưa cho kết quả top-1 tốt. Vì vậy hệ thống vẫn dùng full-text, keyword, RRF
+  và graph expansion; chưa được phép kết luận semantic retrieval đã tối ưu.
 
 ### 3.2 AI Agent với Tool Calling
 
@@ -123,8 +141,9 @@ Luồng kỹ thuật của một function call:
 
 1. `ChatService` tải `chat_history` từ Redis và enrich message bằng user,
    venue, ngày giờ, múi giờ, loại sân và giá.
-2. `IntentRouter` kiểm tra cache, keyword và embedding. Các yêu cầu nghiệp vụ
-   được chuyển tiếp cho `VenueAgent`.
+2. `IntentRouter` kiểm tra cache, keyword và embedding. Vector mẫu được đọc từ
+   Redis nếu cache còn hiệu lực; các yêu cầu nghiệp vụ được chuyển tiếp cho
+   `VenueAgent`.
 3. `AgentExecutor` gửi prompt, history, tool schemas và `agent_scratchpad` cho
    LLM.
 4. LLM trả `AgentFinish` hoặc `tool_call(name, args)`.

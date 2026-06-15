@@ -43,7 +43,7 @@ Super App voi Mini App (WebView) va Partner F&B system.
 +--------------+----------------------+
                | HTTP / WebSocket
 +--------------v----------------------+
-|          FastAPI Backend            |  Application Layer
+|    FastAPI Backend Monolith         |  Application Layer
 |  /chat /booking /order /staff       |
 |  /payment /stripe /realtime         |
 |  /staff/chat /staff/requests        |
@@ -51,15 +51,16 @@ Super App voi Mini App (WebView) va Partner F&B system.
 +---+---------------------------+-----+
     |                           |
 +---v-----------+   +-----------v---------+
-|  AI Agent     |   | Payment Service     |  Domain Layer
-|  LangChain    |   |  (Java/VNPay)       |
-|  Tool Call    |   |  Stripe SDK         |
+|  AI Agent     |   | Payment Module      |  Domain Layer
+|  LangChain    |   |  Stripe SDK         |
+|  Tool Call    |   |  VNPay prototype*   |
 +---+-----------+   +-----------+---------+
     |                           |
 +---v---------------------------v---------+
 |         Infrastructure Layer            |
-|  PostgreSQL | Neo4j | Redis | Docker    |
+|       PostgreSQL | Neo4j | Redis        |
 +-----------------------------------------+
+* Java/VNPay chi la prototype nghien cuu, chua co merchant credentials.
 ```
 
 ---
@@ -77,7 +78,7 @@ Super App voi Mini App (WebView) va Partner F&B system.
 | Database | PostgreSQL | 14+ |
 | Cache & Pub/Sub | Redis | 7+ |
 | Payment (International) | Stripe + flutter_stripe | ^11.0.0 |
-| Payment (Domestic) | VNPay Native SDK | Java gateway |
+| Payment (Domestic) | VNPay prototype | Chua kiem thu sandbox |
 | Real-time | WebSocket (web_socket_channel) | 3.0.3 |
 | Data Scraping | BeautifulSoup, yt-dlp, pdfplumber | - |
 
@@ -205,6 +206,7 @@ python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```bash
 # Install Ollama from https://ollama.ai
 ollama pull qwen2.5-coder:7b
+ollama pull nomic-embed-text
 ollama list
 ```
 
@@ -302,7 +304,19 @@ All knowledge files in `backend/data_pipeline/raw_data/`:
 **Node types:** Rule, Technique, Equipment, Sport, Concept, GameType
 **Relationships:** DUNG_DE, LIEN_QUAN, LA_LOAI, THUOC, SU_DUNG, QUY_DINH
 
-**Stats:** 418 entities, 441 relationships, full-text search index
+**Stats:** 418 entities, 441 relationships, full-text and vector search indexes
+
+Khi backend khoi dong, mot background task chi tao lai embedding cho node bi
+thieu hoac da stale do doi model/noi dung. Cac node hien tai da co 418/418
+embedding; lan khoi dong tiep theo khong nhung lai toan bo. `IntentRouter`
+cung luu cac vector mau vao Redis trong 7 ngay de tranh tao lai hang tram
+request Ollama sau moi lan restart.
+
+Truy van `query_knowledge` la Graph RAG: full-text va vector search duoc hop
+nhat bang RRF, sau do mo rong quan he Neo4j 1-2 buoc. Neu Ollama/vector index
+khong san sang, he thong van fallback ve full-text va keyword. Model
+`nomic-embed-text` da hoat dong ve mat ky thuat, nhung chat luong ngu nghia
+tieng Viet chua duoc benchmark va chua nen duoc xem la toi uu.
 
 ---
 
@@ -390,7 +404,7 @@ All knowledge files in `backend/data_pipeline/raw_data/`:
 
 | Tool | Trigger | Action |
 |------|---------|--------|
-| query_knowledge | Hoi luat, ky thuat | Graph RAG - Neo4j fulltext search |
+| query_knowledge | Hoi luat, ky thuat | Hybrid full-text/vector, RRF, graph expansion 1-2 hops |
 | book_court | Dat san | Check availability, insert PostgreSQL |
 | order_food | Goi do | Insert order, link to active booking |
 | call_staff | Goi nhan vien | Create staff request, notify via WebSocket |
@@ -647,6 +661,12 @@ DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/sports_venue
 
 # Redis
 REDIS_URL=redis://localhost:6379
+
+# Knowledge Graph embeddings
+EMBEDDING_API_URL=http://localhost:11434/api/embeddings
+EMBEDDING_MODEL=nomic-embed-text
+KG_AUTO_EMBED_ON_STARTUP=true
+KG_AUTO_EMBED_MAX_NODES=500
 
 # Stripe
 STRIPE_SECRET_KEY=sk_test_xxx
