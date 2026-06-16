@@ -12,6 +12,8 @@ from typing import Any
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 
+from app.kg.bilingual import bilingual_fulltext_index_cypher
+
 logger = logging.getLogger(__name__)
 
 VALID_ENTITY_TYPES = frozenset(
@@ -133,6 +135,7 @@ class KnowledgeGraphBuilder:
             "CREATE FULLTEXT INDEX IF NOT EXISTS entity_fulltext "
             "FOR (n:Rule|Technique|Equipment|Sport|Concept|GameType) "
             "ON EACH [n.name, n.description]",
+            bilingual_fulltext_index_cypher(),
         ]
 
         async with self.neo4j.session() as session:

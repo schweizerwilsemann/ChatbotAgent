@@ -25,6 +25,7 @@ from app.kg.builder import (
     VALID_ENTITY_TYPES,
     VALID_RELATIONSHIP_TYPES,
 )
+from app.kg.bilingual import build_bilingual_fields, bilingual_fulltext_index_cypher
 
 logging.basicConfig(
     level=logging.INFO,
@@ -262,6 +263,7 @@ async def insert_all_entities(
                 "FOR (n:Rule|Technique|Equipment|Sport|Concept|GameType) "
                 "ON EACH [n.name, n.description]"
             ),
+            bilingual_fulltext_index_cypher(),
         ]
 
         for index in indexes:
@@ -280,6 +282,7 @@ async def insert_all_entities(
             description = entity.get("description", "")
             properties = entity.get("properties", {})
             sources = entity.get("sources", [])
+            bilingual_fields = build_bilingual_fields(entity)
 
             cypher = (
                 f"MERGE (n:{entity_type} {{name: $name}}) "
@@ -294,7 +297,8 @@ async def insert_all_entities(
                 f"    THEN $description "
                 f"    ELSE n.description END, "
                 f"  n.updated_at = datetime() "
-                f"SET n += $properties "
+                f"SET n += $properties, "
+                f"    n += $bilingual_fields "
                 f"RETURN n.name AS name"
             )
 
@@ -305,6 +309,7 @@ async def insert_all_entities(
                     description=description,
                     source=", ".join(sources) if sources else "unknown",
                     properties=properties,
+                    bilingual_fields=bilingual_fields,
                 )
                 record = await result.single()
                 if record:

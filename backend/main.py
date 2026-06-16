@@ -1,6 +1,11 @@
 import asyncio
 import logging
+import sys
 from contextlib import asynccontextmanager, suppress
+
+# Use ProactorEventLoop on Windows to avoid "too many file descriptors in select()"
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 from app.agent.agent import VenueAgent
 from app.agent.simple_agent import SimpleVenueAgent

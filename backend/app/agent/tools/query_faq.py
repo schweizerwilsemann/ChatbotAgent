@@ -1,12 +1,15 @@
 import hashlib
 import logging
+import re
 from typing import Any
 
 from langchain_core.tools import tool
 
+from app.agent.context import current_chat_context
 from app.core.config import settings
 from app.core.neo4j_client import Neo4jClient
 from app.core.redis_client import redis_client
+from app.kg.bilingual import bilingual_fulltext_index_cypher, sync_bilingual_fields
 from app.kg.query import HybridKnowledgeRetriever
 
 logger = logging.getLogger(__name__)
@@ -38,6 +41,9 @@ async def ensure_indexes() -> None:
     if not _neo4j_client:
         return
     try:
+        updated = await sync_bilingual_fields(_neo4j_client)
+        if updated:
+            logger.info("Neo4j bilingual KG fields synced: %d nodes", updated)
         # Create fulltext index for knowledge search
         create_query = """
         CREATE FULLTEXT INDEX entity_fulltext IF NOT EXISTS
@@ -45,7 +51,8 @@ async def ensure_indexes() -> None:
         ON EACH [n.name, n.description]
         """
         await _neo4j_client.execute_query(create_query)
-        logger.info("Neo4j fulltext index 'entity_fulltext' ensured.")
+        await _neo4j_client.execute_query(bilingual_fulltext_index_cypher())
+        logger.info("Neo4j fulltext indexes ensured.")
     except Exception as exc:
         logger.debug("Fulltext index creation skipped: %s", exc)
 
@@ -63,7 +70,7 @@ async def query_knowledge(query: str) -> str:
     if not _retriever:
         return "Knowledge graph chưa được kết nối. Vui lòng thử lại sau."
 
-    question = query
+    question = _clean_query(query)
     cache_key = _cache_key(question)
     try:
         cached = await redis_client.get(cache_key)
@@ -75,9 +82,17 @@ async def query_knowledge(query: str) -> str:
     try:
         results = await _retriever.retrieve(question, limit=5)
         if results:
+            logger.info(
+                "Knowledge retrieval for '%s' returned: %s",
+                question[:120],
+                ", ".join(
+                    str(item.get("name", "")) for item in results[:5]
+                ),
+            )
             formatted = _format_results(results)
             await _cache_result(cache_key, formatted)
             return formatted
+        logger.info("Knowledge retrieval for '%s' returned no results", question[:120])
     except Exception as exc:
         logger.exception("Knowledge retrieval failed: %s", exc)
 
@@ -86,10 +101,63 @@ async def query_knowledge(query: str) -> str:
     return not_found
 
 
+def _clean_query(query: str) -> str:
+    """Strip internal chat context before retrieval.
+
+    The LLM sometimes passes the full enriched message to the tool. Searching
+    with current_datetime, venue_name and resource labels dilutes the sports
+    terms, so keep only the actual user question when possible.
+    """
+    raw = str(query or "").strip()
+    raw = re.sub(r"^\[Ngữ cảnh hiện tại:.*?\]\s*", "", raw, flags=re.DOTALL)
+
+    ctx = current_chat_context.get() or {}
+    current_message = str(ctx.get("_current_user_message") or "").strip()
+    if current_message and (
+        not raw
+        or "current_datetime=" in raw
+        or "venue_name=" in raw
+        or len(raw) > len(current_message) + 80
+    ):
+        raw = current_message
+
+    return _append_context_sport(raw, ctx)
+
+
+def _append_context_sport(question: str, context: dict) -> str:
+    normalized = _strip_diacritics(question.lower())
+    if any(
+        token in normalized
+        for token in ("cau long", "badminton", "pickleball", "bida", "billiard")
+    ):
+        return question
+
+    context_text = " ".join(
+        str(context.get(key) or "")
+        for key in ("court_type", "court_type_name", "venue_name")
+    )
+    context_norm = _strip_diacritics(context_text.lower())
+    if "badminton" in context_norm or "cau long" in context_norm:
+        return f"{question} cầu lông"
+    if "pickleball" in context_norm:
+        return f"{question} pickleball"
+    if "billiard" in context_norm or "bida" in context_norm:
+        return f"{question} bida"
+
+    return question
+
+
+def _strip_diacritics(text: str) -> str:
+    import unicodedata
+
+    nfkd = unicodedata.normalize("NFKD", text)
+    return "".join(c for c in nfkd if not unicodedata.combining(c)).replace("đ", "d")
+
+
 def _cache_key(question: str) -> str:
     normalized = " ".join(question.lower().strip().split())
     digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
-    return f"kg:answer:{settings.KG_CACHE_VERSION}:hybrid-v1:{digest}"
+    return f"kg:answer:{settings.KG_CACHE_VERSION}:hybrid-v2:{digest}"
 
 
 async def _cache_result(

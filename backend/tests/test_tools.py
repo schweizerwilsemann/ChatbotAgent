@@ -5,7 +5,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from app.agent.tools.book_court import book_court
 from app.agent.tools.call_staff import call_staff
-from app.agent.tools.query_faq import query_knowledge, set_neo4j_client
+from app.agent.context import current_chat_context
+from app.agent.tools.query_faq import _clean_query, query_knowledge, set_neo4j_client
 
 
 @pytest.mark.asyncio
@@ -61,6 +62,38 @@ async def test_query_knowledge_tool_with_results(mock_redis):
     assert "[Rule]" in result
     assert "THUOC (1 bước): Bida" in result
     assert "Nguồn: WPA" in result
+
+
+def test_clean_query_strips_internal_context_and_prefers_current_user_message():
+    token = current_chat_context.set(
+        {"_current_user_message": "luật giao bóng cầu lông"}
+    )
+    try:
+        cleaned = _clean_query(
+            "[Ngữ cảnh hiện tại: current_datetime=2026-06-16T13:38:16+07:00; "
+            "venue_name=Nhà thi đấu Cầu lông]\nluật giao bóng cầu lông"
+        )
+    finally:
+        current_chat_context.reset(token)
+
+    assert cleaned == "luật giao bóng cầu lông"
+
+
+def test_clean_query_appends_context_sport_when_question_omits_sport():
+    token = current_chat_context.set(
+        {
+            "_current_user_message": "luật giao bóng",
+            "court_type": "badminton",
+            "court_type_name": "cầu lông",
+            "venue_name": "Nhà thi đấu Cầu lông",
+        }
+    )
+    try:
+        cleaned = _clean_query("luật giao bóng")
+    finally:
+        current_chat_context.reset(token)
+
+    assert cleaned == "luật giao bóng cầu lông"
 
 
 @pytest.mark.asyncio

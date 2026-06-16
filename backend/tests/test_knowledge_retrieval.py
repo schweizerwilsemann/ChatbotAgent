@@ -206,6 +206,44 @@ async def test_hybrid_retrieval_uses_keyword_fallback_when_fulltext_is_empty():
     assert results[0]["name"] == "Luật giao cầu lông"
 
 
+@pytest.mark.asyncio
+async def test_hybrid_retrieval_expands_vietnamese_badminton_query_to_english_terms():
+    client = AsyncMock()
+
+    async def execute_query(query, params):
+        if "db.index.fulltext.queryNodes" in query:
+            return []
+        if "reduce(matches" in query:
+            assert "badminton" in params["terms"]
+            assert "service" in params["terms"]
+            assert "serve" in params["terms"]
+            assert "rules" in params["terms"]
+            return [
+                {
+                    "node_id": "badminton-service-faults",
+                    "name": "Service faults",
+                    "type": "Rule",
+                    "description": (
+                        "Service faults are a specific category of faults that "
+                        "occur during the serve in badminton."
+                    ),
+                    "source": "BWF",
+                    "score": 4.0,
+                }
+            ]
+        if "MATCH path" in query:
+            return []
+        return []
+
+    client.execute_query.side_effect = execute_query
+    retriever = HybridKnowledgeRetriever(client)
+
+    results = await retriever.retrieve("Luật giao bóng cầu lông như thế nào?", limit=2)
+
+    assert len(results) == 1
+    assert results[0]["name"] == "Service faults"
+
+
 def test_format_results_keeps_related_node_when_it_is_also_a_primary_result():
     results = [
         {

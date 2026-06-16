@@ -140,14 +140,18 @@ class NodeEmbedder:
         """
         name = node.get("name", "")
         description = node.get("description", "")
+        search_text = node.get("search_text", "")
         node_type = node.get("type", "")
 
         parts = []
         if node_type:
             parts.append(f"[{node_type}]")
-        parts.append(name)
-        if description and description != name:
-            parts.append(description)
+        if search_text:
+            parts.append(search_text)
+        else:
+            parts.append(name)
+            if description and description != name:
+                parts.append(description)
 
         return self._task_text("search_document", " ".join(parts))
 
@@ -312,7 +316,11 @@ class NodeEmbedder:
         cypher = """
         MATCH (n:KnowledgeEntity)
         WITH n,
-             coalesce(n.name, '') + '\n' + coalesce(n.description, '')
+             CASE
+               WHEN coalesce(n.search_text, '') <> ''
+               THEN n.search_text
+               ELSE coalesce(n.name, '') + '\n' + coalesce(n.description, '')
+             END
                  AS embedding_source
         WHERE n.name IS NOT NULL
           AND (
@@ -326,6 +334,7 @@ class NodeEmbedder:
                head([label IN labels(n)
                      WHERE label IN $entity_labels]) AS type,
                n.description AS description,
+               n.search_text AS search_text,
                embedding_source
         ORDER BY n.name
         LIMIT $limit
@@ -445,6 +454,9 @@ class NodeEmbedder:
             return await result.data()
 
     def _embedding_source(self, node: dict) -> str:
+        search_text = node.get("search_text")
+        if search_text:
+            return str(search_text)
         return f"{node.get('name', '')}\n{node.get('description', '') or ''}"
 
     def _task_text(self, task: str, text: str) -> str:

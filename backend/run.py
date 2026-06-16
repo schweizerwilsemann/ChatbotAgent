@@ -8,6 +8,7 @@ Usage:
 """
 
 import argparse
+import asyncio
 import sys
 
 
@@ -21,6 +22,10 @@ def main() -> None:
     )
     parser.add_argument("--no-reload", action="store_true", help="Disable auto-reload")
     args = parser.parse_args()
+
+    # Use ProactorEventLoop on Windows to avoid "too many file descriptors in select()"
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
     try:
         import uvicorn

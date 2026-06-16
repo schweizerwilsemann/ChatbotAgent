@@ -99,7 +99,8 @@ async def fetch_all_nodes(driver) -> list[dict]:
                 f"MATCH (n:{node_type}) "
                 f"RETURN n.name AS name, "
                 f"       '{node_type}' AS type, "
-                f"       n.description AS description "
+                f"       n.description AS description, "
+                f"       n.search_text AS search_text "
                 f"ORDER BY n.name"
             )
 
@@ -115,6 +116,7 @@ async def fetch_all_nodes(driver) -> list[dict]:
                                 "name": name,
                                 "type": record.get("type", node_type),
                                 "description": record.get("description", "") or "",
+                                "search_text": record.get("search_text", "") or "",
                             }
                         )
 

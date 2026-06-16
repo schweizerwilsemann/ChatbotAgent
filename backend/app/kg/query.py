@@ -12,6 +12,8 @@ import time
 import unicodedata
 from typing import Any
 
+from app.kg.bilingual import expand_query_terms
+
 logger = logging.getLogger(__name__)
 
 
@@ -81,8 +83,32 @@ class HybridKnowledgeRetriever:
         "pickleball": ("pickleball",),
         "badminton": ("cau long", "badminton"),
     }
+    _QUERY_EXPANSIONS = (
+        (("cau long", "badminton"), ("badminton", "shuttlecock", "racket")),
+        (("bida", "billiard", "billiards"), ("billiards", "pool", "cue", "ball")),
+        (("pickleball",), ("pickleball", "paddle", "serve")),
+        (("luat", "quy tac", "quy dinh"), ("rule", "rules", "regulation", "fault")),
+        (("loi", "pham loi"), ("fault", "violation", "misconduct")),
+        (
+            ("giao bong", "giao cau", "phat cau", "phat bong"),
+            ("serve", "service", "serving", "server", "receiver", "service court"),
+        ),
+        (("tinh diem", "diem so"), ("score", "scoring", "rally point")),
+        (("san", "san dau"), ("court", "service court", "boundary")),
+        (
+            ("ky thuat", "ki thuat", "cach danh", "cach choi", "huong dan"),
+            ("technique", "shot", "stroke", "strategy"),
+        ),
+        (("dap cau", "smash"), ("smash", "jump smash", "full smash")),
+        (("cam vot", "cach cam vot"), ("grip", "forehand grip", "backhand grip")),
+        (("di chuyen", "bo chan"), ("footwork", "lunge", "movement")),
+        (("bo nho", "drop", "cat cau"), ("drop shot", "fast drop", "slow drop")),
+        (("phong thu", "defense", "defence"), ("defense", "defensive", "block")),
+        (("tan cong", "attack"), ("attack", "attacking", "offense")),
+    )
     _RRF_K = 60
     _VECTOR_MIN_SCORE = 0.5
+    _FULLTEXT_INDEXES = ("entity_fulltext_bilingual", "entity_fulltext")
 
     def __init__(
         self,
@@ -165,35 +191,56 @@ class HybridKnowledgeRetriever:
 
     async def _fulltext_search(self, query: str, limit: int) -> list[dict]:
         lucene_query = self._build_lucene_query(query)
+        last_error: Exception | None = None
+        for index_name in self._FULLTEXT_INDEXES:
+            try:
+                results = await self._fulltext_search_index(
+                    index_name,
+                    lucene_query,
+                    limit,
+                )
+                if results:
+                    return results
+            except Exception as exc:
+                last_error = exc
+                logger.info("Full-text index %s unavailable: %s", index_name, exc)
+
+        if last_error:
+            logger.info("Full-text retrieval failed; using keyword fallback: %s", last_error)
+        return await self._keyword_search(query, limit)
+
+    async def _fulltext_search_index(
+        self,
+        index_name: str,
+        lucene_query: str,
+        limit: int,
+    ) -> list[dict]:
         cypher = """
-        CALL db.index.fulltext.queryNodes("entity_fulltext", $query)
+        CALL db.index.fulltext.queryNodes($index_name, $query)
         YIELD node, score
         WHERE node.description IS NOT NULL
         RETURN elementId(node) AS node_id,
                node.name AS name,
+               node.name_vi AS name_vi,
                head([label IN labels(node)
                      WHERE label IN $entity_labels]) AS type,
                node.description AS description,
+               node.description_vi AS description_vi,
                node.source AS source,
+               node.search_text AS search_text,
                score
         ORDER BY score DESC
         LIMIT $limit
         """
-        try:
-            results = await self.neo4j.execute_query(
-                cypher,
-                {
-                    "query": lucene_query,
-                    "limit": limit,
-                    "entity_labels": list(self._ENTITY_LABELS),
-                },
-            )
-            if results:
-                return results
-            return await self._keyword_search(query, limit)
-        except Exception as exc:
-            logger.info("Full-text retrieval failed; using keyword fallback: %s", exc)
-            return await self._keyword_search(query, limit)
+        return await self.neo4j.execute_query(
+            cypher,
+            {
+                "index_name": index_name,
+                "query": lucene_query,
+                "limit": limit,
+                "entity_labels": list(self._ENTITY_LABELS),
+            },
+        )
 
     async def _keyword_search(self, query: str, limit: int) -> list[dict]:
         terms = self._keywords(query)
@@ -205,22 +252,31 @@ class HybridKnowledgeRetriever:
         WHERE (node:Rule OR node:Technique OR node:Equipment OR node:Sport
                OR node:Concept OR node:GameType)
           AND node.description IS NOT NULL
-          AND any(term IN $terms
-                  WHERE toLower(node.name) CONTAINS term
-                     OR toLower(node.description) CONTAINS term)
+        WITH node,
+             toLower(
+                coalesce(node.name, '') + ' ' +
+                coalesce(node.description, '') + ' ' +
+                coalesce(node.name_vi, '') + ' ' +
+                coalesce(node.description_vi, '') + ' ' +
+                coalesce(node.search_text, '')
+             ) AS search_text
+        WHERE any(term IN $terms
+                  WHERE search_text CONTAINS term)
         WITH node,
              reduce(matches = 0, term IN $terms |
                  matches + CASE
-                     WHEN toLower(node.name) CONTAINS term
-                       OR toLower(node.description) CONTAINS term
+                     WHEN search_text CONTAINS term
                      THEN 1 ELSE 0 END
              ) AS score
         RETURN elementId(node) AS node_id,
                node.name AS name,
+               node.name_vi AS name_vi,
                head([label IN labels(node)
                      WHERE label IN $entity_labels]) AS type,
                node.description AS description,
+               node.description_vi AS description_vi,
                node.source AS source,
+               node.search_text AS search_text,
                toFloat(score) AS score
         ORDER BY score DESC, size(node.name) ASC
         LIMIT $limit
@@ -253,10 +309,13 @@ class HybridKnowledgeRetriever:
         WHERE score >= $min_score
         RETURN elementId(node) AS node_id,
                node.name AS name,
+               node.name_vi AS name_vi,
                head([label IN labels(node)
                      WHERE label IN $entity_labels]) AS type,
                node.description AS description,
+               node.description_vi AS description_vi,
                node.source AS source,
+               node.search_text AS search_text,
                score
         ORDER BY score DESC
         """
@@ -445,7 +504,9 @@ class HybridKnowledgeRetriever:
         sport: str,
     ) -> bool:
         candidate_text = (
-            f"{candidate.get('name', '')} {candidate.get('description', '')}"
+            f"{candidate.get('name', '')} {candidate.get('name_vi', '')} "
+            f"{candidate.get('description', '')} {candidate.get('description_vi', '')} "
+            f"{candidate.get('search_text', '')}"
         )
         if self._text_matches_sport(candidate_text, sport):
             return True
@@ -515,7 +576,24 @@ class HybridKnowledgeRetriever:
                 continue
             if token not in keywords:
                 keywords.append(token)
-        return keywords[:12]
+
+        normalized_query = self._normalize(query)
+        for triggers, expansions in self._QUERY_EXPANSIONS:
+            if any(trigger in normalized_query for trigger in triggers):
+                for expansion in expansions:
+                    for term in re.findall(r"\w+", expansion.lower()):
+                        if term not in keywords and term not in self._STOP_WORDS:
+                            keywords.append(term)
+
+        for term in expand_query_terms(query):
+            for token in re.findall(r"\w+", term.lower(), flags=re.UNICODE):
+                normalized = self._normalize(token)
+                if normalized in self._STOP_WORDS:
+                    continue
+                if token not in keywords:
+                    keywords.append(token)
+
+        return keywords[:18]
 
     @staticmethod
     def _candidate_key(result: dict) -> str:
