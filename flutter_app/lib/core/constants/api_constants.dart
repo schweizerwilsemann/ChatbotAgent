@@ -63,6 +63,11 @@ class ApiConstants {
   static const String adminCamerasEndpoint = '/api/admin/cameras';
   static const String staffCamerasEndpoint = '/api/staff/cameras';
 
+  // Partner endpoints
+  static const String partnerStoreEndpoint = '/api/partner/me/store';
+  static const String partnerMenuEndpoint = '/api/partner/me/menu';
+  static const String partnerOrdersEndpoint = '/api/partner/me/orders';
+
   static String get realtimeNotificationsWsEndpoint {
     final uri = Uri.parse(baseUrl);
     final scheme = uri.scheme == 'https' ? 'wss' : 'ws';

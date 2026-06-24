@@ -34,6 +34,10 @@ import 'package:sports_venue_chatbot/features/home_screen.dart';
 import 'package:sports_venue_chatbot/features/menu/presentation/menu_screen.dart';
 import 'package:sports_venue_chatbot/features/profile/presentation/profile_screen.dart';
 import 'package:sports_venue_chatbot/features/settings/presentation/settings_screen.dart';
+import 'package:sports_venue_chatbot/features/partner/presentation/partner_shell.dart';
+import 'package:sports_venue_chatbot/features/partner/presentation/partner_dashboard_screen.dart';
+import 'package:sports_venue_chatbot/features/partner/presentation/partner_menu_management_screen.dart';
+import 'package:sports_venue_chatbot/features/partner/presentation/partner_order_management_screen.dart';
 import 'package:sports_venue_chatbot/features/shared/presentation/role_based_shell.dart';
 import 'package:sports_venue_chatbot/features/staff/presentation/staff_notifications_screen.dart';
 import 'package:sports_venue_chatbot/features/staff/presentation/staff_billing_screen.dart';
@@ -60,6 +64,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           location.startsWith('/staff/') ||
           location.startsWith('/staff-operator-chat/');
       final isManagementRoute = isAdminRoute || isStaffRoute;
+      final isPartnerRoute =
+          location == '/partner' || location.startsWith('/partner/');
 
       if (authState.isLoading) {
         return isSplashRoute ? null : '/splash';
@@ -69,6 +75,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         if (!isLoggedIn) return '/login';
         if (userRole == 'ADMIN') return '/admin/dashboard';
         if (userRole == 'STAFF') return '/staff/requests';
+        if (userRole == 'PARTNER') return '/partner/dashboard';
         return '/home';
       }
 
@@ -79,6 +86,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (isLoggedIn && isPublicAuthRoute) {
         if (userRole == 'ADMIN') return '/admin/dashboard';
         if (userRole == 'STAFF') return '/staff/requests';
+        if (userRole == 'PARTNER') return '/partner/dashboard';
         return '/home';
       }
 
@@ -92,7 +100,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return '/admin/dashboard';
       }
 
-      // Logged-in staff/admin on customer routes → their area
+      // Partner trying admin/staff routes → partner area
+      if (isLoggedIn && userRole == 'PARTNER' && isManagementRoute) {
+        return '/partner/dashboard';
+      }
+
+      // Admin/Staff trying partner routes → their area
+      if (isLoggedIn && userRole == 'ADMIN' && isPartnerRoute) {
+        return '/admin/dashboard';
+      }
+      if (isLoggedIn && userRole == 'STAFF' && isPartnerRoute) {
+        return '/staff/requests';
+      }
+
+      // Logged-in staff/admin/partner on customer routes → their area
       // Exception: allow call, voice-agent, staff-chat, and explore routes for all roles
       final isCallRoute = location == '/call' || location == '/voice-agent';
       final isStaffChatRoute = location.startsWith('/staff-chat/') ||
@@ -100,18 +121,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isExploreRoute = location == '/explore' || location == '/mini-app';
       if (isLoggedIn &&
           !isManagementRoute &&
+          !isPartnerRoute &&
           !isCallRoute &&
           !isStaffChatRoute &&
           !isExploreRoute) {
         if (userRole == 'ADMIN') return '/admin/dashboard';
         if (userRole == 'STAFF') return '/staff/requests';
+        if (userRole == 'PARTNER') return '/partner/dashboard';
       }
 
-      // Customer on management routes → home
+      // Partner must stay in partner area only
+      if (isLoggedIn && userRole == 'PARTNER' && !isPartnerRoute) {
+        return '/partner/dashboard';
+      }
+
+      // Customer on management/partner routes → home
       if (isLoggedIn &&
           userRole != 'ADMIN' &&
           userRole != 'STAFF' &&
-          isManagementRoute) {
+          userRole != 'PARTNER' &&
+          (isManagementRoute || isPartnerRoute)) {
         return '/home';
       }
 
@@ -281,6 +310,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'staff_settings',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: SettingsScreen()),
+          ),
+        ],
+      ),
+
+      // Partner shell
+      ShellRoute(
+        builder: (context, state, child) => PartnerShell(child: child),
+        routes: [
+          GoRoute(
+            path: '/partner/dashboard',
+            name: 'partner_dashboard',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: PartnerDashboardScreen()),
+          ),
+          GoRoute(
+            path: '/partner/menu',
+            name: 'partner_menu',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: PartnerMenuManagementScreen()),
+          ),
+          GoRoute(
+            path: '/partner/orders',
+            name: 'partner_orders',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: PartnerOrderManagementScreen()),
           ),
         ],
       ),
