@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "description": "Ground truth for intent router evaluation",
+    "version": "1.0",
+    "created": "2026-06-25"
+  },
+  "test_cases": [
+    {"id": "I01", "query": "xin chào", "expected_intent": "greeting"},
+    {"id": "I02", "query": "hello", "expected_intent": "greeting"},
+    {"id": "I03", "query": "chào bạn", "expected_intent": "greeting"},
+    {"id": "I04", "query": "cảm ơn bạn", "expected_intent": "greeting"},
+    {"id": "I05", "query": "tạm biệt", "expected_intent": "greeting"},
+    {"id": "I06", "query": "thời tiết hôm nay thế nào", "expected_intent": "off_topic"},
+    {"id": "I07", "query": "cách nấu phở", "expected_intent": "off_topic"},
+    {"id": "I08", "query": "giá vàng hôm nay", "expected_intent": "off_topic"},
+    {"id": "I09", "query": "điểm thi đại học", "expected_intent": "off_topic"},
+    {"id": "I10", "query": "dự báo thời tiết", "expected_intent": "off_topic"},
+    {"id": "I11", "query": "luật pickleball", "expected_intent": "domain"},
+    {"id": "I12", "query": "kỹ thuật bida", "expected_intent": "domain"},
+    {"id": "I13", "query": "cách chơi cầu lông", "expected_intent": "domain"},
+    {"id": "I14", "query": "đặt sân", "expected_intent": "domain"},
+    {"id": "I15", "query": "thực đơn quán", "expected_intent": "domain"},
+    {"id": "I16", "query": "gọi nhân viên", "expected_intent": "domain"},
+    {"id": "I17", "query": "giá bao nhiêu", "expected_intent": "domain"},
+    {"id": "I18", "query": "kiểm tra lịch đặt sân", "expected_intent": "domain"},
+    {"id": "I19", "query": "gọi đồ uống", "expected_intent": "domain"},
+    {"id": "I20", "query": "thuê vợt cầu lông", "expected_intent": "domain"},
+    {"id": "I21", "query": "những môn nào được hỗ trợ", "expected_intent": "sports_overview"},
+    {"id": "I22", "query": "bạn hỗ trợ những môn nào", "expected_intent": "sports_overview"},
+    {"id": "I23", "query": "có những môn gì", "expected_intent": "sports_overview"},
+    {"id": "I24", "query": "hỗ trợ môn nào", "expected_intent": "sports_overview"},
+    {"id": "I25", "query": "mình có thể chơi môn gì ở đây", "expected_intent": "sports_overview"},
+    {"id": "I26", "query": "luật smash cầu lông", "expected_intent": "domain"},
+    {"id": "I27", "query": "tính tiền cho tôi", "expected_intent": "domain"},
+    {"id": "I28", "query": "cho tôi 2 coca cola", "expected_intent": "domain"},
+    {"id": "I29", "query": "lập trình python cơ bản", "expected_intent": "off_topic"},
+    {"id": "I30", "query": "bệnh đau đầu nên uống thuốc gì", "expected_intent": "off_topic"}
+  ]
+}

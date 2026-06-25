@@ -1,0 +1,377 @@
+2026-06-25 13:32:47,480 - __main__ - INFO - ============================================================
+2026-06-25 13:32:47,480 - __main__ - INFO - Entity Extraction Pipeline
+2026-06-25 13:32:47,480 - __main__ - INFO - ============================================================
+2026-06-25 13:32:47,480 - __main__ - INFO - Raw data directory: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data
+2026-06-25 13:32:47,480 - __main__ - INFO - Output directory:   C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted
+2026-06-25 13:32:47,480 - __main__ - INFO - --- Step 1: PDF pre-processing ---
+2026-06-25 13:32:47,585 - __main__ - INFO - Skipping PDF (txt already exists): USAP-Official-Rulebook.pdf
+2026-06-25 13:32:47,585 - __main__ - INFO - PDF processing complete: 0/1 converted
+2026-06-25 13:32:47,585 - __main__ - INFO - --- Step 2: Discovering text files ---
+2026-06-25 13:32:47,586 - __main__ - INFO - Found 18 total .txt files in C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data
+2026-06-25 13:32:47,586 - __main__ - INFO - After filtering: 12 .txt files to process
+2026-06-25 13:32:47,586 - __main__ - INFO - --- Step 3: Initializing LLM ---
+2026-06-25 13:32:47,922 - __main__ - INFO - Using Ollama LLM: qwen2.5-coder:7b (at http://localhost:11434)
+2026-06-25 13:32:47,922 - __main__ - INFO - --- Step 4: Extracting entities ---
+2026-06-25 13:32:47,922 - __main__ - INFO - Processing: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data\badminton\bwf_rules.txt
+2026-06-25 13:32:47,923 - __main__ - INFO - Parsed bwf_rules.txt: 7 chunks (sport=badminton)
+2026-06-25 13:32:57,258 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:34:01,962 - app.kg.builder - INFO - Extracted 7 entities and 6 relationships from text (source=bwf_rules.txt)
+2026-06-25 13:34:08,813 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:35:10,239 - app.kg.builder - INFO - Extracted 8 entities and 5 relationships from text (source=bwf_rules.txt)
+2026-06-25 13:35:16,255 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:36:39,654 - app.kg.builder - INFO - Extracted 10 entities and 9 relationships from text (source=bwf_rules.txt)
+2026-06-25 13:36:45,652 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:37:16,228 - app.kg.builder - INFO - Extracted 4 entities and 3 relationships from text (source=bwf_rules.txt)
+2026-06-25 13:37:22,233 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:38:04,070 - app.kg.builder - INFO - Extracted 5 entities and 4 relationships from text (source=bwf_rules.txt)
+2026-06-25 13:38:09,073 - __main__ - INFO -   Processed 5/7 chunks (5 extractions so far)
+2026-06-25 13:38:10,144 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:39:39,743 - app.kg.builder - INFO - Extracted 9 entities and 8 relationships from text (source=bwf_rules.txt)
+2026-06-25 13:39:45,533 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:40:58,485 - app.kg.builder - INFO - Extracted 9 entities and 7 relationships from text (source=bwf_rules.txt)
+2026-06-25 13:41:03,500 - __main__ - INFO -   Processed 7/7 chunks (7 extractions so far)
+2026-06-25 13:41:03,503 - __main__ - INFO - Saved 7 extractions (52 entities) to C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted\extracted_badminton_bwf_rules.json
+2026-06-25 13:41:03,503 - __main__ - INFO -   Completed in 495.6s: 7 chunks → 52 entities, 42 relationships
+2026-06-25 13:41:03,503 - __main__ - INFO - Processing: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data\badminton\techniques.txt
+2026-06-25 13:41:03,505 - __main__ - INFO - Parsed techniques.txt: 9 chunks (sport=badminton)
+2026-06-25 13:41:04,843 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:42:22,418 - app.kg.builder - INFO - Extracted 7 entities and 10 relationships from text (source=techniques.txt)
+2026-06-25 13:42:28,822 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:43:26,603 - app.kg.builder - INFO - Extracted 6 entities and 5 relationships from text (source=techniques.txt)
+2026-06-25 13:43:32,633 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:44:26,753 - app.kg.builder - INFO - Extracted 6 entities and 5 relationships from text (source=techniques.txt)
+2026-06-25 13:44:32,810 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:45:29,221 - app.kg.builder - INFO - Extracted 6 entities and 5 relationships from text (source=techniques.txt)
+2026-06-25 13:45:35,205 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:46:29,977 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: drop shot -> badminton
+2026-06-25 13:46:29,977 - app.kg.builder - INFO - Extracted 6 entities and 5 relationships from text (source=techniques.txt)
+2026-06-25 13:46:34,980 - __main__ - INFO -   Processed 5/9 chunks (5 extractions so far)
+2026-06-25 13:46:35,979 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:47:22,440 - app.kg.builder - INFO - Extracted 5 entities and 4 relationships from text (source=techniques.txt)
+2026-06-25 13:47:28,455 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:48:05,622 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Drive -> Badminton
+2026-06-25 13:48:05,622 - app.kg.builder - INFO - Extracted 4 entities and 3 relationships from text (source=techniques.txt)
+2026-06-25 13:48:11,679 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:49:19,422 - app.kg.builder - INFO - Extracted 6 entities and 8 relationships from text (source=techniques.txt)
+2026-06-25 13:49:25,567 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:51:38,155 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Front-and-back formation -> Net shots
+2026-06-25 13:51:38,156 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Front-and-back formation -> Kills
+2026-06-25 13:51:38,156 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Front-and-back formation -> Intercepting weak returns
+2026-06-25 13:51:38,156 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Side-by-side formation -> Clears
+2026-06-25 13:51:38,156 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Side-by-side formation -> Smashes
+2026-06-25 13:51:38,156 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Side-by-side formation -> Drops
+2026-06-25 13:51:38,156 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Rotation between formations -> Smooth and coordinated movement
+2026-06-25 13:51:38,156 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Communication and coordination -> Covering the court
+2026-06-25 13:51:38,156 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Deception and variation -> Speed of shots
+2026-06-25 13:51:38,156 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Deception and variation -> Direction of shots
+2026-06-25 13:51:38,156 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Deception and variation -> Placement of shots
+2026-06-25 13:51:38,156 - app.kg.builder - INFO - Extracted 10 entities and 7 relationships from text (source=techniques.txt)
+2026-06-25 13:51:43,164 - __main__ - INFO -   Processed 9/9 chunks (9 extractions so far)
+2026-06-25 13:51:43,166 - __main__ - INFO - Saved 9 extractions (56 entities) to C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted\extracted_badminton_techniques.json
+2026-06-25 13:51:43,166 - __main__ - INFO -   Completed in 639.7s: 9 chunks → 56 entities, 52 relationships
+2026-06-25 13:51:43,166 - __main__ - INFO - Processing: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data\badminton\wikipedia_extra.txt
+2026-06-25 13:51:43,169 - __main__ - INFO - Parsed wikipedia_extra.txt: 1 chunks (sport=badminton)
+2026-06-25 13:51:45,307 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:55:17,008 - app.kg.builder - WARNING - Skipping entity with invalid type: Person
+2026-06-25 13:55:17,008 - app.kg.builder - WARNING - Skipping entity with invalid type: Publication
+2026-06-25 13:55:17,008 - app.kg.builder - WARNING - Skipping entity with invalid type: Material
+2026-06-25 13:55:17,008 - app.kg.builder - WARNING - Skipping entity with invalid type: Material
+2026-06-25 13:55:17,008 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Isaac Spratt -> Battledore and shuttlecock
+2026-06-25 13:55:17,008 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: The Cornhill Magazine -> Battledore and shuttlecock
+2026-06-25 13:55:17,008 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: India rubber -> Shuttlecock
+2026-06-25 13:55:17,008 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Lead -> Shuttlecock
+2026-06-25 13:55:17,008 - app.kg.builder - INFO - Extracted 17 entities and 16 relationships from text (source=wikipedia_extra.txt)
+2026-06-25 13:55:22,013 - __main__ - INFO -   Processed 1/1 chunks (1 extractions so far)
+2026-06-25 13:55:22,015 - __main__ - INFO - Saved 1 extractions (17 entities) to C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted\extracted_badminton_wikipedia_extra.json
+2026-06-25 13:55:22,015 - __main__ - INFO -   Completed in 218.8s: 1 chunks → 17 entities, 16 relationships
+2026-06-25 13:55:22,015 - __main__ - INFO - Processing: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data\billiards\diamond_system.txt
+2026-06-25 13:55:22,017 - __main__ - INFO - Parsed diamond_system.txt: 7 chunks (sport=billiards)
+2026-06-25 13:55:22,886 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:56:28,625 - app.kg.builder - INFO - Extracted 8 entities and 6 relationships from text (source=diamond_system.txt)
+2026-06-25 13:56:34,602 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:57:29,228 - app.kg.builder - INFO - Extracted 7 entities and 5 relationships from text (source=diamond_system.txt)
+2026-06-25 13:57:35,831 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 13:58:42,282 - app.kg.builder - INFO - Extracted 7 entities and 6 relationships from text (source=diamond_system.txt)
+2026-06-25 13:58:48,978 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:00:00,802 - app.kg.builder - INFO - Extracted 8 entities and 7 relationships from text (source=diamond_system.txt)
+2026-06-25 14:00:06,918 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:01:01,415 - app.kg.builder - INFO - Extracted 6 entities and 5 relationships from text (source=diamond_system.txt)
+2026-06-25 14:01:06,423 - __main__ - INFO -   Processed 5/7 chunks (5 extractions so far)
+2026-06-25 14:01:07,902 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:02:38,809 - app.kg.builder - INFO - Extracted 9 entities and 11 relationships from text (source=diamond_system.txt)
+2026-06-25 14:02:44,939 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:04:26,114 - app.kg.builder - INFO - Extracted 11 entities and 10 relationships from text (source=diamond_system.txt)
+2026-06-25 14:04:31,126 - __main__ - INFO -   Processed 7/7 chunks (7 extractions so far)
+2026-06-25 14:04:31,128 - __main__ - INFO - Saved 7 extractions (56 entities) to C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted\extracted_billiards_diamond_system.json
+2026-06-25 14:04:31,128 - __main__ - INFO -   Completed in 549.1s: 7 chunks → 56 entities, 50 relationships
+2026-06-25 14:04:31,128 - __main__ - INFO - Processing: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data\billiards\three_cushion_techniques.txt
+2026-06-25 14:04:31,129 - __main__ - INFO - Parsed three_cushion_techniques.txt: 6 chunks (sport=billiards)
+2026-06-25 14:04:32,845 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:06:25,775 - app.kg.builder - INFO - Extracted 11 entities and 10 relationships from text (source=three_cushion_techniques.txt)
+2026-06-25 14:06:32,497 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:07:55,864 - app.kg.builder - INFO - Extracted 10 entities and 5 relationships from text (source=three_cushion_techniques.txt)
+2026-06-25 14:08:02,574 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:09:08,102 - app.kg.builder - INFO - Extracted 7 entities and 6 relationships from text (source=three_cushion_techniques.txt)
+2026-06-25 14:09:14,694 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:09:57,774 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: plus 2 system -> cue ball
+2026-06-25 14:09:57,774 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: plus 3 system -> plus 2 system
+2026-06-25 14:09:57,774 - app.kg.builder - INFO - Extracted 5 entities and 2 relationships from text (source=three_cushion_techniques.txt)
+2026-06-25 14:10:03,858 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:11:21,799 - app.kg.builder - INFO - Extracted 7 entities and 9 relationships from text (source=three_cushion_techniques.txt)
+2026-06-25 14:11:26,815 - __main__ - INFO -   Processed 5/6 chunks (5 extractions so far)
+2026-06-25 14:11:28,333 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:13:32,755 - app.kg.builder - INFO - Extracted 13 entities and 11 relationships from text (source=three_cushion_techniques.txt)
+2026-06-25 14:13:37,759 - __main__ - INFO -   Processed 6/6 chunks (6 extractions so far)
+2026-06-25 14:13:37,761 - __main__ - INFO - Saved 6 extractions (53 entities) to C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted\extracted_billiards_three_cushion_techniques.json
+2026-06-25 14:13:37,761 - __main__ - INFO -   Completed in 546.6s: 6 chunks → 53 entities, 43 relationships
+2026-06-25 14:13:37,762 - __main__ - INFO - Processing: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data\billiards\wikipedia_extra.txt
+2026-06-25 14:13:37,764 - __main__ - INFO - Parsed wikipedia_extra.txt: 2 chunks (sport=billiards)
+2026-06-25 14:13:40,977 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:15:48,899 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: 1-cushion billiards -> billiards
+2026-06-25 14:15:48,899 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: one-pocket -> billiards
+2026-06-25 14:15:48,899 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: three-ball -> billiards
+2026-06-25 14:15:48,899 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: four-ball billiards -> billiards
+2026-06-25 14:15:48,899 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: five-pin billiards -> billiards
+2026-06-25 14:15:48,899 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: six-ball -> billiards
+2026-06-25 14:15:48,899 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: seven-ball -> billiards
+2026-06-25 14:15:48,899 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: eight-ball -> billiards
+2026-06-25 14:15:48,899 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: nine-ball -> billiards
+2026-06-25 14:15:48,899 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: ten-ball -> billiards
+2026-06-25 14:15:48,899 - app.kg.builder - INFO - Extracted 13 entities and 2 relationships from text (source=wikipedia_extra.txt)
+2026-06-25 14:15:56,908 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:18:47,385 - app.kg.builder - WARNING - Skipping entity with invalid type: Person
+2026-06-25 14:18:47,385 - app.kg.builder - WARNING - Skipping entity with invalid type: Location
+2026-06-25 14:18:47,385 - app.kg.builder - WARNING - Skipping entity with invalid type: Person
+2026-06-25 14:18:47,385 - app.kg.builder - WARNING - Skipping entity with invalid type: Award
+2026-06-25 14:18:47,385 - app.kg.builder - WARNING - Skipping entity with invalid type: Person
+2026-06-25 14:18:47,385 - app.kg.builder - WARNING - Skipping entity with invalid type: Person
+2026-06-25 14:18:47,385 - app.kg.builder - WARNING - Skipping entity with invalid type: Tournament
+2026-06-25 14:18:47,385 - app.kg.builder - WARNING - Skipping entity with invalid type: Publication
+2026-06-25 14:18:47,385 - app.kg.builder - WARNING - Skipping entity with invalid type: Publication
+2026-06-25 14:18:47,385 - app.kg.builder - WARNING - Skipping relationship with invalid type: EVOLVED_FROM
+2026-06-25 14:18:47,385 - app.kg.builder - WARNING - Skipping relationship with invalid type: EVOLVED_FROM
+2026-06-25 14:18:47,387 - app.kg.builder - WARNING - Skipping relationship with invalid type: POPULARIZED
+2026-06-25 14:18:47,387 - app.kg.builder - WARNING - Skipping relationship with invalid type: HOSTED
+2026-06-25 14:18:47,387 - app.kg.builder - WARNING - Skipping relationship with invalid type: PARTICIPANT
+2026-06-25 14:18:47,387 - app.kg.builder - WARNING - Skipping relationship with invalid type: REGULATES
+2026-06-25 14:18:47,387 - app.kg.builder - WARNING - Skipping relationship with invalid type: POPULARIZED
+2026-06-25 14:18:47,387 - app.kg.builder - WARNING - Skipping relationship with invalid type: POPULARIZED
+2026-06-25 14:18:47,387 - app.kg.builder - WARNING - Skipping relationship with invalid type: HOSTED
+2026-06-25 14:18:47,387 - app.kg.builder - WARNING - Skipping relationship with invalid type: COVERS
+2026-06-25 14:18:47,387 - app.kg.builder - WARNING - Skipping relationship with invalid type: COVERS
+2026-06-25 14:18:47,387 - app.kg.builder - INFO - Extracted 7 entities and 3 relationships from text (source=wikipedia_extra.txt)
+2026-06-25 14:18:52,391 - __main__ - INFO -   Processed 2/2 chunks (2 extractions so far)
+2026-06-25 14:18:52,392 - __main__ - INFO - Saved 2 extractions (20 entities) to C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted\extracted_billiards_wikipedia_extra.json
+2026-06-25 14:18:52,392 - __main__ - INFO -   Completed in 314.6s: 2 chunks → 20 entities, 5 relationships
+2026-06-25 14:18:52,392 - __main__ - INFO - Processing: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data\billiards\wpa_rules.txt
+2026-06-25 14:18:52,394 - __main__ - INFO - Parsed wpa_rules.txt: 32 chunks (sport=billiards)
+2026-06-25 14:18:53,318 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:20:07,541 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Bóng 9-ball -> GameType
+2026-06-25 14:20:07,541 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Bóng 10-ball -> GameType
+2026-06-25 14:20:07,541 - app.kg.builder - INFO - Extracted 7 entities and 4 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:20:13,278 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:21:05,473 - app.kg.builder - INFO - Extracted 7 entities and 4 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:21:11,297 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:22:12,314 - app.kg.builder - INFO - Extracted 7 entities and 6 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:22:18,054 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:22:48,884 - app.kg.builder - INFO - Extracted 4 entities and 3 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:22:54,551 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:23:28,115 - app.kg.builder - INFO - Extracted 4 entities and 3 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:23:33,117 - __main__ - INFO -   Processed 5/32 chunks (5 extractions so far)
+2026-06-25 14:23:33,912 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:24:42,568 - app.kg.builder - INFO - Extracted 8 entities and 7 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:24:48,366 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:25:34,447 - app.kg.builder - INFO - Extracted 5 entities and 5 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:25:40,201 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:26:12,663 - app.kg.builder - INFO - Extracted 4 entities and 3 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:26:18,301 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:27:03,031 - app.kg.builder - INFO - Extracted 5 entities and 4 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:27:08,783 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:29:00,481 - app.kg.builder - INFO - Extracted 11 entities and 11 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:29:05,484 - __main__ - INFO -   Processed 10/32 chunks (10 extractions so far)
+2026-06-25 14:29:06,178 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:29:23,118 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Player -> Foul
+2026-06-25 14:29:23,118 - app.kg.builder - INFO - Extracted 2 entities and 1 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:29:28,871 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:29:53,303 - app.kg.builder - INFO - Extracted 3 entities and 2 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:29:58,977 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:30:19,129 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Push out -> Cue ball
+2026-06-25 14:30:19,129 - app.kg.builder - INFO - Extracted 2 entities and 1 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:30:24,923 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:31:26,666 - app.kg.builder - INFO - Extracted 7 entities and 6 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:31:32,348 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:32:16,221 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Ball in Hand -> Incoming Player
+2026-06-25 14:32:16,221 - app.kg.builder - INFO - Extracted 5 entities and 3 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:32:21,223 - __main__ - INFO -   Processed 15/32 chunks (15 extractions so far)
+2026-06-25 14:32:22,052 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:33:36,485 - app.kg.builder - INFO - Extracted 9 entities and 7 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:33:42,077 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:34:05,624 - app.kg.builder - INFO - Extracted 3 entities and 2 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:34:11,414 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:35:29,997 - app.kg.builder - INFO - Extracted 9 entities and 8 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:35:35,732 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:36:16,894 - app.kg.builder - INFO - Extracted 5 entities and 4 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:36:22,730 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:37:30,182 - app.kg.builder - INFO - Extracted 6 entities and 8 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:37:35,186 - __main__ - INFO -   Processed 20/32 chunks (20 extractions so far)
+2026-06-25 14:37:36,028 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:39:46,808 - app.kg.builder - INFO - Extracted 17 entities and 11 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:39:52,754 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:40:59,052 - app.kg.builder - INFO - Extracted 8 entities and 6 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:41:04,850 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:41:51,656 - app.kg.builder - INFO - Extracted 5 entities and 4 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:41:57,463 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:42:47,617 - app.kg.builder - INFO - Extracted 6 entities and 5 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:42:53,344 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:43:51,082 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Ball In Hand -> Incoming Player
+2026-06-25 14:43:51,082 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: 3-Cushion Billiards -> Billiards
+2026-06-25 14:43:51,082 - app.kg.builder - INFO - Extracted 7 entities and 4 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:43:56,093 - __main__ - INFO -   Processed 25/32 chunks (25 extractions so far)
+2026-06-25 14:43:56,779 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:45:09,627 - app.kg.builder - INFO - Extracted 9 entities and 7 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:45:15,289 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:45:47,667 - app.kg.builder - INFO - Extracted 4 entities and 3 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:45:53,288 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:46:25,877 - app.kg.builder - INFO - Extracted 4 entities and 3 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:46:31,441 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:47:19,777 - app.kg.builder - INFO - Extracted 6 entities and 5 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:47:25,497 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:48:24,414 - app.kg.builder - INFO - Extracted 7 entities and 6 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:48:29,423 - __main__ - INFO -   Processed 30/32 chunks (30 extractions so far)
+2026-06-25 14:48:29,983 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:48:51,226 - app.kg.builder - INFO - Extracted 3 entities and 2 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:48:56,900 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:50:12,186 - app.kg.builder - INFO - Extracted 9 entities and 7 relationships from text (source=wpa_rules.txt)
+2026-06-25 14:50:17,189 - __main__ - INFO -   Processed 32/32 chunks (32 extractions so far)
+2026-06-25 14:50:17,194 - __main__ - INFO - Saved 32 extractions (198 entities) to C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted\extracted_billiards_wpa_rules.json
+2026-06-25 14:50:17,194 - __main__ - INFO -   Completed in 1884.8s: 32 chunks → 198 entities, 155 relationships
+2026-06-25 14:50:17,194 - __main__ - INFO - Processing: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data\billiards\youtube_techniques.txt
+2026-06-25 14:50:17,204 - __main__ - INFO - Parsed youtube_techniques.txt: 4 chunks (sport=billiards)
+2026-06-25 14:50:18,233 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:52:26,136 - app.kg.builder - INFO - Extracted 14 entities and 11 relationships from text (source=youtube_techniques.txt)
+2026-06-25 14:52:31,881 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:53:17,604 - app.kg.builder - INFO - Extracted 6 entities and 4 relationships from text (source=youtube_techniques.txt)
+2026-06-25 14:53:23,325 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:55:20,255 - app.kg.builder - INFO - Extracted 12 entities and 12 relationships from text (source=youtube_techniques.txt)
+2026-06-25 14:55:25,913 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:55:48,136 - app.kg.builder - INFO - Extracted 3 entities and 2 relationships from text (source=youtube_techniques.txt)
+2026-06-25 14:55:53,148 - __main__ - INFO -   Processed 4/4 chunks (4 extractions so far)
+2026-06-25 14:55:53,150 - __main__ - INFO - Saved 4 extractions (35 entities) to C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted\extracted_billiards_youtube_techniques.json
+2026-06-25 14:55:53,150 - __main__ - INFO -   Completed in 335.9s: 4 chunks → 35 entities, 29 relationships
+2026-06-25 14:55:53,150 - __main__ - INFO - Processing: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data\pickleball\techniques.txt
+2026-06-25 14:55:53,163 - __main__ - INFO - Parsed techniques.txt: 9 chunks (sport=pickleball)
+2026-06-25 14:55:54,596 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:57:30,576 - app.kg.builder - INFO - Extracted 11 entities and 10 relationships from text (source=techniques.txt)
+2026-06-25 14:57:36,649 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:58:12,226 - app.kg.builder - INFO - Extracted 4 entities and 3 relationships from text (source=techniques.txt)
+2026-06-25 14:58:18,236 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:58:53,446 - app.kg.builder - INFO - Extracted 4 entities and 3 relationships from text (source=techniques.txt)
+2026-06-25 14:58:59,608 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 14:59:57,572 - app.kg.builder - INFO - Extracted 6 entities and 5 relationships from text (source=techniques.txt)
+2026-06-25 15:00:03,463 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:00:49,378 - app.kg.builder - INFO - Extracted 5 entities and 4 relationships from text (source=techniques.txt)
+2026-06-25 15:00:54,378 - __main__ - INFO -   Processed 5/9 chunks (5 extractions so far)
+2026-06-25 15:00:55,278 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:01:14,885 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Erne -> kitchen
+2026-06-25 15:01:14,886 - app.kg.builder - INFO - Extracted 2 entities and 1 relationships from text (source=techniques.txt)
+2026-06-25 15:01:20,800 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:02:24,821 - app.kg.builder - INFO - Extracted 8 entities and 7 relationships from text (source=techniques.txt)
+2026-06-25 15:02:30,754 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:03:05,976 - app.kg.builder - INFO - Extracted 4 entities and 3 relationships from text (source=techniques.txt)
+2026-06-25 15:03:11,989 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:03:57,642 - app.kg.builder - WARNING - Skipping entity with invalid type: Role
+2026-06-25 15:03:57,642 - app.kg.builder - WARNING - Skipping entity with invalid type: Role
+2026-06-25 15:03:57,642 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Stacking -> Server
+2026-06-25 15:03:57,642 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Stacking -> Returner
+2026-06-25 15:03:57,642 - app.kg.builder - INFO - Extracted 4 entities and 2 relationships from text (source=techniques.txt)
+2026-06-25 15:04:02,653 - __main__ - INFO -   Processed 9/9 chunks (9 extractions so far)
+2026-06-25 15:04:02,654 - __main__ - INFO - Saved 9 extractions (48 entities) to C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted\extracted_pickleball_techniques.json
+2026-06-25 15:04:02,655 - __main__ - INFO -   Completed in 489.5s: 9 chunks → 48 entities, 38 relationships
+2026-06-25 15:04:02,655 - __main__ - INFO - Processing: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data\pickleball\USAP-Official-Rulebook.txt
+2026-06-25 15:04:04,380 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:07:04,691 - app.kg.builder - WARNING - Skipping entity with invalid type: Organization
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping entity with invalid type: Document
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping entity with invalid type: Section
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping entity with invalid type: Section
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping entity with invalid type: Section
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping entity with invalid type: Section
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping entity with invalid type: Section
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: USA Pickleball -> Official Rulebook
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Official Rulebook -> Pickleball
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Part I -> Introduction to Pickleball
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Part II -> General Rules of Play
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Part III -> Tournament Play
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Definitions -> Part I
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Court and Equipment -> Part I
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Point Scoring -> Part II
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Player Positions and Serving Sequence -> Part II
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Player Readiness and Calling the Score -> Part II
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Serving -> Part II
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Line Calls -> Part II
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Dead Balls, Faults, and Hinders -> Part II
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Rally Situations -> Part II
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Non-Volley Zone Infractions -> Part II
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: The Paddle During Play -> Part II
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: The Net & Net Support System During Play -> Part II
+2026-06-25 15:07:04,692 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Variations on Standard Pickleball -> Part II
+2026-06-25 15:07:04,692 - app.kg.builder - INFO - Extracted 13 entities and 1 relationships from text (source=USAP-Official-Rulebook.txt)
+2026-06-25 15:07:09,703 - __main__ - INFO -   Processed 1/1 chunks (1 extractions so far)
+2026-06-25 15:07:09,704 - __main__ - INFO - Saved 1 extractions (13 entities) to C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted\extracted_pickleball_USAP-Official-Rulebook.json
+2026-06-25 15:07:09,704 - __main__ - INFO -   Completed in 187.0s: 1 chunks → 13 entities, 1 relationships
+2026-06-25 15:07:09,704 - __main__ - INFO - Processing: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data\pickleball\usapa_rules.txt
+2026-06-25 15:07:09,715 - __main__ - INFO - Parsed usapa_rules.txt: 7 chunks (sport=pickleball)
+2026-06-25 15:07:11,336 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:08:41,483 - app.kg.builder - INFO - Extracted 10 entities and 9 relationships from text (source=usapa_rules.txt)
+2026-06-25 15:08:47,896 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:09:49,256 - app.kg.builder - INFO - Extracted 7 entities and 6 relationships from text (source=usapa_rules.txt)
+2026-06-25 15:09:55,392 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:10:23,536 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: two-bounce rule -> serve
+2026-06-25 15:10:23,536 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: two-bounce rule -> return
+2026-06-25 15:10:23,536 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: two-bounce rule -> volley
+2026-06-25 15:10:23,537 - app.kg.builder - INFO - Extracted 2 entities and 1 relationships from text (source=usapa_rules.txt)
+2026-06-25 15:10:29,934 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:11:26,245 - app.kg.builder - INFO - Extracted 6 entities and 5 relationships from text (source=usapa_rules.txt)
+2026-06-25 15:11:32,380 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:13:13,323 - app.kg.builder - INFO - Extracted 10 entities and 9 relationships from text (source=usapa_rules.txt)
+2026-06-25 15:13:18,326 - __main__ - INFO -   Processed 5/7 chunks (5 extractions so far)
+2026-06-25 15:13:19,619 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:14:56,635 - app.kg.builder - INFO - Extracted 10 entities and 9 relationships from text (source=usapa_rules.txt)
+2026-06-25 15:15:03,129 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:16:21,029 - app.kg.builder - INFO - Extracted 7 entities and 6 relationships from text (source=usapa_rules.txt)
+2026-06-25 15:16:26,033 - __main__ - INFO -   Processed 7/7 chunks (7 extractions so far)
+2026-06-25 15:16:26,036 - __main__ - INFO - Saved 7 extractions (52 entities) to C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted\extracted_pickleball_usapa_rules.json
+2026-06-25 15:16:26,036 - __main__ - INFO -   Completed in 556.3s: 7 chunks → 52 entities, 45 relationships
+2026-06-25 15:16:26,036 - __main__ - INFO - Processing: C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\raw_data\pickleball\wikipedia_extra.txt
+2026-06-25 15:16:26,059 - __main__ - INFO - Parsed wikipedia_extra.txt: 4 chunks (sport=pickleball)
+2026-06-25 15:16:28,248 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:18:45,435 - app.kg.builder - WARNING - Skipping entity with invalid type: Location
+2026-06-25 15:18:45,435 - app.kg.builder - WARNING - Skipping entity with invalid type: Location
+2026-06-25 15:18:45,435 - app.kg.builder - WARNING - Skipping entity with invalid type: Person
+2026-06-25 15:18:45,435 - app.kg.builder - WARNING - Skipping entity with invalid type: Person
+2026-06-25 15:18:45,435 - app.kg.builder - WARNING - Skipping entity with invalid type: Person
+2026-06-25 15:18:45,435 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Pickleball -> Bainbridge Island
+2026-06-25 15:18:45,436 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Pickleball -> Washington State
+2026-06-25 15:18:45,436 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Pickleball -> Joel Pritchard
+2026-06-25 15:18:45,436 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Pickleball -> Barney McCallum
+2026-06-25 15:18:45,436 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Pickleball -> Bill Bell
+2026-06-25 15:18:45,436 - app.kg.builder - INFO - Extracted 10 entities and 8 relationships from text (source=wikipedia_extra.txt)
+2026-06-25 15:18:52,532 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:21:22,275 - app.kg.builder - WARNING - Skipping entity with invalid type: Organization
+2026-06-25 15:21:22,276 - app.kg.builder - WARNING - Skipping entity with invalid type: Location
+2026-06-25 15:21:22,276 - app.kg.builder - WARNING - Skipping relationship with unknown source/target: Association of Pickleball Players -> APP or APP Tour
+2026-06-25 15:21:22,276 - app.kg.builder - INFO - Extracted 23 entities and 1 relationships from text (source=wikipedia_extra.txt)
+2026-06-25 15:21:29,116 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:22:27,457 - app.kg.builder - INFO - Extracted 6 entities and 5 relationships from text (source=wikipedia_extra.txt)
+2026-06-25 15:22:33,109 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-06-25 15:23:04,615 - app.kg.builder - INFO - Extracted 4 entities and 3 relationships from text (source=wikipedia_extra.txt)
+2026-06-25 15:23:09,622 - __main__ - INFO -   Processed 4/4 chunks (4 extractions so far)
+2026-06-25 15:23:09,624 - __main__ - INFO - Saved 4 extractions (43 entities) to C:\Users\Administrator\AndroidStudioProjects\ChatbotAgent\backend\data_pipeline\extracted\extracted_pickleball_wikipedia_extra.json
+2026-06-25 15:23:09,624 - __main__ - INFO -   Completed in 403.6s: 4 chunks → 43 entities, 17 relationships
+2026-06-25 15:23:09,624 - __main__ - INFO - ============================================================
+2026-06-25 15:23:09,624 - __main__ - INFO - Extraction complete!
+2026-06-25 15:23:09,624 - __main__ - INFO -   Files processed:     12 / 12
+2026-06-25 15:23:09,624 - __main__ - INFO -   Total chunks:        89
+2026-06-25 15:23:09,624 - __main__ - INFO -   Total entities:      643
+2026-06-25 15:23:09,625 - __main__ - INFO -   Total relationships: 493
+2026-06-25 15:23:09,625 - __main__ - INFO -   Elapsed time:        6621.7s
+2026-06-25 15:23:09,626 - __main__ - INFO - ============================================================

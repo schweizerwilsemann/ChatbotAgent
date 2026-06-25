@@ -1,0 +1,90 @@
+{
+  "generated_at": "2026-06-25T15:45:06.946962",
+  "evaluations": {
+    "retrieval": {
+      "p@1": 0.52,
+      "p@3": 0.33333333333333337,
+      "p@5": 0.23200000000000004,
+      "r@1": 0.36,
+      "r@3": 0.72,
+      "r@5": 0.8333333333333333,
+      "f1@5": 0.35,
+      "mrr": 0.58,
+      "ndcg@3": 0.6193861105131251,
+      "ndcg@5": 0.6699116817298402,
+      "keyword_coverage": 0.2733333333333333,
+      "avg_latency_ms": 472.5908759981394,
+      "sources_used": {
+        "fulltext_only": 16,
+        "vector_only": 42,
+        "both": 67
+      }
+    },
+    "intent_router": {
+      "accuracy": 0.9,
+      "macro_precision": 1.0,
+      "macro_recall": 0.85,
+      "macro_f1": 0.8928571428571429,
+      "avg_latency_ms": 49.92130332005521,
+      "class_metrics": {
+        "domain": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 13
+        },
+        "greeting": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 5
+        },
+        "off_topic": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 7
+        },
+        "sports_overview": {
+          "precision": 1.0,
+          "recall": 0.4,
+          "f1": 0.5714285714285715,
+          "support": 5
+        }
+      }
+    },
+    "rrf": {
+      "hybrid_rrf": {
+        "mrr": 0.5066666666666667,
+        "p@5": 0.192,
+        "r@5": 0.192
+      },
+      "fulltext_only": {
+        "mrr": 0.6999999999999998,
+        "p@5": 0.3360000000000001,
+        "r@5": 0.3360000000000001
+      },
+      "vector_only": {
+        "mrr": 0.19333333333333333,
+        "p@5": 0.08800000000000001,
+        "r@5": 0.08800000000000001
+      }
+    },
+    "graph_rag": {
+      "graph_expansion_hit_rate": 0.928,
+      "avg_related_entities": 3.544,
+      "sport_detection_accuracy": 0.848,
+      "latency_with_graph_ms": 610.700008040294,
+      "latency_without_graph_ms": 375.2120079752058,
+      "graph_overhead_ms": 235.48800006508827,
+      "relationship_weights": {
+        "THUOC": 1.0,
+        "QUY_DINH": 1.0,
+        "DUNG_DE": 0.9,
+        "SU_DUNG": 0.85,
+        "LA_LOAI": 0.8,
+        "LIEN_QUAN": 0.6
+      }
+    }
+  }
+}

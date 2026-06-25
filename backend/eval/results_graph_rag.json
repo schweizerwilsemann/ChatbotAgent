@@ -1,0 +1,16 @@
+{
+  "graph_expansion_hit_rate": 0.928,
+  "avg_related_entities": 3.544,
+  "sport_detection_accuracy": 0.848,
+  "latency_with_graph_ms": 610.700008040294,
+  "latency_without_graph_ms": 375.2120079752058,
+  "graph_overhead_ms": 235.48800006508827,
+  "relationship_weights": {
+    "THUOC": 1.0,
+    "QUY_DINH": 1.0,
+    "DUNG_DE": 0.9,
+    "SU_DUNG": 0.85,
+    "LA_LOAI": 0.8,
+    "LIEN_QUAN": 0.6
+  }
+}

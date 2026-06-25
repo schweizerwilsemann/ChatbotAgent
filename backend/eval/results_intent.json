@@ -1,0 +1,277 @@
+{
+  "summary": {
+    "accuracy": 0.9,
+    "macro_precision": 1.0,
+    "macro_recall": 0.85,
+    "macro_f1": 0.8928571428571429,
+    "avg_latency_ms": 49.92130332005521,
+    "class_metrics": {
+      "domain": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 13
+      },
+      "greeting": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "off_topic": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 7
+      },
+      "sports_overview": {
+        "precision": 1.0,
+        "recall": 0.4,
+        "f1": 0.5714285714285715,
+        "support": 5
+      }
+    }
+  },
+  "details": [
+    {
+      "id": "I01",
+      "query": "xin chào",
+      "expected": "greeting",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 1.4782000798732042
+    },
+    {
+      "id": "I02",
+      "query": "hello",
+      "expected": "greeting",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 0.678099924698472
+    },
+    {
+      "id": "I03",
+      "query": "chào bạn",
+      "expected": "greeting",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 0.5307998508214951
+    },
+    {
+      "id": "I04",
+      "query": "cảm ơn bạn",
+      "expected": "greeting",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 95.73710011318326
+    },
+    {
+      "id": "I05",
+      "query": "tạm biệt",
+      "expected": "greeting",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 91.53619990684092
+    },
+    {
+      "id": "I06",
+      "query": "thời tiết hôm nay thế nào",
+      "expected": "off_topic",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 78.27630010433495
+    },
+    {
+      "id": "I07",
+      "query": "cách nấu phở",
+      "expected": "off_topic",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 77.6657999958843
+    },
+    {
+      "id": "I08",
+      "query": "giá vàng hôm nay",
+      "expected": "off_topic",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 83.61090021207929
+    },
+    {
+      "id": "I09",
+      "query": "điểm thi đại học",
+      "expected": "off_topic",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 72.46059994213283
+    },
+    {
+      "id": "I10",
+      "query": "dự báo thời tiết",
+      "expected": "off_topic",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 72.50260002911091
+    },
+    {
+      "id": "I11",
+      "query": "luật pickleball",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 0.6096998695284128
+    },
+    {
+      "id": "I12",
+      "query": "kỹ thuật bida",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 0.5660001188516617
+    },
+    {
+      "id": "I13",
+      "query": "cách chơi cầu lông",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 77.01719994656742
+    },
+    {
+      "id": "I14",
+      "query": "đặt sân",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 0.5250999238342047
+    },
+    {
+      "id": "I15",
+      "query": "thực đơn quán",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 70.62030001543462
+    },
+    {
+      "id": "I16",
+      "query": "gọi nhân viên",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 0.5055998917669058
+    },
+    {
+      "id": "I17",
+      "query": "giá bao nhiêu",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 69.50740003958344
+    },
+    {
+      "id": "I18",
+      "query": "kiểm tra lịch đặt sân",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 71.05839997529984
+    },
+    {
+      "id": "I19",
+      "query": "gọi đồ uống",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 69.1682999022305
+    },
+    {
+      "id": "I20",
+      "query": "thuê vợt cầu lông",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 72.31109985150397
+    },
+    {
+      "id": "I21",
+      "query": "những môn nào được hỗ trợ",
+      "expected": "sports_overview",
+      "predicted": "sports_overview",
+      "correct": true,
+      "latency_ms": 0.5591001827269793
+    },
+    {
+      "id": "I22",
+      "query": "bạn hỗ trợ những môn nào",
+      "expected": "sports_overview",
+      "predicted": "sports_overview",
+      "correct": true,
+      "latency_ms": 0.4950000438839197
+    },
+    {
+      "id": "I23",
+      "query": "có những môn gì",
+      "expected": "sports_overview",
+      "predicted": "pass_to_llm",
+      "correct": false,
+      "latency_ms": 74.07450000755489
+    },
+    {
+      "id": "I24",
+      "query": "hỗ trợ môn nào",
+      "expected": "sports_overview",
+      "predicted": "pass_to_llm",
+      "correct": false,
+      "latency_ms": 80.88929997757077
+    },
+    {
+      "id": "I25",
+      "query": "mình có thể chơi môn gì ở đây",
+      "expected": "sports_overview",
+      "predicted": "pass_to_llm",
+      "correct": false,
+      "latency_ms": 71.85279997065663
+    },
+    {
+      "id": "I26",
+      "query": "luật smash cầu lông",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 52.5431998539716
+    },
+    {
+      "id": "I27",
+      "query": "tính tiền cho tôi",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 52.49749985523522
+    },
+    {
+      "id": "I28",
+      "query": "cho tôi 2 coca cola",
+      "expected": "domain",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 51.92770017310977
+    },
+    {
+      "id": "I29",
+      "query": "lập trình python cơ bản",
+      "expected": "off_topic",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 52.3366997949779
+    },
+    {
+      "id": "I30",
+      "query": "bệnh đau đầu nên uống thuốc gì",
+      "expected": "off_topic",
+      "predicted": "pass_to_llm",
+      "correct": true,
+      "latency_ms": 54.09760004840791
+    }
+  ]
+}

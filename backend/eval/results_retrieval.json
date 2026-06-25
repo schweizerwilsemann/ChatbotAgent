@@ -1,0 +1,593 @@
+{
+  "summary": {
+    "p@1": 0.52,
+    "p@3": 0.33333333333333337,
+    "p@5": 0.23200000000000004,
+    "r@1": 0.36,
+    "r@3": 0.72,
+    "r@5": 0.8333333333333333,
+    "f1@5": 0.35,
+    "mrr": 0.58,
+    "ndcg@3": 0.6193861105131251,
+    "ndcg@5": 0.6699116817298402,
+    "keyword_coverage": 0.2733333333333333,
+    "avg_latency_ms": 472.5908759981394,
+    "sources_used": {
+      "fulltext_only": 16,
+      "vector_only": 42,
+      "both": 67
+    }
+  },
+  "details": [
+    {
+      "id": "R01",
+      "query": "smash là gì",
+      "expected": [
+        "Jump Smash",
+        "Full Smash",
+        "Smash"
+      ],
+      "retrieved": [
+        "Full Smash",
+        "Jump Smash",
+        "Deceptive Smash",
+        "Stick Smash",
+        "Block Drive"
+      ],
+      "p@5": 0.4,
+      "r@5": 0.6666666666666666,
+      "mrr": 1.0,
+      "ndcg@5": 0.7653606369886217,
+      "latency_ms": 1003.0131998937577,
+      "matched": [
+        "Full Smash",
+        "Jump Smash"
+      ]
+    },
+    {
+      "id": "R02",
+      "query": "luật giao cầu trong pickleball",
+      "expected": [
+        "Serve",
+        "service faults"
+      ],
+      "retrieved": [
+        "Serve",
+        "Serving",
+        "two-bounce rule",
+        "Server",
+        "Receiver"
+      ],
+      "p@5": 0.2,
+      "r@5": 0.5,
+      "mrr": 1.0,
+      "ndcg@5": 0.6131471927654584,
+      "latency_ms": 499.25799993798137,
+      "matched": [
+        "Serve"
+      ]
+    },
+    {
+      "id": "R03",
+      "query": "cách cầm vợt cầu lông",
+      "expected": [
+        "grip",
+        "forehand grip",
+        "backhand grip"
+      ],
+      "retrieved": [
+        "Drive Serve",
+        "Service strategy",
+        "Racket",
+        "Misconduct",
+        "High Serve"
+      ],
+      "p@5": 0.0,
+      "r@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "latency_ms": 406.40700003132224,
+      "matched": []
+    },
+    {
+      "id": "R04",
+      "query": "kỹ thuật bỏ nhỏ trong cầu lông",
+      "expected": [
+        "slow drop",
+        "drop shot",
+        "fast drop"
+      ],
+      "retrieved": [
+        "fast drop",
+        "slow drop",
+        "straight drop",
+        "cross-court drop",
+        "Ball in Hand"
+      ],
+      "p@5": 0.4,
+      "r@5": 0.6666666666666666,
+      "mrr": 1.0,
+      "ndcg@5": 0.7653606369886217,
+      "latency_ms": 383.63200007006526,
+      "matched": [
+        "fast drop",
+        "slow drop"
+      ]
+    },
+    {
+      "id": "R05",
+      "query": "luật 8 bi bida",
+      "expected": [
+        "8-ball"
+      ],
+      "retrieved": [
+        "shooter's group",
+        "stripes",
+        "solids",
+        "double hit",
+        "Giấu bi cue sau bi khác"
+      ],
+      "p@5": 0.0,
+      "r@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "latency_ms": 476.84120014309883,
+      "matched": []
+    },
+    {
+      "id": "R06",
+      "query": "hệ thống diamond trong bida",
+      "expected": [
+        "diamond system",
+        "Diamond System"
+      ],
+      "retrieved": [
+        "plus 2 formula",
+        "diamond system",
+        "diamond rack",
+        "plus 2 system",
+        "diamond markers"
+      ],
+      "p@5": 0.2,
+      "r@5": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "latency_ms": 430.6065000128001,
+      "matched": [
+        "diamond system"
+      ]
+    },
+    {
+      "id": "R07",
+      "query": "kitchen zone trong pickleball là gì",
+      "expected": [
+        "Non-Volley Zone"
+      ],
+      "retrieved": [
+        "non-volley zone",
+        "Erne",
+        "Non-Volley Zone",
+        "Non-Volley Zone Infractions",
+        "Standard Play"
+      ],
+      "p@5": 0.4,
+      "r@5": 2.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.5,
+      "latency_ms": 542.9847999475896,
+      "matched": [
+        "non-volley zone",
+        "Non-Volley Zone"
+      ]
+    },
+    {
+      "id": "R08",
+      "query": "kỹ thuật phông cầu",
+      "expected": [
+        "overhead clear",
+        "clear"
+      ],
+      "retrieved": [
+        "Service strategy",
+        "overhead clear",
+        "High serve",
+        "Speed-up from the dink",
+        "đánh (Stroke)"
+      ],
+      "p@5": 0.2,
+      "r@5": 0.5,
+      "mrr": 0.5,
+      "ndcg@5": 0.38685280723454163,
+      "latency_ms": 454.70439991913736,
+      "matched": [
+        "overhead clear"
+      ]
+    },
+    {
+      "id": "R09",
+      "query": "cách phát bóng cao trong cầu lông",
+      "expected": [
+        "Service",
+        "High Serve"
+      ],
+      "retrieved": [
+        "Service",
+        "Serving from the wrong service court",
+        "Ball in hand",
+        "Service court",
+        "Bóng cờ vua"
+      ],
+      "p@5": 0.2,
+      "r@5": 0.5,
+      "mrr": 1.0,
+      "ndcg@5": 0.6131471927654584,
+      "latency_ms": 454.7965999227017,
+      "matched": [
+        "Service"
+      ]
+    },
+    {
+      "id": "R10",
+      "query": "luật hai nảy trong pickleball",
+      "expected": [
+        "two-bounce rule"
+      ],
+      "retrieved": [
+        "Serve",
+        "Rally Situations",
+        "Line Calls",
+        "Dead Balls, Faults, and Hinders",
+        "Carrying or scooping the ball"
+      ],
+      "p@5": 0.0,
+      "r@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "latency_ms": 489.8091000504792,
+      "matched": []
+    },
+    {
+      "id": "R11",
+      "query": "kỹ thuật masse trong bida",
+      "expected": [
+        "Masse shot",
+        "Masse"
+      ],
+      "retrieved": [
+        "Masse",
+        "tay cầm cơ",
+        "Jenny shot",
+        "Masse shot",
+        "Giấu bi cue sau bi khác"
+      ],
+      "p@5": 0.4,
+      "r@5": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 0.8772153153380493,
+      "latency_ms": 583.4133999887854,
+      "matched": [
+        "Masse",
+        "Masse shot"
+      ]
+    },
+    {
+      "id": "R12",
+      "query": "cách di chuyển bộ chân trong cầu lông",
+      "expected": [
+        "Footwork",
+        "Lunge"
+      ],
+      "retrieved": [
+        "Footwork",
+        "Footwork",
+        "Six corners footwork pattern",
+        "Bóng cờ vua",
+        "Advantage"
+      ],
+      "p@5": 0.4,
+      "r@5": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "latency_ms": 420.02449999563396,
+      "matched": [
+        "Footwork",
+        "Footwork"
+      ]
+    },
+    {
+      "id": "R13",
+      "query": "bi cái trong bida là gì",
+      "expected": [
+        "Cue Ball",
+        "Cue ball",
+        "cue ball"
+      ],
+      "retrieved": [
+        "kiểm soát bi cue",
+        "Giấu bi cue sau bi khác",
+        "Masse",
+        "follow shot",
+        "draw shot"
+      ],
+      "p@5": 0.0,
+      "r@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "latency_ms": 438.4633998852223,
+      "matched": []
+    },
+    {
+      "id": "R14",
+      "query": "quả cầu lông dùng làm gì",
+      "expected": [
+        "Shuttlecock"
+      ],
+      "retrieved": [
+        "Shuttlecock",
+        "Drive Serve",
+        "Service strategy",
+        "Racket",
+        "High serve"
+      ],
+      "p@5": 0.2,
+      "r@5": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "latency_ms": 498.0158000253141,
+      "matched": [
+        "Shuttlecock"
+      ]
+    },
+    {
+      "id": "R15",
+      "query": "dink trong pickleball là gì",
+      "expected": [
+        "Dinking",
+        "Basic dink",
+        "Dink"
+      ],
+      "retrieved": [
+        "Basic dink",
+        "Dink battles",
+        "dinking",
+        "dink volley",
+        "Dinking"
+      ],
+      "p@5": 0.6,
+      "r@5": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 0.8854598815714874,
+      "latency_ms": 478.6459000315517,
+      "matched": [
+        "Basic dink",
+        "dinking",
+        "Dinking"
+      ]
+    },
+    {
+      "id": "R16",
+      "query": "kỹ thuật drive trong cầu lông",
+      "expected": [
+        "Drive"
+      ],
+      "retrieved": [
+        "Block Drive",
+        "Drive",
+        "Service strategy",
+        "third shot drive",
+        "Flat Drive"
+      ],
+      "p@5": 0.2,
+      "r@5": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "latency_ms": 405.973199987784,
+      "matched": [
+        "Drive"
+      ]
+    },
+    {
+      "id": "R17",
+      "query": "break shot trong bida là gì",
+      "expected": [
+        "Break shot"
+      ],
+      "retrieved": [
+        "break shot",
+        "Break shot",
+        "head string",
+        "Push out",
+        "Push Out"
+      ],
+      "p@5": 0.4,
+      "r@5": 2.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.6309297535714575,
+      "latency_ms": 450.9980999864638,
+      "matched": [
+        "break shot",
+        "Break shot"
+      ]
+    },
+    {
+      "id": "R18",
+      "query": "foul trong bida",
+      "expected": [
+        "Foul",
+        "foul"
+      ],
+      "retrieved": [
+        "Foul",
+        "Scratch",
+        "Ball in Hand",
+        "foul",
+        "Ball in hand"
+      ],
+      "p@5": 0.4,
+      "r@5": 2.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.4306765580733931,
+      "latency_ms": 477.3335000500083,
+      "matched": [
+        "Foul",
+        "foul"
+      ]
+    },
+    {
+      "id": "R19",
+      "query": "paddle trong pickleball dùng để làm gì",
+      "expected": [
+        "Paddle",
+        "pickleball paddle"
+      ],
+      "retrieved": [
+        "pickleball",
+        "Pickleball",
+        "The Paddle During Play",
+        "Variations on Standard Pickleball",
+        "Carrying or scooping the ball"
+      ],
+      "p@5": 0.0,
+      "r@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "latency_ms": 446.04270020499825,
+      "matched": []
+    },
+    {
+      "id": "R20",
+      "query": "smash cầu lông cần cầm vợt như thế nào",
+      "expected": [
+        "grip",
+        "forehand grip",
+        "Smash"
+      ],
+      "retrieved": [
+        "Full Smash",
+        "Jump Smash",
+        "panhandle grip",
+        "Deceptive Smash",
+        "Stick Smash"
+      ],
+      "p@5": 0.0,
+      "r@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "latency_ms": 393.47140002064407,
+      "matched": []
+    },
+    {
+      "id": "R21",
+      "query": "luật đánh đơn cầu lông",
+      "expected": [
+        "singles",
+        "Singles"
+      ],
+      "retrieved": [
+        "Drive Serve",
+        "Service strategy",
+        "Misconduct",
+        "High Serve",
+        "Racket"
+      ],
+      "p@5": 0.0,
+      "r@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "latency_ms": 395.14539996162057,
+      "matched": []
+    },
+    {
+      "id": "R22",
+      "query": "luật đánh đôi trong pickleball",
+      "expected": [
+        "Doubles",
+        "doubles",
+        "doubles pickleball"
+      ],
+      "retrieved": [
+        "Rally Situations",
+        "Line Calls",
+        "pickleball",
+        "Carrying or scooping the ball",
+        "Speed-up from the dink"
+      ],
+      "p@5": 0.0,
+      "r@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "latency_ms": 417.5499000120908,
+      "matched": []
+    },
+    {
+      "id": "R23",
+      "query": "ball in hand trong bida là gì",
+      "expected": [
+        "ball in hand",
+        "Ball in hand"
+      ],
+      "retrieved": [
+        "ball in hand",
+        "Ball in hand",
+        "Ball in Hand",
+        "placing the cue ball in the wrong area on a ball-in-hand situation",
+        "Ball in hand"
+      ],
+      "p@5": 0.8,
+      "r@5": 4.0,
+      "mrr": 1.0,
+      "ndcg@5": 2.5177825608059994,
+      "latency_ms": 438.4115000721067,
+      "matched": [
+        "ball in hand",
+        "Ball in hand",
+        "Ball in Hand",
+        "Ball in hand"
+      ]
+    },
+    {
+      "id": "R24",
+      "query": "kỹ thuật giao cầu flick trong cầu lông",
+      "expected": [
+        "Flick Serve"
+      ],
+      "retrieved": [
+        "Flick serve",
+        "Service strategy",
+        "Flick Serve",
+        "Drive Serve",
+        "Serving out of turn"
+      ],
+      "p@5": 0.4,
+      "r@5": 2.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.5,
+      "latency_ms": 398.82749994285405,
+      "matched": [
+        "Flick serve",
+        "Flick Serve"
+      ]
+    },
+    {
+      "id": "R25",
+      "query": "phòng thủ trong bida là gì",
+      "expected": [
+        "defensive clear",
+        "Defensive play"
+      ],
+      "retrieved": [
+        "tay cầm cơ",
+        "follow shot",
+        "Bi cue",
+        "stun shot",
+        "Masse"
+      ],
+      "p@5": 0.0,
+      "r@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "latency_ms": 430.4028998594731,
+      "matched": []
+    }
+  ]
+}

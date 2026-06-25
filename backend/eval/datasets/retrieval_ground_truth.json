@@ -1,0 +1,209 @@
+{
+  "metadata": {
+    "description": "Ground truth for retrieval evaluation — updated to match Neo4j entity names",
+    "version": "2.0",
+    "updated": "2026-06-25"
+  },
+  "test_cases": [
+    {
+      "id": "R01",
+      "query": "smash là gì",
+      "sport": "badminton",
+      "expected_entities": ["Smash", "Jump Smash", "Full Smash"],
+      "expected_keywords": ["đập cầu", "kỹ thuật tấn công", "mạnh"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R02",
+      "query": "luật giao cầu trong pickleball",
+      "sport": "pickleball",
+      "expected_entities": ["Serve", "service faults"],
+      "expected_keywords": ["giao cầu", "pickleball", "dưới tay"],
+      "expected_type": "Rule"
+    },
+    {
+      "id": "R03",
+      "query": "cách cầm vợt cầu lông",
+      "sport": "badminton",
+      "expected_entities": ["grip", "forehand grip", "backhand grip"],
+      "expected_keywords": ["cầm vợt", "forehand", "backhand"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R04",
+      "query": "kỹ thuật bỏ nhỏ trong cầu lông",
+      "sport": "badminton",
+      "expected_entities": ["drop shot", "fast drop", "slow drop"],
+      "expected_keywords": ["bỏ nhỏ", "cắt cầu", "drop shot"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R05",
+      "query": "luật 8 bi bida",
+      "sport": "billiards",
+      "expected_entities": ["8-ball"],
+      "expected_keywords": ["8 bi", "lỗ", "quy tắc"],
+      "expected_type": "Rule"
+    },
+    {
+      "id": "R06",
+      "query": "hệ thống diamond trong bida",
+      "sport": "billiards",
+      "expected_entities": ["Diamond System", "diamond system"],
+      "expected_keywords": ["diamond", "kim cương", "đánh băng"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R07",
+      "query": "kitchen zone trong pickleball là gì",
+      "sport": "pickleball",
+      "expected_entities": ["Non-Volley Zone"],
+      "expected_keywords": ["kitchen", "non-volley", "vùng cấm volley"],
+      "expected_type": "Concept"
+    },
+    {
+      "id": "R08",
+      "query": "kỹ thuật phông cầu",
+      "sport": "badminton",
+      "expected_entities": ["clear", "overhead clear"],
+      "expected_keywords": ["phông cầu", "lốp cầu", "clear"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R09",
+      "query": "cách phát bóng cao trong cầu lông",
+      "sport": "badminton",
+      "expected_entities": ["High Serve", "Service"],
+      "expected_keywords": ["giao cầu cao", "phát bóng"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R10",
+      "query": "luật hai nảy trong pickleball",
+      "sport": "pickleball",
+      "expected_entities": ["two-bounce rule"],
+      "expected_keywords": ["hai nảy", "bounce", "pickleball"],
+      "expected_type": "Rule"
+    },
+    {
+      "id": "R11",
+      "query": "kỹ thuật masse trong bida",
+      "sport": "billiards",
+      "expected_entities": ["Masse", "Masse shot"],
+      "expected_keywords": ["masse", "đánh cong", "bi cue"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R12",
+      "query": "cách di chuyển bộ chân trong cầu lông",
+      "sport": "badminton",
+      "expected_entities": ["Footwork", "Lunge"],
+      "expected_keywords": ["di chuyển", "bộ chân", "footwork"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R13",
+      "query": "bi cái trong bida là gì",
+      "sport": "billiards",
+      "expected_entities": ["Cue Ball", "Cue ball", "cue ball"],
+      "expected_keywords": ["bi cái", "cue ball", "bi trắng"],
+      "expected_type": "Equipment"
+    },
+    {
+      "id": "R14",
+      "query": "quả cầu lông dùng làm gì",
+      "sport": "badminton",
+      "expected_entities": ["Shuttlecock"],
+      "expected_keywords": ["quả cầu", "shuttlecock"],
+      "expected_type": "Equipment"
+    },
+    {
+      "id": "R15",
+      "query": "dink trong pickleball là gì",
+      "sport": "pickleball",
+      "expected_entities": ["Dink", "Basic dink", "Dinking"],
+      "expected_keywords": ["dink", "bỏ nhỏ", "pickleball"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R16",
+      "query": "kỹ thuật drive trong cầu lông",
+      "sport": "badminton",
+      "expected_entities": ["Drive"],
+      "expected_keywords": ["đánh ngang", "drive"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R17",
+      "query": "break shot trong bida là gì",
+      "sport": "billiards",
+      "expected_entities": ["Break shot"],
+      "expected_keywords": ["cú phá", "khai cuộc"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R18",
+      "query": "foul trong bida",
+      "sport": "billiards",
+      "expected_entities": ["Foul", "foul"],
+      "expected_keywords": ["lỗi", "phạm lỗi"],
+      "expected_type": "Rule"
+    },
+    {
+      "id": "R19",
+      "query": "paddle trong pickleball dùng để làm gì",
+      "sport": "pickleball",
+      "expected_entities": ["Paddle", "pickleball paddle"],
+      "expected_keywords": ["vợt pickleball", "paddle"],
+      "expected_type": "Equipment"
+    },
+    {
+      "id": "R20",
+      "query": "smash cầu lông cần cầm vợt như thế nào",
+      "sport": "badminton",
+      "expected_entities": ["Smash", "forehand grip", "grip"],
+      "expected_keywords": ["smash", "cầm vợt", "forehand grip"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R21",
+      "query": "luật đánh đơn cầu lông",
+      "sport": "badminton",
+      "expected_entities": ["Singles", "singles"],
+      "expected_keywords": ["đơn", "đánh đơn", "singles"],
+      "expected_type": "GameType"
+    },
+    {
+      "id": "R22",
+      "query": "luật đánh đôi trong pickleball",
+      "sport": "pickleball",
+      "expected_entities": ["Doubles", "doubles", "doubles pickleball"],
+      "expected_keywords": ["đôi", "đánh đôi", "doubles"],
+      "expected_type": "GameType"
+    },
+    {
+      "id": "R23",
+      "query": "ball in hand trong bida là gì",
+      "sport": "billiards",
+      "expected_entities": ["Ball in hand", "ball in hand"],
+      "expected_keywords": ["bi trong tay", "đặt bi cái"],
+      "expected_type": "Rule"
+    },
+    {
+      "id": "R24",
+      "query": "kỹ thuật giao cầu flick trong cầu lông",
+      "sport": "badminton",
+      "expected_entities": ["Flick Serve"],
+      "expected_keywords": ["giao cầu flick", "lắc cổ tay"],
+      "expected_type": "Technique"
+    },
+    {
+      "id": "R25",
+      "query": "phòng thủ trong bida là gì",
+      "sport": "billiards",
+      "expected_entities": ["Defensive play", "defensive clear"],
+      "expected_keywords": ["phòng thủ", "defensive", "an toàn"],
+      "expected_type": "Technique"
+    }
+  ]
+}
