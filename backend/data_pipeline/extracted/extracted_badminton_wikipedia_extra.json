@@ -1,0 +1,219 @@
+{
+  "extracted_at": "2026-06-25T06:55:22.013627+00:00",
+  "source": "badminton_wikipedia_extra",
+  "extraction_count": 1,
+  "total_entities": 17,
+  "total_relationships": 16,
+  "extractions": [
+    {
+      "chunk_title": "Badminton - Wikipedia",
+      "chunk_source": "wikipedia_extra.txt",
+      "sport": "badminton",
+      "extracted_at": "2026-06-25T06:55:17.008747+00:00",
+      "entity_count": 17,
+      "relationship_count": 16,
+      "entities": [
+        {
+          "name": "Badminton",
+          "type": "Sport",
+          "description": "A racquet sport played using rackets to hit a shuttlecock across a net.",
+          "properties": {}
+        },
+        {
+          "name": "Racket",
+          "type": "Equipment",
+          "description": "The implement used to hit the shuttlecock in badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Shuttlecock",
+          "type": "Equipment",
+          "description": "A feathered projectile used in badminton, known for its high drag and top speed.",
+          "properties": {}
+        },
+        {
+          "name": "Net",
+          "type": "Equipment",
+          "description": "The horizontal bar that separates the two halves of the court in badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Singles",
+          "type": "GameType",
+          "description": "A form of badminton where one player competes against another on each side.",
+          "properties": {}
+        },
+        {
+          "name": "Doubles",
+          "type": "GameType",
+          "description": "A form of badminton where two players compete against two other players on each side.",
+          "properties": {}
+        },
+        {
+          "name": "Court",
+          "type": "Equipment",
+          "description": "The rectangular area on which badminton is played, divided by a net.",
+          "properties": {}
+        },
+        {
+          "name": "Aerobic stamina",
+          "type": "Concept",
+          "description": "Physical endurance required for sustained aerobic exercise in badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Agility",
+          "type": "Concept",
+          "description": "The ability to move quickly and change direction, essential in badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Strength",
+          "type": "Concept",
+          "description": "Muscular power required for hitting the shuttlecock with force in badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Speed",
+          "type": "Concept",
+          "description": "The ability to move and react quickly, crucial in badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Precision",
+          "type": "Concept",
+          "description": "Accuracy in hitting the shuttlecock with control in badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Motor coordination",
+          "type": "Concept",
+          "description": "The ability to coordinate movements of the body, essential for playing badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Sophisticated racquet movements",
+          "type": "Technique",
+          "description": "Advanced techniques involving wrist flexibility in badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Battledore and shuttlecock",
+          "type": "Concept",
+          "description": "An earlier game from which badminton developed, played with a racquet and a shuttlecock.",
+          "properties": {}
+        },
+        {
+          "name": "Duke of Beaufort's Badminton House",
+          "type": "Concept",
+          "description": "The origin of the name 'badminton', located in Gloucestershire.",
+          "properties": {}
+        },
+        {
+          "name": "Poona or Poonah",
+          "type": "Concept",
+          "description": "The garrison town where the game was particularly popular and rules were first drawn up.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Badminton",
+          "target": "Racket",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Badminton",
+          "target": "Shuttlecock",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Badminton",
+          "target": "Net",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Singles",
+          "target": "Badminton",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "Doubles",
+          "target": "Badminton",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "Court",
+          "target": "Badminton",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Aerobic stamina",
+          "target": "Badminton",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Agility",
+          "target": "Badminton",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Strength",
+          "target": "Badminton",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Speed",
+          "target": "Badminton",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Precision",
+          "target": "Badminton",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Motor coordination",
+          "target": "Badminton",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Sophisticated racquet movements",
+          "target": "Badminton",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Battledore and shuttlecock",
+          "target": "Badminton",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Duke of Beaufort's Badminton House",
+          "target": "Badminton",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Poona or Poonah",
+          "target": "Badminton",
+          "type": "DUNG_DE",
+          "properties": {}
+        }
+      ]
+    }
+  ]
+}

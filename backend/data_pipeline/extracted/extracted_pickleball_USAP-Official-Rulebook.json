@@ -1,17 +1,17 @@
 {
-  "extracted_at": "2026-05-08T05:52:20.216725+00:00",
+  "extracted_at": "2026-06-25T08:07:09.703896+00:00",
   "source": "pickleball_USAP-Official-Rulebook",
   "extraction_count": 1,
-  "total_entities": 4,
-  "total_relationships": 3,
+  "total_entities": 13,
+  "total_relationships": 1,
   "extractions": [
     {
       "chunk_title": "Usap-Official-Rulebook",
       "chunk_source": "USAP-Official-Rulebook.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:52:15.209692+00:00",
-      "entity_count": 4,
-      "relationship_count": 3,
+      "extracted_at": "2026-06-25T08:07:04.692868+00:00",
+      "entity_count": 13,
+      "relationship_count": 1,
       "entities": [
         {
           "name": "Pickleball",
@@ -20,41 +20,83 @@
           "properties": {}
         },
         {
-          "name": "Standard Play",
-          "type": "GameType",
-          "description": "Regular play of pickleball, including recreational and organized league play.",
+          "name": "Game",
+          "type": "Concept",
+          "description": "The core activity of pickleball.",
           "properties": {}
         },
         {
-          "name": "Tournament Play",
-          "type": "GameType",
-          "description": "Official competitions where players compete for ratings on a national or international basis.",
+          "name": "Point Scoring",
+          "type": "Rule",
+          "description": "How points are scored in pickleball.",
           "properties": {}
         },
         {
-          "name": "Non-sanctioned Tournaments",
-          "type": "GameType",
-          "description": "Tournaments that use the rules as guidelines but may be more flexible in their application.",
+          "name": "Player Positions and Serving Sequence",
+          "type": "Rule",
+          "description": "The order of players and serving sequence in pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "Player Readiness and Calling the Score",
+          "type": "Rule",
+          "description": "How to indicate readiness and call scores in pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "Serving",
+          "type": "Rule",
+          "description": "The rules for serving in pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "Line Calls",
+          "type": "Rule",
+          "description": "Rules related to line calls in pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "Dead Balls, Faults, and Hinders",
+          "type": "Rule",
+          "description": "Rules for dead balls, faults, and hinders in pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "Rally Situations",
+          "type": "Rule",
+          "description": "Rules for various rally situations in pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "Non-Volley Zone Infractions",
+          "type": "Rule",
+          "description": "Rules related to non-volley zone infractions in pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "The Paddle During Play",
+          "type": "Rule",
+          "description": "Rules for using the paddle during play in pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "The Net & Net Support System During Play",
+          "type": "Rule",
+          "description": "Rules related to the net and its support system during play in pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "Variations on Standard Pickleball",
+          "type": "Concept",
+          "description": "Different variations of standard pickleball rules.",
           "properties": {}
         }
       ],
       "relationships": [
         {
-          "source": "Standard Play",
+          "source": "Game",
           "target": "Pickleball",
-          "type": "LA_LOAI",
-          "properties": {}
-        },
-        {
-          "source": "Tournament Play",
-          "target": "Pickleball",
-          "type": "LA_LOAI",
-          "properties": {}
-        },
-        {
-          "source": "Non-sanctioned Tournaments",
-          "target": "Pickleball",
-          "type": "LA_LOAI",
+          "type": "DUNG_DE",
           "properties": {}
         }
       ]

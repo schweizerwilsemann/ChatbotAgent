@@ -1,0 +1,417 @@
+{
+  "extracted_at": "2026-06-25T08:23:09.622435+00:00",
+  "source": "pickleball_wikipedia_extra",
+  "extraction_count": 4,
+  "total_entities": 43,
+  "total_relationships": 17,
+  "extractions": [
+    {
+      "chunk_title": "Pickleball - Wikipedia",
+      "chunk_source": "wikipedia_extra.txt",
+      "sport": "pickleball",
+      "extracted_at": "2026-06-25T08:18:45.436789+00:00",
+      "entity_count": 10,
+      "relationship_count": 8,
+      "entities": [
+        {
+          "name": "Pickleball",
+          "type": "Sport",
+          "description": "A racket sport played with two or four players.",
+          "properties": {}
+        },
+        {
+          "name": "Racket",
+          "type": "Equipment",
+          "description": "A smooth-faced paddle used in pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "Pickleball ball",
+          "type": "Equipment",
+          "description": "A perforated, hollow plastic ball used in pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "Net",
+          "type": "Equipment",
+          "description": "A 34-inch-high net used to separate the two sides of the court.",
+          "properties": {}
+        },
+        {
+          "name": "Doubles badminton court",
+          "type": "GameType",
+          "description": "The type of court used in pickleball, resembling a doubles badminton court.",
+          "properties": {}
+        },
+        {
+          "name": "Non-volley zone",
+          "type": "Concept",
+          "description": "A 7-foot area on each side of the net where players cannot strike the ball before it has bounced.",
+          "properties": {}
+        },
+        {
+          "name": "Tennis",
+          "type": "Sport",
+          "description": "A racket sport that pickleball resembles aspects of.",
+          "properties": {}
+        },
+        {
+          "name": "Table tennis",
+          "type": "Sport",
+          "description": "A racket sport that pickleball resembles aspects of.",
+          "properties": {}
+        },
+        {
+          "name": "Pickle boat",
+          "type": "Concept",
+          "description": "A type of boat where oarsmen were chosen from leftovers, possibly the origin of the game's name.",
+          "properties": {}
+        },
+        {
+          "name": "Dog Pickles",
+          "type": "Equipment",
+          "description": "The family dog that may have influenced the naming of pickleball.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Pickleball",
+          "target": "Racket",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Pickleball",
+          "target": "Pickleball ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Pickleball",
+          "target": "Net",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Pickleball",
+          "target": "Doubles badminton court",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Pickleball",
+          "target": "Tennis",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Pickleball",
+          "target": "Table tennis",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Pickleball",
+          "target": "Pickle boat",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Pickleball",
+          "target": "Dog Pickles",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Pickleball Glossary",
+      "chunk_source": "wikipedia_extra.txt",
+      "sport": "pickleball",
+      "extracted_at": "2026-06-25T08:21:22.276962+00:00",
+      "entity_count": 23,
+      "relationship_count": 1,
+      "entities": [
+        {
+          "name": "Pickleball court",
+          "type": "Equipment",
+          "description": "A rectangular playing surface for pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "Ace",
+          "type": "Technique",
+          "description": "A serve that is not returned by the receiver.",
+          "properties": {}
+        },
+        {
+          "name": "APP or APP Tour",
+          "type": "GameType",
+          "description": "The official tour for pickleball players.",
+          "properties": {}
+        },
+        {
+          "name": "Approach shot",
+          "type": "Technique",
+          "description": "A shot executed while moving from the backcourt towards the non-volley line.",
+          "properties": {}
+        },
+        {
+          "name": "Around-the-post (ATP)",
+          "type": "Technique",
+          "description": "A legal shot that travels outside the net posts.",
+          "properties": {}
+        },
+        {
+          "name": "At the net",
+          "type": "Concept",
+          "description": "A player positioned at the non-volley line.",
+          "properties": {}
+        },
+        {
+          "name": "Attackable ball or Attackable shot",
+          "type": "Technique",
+          "description": "A ball returned over the net that allows the receiving side to make a strategic offensive shot.",
+          "properties": {}
+        },
+        {
+          "name": "Backcourt",
+          "type": "Equipment",
+          "description": "The area of the court located near the baseline.",
+          "properties": {}
+        },
+        {
+          "name": "Backhand shot",
+          "type": "Technique",
+          "description": "A shot made with the palm of the hand facing away from the net.",
+          "properties": {}
+        },
+        {
+          "name": "Backswing",
+          "type": "Technique",
+          "description": "The backward movement of the paddle in advance of striking the ball.",
+          "properties": {}
+        },
+        {
+          "name": "Bagel",
+          "type": "Rule",
+          "description": "A shutout game ending when one team earned no points.",
+          "properties": {}
+        },
+        {
+          "name": "Bainbridge Cup",
+          "type": "GameType",
+          "description": "An international pickleball competition organized by the International Pickleball Federation.",
+          "properties": {}
+        },
+        {
+          "name": "Ball! or Ball on!",
+          "type": "Concept",
+          "description": "A call made to alert all players when an errant ball is on the court.",
+          "properties": {}
+        },
+        {
+          "name": "Ball type",
+          "type": "Equipment",
+          "description": "The type of pickleball used in a match, either indoor or outdoor.",
+          "properties": {}
+        },
+        {
+          "name": "Banger",
+          "type": "Technique",
+          "description": "A player that hits mostly powerful drive shots.",
+          "properties": {}
+        },
+        {
+          "name": "Baselines",
+          "type": "Equipment",
+          "description": "The lines parallel to the net at the back of the pickleball court.",
+          "properties": {}
+        },
+        {
+          "name": "Bash",
+          "type": "Technique",
+          "description": "A hard shot that hits the top of the net and then lands in play on the opponent's side.",
+          "properties": {}
+        },
+        {
+          "name": "Bert",
+          "type": "Technique",
+          "description": "An approach shot where a player crosses in front of their partner to execute an attack on their partner's side.",
+          "properties": {}
+        },
+        {
+          "name": "Bevel",
+          "type": "Equipment",
+          "description": "One of the eight sides of a standard eight-sided racket handle.",
+          "properties": {}
+        },
+        {
+          "name": "Block shot or Blocking",
+          "type": "Technique",
+          "description": "A backhanded defensive shot with little or no backswing intended to slow the ball and drop it in the opponent's non-volley zone.",
+          "properties": {}
+        },
+        {
+          "name": "Body shot, Body bag, or Tag",
+          "type": "Technique",
+          "description": "A shot that hits the body of an opposing player, often intentionally.",
+          "properties": {}
+        },
+        {
+          "name": "Bounce it!",
+          "type": "Concept",
+          "description": "In doubles, a call made by one partner to the other instructing them to allow the ball to bounce before striking the ball.",
+          "properties": {}
+        },
+        {
+          "name": "Carry",
+          "type": "Technique",
+          "description": "Hitting the ball in such a way that it does not bounce away from the paddle but tends to be carried.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Pickleball court",
+          "target": "Backcourt",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Dink (pickleball)",
+      "chunk_source": "wikipedia_extra.txt",
+      "sport": "pickleball",
+      "extracted_at": "2026-06-25T08:22:27.457906+00:00",
+      "entity_count": 6,
+      "relationship_count": 5,
+      "entities": [
+        {
+          "name": "drop shot",
+          "type": "Technique",
+          "description": "A soft shot in some racket sports, particularly effective near the net.",
+          "properties": {}
+        },
+        {
+          "name": "pickleball",
+          "type": "Sport",
+          "description": "A sport played with a paddle and a plastic ball on a badminton court.",
+          "properties": {}
+        },
+        {
+          "name": "non-volley zone",
+          "type": "Concept",
+          "description": "An area in pickleball where players cannot volley the ball, forcing them to hit it upward.",
+          "properties": {}
+        },
+        {
+          "name": "dink shot",
+          "type": "Technique",
+          "description": "A very soft drop shot performed near or at the non-volley line.",
+          "properties": {}
+        },
+        {
+          "name": "drop volley",
+          "type": "Technique",
+          "description": "A drop shot made before the ball bounces, similar to a regular drop shot but with a high arc.",
+          "properties": {}
+        },
+        {
+          "name": "dink volley",
+          "type": "Technique",
+          "description": "A dink shot made before the ball bounces.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "drop shot",
+          "target": "pickleball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "non-volley zone",
+          "target": "pickleball",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "dink shot",
+          "target": "drop shot",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "drop volley",
+          "target": "drop shot",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "dink volley",
+          "target": "dink shot",
+          "type": "THUOC",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Third shot drop",
+      "chunk_source": "wikipedia_extra.txt",
+      "sport": "pickleball",
+      "extracted_at": "2026-06-25T08:23:04.615666+00:00",
+      "entity_count": 4,
+      "relationship_count": 3,
+      "entities": [
+        {
+          "name": "Pickleball",
+          "type": "Sport",
+          "description": "A sport played with a paddle and a small ball on a badminton court.",
+          "properties": {}
+        },
+        {
+          "name": "Paddle",
+          "type": "Equipment",
+          "description": "The implement used to hit the pickleball in the game.",
+          "properties": {}
+        },
+        {
+          "name": "Ball",
+          "type": "Equipment",
+          "description": "A small, hard ball used in pickleball.",
+          "properties": {}
+        },
+        {
+          "name": "Badminton Court",
+          "type": "Equipment",
+          "description": "The rectangular court on which pickleball is played.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "Pickleball",
+          "target": "Paddle",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Pickleball",
+          "target": "Ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Pickleball",
+          "target": "Badminton Court",
+          "type": "THUOC",
+          "properties": {}
+        }
+      ]
+    }
+  ]
+}

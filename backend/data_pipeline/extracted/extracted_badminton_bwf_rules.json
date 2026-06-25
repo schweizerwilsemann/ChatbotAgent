@@ -1,15 +1,15 @@
 {
-  "extracted_at": "2026-05-08T04:41:20.575359+00:00",
+  "extracted_at": "2026-06-25T06:41:03.500122+00:00",
   "source": "badminton_bwf_rules",
   "extraction_count": 7,
-  "total_entities": 53,
-  "total_relationships": 41,
+  "total_entities": 52,
+  "total_relationships": 42,
   "extractions": [
     {
       "chunk_title": "Court and Equipment",
       "chunk_source": "bwf_rules.txt",
       "sport": "badminton",
-      "extracted_at": "2026-05-08T04:34:20.113202+00:00",
+      "extracted_at": "2026-06-25T06:34:01.962272+00:00",
       "entity_count": 7,
       "relationship_count": 6,
       "entities": [
@@ -34,7 +34,7 @@
         {
           "name": "Shuttlecock",
           "type": "Equipment",
-          "description": "The projectile struck with a racket in badminton.",
+          "description": "The conical projectile struck with a racket in badminton.",
           "properties": {}
         },
         {
@@ -99,93 +99,87 @@
       "chunk_title": "Scoring System",
       "chunk_source": "bwf_rules.txt",
       "sport": "badminton",
-      "extracted_at": "2026-05-08T04:35:34.815103+00:00",
-      "entity_count": 9,
+      "extracted_at": "2026-06-25T06:35:10.239742+00:00",
+      "entity_count": 8,
       "relationship_count": 5,
       "entities": [
         {
-          "name": "scoring system",
+          "name": "Scoring System",
           "type": "Rule",
-          "description": "The method used to determine the winner of a game or match in badminton.",
+          "description": "The system used to determine points in badminton.",
           "properties": {}
         },
         {
-          "name": "rally point scoring",
+          "name": "Rally Point Scoring",
           "type": "GameType",
-          "description": "A scoring system where points are awarded for each rally, regardless of who is serving.",
+          "description": "A scoring method where a point is awarded for each rally.",
           "properties": {}
         },
         {
-          "name": "match",
+          "name": "Match",
           "type": "GameType",
-          "description": "The largest unit of play in badminton, consisting of the best of three games.",
+          "description": "The overall competition in badminton, consisting of multiple games.",
           "properties": {}
         },
         {
-          "name": "game",
+          "name": "Game",
           "type": "GameType",
-          "description": "A single unit of play in badminton, typically played to 21 points.",
+          "description": "A single unit of play in a match.",
           "properties": {}
         },
         {
-          "name": "singles",
+          "name": "Point",
+          "type": "Rule",
+          "description": "The basic unit of scoring in badminton.",
+          "properties": {}
+        },
+        {
+          "name": "Singles",
           "type": "GameType",
-          "description": "A format of play where two players compete against each other.",
+          "description": "A match format where one player competes against another.",
           "properties": {}
         },
         {
-          "name": "doubles",
+          "name": "Doubles",
           "type": "GameType",
-          "description": "A format of play where four players compete in two teams of two.",
+          "description": "A match format where two players compete against two other players.",
           "properties": {}
         },
         {
-          "name": "server",
-          "type": "Technique",
-          "description": "The player who serves the shuttlecock to start a rally.",
-          "properties": {}
-        },
-        {
-          "name": "service court",
+          "name": "Service Court",
           "type": "Equipment",
-          "description": "A designated area on the badminton court where players serve from and return shots to.",
-          "properties": {}
-        },
-        {
-          "name": "interval",
-          "type": "Rule",
-          "description": "A break in play during a match, typically lasting 60 seconds.",
+          "description": "The area on the court from which a player serves.",
           "properties": {}
         }
       ],
       "relationships": [
         {
-          "source": "scoring system",
-          "target": "rally point scoring",
+          "source": "Scoring System",
+          "target": "Rally Point Scoring",
           "type": "LA_LOAI",
           "properties": {}
         },
         {
-          "source": "match",
-          "target": "game",
+          "source": "Match",
+          "target": "Game",
           "type": "THUOC",
           "properties": {}
         },
         {
-          "source": "singles",
-          "target": "server",
+          "source": "Game",
+          "target": "Point",
           "type": "SU_DUNG",
           "properties": {}
         },
         {
-          "source": "doubles",
-          "target": "service court",
-          "type": "SU_DUNG",
+          "source": "Singles",
+          "target": "Service Court",
+          "type": "LIEN_QUAN",
           "properties": {}
         },
         {
-          "source": "interval",
-          "target": "match",
+          "source": "Doubles",
+          "target": "Service Court",
           "type": "LIEN_QUAN",
           "properties": {}
         }
@@ -195,9 +189,9 @@
       "chunk_title": "Service Rules",
       "chunk_source": "bwf_rules.txt",
       "sport": "badminton",
-      "extracted_at": "2026-05-08T04:36:44.183583+00:00",
-      "entity_count": 8,
-      "relationship_count": 6,
+      "extracted_at": "2026-06-25T06:36:39.655498+00:00",
+      "entity_count": 10,
+      "relationship_count": 9,
       "entities": [
         {
           "name": "Badminton",
@@ -214,7 +208,7 @@
         {
           "name": "Shuttlecock",
           "type": "Equipment",
-          "description": "A small, feathered object used in badminton.",
+          "description": "A small, feathered projectile used in badminton.",
           "properties": {}
         },
         {
@@ -224,27 +218,39 @@
           "properties": {}
         },
         {
-          "name": "Service Court",
+          "name": "Court",
           "type": "Concept",
-          "description": "The area on the court where a player serves from.",
+          "description": "The playing area for badminton.",
           "properties": {}
         },
         {
           "name": "Net",
           "type": "Equipment",
-          "description": "A horizontal bar used to separate the two halves of the badminton court.",
+          "description": "A horizontal bar used to separate the two halves of a badminton court.",
           "properties": {}
         },
         {
-          "name": "Singles",
-          "type": "GameType",
-          "description": "A game variant in badminton played by one player on each side.",
+          "name": "Service Line",
+          "type": "Concept",
+          "description": "The line on the court where service must be made from.",
           "properties": {}
         },
         {
-          "name": "Doubles",
-          "type": "GameType",
-          "description": "A game variant in badminton played by two players on each side.",
+          "name": "Center Line",
+          "type": "Concept",
+          "description": "The central dividing line of the badminton court.",
+          "properties": {}
+        },
+        {
+          "name": "Sideline",
+          "type": "Concept",
+          "description": "The lines on either side of the badminton court.",
+          "properties": {}
+        },
+        {
+          "name": "Back Boundary Line",
+          "type": "Concept",
+          "description": "The line at the back of the badminton court.",
           "properties": {}
         }
       ],
@@ -268,21 +274,39 @@
           "properties": {}
         },
         {
-          "source": "Badminton",
+          "source": "Service",
+          "target": "Court",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Service",
           "target": "Net",
           "type": "LIEN_QUAN",
           "properties": {}
         },
         {
-          "source": "Service Court",
-          "target": "Singles",
-          "type": "THUOC",
+          "source": "Service",
+          "target": "Service Line",
+          "type": "LIEN_QUAN",
           "properties": {}
         },
         {
-          "source": "Service Court",
-          "target": "Doubles",
-          "type": "THUOC",
+          "source": "Service",
+          "target": "Center Line",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Service",
+          "target": "Sideline",
+          "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Service",
+          "target": "Back Boundary Line",
+          "type": "LIEN_QUAN",
           "properties": {}
         }
       ]
@@ -291,7 +315,7 @@
       "chunk_title": "Lets",
       "chunk_source": "bwf_rules.txt",
       "sport": "badminton",
-      "extracted_at": "2026-05-08T04:37:19.613825+00:00",
+      "extracted_at": "2026-06-25T06:37:16.228409+00:00",
       "entity_count": 4,
       "relationship_count": 3,
       "entities": [
@@ -345,14 +369,14 @@
       "chunk_title": "Faults",
       "chunk_source": "bwf_rules.txt",
       "sport": "badminton",
-      "extracted_at": "2026-05-08T04:38:21.663692+00:00",
-      "entity_count": 7,
-      "relationship_count": 6,
+      "extracted_at": "2026-06-25T06:38:04.070392+00:00",
+      "entity_count": 5,
+      "relationship_count": 4,
       "entities": [
         {
           "name": "Fault",
           "type": "Rule",
-          "description": "A mistake in badminton that results in losing a rally.",
+          "description": "An error in badminton that results in a point loss or serve change.",
           "properties": {}
         },
         {
@@ -364,25 +388,13 @@
         {
           "name": "Net",
           "type": "Equipment",
-          "description": "The horizontal bar that divides the court into two halves.",
+          "description": "The horizontal bar that separates the two sides of a badminton court.",
           "properties": {}
         },
         {
           "name": "Court boundaries",
           "type": "Concept",
-          "description": "The lines that define the playing area of a badminton court.",
-          "properties": {}
-        },
-        {
-          "name": "Player",
-          "type": "Concept",
-          "description": "An individual participating in a game of badminton.",
-          "properties": {}
-        },
-        {
-          "name": "Racket",
-          "type": "Equipment",
-          "description": "The implement used to hit the shuttlecock in badminton.",
+          "description": "The lines defining the playing area in badminton.",
           "properties": {}
         },
         {
@@ -402,31 +414,19 @@
         {
           "source": "Fault",
           "target": "Net",
-          "type": "SU_DUNG",
+          "type": "LIEN_QUAN",
           "properties": {}
         },
         {
           "source": "Fault",
           "target": "Court boundaries",
-          "type": "SU_DUNG",
-          "properties": {}
-        },
-        {
-          "source": "Fault",
-          "target": "Player",
-          "type": "SU_DUNG",
-          "properties": {}
-        },
-        {
-          "source": "Fault",
-          "target": "Racket",
-          "type": "SU_DUNG",
+          "type": "LIEN_QUAN",
           "properties": {}
         },
         {
           "source": "Fault",
           "target": "Service court",
-          "type": "LA_LOAI",
+          "type": "LIEN_QUAN",
           "properties": {}
         }
       ]
@@ -435,7 +435,7 @@
       "chunk_title": "Faults in Service",
       "chunk_source": "bwf_rules.txt",
       "sport": "badminton",
-      "extracted_at": "2026-05-08T04:39:55.669335+00:00",
+      "extracted_at": "2026-06-25T06:39:39.743891+00:00",
       "entity_count": 9,
       "relationship_count": 8,
       "entities": [
@@ -549,14 +549,14 @@
       "chunk_title": "Continuous Play and Misconduct",
       "chunk_source": "bwf_rules.txt",
       "sport": "badminton",
-      "extracted_at": "2026-05-08T04:41:15.572415+00:00",
+      "extracted_at": "2026-06-25T06:40:58.485490+00:00",
       "entity_count": 9,
       "relationship_count": 7,
       "entities": [
         {
           "name": "Badminton",
           "type": "Sport",
-          "description": "A sport played with racquets and a shuttlecock.",
+          "description": "A sport played with a shuttlecock and racquets.",
           "properties": {}
         },
         {
@@ -592,19 +592,19 @@
         {
           "name": "Fault",
           "type": "Rule",
-          "description": "An action taken by the umpire against a player for misconduct, often resulting in a point for the opposing team.",
+          "description": "An action taken by the umpire when a player commits an infraction.",
           "properties": {}
         },
         {
           "name": "Disqualification",
           "type": "Rule",
-          "description": "The removal of a player from the match or tournament due to repeated misconduct.",
+          "description": "The removal of a player from the match or tournament for misconduct.",
           "properties": {}
         },
         {
           "name": "Spirit of the Game",
           "type": "Concept",
-          "description": "The values and principles that players are expected to uphold during the game, including fair play and sportsmanship.",
+          "description": "The values and principles that guide fair play and sportsmanship in badminton.",
           "properties": {}
         }
       ],
@@ -612,19 +612,19 @@
         {
           "source": "Badminton",
           "target": "Continuous Play",
-          "type": "LIEN_QUAN",
+          "type": "DUNG_DE",
           "properties": {}
         },
         {
           "source": "Badminton",
           "target": "Medical Timeout",
-          "type": "LIEN_QUAN",
+          "type": "DUNG_DE",
           "properties": {}
         },
         {
           "source": "Misconduct",
           "target": "Umpire",
-          "type": "DUNG_DE",
+          "type": "LIEN_QUAN",
           "properties": {}
         },
         {
@@ -648,7 +648,7 @@
         {
           "source": "Badminton",
           "target": "Spirit of the Game",
-          "type": "LIEN_QUAN",
+          "type": "DUNG_DE",
           "properties": {}
         }
       ]

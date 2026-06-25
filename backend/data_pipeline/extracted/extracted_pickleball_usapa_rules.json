@@ -1,22 +1,22 @@
 {
-  "extracted_at": "2026-05-08T06:00:40.630704+00:00",
+  "extracted_at": "2026-06-25T08:16:26.033678+00:00",
   "source": "pickleball_usapa_rules",
   "extraction_count": 7,
-  "total_entities": 51,
+  "total_entities": 52,
   "total_relationships": 45,
   "extractions": [
     {
       "chunk_title": "Court and Equipment",
       "chunk_source": "usapa_rules.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:53:53.515802+00:00",
+      "extracted_at": "2026-06-25T08:08:41.483616+00:00",
       "entity_count": 10,
-      "relationship_count": 10,
+      "relationship_count": 9,
       "entities": [
         {
           "name": "pickleball",
           "type": "Sport",
-          "description": "A sport played on a rectangular court with a paddle and ball.",
+          "description": "A sport played on a rectangular court with a net.",
           "properties": {}
         },
         {
@@ -32,15 +32,15 @@
           "properties": {}
         },
         {
-          "name": "Non-Volley Zone (kitchen)",
+          "name": "Non-Volley Zone",
           "type": "Concept",
-          "description": "A 14-foot-wide strip in the middle of the court, extending 7 feet from the net on both sides.",
+          "description": "The 14-foot-wide strip in the middle of the court, extending 7 feet from the net on both sides.",
           "properties": {}
         },
         {
-          "name": "service areas",
+          "name": "centerline",
           "type": "Equipment",
-          "description": "Divisions of the court separated by a centerline for singles and doubles play.",
+          "description": "A line that runs from the kitchen line to the baseline, dividing the court into left and right service areas.",
           "properties": {}
         },
         {
@@ -62,15 +62,15 @@
           "properties": {}
         },
         {
-          "name": "pickleball ball",
+          "name": "perforated polymer ball",
           "type": "Equipment",
-          "description": "A perforated polymer ball with specific size and weight requirements.",
+          "description": "The ball used in pickleball with specific size and weight requirements.",
           "properties": {}
         },
         {
-          "name": "USAPA rules",
-          "type": "Rule",
-          "description": "The official set of rules governing pickleball, maintained by the USA Pickleball Association.",
+          "name": "athletic footwear",
+          "type": "Equipment",
+          "description": "Footwear worn by players, recommended to have non-marking soles.",
           "properties": {}
         }
       ],
@@ -89,13 +89,13 @@
         },
         {
           "source": "pickleball",
-          "target": "Non-Volley Zone (kitchen)",
+          "target": "Non-Volley Zone",
           "type": "DUNG_DE",
           "properties": {}
         },
         {
           "source": "pickleball",
-          "target": "service areas",
+          "target": "centerline",
           "type": "DUNG_DE",
           "properties": {}
         },
@@ -114,25 +114,19 @@
         {
           "source": "pickleball",
           "target": "pickleball paddle",
-          "type": "SU_DUNG",
+          "type": "DUNG_DE",
           "properties": {}
         },
         {
           "source": "pickleball",
-          "target": "pickleball ball",
-          "type": "SU_DUNG",
+          "target": "perforated polymer ball",
+          "type": "DUNG_DE",
           "properties": {}
         },
         {
-          "source": "USAPA rules",
-          "target": "pickleball paddle",
-          "type": "QUY_DINH",
-          "properties": {}
-        },
-        {
-          "source": "USAPA rules",
-          "target": "pickleball ball",
-          "type": "QUY_DINH",
+          "source": "pickleball",
+          "target": "athletic footwear",
+          "type": "DUNG_DE",
           "properties": {}
         }
       ]
@@ -141,7 +135,7 @@
       "chunk_title": "Serving Rules",
       "chunk_source": "usapa_rules.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:54:54.125305+00:00",
+      "extracted_at": "2026-06-25T08:09:49.256978+00:00",
       "entity_count": 7,
       "relationship_count": 6,
       "entities": [
@@ -154,25 +148,25 @@
         {
           "name": "Underhand Motion",
           "type": "Technique",
-          "description": "The serving motion in pickleball that must be executed below waist level.",
+          "description": "The serving motion in pickleball where the paddle is below waist level.",
           "properties": {}
         },
         {
           "name": "Baseline",
           "type": "Equipment",
-          "description": "A line on the pickleball court where players must stand during serve.",
+          "description": "A line marking the back boundary of a pickleball court.",
           "properties": {}
         },
         {
           "name": "Service Court",
           "type": "GameType",
-          "description": "The area of the pickleball court where serves are made and returned.",
+          "description": "One of two designated areas on a pickleball court where serves must be made and returned.",
           "properties": {}
         },
         {
           "name": "Drop Serve",
           "type": "Rule",
-          "description": "An alternative serve method in pickleball that was adopted in 2021.",
+          "description": "An alternative serve option in pickleball introduced in 2021.",
           "properties": {}
         },
         {
@@ -184,7 +178,7 @@
         {
           "name": "Net",
           "type": "Equipment",
-          "description": "A horizontal bar that separates the two service courts in pickleball.",
+          "description": "A horizontal bar that separates the two halves of a pickleball court.",
           "properties": {}
         }
       ],
@@ -231,7 +225,7 @@
       "chunk_title": "The Two-Bounce Rule",
       "chunk_source": "usapa_rules.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:55:26.929161+00:00",
+      "extracted_at": "2026-06-25T08:10:23.537344+00:00",
       "entity_count": 2,
       "relationship_count": 1,
       "entities": [
@@ -261,9 +255,9 @@
       "chunk_title": "Non-Volley Zone (Kitchen) Rules",
       "chunk_source": "usapa_rules.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:56:14.824147+00:00",
-      "entity_count": 5,
-      "relationship_count": 4,
+      "extracted_at": "2026-06-25T08:11:26.245298+00:00",
+      "entity_count": 6,
+      "relationship_count": 5,
       "entities": [
         {
           "name": "Non-Volley Zone",
@@ -274,7 +268,7 @@
         {
           "name": "Kitchen Line",
           "type": "Equipment",
-          "description": "The boundary line of the Non-Volley Zone.",
+          "description": "The boundary line that defines the Non-Volley Zone.",
           "properties": {}
         },
         {
@@ -286,7 +280,13 @@
         {
           "name": "Momentum Rule",
           "type": "Rule",
-          "description": "Preventing players from entering the Non-Volley Zone due to momentum from a volley motion.",
+          "description": "Preventing players from entering the kitchen due to momentum from a volley motion.",
+          "properties": {}
+        },
+        {
+          "name": "Dinking",
+          "type": "Technique",
+          "description": "A soft shot that lands in the opponent's Non-Volley Zone, forcing them to hit up on the ball.",
           "properties": {}
         },
         {
@@ -306,13 +306,19 @@
         {
           "source": "Non-Volley Zone",
           "target": "Volley",
-          "type": "QUY_DINH",
+          "type": "SU_DUNG",
           "properties": {}
         },
         {
           "source": "Momentum Rule",
           "target": "Volley",
           "type": "LIEN_QUAN",
+          "properties": {}
+        },
+        {
+          "source": "Dinking",
+          "target": "Non-Volley Zone",
+          "type": "SU_DUNG",
           "properties": {}
         },
         {
@@ -327,7 +333,7 @@
       "chunk_title": "Scoring",
       "chunk_source": "usapa_rules.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:57:47.172401+00:00",
+      "extracted_at": "2026-06-25T08:13:13.323895+00:00",
       "entity_count": 10,
       "relationship_count": 9,
       "entities": [
@@ -340,43 +346,43 @@
         {
           "name": "Side-out scoring system",
           "type": "Rule",
-          "description": "Only the serving team can score points in traditional pickleball.",
+          "description": "The standard scoring method in pickleball where only the serving team can score points.",
           "properties": {}
         },
         {
           "name": "Rally scoring",
           "type": "Rule",
-          "description": "A point is scored on every rally, regardless of which team is serving.",
+          "description": "An experimental scoring method introduced by USAPA where a point is scored on every rally, regardless of which team is serving.",
           "properties": {}
         },
         {
           "name": "Games to 11 points",
           "type": "GameType",
-          "description": "Standard game length in pickleball.",
+          "description": "The standard game format in pickleball where games are played to 11 points with a win-by-2 rule.",
           "properties": {}
         },
         {
           "name": "Games to 15 or 21 points",
           "type": "GameType",
-          "description": "Extended game lengths used in some tournaments.",
+          "description": "Extended game formats used in some tournaments and recreational play where games are played to 15 or 21 points with a win-by-2 rule.",
           "properties": {}
         },
         {
           "name": "Best-of-three format",
           "type": "GameType",
-          "description": "Tournament format where the first team to win two games wins the match.",
+          "description": "A tournament format where the first team to win two games wins the match.",
           "properties": {}
         },
         {
           "name": "Singles scoring",
           "type": "Rule",
-          "description": "Score is announced with just two numbers: the server's score and the receiver's score.",
+          "description": "Scoring method in singles pickleball where the score is announced with just two numbers: the server's score and the receiver's score.",
           "properties": {}
         },
         {
           "name": "Doubles scoring",
           "type": "Rule",
-          "description": "Score is announced with three numbers: the serving team's score, the receiving team's score, and the server number (1 or 2).",
+          "description": "Scoring method in doubles pickleball where the score is announced with three numbers: the serving team's score, the receiving team's score, and the server number (1 or 2).",
           "properties": {}
         },
         {
@@ -406,33 +412,33 @@
           "properties": {}
         },
         {
-          "source": "Pickleball",
+          "source": "Games to 11 points",
+          "target": "Side-out scoring system",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "Games to 15 or 21 points",
+          "target": "Side-out scoring system",
+          "type": "THUOC",
+          "properties": {}
+        },
+        {
+          "source": "Best-of-three format",
           "target": "Games to 11 points",
-          "type": "LA_LOAI",
-          "properties": {}
-        },
-        {
-          "source": "Pickleball",
-          "target": "Games to 15 or 21 points",
-          "type": "LA_LOAI",
-          "properties": {}
-        },
-        {
-          "source": "Pickleball",
-          "target": "Best-of-three format",
-          "type": "LA_LOAI",
+          "type": "THUOC",
           "properties": {}
         },
         {
           "source": "Singles scoring",
-          "target": "Pickleball",
-          "type": "DUNG_DE",
+          "target": "Side-out scoring system",
+          "type": "THUOC",
           "properties": {}
         },
         {
           "source": "Doubles scoring",
-          "target": "Pickleball",
-          "type": "DUNG_DE",
+          "target": "Side-out scoring system",
+          "type": "THUOC",
           "properties": {}
         },
         {
@@ -453,7 +459,7 @@
       "chunk_title": "Faults",
       "chunk_source": "usapa_rules.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:59:24.089463+00:00",
+      "extracted_at": "2026-06-25T08:14:56.635321+00:00",
       "entity_count": 10,
       "relationship_count": 9,
       "entities": [
@@ -502,7 +508,7 @@
         {
           "name": "Double hit",
           "type": "Rule",
-          "description": "The ball being hit twice by the same player or team before crossing the net is a fault, except for hitting the paddle and then hand in one motion.",
+          "description": "The ball being hit twice by the same player or team before crossing the net is a fault, except for hitting paddle and then hand in one motion.",
           "properties": {}
         },
         {
@@ -514,7 +520,7 @@
         {
           "name": "Serving out of turn",
           "type": "Rule",
-          "description": "In doubles, serving when it is not your turn is a fault and any points scored during that incorrect serve are lost.",
+          "description": "In doubles, serving when it is not your turn is a fault, and points scored during that serve are lost.",
           "properties": {}
         }
       ],
@@ -579,7 +585,7 @@
       "chunk_title": "Doubles Strategy",
       "chunk_source": "usapa_rules.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T06:00:35.616954+00:00",
+      "extracted_at": "2026-06-25T08:16:21.029221+00:00",
       "entity_count": 7,
       "relationship_count": 6,
       "entities": [
@@ -616,7 +622,7 @@
         {
           "name": "third shot drop",
           "type": "Technique",
-          "description": "A soft shot hit by the serving team after the serve and return, landing in the kitchen to allow the serving team to approach the net.",
+          "description": "A soft shot hit by the serving team after the serve and return, landing in the kitchen to allow transition from the baseline to the kitchen line.",
           "properties": {}
         },
         {
@@ -630,37 +636,37 @@
         {
           "source": "doubles pickleball",
           "target": "kitchen line",
-          "type": "DUNG_DE",
+          "type": "LIEN_QUAN",
           "properties": {}
         },
         {
           "source": "communication",
           "target": "doubles pickleball",
-          "type": "LIEN_QUAN",
+          "type": "SU_DUNG",
           "properties": {}
         },
         {
           "source": "stacking",
           "target": "doubles pickleball",
-          "type": "LIEN_QUAN",
+          "type": "SU_DUNG",
           "properties": {}
         },
         {
           "source": "poaching",
           "target": "doubles pickleball",
-          "type": "LIEN_QUAN",
+          "type": "SU_DUNG",
           "properties": {}
         },
         {
           "source": "third shot drop",
           "target": "doubles pickleball",
-          "type": "LIEN_QUAN",
+          "type": "SU_DUNG",
           "properties": {}
         },
         {
           "source": "dinking",
           "target": "doubles pickleball",
-          "type": "LIEN_QUAN",
+          "type": "SU_DUNG",
           "properties": {}
         }
       ]

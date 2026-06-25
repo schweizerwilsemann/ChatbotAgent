@@ -1,0 +1,183 @@
+{
+  "extracted_at": "2026-06-25T07:18:52.391029+00:00",
+  "source": "billiards_wikipedia_extra",
+  "extraction_count": 2,
+  "total_entities": 20,
+  "total_relationships": 5,
+  "extractions": [
+    {
+      "chunk_title": "Billiards Glossary",
+      "chunk_source": "wikipedia_extra.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-06-25T07:15:48.899235+00:00",
+      "entity_count": 13,
+      "relationship_count": 2,
+      "entities": [
+        {
+          "name": "ball",
+          "type": "Equipment",
+          "description": "A spherical object used in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The white ball used to strike other balls in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "object ball",
+          "type": "Equipment",
+          "description": "A colored ball numbered from 1 to 9 used in various games of billiards.",
+          "properties": {}
+        },
+        {
+          "name": "1-cushion billiards",
+          "type": "GameType",
+          "description": "A type of billiards where the balls are pocketed using only one cushion.",
+          "properties": {}
+        },
+        {
+          "name": "one-pocket",
+          "type": "GameType",
+          "description": "A game in which players attempt to pocket all their opponent's balls and their own color group into a single pocket.",
+          "properties": {}
+        },
+        {
+          "name": "three-ball",
+          "type": "GameType",
+          "description": "A variant of billiards where players use three balls, typically numbered 1, 3, and 5.",
+          "properties": {}
+        },
+        {
+          "name": "four-ball billiards",
+          "type": "GameType",
+          "description": "A game in which players use four balls, typically numbered 1, 4, 7, and 9.",
+          "properties": {}
+        },
+        {
+          "name": "five-pin billiards",
+          "type": "GameType",
+          "description": "An Italian-originated game played on a rectangular table with five pins.",
+          "properties": {}
+        },
+        {
+          "name": "six-ball",
+          "type": "GameType",
+          "description": "A variant of pool where players use six balls, typically numbered 1 through 6.",
+          "properties": {}
+        },
+        {
+          "name": "seven-ball",
+          "type": "GameType",
+          "description": "A game in which players use seven balls, typically numbered 1 through 7.",
+          "properties": {}
+        },
+        {
+          "name": "eight-ball",
+          "type": "GameType",
+          "description": "A popular variant of pool where players must pocket all their opponent's balls and their own color group before pocketing the eight ball.",
+          "properties": {}
+        },
+        {
+          "name": "nine-ball",
+          "type": "GameType",
+          "description": "A game in which players use nine balls, typically numbered 1 through 9.",
+          "properties": {}
+        },
+        {
+          "name": "ten-ball",
+          "type": "GameType",
+          "description": "A variant of pool where players use ten balls, typically numbered 1 through 10.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "ball",
+          "target": "cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "object ball",
+          "target": "ball",
+          "type": "THUOC",
+          "properties": {}
+        }
+      ]
+    },
+    {
+      "chunk_title": "Three-cushion billiards",
+      "chunk_source": "wikipedia_extra.txt",
+      "sport": "billiards",
+      "extracted_at": "2026-06-25T07:18:47.387122+00:00",
+      "entity_count": 7,
+      "relationship_count": 3,
+      "entities": [
+        {
+          "name": "three-cushion billiards",
+          "type": "Sport",
+          "description": "A form of carom billiards where the cue ball must contact both object balls while hitting at least three rail cushions.",
+          "properties": {}
+        },
+        {
+          "name": "one-cushion billiards",
+          "type": "GameType",
+          "description": "An earlier form of carom billiards that evolved into three-cushion billiards.",
+          "properties": {}
+        },
+        {
+          "name": "straight rail billiards",
+          "type": "GameType",
+          "description": "A precursor to both one-cushion and three-cushion billiards, which influenced their development.",
+          "properties": {}
+        },
+        {
+          "name": "balkline",
+          "type": "GameType",
+          "description": "Another carom billiards game that arose from straight rail billiards.",
+          "properties": {}
+        },
+        {
+          "name": "cue ball",
+          "type": "Equipment",
+          "description": "The main ball used in billiards, which players strike with a cue stick to hit other balls on the table.",
+          "properties": {}
+        },
+        {
+          "name": "object balls",
+          "type": "Equipment",
+          "description": "The balls that are struck by the cue ball during gameplay.",
+          "properties": {}
+        },
+        {
+          "name": "rail cushions",
+          "type": "Equipment",
+          "description": "The sides of the billiard table where the cue ball and object balls can hit to score points.",
+          "properties": {}
+        }
+      ],
+      "relationships": [
+        {
+          "source": "three-cushion billiards",
+          "target": "rail cushions",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "three-cushion billiards",
+          "target": "cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "three-cushion billiards",
+          "target": "object balls",
+          "type": "SU_DUNG",
+          "properties": {}
+        }
+      ]
+    }
+  ]
+}

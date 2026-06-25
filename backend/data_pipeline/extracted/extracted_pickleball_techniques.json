@@ -1,15 +1,15 @@
 {
-  "extracted_at": "2026-05-08T05:51:17.672547+00:00",
+  "extracted_at": "2026-06-25T08:04:02.653669+00:00",
   "source": "pickleball_techniques",
   "extraction_count": 9,
-  "total_entities": 51,
-  "total_relationships": 39,
+  "total_entities": 48,
+  "total_relationships": 38,
   "extractions": [
     {
       "chunk_title": "The Serve",
       "chunk_source": "techniques.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:44:30.526676+00:00",
+      "extracted_at": "2026-06-25T07:57:30.576131+00:00",
       "entity_count": 11,
       "relationship_count": 10,
       "entities": [
@@ -102,13 +102,13 @@
         {
           "source": "Power Serve",
           "target": "Serve",
-          "type": "THUOC",
+          "type": "LA_LOAI",
           "properties": {}
         },
         {
           "source": "Placement Serve",
           "target": "Serve",
-          "type": "THUOC",
+          "type": "LA_LOAI",
           "properties": {}
         },
         {
@@ -120,25 +120,25 @@
         {
           "source": "Topspin",
           "target": "Spin",
-          "type": "THUOC",
+          "type": "LA_LOAI",
           "properties": {}
         },
         {
           "source": "Sidespin",
           "target": "Spin",
-          "type": "THUOC",
+          "type": "LA_LOAI",
           "properties": {}
         },
         {
           "source": "Backspin",
           "target": "Spin",
-          "type": "THUOC",
+          "type": "LA_LOAI",
           "properties": {}
         },
         {
           "source": "Lob Serve",
           "target": "Serve",
-          "type": "THUOC",
+          "type": "LA_LOAI",
           "properties": {}
         }
       ]
@@ -147,50 +147,32 @@
       "chunk_title": "The Return of Serve",
       "chunk_source": "techniques.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:45:32.184639+00:00",
-      "entity_count": 7,
-      "relationship_count": 4,
+      "extracted_at": "2026-06-25T07:58:12.226998+00:00",
+      "entity_count": 4,
+      "relationship_count": 3,
       "entities": [
         {
           "name": "return of serve",
           "type": "Technique",
-          "description": "The second shot in a pickleball rally, crucial for the receiving team to gain an advantage.",
+          "description": "The second shot in a pickleball rally, critical for the receiving team to gain an advantage.",
           "properties": {}
         },
         {
           "name": "two-bounce rule",
           "type": "Rule",
-          "description": "A regulation requiring the ball to bounce twice before being returned.",
+          "description": "A regulation requiring the ball to bounce twice before it can be hit by the opponent.",
           "properties": {}
         },
         {
           "name": "deep return",
           "type": "Technique",
-          "description": "Hitting the ball deep into the opponent's court to push them back and set up a strong position for the receiving team.",
+          "description": "Hitting the ball deep into the opponent's court, pushing the serving team back and giving the receiving team more time to advance.",
           "properties": {}
         },
         {
           "name": "kitchen line",
           "type": "Concept",
-          "description": "The area near the net where players advance after hitting the return of serve.",
-          "properties": {}
-        },
-        {
-          "name": "topspin return",
-          "type": "Technique",
-          "description": "A return with topspin that dips faster and bounces higher, making it harder for the opponent to handle.",
-          "properties": {}
-        },
-        {
-          "name": "slice return",
-          "type": "Technique",
-          "description": "A return with slice that stays low and can force the opponent to hit up on the ball.",
-          "properties": {}
-        },
-        {
-          "name": "cross-court return",
-          "type": "Technique",
-          "description": "A return that creates a longer angle, potentially catching the opponent off guard.",
+          "description": "The area near the net where players can attempt to score points.",
           "properties": {}
         }
       ],
@@ -202,21 +184,15 @@
           "properties": {}
         },
         {
-          "source": "deep return",
-          "target": "kitchen line",
+          "source": "return of serve",
+          "target": "deep return",
           "type": "LIEN_QUAN",
           "properties": {}
         },
         {
-          "source": "topspin return",
-          "target": "slice return",
-          "type": "LA_LOAI",
-          "properties": {}
-        },
-        {
-          "source": "cross-court return",
-          "target": "slice return",
-          "type": "LA_LOAI",
+          "source": "return of serve",
+          "target": "kitchen line",
+          "type": "THUOC",
           "properties": {}
         }
       ]
@@ -225,7 +201,7 @@
       "chunk_title": "The Third Shot",
       "chunk_source": "techniques.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:46:13.865118+00:00",
+      "extracted_at": "2026-06-25T07:58:53.446111+00:00",
       "entity_count": 4,
       "relationship_count": 3,
       "entities": [
@@ -279,7 +255,7 @@
       "chunk_title": "Dinking",
       "chunk_source": "techniques.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:47:15.595757+00:00",
+      "extracted_at": "2026-06-25T07:59:57.572891+00:00",
       "entity_count": 6,
       "relationship_count": 5,
       "entities": [
@@ -304,19 +280,19 @@
         {
           "name": "Dink placement strategy",
           "type": "Concept",
-          "description": "Hitting the ball to the opponent's weaknesses based on their backhand or movement speed.",
+          "description": "Hitting the ball to the opponent's weaknesses to create opportunities for attack while minimizing the risk of making an error.",
           "properties": {}
         },
         {
           "name": "Speed-up from the dink",
           "type": "Technique",
-          "description": "Suddenly hitting the ball harder after a series of soft dinks, catching the opponent off guard.",
+          "description": "Suddenly hitting the ball harder after a series of soft dinks, catching the opponent off guard and winning the point outright.",
           "properties": {}
         },
         {
           "name": "Dink battles",
           "type": "Concept",
-          "description": "Long rallies where both teams try to create an opportunity to attack.",
+          "description": "Long rallies where both teams try to create an opportunity to attack, requiring patience and anticipation.",
           "properties": {}
         }
       ],
@@ -357,7 +333,7 @@
       "chunk_title": "Volleying",
       "chunk_source": "techniques.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:48:08.242134+00:00",
+      "extracted_at": "2026-06-25T08:00:49.378818+00:00",
       "entity_count": 5,
       "relationship_count": 4,
       "entities": [
@@ -423,7 +399,7 @@
       "chunk_title": "The Erne",
       "chunk_source": "techniques.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:48:33.209985+00:00",
+      "extracted_at": "2026-06-25T08:01:14.886171+00:00",
       "entity_count": 2,
       "relationship_count": 1,
       "entities": [
@@ -436,7 +412,7 @@
         {
           "name": "pickleball",
           "type": "Sport",
-          "description": "A sport played with a small ball and paddles on a badminton court.",
+          "description": "A sport played with a small ball and paddles, typically on a badminton court.",
           "properties": {}
         }
       ],
@@ -453,7 +429,7 @@
       "chunk_title": "Overhead/Smash",
       "chunk_source": "techniques.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:49:42.243459+00:00",
+      "extracted_at": "2026-06-25T08:02:24.821811+00:00",
       "entity_count": 8,
       "relationship_count": 7,
       "entities": [
@@ -478,7 +454,7 @@
         {
           "name": "Net",
           "type": "Equipment",
-          "description": "The vertical barrier that separates the two sides of a pickleball court.",
+          "description": "The barrier between the two sides of a pickleball court.",
           "properties": {}
         },
         {
@@ -494,15 +470,15 @@
           "properties": {}
         },
         {
-          "name": "Deep",
-          "type": "Concept",
-          "description": "Far from the net.",
+          "name": "Deep lob",
+          "type": "Technique",
+          "description": "A lob that is both high and deep.",
           "properties": {}
         },
         {
           "name": "Footwork",
-          "type": "Technique",
-          "description": "The movement of a player on the court to reach shots or defend against them.",
+          "type": "Concept",
+          "description": "The movement of a player on the pickleball court.",
           "properties": {}
         }
       ],
@@ -539,7 +515,7 @@
         },
         {
           "source": "Overhead",
-          "target": "Deep",
+          "target": "Deep lob",
           "type": "LIEN_QUAN",
           "properties": {}
         },
@@ -555,7 +531,7 @@
       "chunk_title": "Lob Shot",
       "chunk_source": "techniques.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:50:22.612773+00:00",
+      "extracted_at": "2026-06-25T08:03:05.976837+00:00",
       "entity_count": 4,
       "relationship_count": 3,
       "entities": [
@@ -609,7 +585,7 @@
       "chunk_title": "Stacking",
       "chunk_source": "techniques.txt",
       "sport": "pickleball",
-      "extracted_at": "2026-05-08T05:51:12.667228+00:00",
+      "extracted_at": "2026-06-25T08:03:57.642738+00:00",
       "entity_count": 4,
       "relationship_count": 2,
       "entities": [

@@ -1,15 +1,15 @@
 {
-  "extracted_at": "2026-05-08T05:08:00.705083+00:00",
+  "extracted_at": "2026-06-25T07:13:37.760626+00:00",
   "source": "billiards_three_cushion_techniques",
   "extraction_count": 6,
-  "total_entities": 52,
-  "total_relationships": 45,
+  "total_entities": 53,
+  "total_relationships": 43,
   "extractions": [
     {
       "chunk_title": "Basic Position Play",
       "chunk_source": "three_cushion_techniques.txt",
       "sport": "billiards",
-      "extracted_at": "2026-05-08T05:00:57.933119+00:00",
+      "extracted_at": "2026-06-25T07:06:25.777305+00:00",
       "entity_count": 11,
       "relationship_count": 10,
       "entities": [
@@ -22,7 +22,7 @@
         {
           "name": "First object ball",
           "type": "Equipment",
-          "description": "One of the two object balls in 3-cushion billiards.",
+          "description": "One of the two balls used in 3-cushion billiards, either red or opponent's cue ball.",
           "properties": {}
         },
         {
@@ -76,7 +76,7 @@
         {
           "name": "Diamond system",
           "type": "Concept",
-          "description": "A method for calculating the path of the cue ball in 3-cushion billiards, often used with follow and draw shots.",
+          "description": "A method for calculating angles in 3-cushion billiards.",
           "properties": {}
         }
       ],
@@ -147,7 +147,7 @@
       "chunk_title": "The Diamond System",
       "chunk_source": "three_cushion_techniques.txt",
       "sport": "billiards",
-      "extracted_at": "2026-05-08T05:02:26.269920+00:00",
+      "extracted_at": "2026-06-25T07:07:55.864250+00:00",
       "entity_count": 10,
       "relationship_count": 5,
       "entities": [
@@ -178,13 +178,13 @@
         {
           "name": "long rail calculations",
           "type": "GameType",
-          "description": "The most common in 3-cushion billiards, where the cue ball starts near one long rail and travels to the opposite long rail (via one or more cushions).",
+          "description": "The most common in 3-cushion billiards, where the cue ball starts near one long rail and travels to the opposite long rail via one or more cushions.",
           "properties": {}
         },
         {
           "name": "plus 2 system",
           "type": "Technique",
-          "description": "The most common system used in long rail calculations, where the starting diamond number plus the ending diamond number equals 2.",
+          "description": "The most common system used for long rail calculations in 3-cushion billiards.",
           "properties": {}
         },
         {
@@ -249,7 +249,7 @@
       "chunk_title": "Plus 2 System (Natural)",
       "chunk_source": "three_cushion_techniques.txt",
       "sport": "billiards",
-      "extracted_at": "2026-05-08T05:03:37.371454+00:00",
+      "extracted_at": "2026-06-25T07:09:08.102682+00:00",
       "entity_count": 7,
       "relationship_count": 6,
       "entities": [
@@ -274,25 +274,25 @@
         {
           "name": "cue ball",
           "type": "Equipment",
-          "description": "The small, hard ball used in billiards that is struck with a cue stick.",
+          "description": "The ball used to strike other balls in billiards.",
           "properties": {}
         },
         {
-          "name": "object balls",
+          "name": "object ball",
           "type": "Equipment",
-          "description": "The balls on the table that are hit by the cue ball during gameplay.",
+          "description": "A ball that is struck by the cue ball during a shot in billiards.",
           "properties": {}
         },
         {
           "name": "short rail",
           "type": "Equipment",
-          "description": "One of the two long rails on a billiard table, typically located between the pockets.",
+          "description": "One of the rails on the table where balls can be pocketed or contacted.",
           "properties": {}
         },
         {
           "name": "long rail",
           "type": "Equipment",
-          "description": "The other long rail on a billiard table, opposite to the short rail.",
+          "description": "The longer rail on the table where balls can be pocketed or contacted.",
           "properties": {}
         }
       ],
@@ -317,19 +317,19 @@
         },
         {
           "source": "plus 2 system",
-          "target": "object balls",
+          "target": "object ball",
           "type": "SU_DUNG",
           "properties": {}
         },
         {
-          "source": "starting diamond",
-          "target": "cue ball",
+          "source": "plus 2 system",
+          "target": "short rail",
           "type": "DUNG_DE",
           "properties": {}
         },
         {
-          "source": "ending diamond",
-          "target": "cue ball",
+          "source": "plus 2 system",
+          "target": "long rail",
           "type": "DUNG_DE",
           "properties": {}
         }
@@ -339,32 +339,38 @@
       "chunk_title": "Plus 3 System (Short)",
       "chunk_source": "three_cushion_techniques.txt",
       "sport": "billiards",
-      "extracted_at": "2026-05-08T05:04:19.124705+00:00",
-      "entity_count": 4,
-      "relationship_count": 3,
+      "extracted_at": "2026-06-25T07:09:57.774572+00:00",
+      "entity_count": 5,
+      "relationship_count": 2,
       "entities": [
         {
           "name": "plus 3 system",
           "type": "Rule",
-          "description": "A specific rule or regulation of billiards.",
+          "description": "A specific rule for billiards where the starting and ending diamond numbers add up to 3.",
           "properties": {}
         },
         {
           "name": "cue ball",
           "type": "Equipment",
-          "description": "The main equipment used in billiards.",
-          "properties": {}
-        },
-        {
-          "name": "object balls",
-          "type": "Equipment",
-          "description": "Secondary equipment used in billiards.",
+          "description": "The ball used to strike other balls in billiards.",
           "properties": {}
         },
         {
           "name": "diamonds",
           "type": "Concept",
-          "description": "A general concept related to the layout of a billiard table.",
+          "description": "Markers on the table used for counting and positioning in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "short rail",
+          "type": "Equipment",
+          "description": "One of the rails on a billiard table.",
+          "properties": {}
+        },
+        {
+          "name": "long rail",
+          "type": "Equipment",
+          "description": "The other rail on a billiard table.",
           "properties": {}
         }
       ],
@@ -372,12 +378,6 @@
         {
           "source": "plus 3 system",
           "target": "cue ball",
-          "type": "SU_DUNG",
-          "properties": {}
-        },
-        {
-          "source": "plus 3 system",
-          "target": "object balls",
           "type": "SU_DUNG",
           "properties": {}
         },
@@ -393,7 +393,7 @@
       "chunk_title": "Masse and Curve Shots",
       "chunk_source": "three_cushion_techniques.txt",
       "sport": "billiards",
-      "extracted_at": "2026-05-08T05:05:41.705152+00:00",
+      "extracted_at": "2026-06-25T07:11:21.800874+00:00",
       "entity_count": 7,
       "relationship_count": 9,
       "entities": [
@@ -412,19 +412,19 @@
         {
           "name": "Cue ball",
           "type": "Equipment",
-          "description": "The small white ball used in billiards that players strike with a cue stick.",
+          "description": "The white ball used as the primary striking ball in billiards.",
+          "properties": {}
+        },
+        {
+          "name": "Object balls",
+          "type": "Equipment",
+          "description": "Colored balls used as targets in billiards.",
           "properties": {}
         },
         {
           "name": "Cue stick",
           "type": "Equipment",
-          "description": "A long, thin stick used to strike the balls in billiards.",
-          "properties": {}
-        },
-        {
-          "name": "Object ball",
-          "type": "Equipment",
-          "description": "The colored balls used in billiards that players aim to pocket.",
+          "description": "The long, thin stick used to strike the cue ball in billiards.",
           "properties": {}
         },
         {
@@ -436,7 +436,7 @@
         {
           "name": "Diamond system",
           "type": "Concept",
-          "description": "A method used in 3-cushion billiards to achieve precise angles and shots.",
+          "description": "A method used to determine angles and shots in billiards.",
           "properties": {}
         }
       ],
@@ -455,26 +455,26 @@
         },
         {
           "source": "Masse shot",
-          "target": "Cue stick",
-          "type": "SU_DUNG",
+          "target": "Object balls",
+          "type": "LIEN_QUAN",
           "properties": {}
         },
         {
           "source": "Jenny shot",
-          "target": "Cue stick",
-          "type": "SU_DUNG",
+          "target": "Object balls",
+          "type": "LIEN_QUAN",
           "properties": {}
         },
         {
           "source": "Masse shot",
-          "target": "Object ball",
-          "type": "LIEN_QUAN",
+          "target": "Cue stick",
+          "type": "SU_DUNG",
           "properties": {}
         },
         {
           "source": "Jenny shot",
-          "target": "Object ball",
-          "type": "LIEN_QUAN",
+          "target": "Cue stick",
+          "type": "SU_DUNG",
           "properties": {}
         },
         {
@@ -501,9 +501,9 @@
       "chunk_title": "Strategy and Defense",
       "chunk_source": "three_cushion_techniques.txt",
       "sport": "billiards",
-      "extracted_at": "2026-05-08T05:07:55.689900+00:00",
+      "extracted_at": "2026-06-25T07:13:32.756376+00:00",
       "entity_count": 13,
-      "relationship_count": 12,
+      "relationship_count": 11,
       "entities": [
         {
           "name": "3-cushion billiards",
@@ -526,7 +526,7 @@
         {
           "name": "Cue ball",
           "type": "Equipment",
-          "description": "The main striking ball used in 3-cushion billiards.",
+          "description": "The main striking object used in 3-cushion billiards.",
           "properties": {}
         },
         {
@@ -544,117 +544,111 @@
         {
           "name": "Diamond system",
           "type": "Concept",
-          "description": "A strategy for positioning balls on the table in 3-cushion billiards.",
-          "properties": {}
-        },
-        {
-          "name": "Inning management",
-          "type": "Concept",
-          "description": "Strategic approach to maximize points per turn in 3-cushion billiards.",
+          "description": "A strategy for controlling the cue ball's path after contact with cushions and object balls.",
           "properties": {}
         },
         {
           "name": "Natural pattern",
           "type": "GameType",
-          "description": "A common game pattern where both object balls are near the same long rail in 3-cushion billiards.",
+          "description": "A common game pattern in 3-cushion billiards where both object balls are near the same long rail.",
           "properties": {}
         },
         {
           "name": "Cross-table pattern",
           "type": "GameType",
-          "description": "A common game pattern where object balls are on opposite short rails in 3-cushion billiards.",
+          "description": "A common game pattern in 3-cushion billiards where object balls are on opposite short rails.",
           "properties": {}
         },
         {
           "name": "End-rail pattern",
           "type": "GameType",
-          "description": "A common game pattern where object balls are near the short rail at the end of the table in 3-cushion billiards.",
+          "description": "A common game pattern in 3-cushion billiards where object balls are near the short rail at the end of the table.",
           "properties": {}
         },
         {
           "name": "Cluster pattern",
           "type": "GameType",
-          "description": "A common game pattern where all three balls are close together in 3-cushion billiards.",
+          "description": "A common game pattern in 3-cushion billiards where all three balls are close together.",
           "properties": {}
         },
         {
           "name": "Spread pattern",
           "type": "GameType",
-          "description": "A common game pattern where all three balls are far apart in 3-cushion billiards.",
+          "description": "A common game pattern in 3-cushion billiards where all three balls are far apart.",
+          "properties": {}
+        },
+        {
+          "name": "Inning management",
+          "type": "Concept",
+          "description": "Strategy to maximize points scored per turn while minimizing turns with no points.",
           "properties": {}
         }
       ],
       "relationships": [
         {
-          "source": "Defensive play",
-          "target": "3-cushion billiards",
+          "source": "3-cushion billiards",
+          "target": "Defensive play",
           "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "3-cushion billiards",
+          "target": "Offensive play",
+          "type": "DUNG_DE",
+          "properties": {}
+        },
+        {
+          "source": "Defensive play",
+          "target": "Cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Defensive play",
+          "target": "Object balls",
+          "type": "SU_DUNG",
           "properties": {}
         },
         {
           "source": "Offensive play",
-          "target": "3-cushion billiards",
+          "target": "Cue ball",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "Offensive play",
+          "target": "Object balls",
+          "type": "SU_DUNG",
+          "properties": {}
+        },
+        {
+          "source": "3-cushion billiards",
+          "target": "Short rails",
           "type": "DUNG_DE",
           "properties": {}
         },
         {
-          "source": "Cue ball",
-          "target": "3-cushion billiards",
-          "type": "SU_DUNG",
-          "properties": {}
-        },
-        {
-          "source": "Object balls",
-          "target": "3-cushion billiards",
-          "type": "SU_DUNG",
-          "properties": {}
-        },
-        {
-          "source": "Short rails",
-          "target": "3-cushion billiards",
-          "type": "SU_DUNG",
-          "properties": {}
-        },
-        {
-          "source": "Diamond system",
-          "target": "3-cushion billiards",
-          "type": "LIEN_QUAN",
-          "properties": {}
-        },
-        {
-          "source": "Inning management",
-          "target": "3-cushion billiards",
+          "source": "3-cushion billiards",
+          "target": "Diamond system",
           "type": "DUNG_DE",
           "properties": {}
         },
         {
           "source": "Natural pattern",
-          "target": "3-cushion billiards",
-          "type": "LA_LOAI",
+          "target": "Cluster pattern",
+          "type": "LIEN_QUAN",
           "properties": {}
         },
         {
           "source": "Cross-table pattern",
-          "target": "3-cushion billiards",
-          "type": "LA_LOAI",
+          "target": "Spread pattern",
+          "type": "LIEN_QUAN",
           "properties": {}
         },
         {
           "source": "End-rail pattern",
-          "target": "3-cushion billiards",
-          "type": "LA_LOAI",
-          "properties": {}
-        },
-        {
-          "source": "Cluster pattern",
-          "target": "3-cushion billiards",
-          "type": "LA_LOAI",
-          "properties": {}
-        },
-        {
-          "source": "Spread pattern",
-          "target": "3-cushion billiards",
-          "type": "LA_LOAI",
+          "target": "Natural pattern",
+          "type": "LIEN_QUAN",
           "properties": {}
         }
       ]
